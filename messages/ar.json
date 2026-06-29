@@ -1,0 +1,313 @@
+{
+  "metadata": {
+    "title": "Steinheim | Premium German Bathroom Fixtures in Egypt",
+    "description": "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG."
+  },
+  "nav": {
+    "collections": "Collections",
+    "catalogue": "الكتالوج التفاعلي",
+    "assistant": "Concierge",
+    "finishes": "Finishes",
+    "projects": "مشاريع",
+    "trade": "Trade",
+    "configurator": "Build",
+    "compare": "Compare",
+    "specSheet": "Specs",
+    "about": "About",
+    "journal": "Journal",
+    "contact": "Contact",
+    "search": "Search",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "hero": {
+    "headline": "Defined by what endures",
+    "subline": "Premium German bathroom systems — now in Egypt",
+    "cta": "Explore collections"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "أنظمة حمّامات ألمانية فاخرة — مصر",
+      "headline": "دقة معمارية. أناقة تدوم.",
+      "headlineLineOne": "أنظمة حمّامات",
+      "headlineLineTwo": "معمارية",
+      "headlineLineThree": "لمصر",
+      "body": "أنظمة حمّامات فاخرة مصنوعة في ألمانيا. أربع مجموعات، ستة تشطيبات، لغة معمارية واحدة.",
+      "primaryCta": "اكتشف المجموعات",
+      "secondaryCta": "افتح الكتالوج",
+      "caption": "دقة في كل تفصيلة. حرية في كل اختيار.",
+      "imageAlt": "خلاط بانيو أرضي من شتاينهايم داخل حمّام عصري من الحجر"
+    },
+    "statement": {
+      "eyebrow": "فلسفة شتاينهايم",
+      "headline": "الحمّام مش مجموعة قطع. هو لغة واحدة متكاملة.",
+      "body": "شتاينهايم بتجمع المنتجات والتشطيبات والاختيارات الفنية في نظام متناسق، علشان صاحب البيت والمصمم وفريق المشروع يقدروا يعملوا مساحة محسوبة من كل زاوية.",
+      "collections": { "value": "04", "label": "مجموعات متناسقة" },
+      "finishes": { "value": "06", "label": "عائلات تشطيبات" },
+      "catalogue": { "value": "26", "label": "منتج موثّق في الكتالوج" }
+    },
+    "collections": {
+      "eyebrow": "المجموعات",
+      "headline": "أربع شخصيات مختلفة للمكان.",
+      "body": "من المنحنيات الهادية للهندسة الواضحة، كل مجموعة بتكمّل فكرة تصميم واحدة عبر كل منتجات الحمّام."
+    },
+    "engineering": {
+      "eyebrow": "أبعد من الشكل",
+      "headline": "كل تفصيلة محسوبة من جوّه لبرّه.",
+      "body": "السطح الجميل هو البداية بس. شتاينهايم بتجمع لغة التصميم مع مكوّنات محددة، عائلات منتجات متناسقة، ومعلومات فنية واضحة لاختيار واثق للبيت أو المشروع.",
+      "cta": "اعرف شتاينهايم",
+      "caption": "عمود دش · أسود مطفي",
+      "imageAlt": "عمود دش شتاينهايم داخل مساحة حمّام معمارية دافئة"
+    },
+    "finishes": {
+      "eyebrow": "أتيليه التشطيبات",
+      "headline": "السطح بيغيّر كل حاجة.",
+      "body": "ست عائلات تشطيبات بتخلي نفس التصميم هادي ولامع، دافي، جرافيكي، أو معماري بعمق.",
+      "pvd": "تشطيب PVD",
+      "standard": "تشطيب أساسي",
+      "summary": "٦ تشطيبات · PVD وأساسي",
+      "subheadline": "تصميم واحد. ستة أسطح.",
+      "availability": "توفر التشطيبات بيختلف حسب المجموعة والمنتج. استخدم دليل التشطيبات لتأكيد كل اختيار.",
+      "cta": "استفسر عن التشطيبات"
+    },
+    "product": {
+      "eyebrow": "قطعة مختارة · مجموعة Joy",
+      "body": "خلاط بانيو أرضي بطقم هاند شاور كامل، متاح بتشطيبات مجموعة Joy.",
+      "finish": "التشطيب المختار",
+      "cta": "شوف المنتج"
+    },
+    "assembly": {
+      "eyebrow": "انضباط المواصفات",
+      "headlineLineOne": "الجمال مش",
+      "headlineLineTwo": "غير السطح.",
+      "body": "حمام Steinheim بيتبني من مجموعات منسقة، أرقام موديلات مؤكدة، قواعد تشطيب واضحة، ومعلومات فنية يقدر فريق المشروع يعتمد عليها.",
+      "scroll": "انزل",
+      "cta": "اكتشف المجموعات",
+      "foundation": { "label": "المجموعات", "spec": "Joy · Up · Art · Quatro", "detail": "أربع مجموعات في مصر، كل واحدة بلغة تصميم مختلفة." },
+      "structure": { "label": "المكونات", "spec": "Sedal · Neoperl", "detail": "البيانات الفنية المنشورة بتذكر Sedal 35mm وNeoperl في المنتجات المحددة." },
+      "control": { "label": "التركيب", "spec": "1/2 inch · 0.5-5 bar", "detail": "مواصفات مناسبة للتخطيط القياسي في مشاريع مصر." },
+      "flow": { "label": "التشطيبات", "spec": "ست عائلات تشطيب", "detail": "التوفر بيتأكد حسب المنتج والمجموعة، مش كقاعدة عامة." },
+      "complete": { "label": "العرض", "spec": "موديلات · كميات · RFQ", "detail": "كل اختيار بصري ممكن يتحول لجدول توريد واضح للمشاريع." }
+    },
+    "precision": {
+      "eyebrow": "هندسة الأداء",
+      "headline": "دقة تشعر بها.",
+      "body": "كل قطعة من Steinheim مبنية حول مكونات تتفوق على الزمن — خراطيش Sedal، ومهويات Neoperl، وأسطح PVD مصممة لعقود من الاستخدام اليومي.",
+      "flow": { "label": "معدل التدفق", "detail": "مهوي Neoperl، بدون رذاذ" },
+      "temp": { "label": "دقة الحرارة", "detail": "تحكم قرص Sedal السيراميكي" },
+      "cycles": { "label": "عمر الخرطوشة", "detail": "دورات فتح وإغلاق، ضمان مدى الحياة" },
+      "finishes": { "label": "تشطيبات PVD وقياسية", "detail": "منسقة عبر جميع المجموعات" }
+    },
+    "finishMorph": {
+      "eyebrow": "شكل واحد. ست هويات.",
+      "headline": "تعبير لا نهائي. لغة تصميم موحدة.",
+      "body": "كل تشطيب من شتاينهايم بيحوّل نفس الشكل لشخصية مختلفة — من الكروم الهادي للأسود المطفي الدرامي، والذهبي الدافئ للقهوة العميقة.",
+      "scroll": "مرر",
+      "cta": "استكشف جميع التشطيبات ←"
+    },
+    "trade": {
+      "eyebrow": "تجربة المواصفات",
+      "headline": "من الإلهام لمقترح قابل للتنفيذ.",
+      "body": "اتفرّج على الكتالوج، اسأل مستشار الذكاء الاصطناعي، اجمع المنتجات والكميات، وبعدها جهّز brief منظم لفريق شتاينهايم للمشروعات.",
+      "primaryCta": "افتح الكتالوج التفاعلي",
+      "secondaryCta": "للمحترفين",
+      "discover": { "title": "اكتشف", "body": "تنقّل بين المجموعات والمنتجات والتشطيبات وصور المشاريع براحتك، أو خلّي الـAI يرشدك." },
+      "specify": { "title": "حدّد", "body": "اختار التشطيب ورقم الموديل والكميات، وخلي جدول المشروع كله في مكان واحد." },
+      "propose": { "title": "جهّز المقترح", "body": "طلّع ملف RFQ واضح علشان التسعير التجاري والمخزون ومدة التوريد ومراجعة فريق المشروع." }
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "viewCollection": "View collection",
+    "filterBy": "Filter by",
+    "allTypes": "All types",
+    "allFinishes": "All finishes",
+    "joy": {
+      "name": "Joy",
+      "description": "Round, refined forms for contemporary bathrooms"
+    },
+    "up": {
+      "name": "Up",
+      "description": "Streamlined silhouettes with flowing curves"
+    },
+    "art": {
+      "name": "Art",
+      "description": "Stainless steel architectural precision"
+    },
+    "quatro": {
+      "name": "Quatro",
+      "description": "Geometric lines for bold design statements"
+    }
+  },
+  "featureStrip": {
+    "line": "German engineering. European precision. Available in 6 finishes."
+  },
+  "finishes": {
+    "title": "Finishes",
+    "heroHeadline": "Six finishes. One philosophy.",
+    "chrome": {
+      "name": "Chrome",
+      "description": "A timeless mirror finish that reflects light and complements any bathroom palette. The most versatile choice for both classic and modern interiors."
+    },
+    "brushedNickel": {
+      "name": "Brushed Nickel",
+      "description": "A soft satin finish with understated warmth. Resists fingerprints and water spots, making it ideal for high-traffic bathrooms."
+    },
+    "matteBlack": {
+      "name": "Matte Black",
+      "description": "A bold, light-absorbing surface that creates dramatic contrast. The defining fixture finish of contemporary design."
+    },
+    "brushedGold": {
+      "name": "Brushed Gold",
+      "description": "A warm rose-gold tone achieved through PVD coating. Fingerprint-resistant. Ideal for contemporary spaces with warm material palettes."
+    },
+    "coffeeGold": {
+      "name": "Coffee Gold",
+      "description": "A deep, burnished gold with brown undertones. PVD-coated for durability. Pairs beautifully with dark stone and timber."
+    },
+    "metalGun": {
+      "name": "Metal Gun",
+      "description": "A dark gunmetal grey with industrial character. PVD-coated for lasting performance. Suits minimalist and industrial-inspired spaces."
+    },
+    "compare": "Compare finishes",
+    "availableIn": "Available in",
+    "careInstructions": "Care instructions"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "requestTrade": "Request trade pricing",
+    "description": "Description",
+    "specifications": "Specifications",
+    "whatsIncluded": "What's included",
+    "technicalDrawing": "Technical drawing",
+    "downloads": "Downloads",
+    "careMaintenance": "Care & maintenance",
+    "relatedProducts": "Related products",
+    "finish": "Finish",
+    "price": "Price",
+    "model": "Model",
+    "series": "Series"
+  },
+  "specs": {
+    "installationType": "Installation type",
+    "material": "Material",
+    "cartridge": "Cartridge",
+    "aerator": "Aerator",
+    "dimensions": "Dimensions",
+    "pressureRange": "Pressure range",
+    "maxPressure": "Max pressure",
+    "maxTemperature": "Max hot water temperature",
+    "operatingTemperature": "Recommended operating temperature",
+    "connectionSize": "Connection size",
+    "mountingAperture": "Mounting aperture",
+    "inletPipe": "Inlet pipe"
+  },
+  "brandPillars": {
+    "sedal": {
+      "title": "Sedal cartridges",
+      "description": "Spanish-engineered ceramic cartridges with lifetime warranty. Smooth, precise control."
+    },
+    "neoperl": {
+      "title": "Neoperl aerators",
+      "description": "Swiss-made aerators delivering splash-free, perfectly aerated water flow."
+    },
+    "pvd": {
+      "title": "PVD finishes",
+      "description": "Physical Vapor Deposition creates hard, durable, hypoallergenic surfaces."
+    }
+  },
+  "newsletter": {
+    "title": "Stay informed",
+    "placeholder": "Your email address",
+    "submit": "Subscribe"
+  },
+  "trade": {
+    "heroHeadline": "For the professionals who specify",
+    "description": "Steinheim's trade programme offers project pricing, sample units, specification sheets, and dedicated support for architects, interior designers, and developers across Egypt.",
+    "companyName": "Company name",
+    "yourRole": "Your role",
+    "projectName": "Project name",
+    "projectLocation": "Project location",
+    "productsOfInterest": "Products of interest",
+    "estimatedUnits": "Estimated units",
+    "timeline": "Timeline",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "submit": "Submit enquiry",
+    "roles": {
+      "architect": "Architect",
+      "interiorDesigner": "Interior Designer",
+      "developer": "Developer",
+      "contractor": "Contractor",
+      "other": "Other"
+    },
+    "benefits": {
+      "pricing": { "title": "Project pricing", "description": "Competitive volume-based pricing for trade projects" },
+      "samples": { "title": "Sample units", "description": "Physical samples for client presentations and mood boards" },
+      "specs": { "title": "Spec sheets", "description": "Complete technical documentation and CAD files" },
+      "support": { "title": "Dedicated support", "description": "Direct line to our trade team for project consultation" }
+    }
+  },
+  "about": {
+    "heroHeadline": "The story of Steinheim",
+    "narrative": "At Steinheim, finishes are an essential design element, carefully developed to enhance both form and function. Every product reflects a philosophy where German precision engineering meets thoughtful, enduring design.",
+    "warrantyTitle": "Warranty",
+    "partnership": "Exclusively distributed in Egypt by El Sharbatly International Group"
+  },
+  "warranty": {
+    "title": "Warranty",
+    "lifetime": "Lifetime warranty",
+    "tenYear": "10-year warranty",
+    "fiveYear": "5-year warranty",
+    "threeYear": "3-year warranty",
+    "sedalCartridges": "Sedal cartridges",
+    "chromeNickelFinishes": "Chrome and Brushed Nickel finishes",
+    "neoperlAerators": "Neoperl aerators and brass body",
+    "pvdFinishes": "PVD finishes (Matte Black, Metal Gun, Brushed Gold, Coffee Gold)",
+    "validInEgypt": "Valid in Egypt only. Covers manufacturing defects, not misuse.",
+    "claimsProcess": "Claims process"
+  },
+  "journal": {
+    "title": "Journal",
+    "readMore": "Read more",
+    "relatedPosts": "Related posts",
+    "categories": {
+      "design": "Design",
+      "technical": "Technical",
+      "projects": "Projects"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send message",
+    "info": {
+      "address": "Cairo, Egypt",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp"
+    }
+  },
+  "footer": {
+    "tagline": "Premium German bathroom systems",
+    "distributor": "Exclusive distributor: El Sharbatly International Group",
+    "rights": "All rights reserved"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to checkout",
+    "remove": "Remove",
+    "continueShopping": "Continue shopping"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "viewAll": "View all",
+    "currency": "LE"
+  }
+}

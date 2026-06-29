@@ -1,0 +1,313 @@
+{
+  "metadata": {
+    "title": "Steinheim | Premium German Bathroom Fixtures in Egypt",
+    "description": "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG."
+  },
+  "nav": {
+    "collections": "Collections",
+    "catalogue": "Interactive Catalogue",
+    "assistant": "Concierge",
+    "finishes": "Finishes",
+    "projects": "Projects",
+    "trade": "Trade",
+    "configurator": "Build",
+    "compare": "Compare",
+    "specSheet": "Specs",
+    "about": "About",
+    "journal": "Journal",
+    "contact": "Contact",
+    "search": "Search",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "hero": {
+    "headline": "Defined by what endures",
+    "subline": "Premium German bathroom systems — now in Egypt",
+    "cta": "Explore collections"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Premium German bathroom systems — Egypt",
+      "headline": "Architectural precision. Timeless by nature.",
+      "headlineLineOne": "Architectural",
+      "headlineLineTwo": "bathroom systems",
+      "headlineLineThree": "for Egypt",
+      "body": "Luxury bathroom systems crafted in Germany. Four collections, six finishes, one architectural language.",
+      "primaryCta": "Explore collections",
+      "secondaryCta": "Open the catalogue",
+      "caption": "Precision in every detail. Freedom in every choice.",
+      "imageAlt": "Steinheim wall-mounted mixer in an architectural bathroom"
+    },
+    "statement": {
+      "eyebrow": "The Steinheim philosophy",
+      "headline": "A bathroom is not a collection of objects. It is one complete language.",
+      "body": "Steinheim brings products, finishes, and technical choices into a coordinated system—giving homeowners, designers, and project teams a clearer way to create spaces that feel intentional from every angle.",
+      "collections": { "value": "04", "label": "Coordinated collections" },
+      "finishes": { "value": "06", "label": "Finish families" },
+      "catalogue": { "value": "26", "label": "Verified catalogue products" }
+    },
+    "collections": {
+      "eyebrow": "The collections",
+      "headline": "Four distinct ways to shape a room.",
+      "body": "From soft curves to decisive geometry, each collection carries one design idea across the products that complete a bathroom."
+    },
+    "engineering": {
+      "eyebrow": "Designed beyond appearance",
+      "headline": "Considered from the inside out.",
+      "body": "A beautiful surface is only the beginning. Steinheim pairs its design language with specified components, coordinated product families, and practical technical information for confident residential and project decisions.",
+      "cta": "Discover Steinheim",
+      "caption": "Shower column · Matte Black",
+      "imageAlt": "Steinheim shower column in a warm architectural shower space"
+    },
+    "finishes": {
+      "eyebrow": "The finish atelier",
+      "headline": "Surface changes everything.",
+      "body": "Six finish families let the same design move from quiet and reflective to warm, graphic, or deeply architectural.",
+      "pvd": "PVD finish",
+      "standard": "Standard finish",
+      "summary": "One shape. Six identities.",
+      "subheadline": "Endless expression. Unified design language.",
+      "availability": "Each Steinheim finish transforms the same form into a different character — from quiet chrome to dramatic matte black.",
+      "cta": "Enquire about finishes"
+    },
+    "product": {
+      "eyebrow": "Selected piece · Joy collection",
+      "body": "A floor-mounted bath mixer with a complete hand-shower set, available across the Joy finish palette.",
+      "finish": "Selected finish",
+      "cta": "View product"
+    },
+    "assembly": {
+      "eyebrow": "Specification discipline",
+      "headlineLineOne": "Beauty is only",
+      "headlineLineTwo": "the surface.",
+      "body": "A Steinheim bathroom is built from coordinated collections, verified model references, finish rules, and technical details that project teams can trust.",
+      "scroll": "Scroll",
+      "cta": "Explore the collections",
+      "foundation": { "label": "Collection", "spec": "Joy · Up · Art · Quatro", "detail": "Four Egypt collections with distinct design languages." },
+      "structure": { "label": "Components", "spec": "Sedal · Neoperl", "detail": "Published technical data lists 35mm Sedal cartridges and Neoperl aerators where specified." },
+      "control": { "label": "Installation", "spec": "1/2 inch · 0.5-5 bar", "detail": "Common mixer specifications support standard Egyptian project planning." },
+      "flow": { "label": "Finishes", "spec": "Six finish families", "detail": "Availability is verified by exact product and collection, not assumed globally." },
+      "complete": { "label": "Proposal", "spec": "Models · quantities · RFQ", "detail": "Every visible choice can become a structured trade schedule." }
+    },
+    "precision": {
+      "eyebrow": "Engineered to perform",
+      "headline": "Precision you can feel.",
+      "body": "Every Steinheim fixture is built around components that outlast trends — Sedal cartridges, Neoperl aerators, and PVD surfaces engineered for decades of daily use.",
+      "flow": { "label": "Laminar flow rate", "detail": "Neoperl aerator, splash-free" },
+      "temp": { "label": "Temperature accuracy", "detail": "Sedal ceramic disc control" },
+      "cycles": { "label": "Cartridge lifespan", "detail": "Open-close cycles, lifetime warranty" },
+      "finishes": { "label": "PVD & standard finishes", "detail": "Coordinated across all collections" }
+    },
+    "finishMorph": {
+      "eyebrow": "One shape. Six identities.",
+      "headline": "Endless expression. Unified design language.",
+      "body": "Each Steinheim finish transforms the same form into a different character — from quiet chrome to dramatic matte black, warm brushed gold to deep coffee gold.",
+      "scroll": "Scroll",
+      "cta": "Explore all finishes →"
+    },
+    "trade": {
+      "eyebrow": "The specification experience",
+      "headline": "From inspiration to a buildable proposal.",
+      "body": "Explore the catalogue, ask the AI advisor, assemble exact products and quantities, then create one structured brief for the Steinheim trade team.",
+      "primaryCta": "Open interactive catalogue",
+      "secondaryCta": "For professionals",
+      "discover": { "title": "Discover", "body": "Move through collections, products, finishes, and project imagery at your own pace—or let the AI guide the route." },
+      "specify": { "title": "Specify", "body": "Choose exact finishes, model references, and quantities while keeping the project schedule in one place." },
+      "propose": { "title": "Propose", "body": "Generate a clean RFQ document for commercial pricing, stock, lead-time, and project-team review." }
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "viewCollection": "View collection",
+    "filterBy": "Filter by",
+    "allTypes": "All types",
+    "allFinishes": "All finishes",
+    "joy": {
+      "name": "Joy",
+      "description": "Round, refined forms for contemporary bathrooms"
+    },
+    "up": {
+      "name": "Up",
+      "description": "Streamlined silhouettes with flowing curves"
+    },
+    "art": {
+      "name": "Art",
+      "description": "Stainless steel architectural precision"
+    },
+    "quatro": {
+      "name": "Quatro",
+      "description": "Geometric lines for bold design statements"
+    }
+  },
+  "featureStrip": {
+    "line": "German engineering. European precision. Available in 6 finishes."
+  },
+  "finishes": {
+    "title": "Finishes",
+    "heroHeadline": "Six finishes. One philosophy.",
+    "chrome": {
+      "name": "Chrome",
+      "description": "A timeless mirror finish that reflects light and complements any bathroom palette. The most versatile choice for both classic and modern interiors."
+    },
+    "brushedNickel": {
+      "name": "Brushed Nickel",
+      "description": "A soft satin finish with understated warmth. Resists fingerprints and water spots, making it ideal for high-traffic bathrooms."
+    },
+    "matteBlack": {
+      "name": "Matte Black",
+      "description": "A bold, light-absorbing surface that creates dramatic contrast. The defining fixture finish of contemporary design."
+    },
+    "brushedGold": {
+      "name": "Brushed Gold",
+      "description": "A warm rose-gold tone achieved through PVD coating. Fingerprint-resistant. Ideal for contemporary spaces with warm material palettes."
+    },
+    "coffeeGold": {
+      "name": "Coffee Gold",
+      "description": "A deep, burnished gold with brown undertones. PVD-coated for durability. Pairs beautifully with dark stone and timber."
+    },
+    "metalGun": {
+      "name": "Metal Gun",
+      "description": "A dark gunmetal grey with industrial character. PVD-coated for lasting performance. Suits minimalist and industrial-inspired spaces."
+    },
+    "compare": "Compare finishes",
+    "availableIn": "Available in",
+    "careInstructions": "Care instructions"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "requestTrade": "Request trade pricing",
+    "description": "Description",
+    "specifications": "Specifications",
+    "whatsIncluded": "What's included",
+    "technicalDrawing": "Technical drawing",
+    "downloads": "Downloads",
+    "careMaintenance": "Care & maintenance",
+    "relatedProducts": "Related products",
+    "finish": "Finish",
+    "price": "Price",
+    "model": "Model",
+    "series": "Series"
+  },
+  "specs": {
+    "installationType": "Installation type",
+    "material": "Material",
+    "cartridge": "Cartridge",
+    "aerator": "Aerator",
+    "dimensions": "Dimensions",
+    "pressureRange": "Pressure range",
+    "maxPressure": "Max pressure",
+    "maxTemperature": "Max hot water temperature",
+    "operatingTemperature": "Recommended operating temperature",
+    "connectionSize": "Connection size",
+    "mountingAperture": "Mounting aperture",
+    "inletPipe": "Inlet pipe"
+  },
+  "brandPillars": {
+    "sedal": {
+      "title": "Sedal cartridges",
+      "description": "Spanish-engineered ceramic cartridges with lifetime warranty. Smooth, precise control."
+    },
+    "neoperl": {
+      "title": "Neoperl aerators",
+      "description": "Swiss-made aerators delivering splash-free, perfectly aerated water flow."
+    },
+    "pvd": {
+      "title": "PVD finishes",
+      "description": "Physical Vapor Deposition creates hard, durable, hypoallergenic surfaces."
+    }
+  },
+  "newsletter": {
+    "title": "Stay informed",
+    "placeholder": "Your email address",
+    "submit": "Subscribe"
+  },
+  "trade": {
+    "heroHeadline": "For the professionals who specify",
+    "description": "Steinheim's trade programme offers project pricing, sample units, specification sheets, and dedicated support for architects, interior designers, and developers across Egypt.",
+    "companyName": "Company name",
+    "yourRole": "Your role",
+    "projectName": "Project name",
+    "projectLocation": "Project location",
+    "productsOfInterest": "Products of interest",
+    "estimatedUnits": "Estimated units",
+    "timeline": "Timeline",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "submit": "Submit enquiry",
+    "roles": {
+      "architect": "Architect",
+      "interiorDesigner": "Interior Designer",
+      "developer": "Developer",
+      "contractor": "Contractor",
+      "other": "Other"
+    },
+    "benefits": {
+      "pricing": { "title": "Project pricing", "description": "Competitive volume-based pricing for trade projects" },
+      "samples": { "title": "Sample units", "description": "Physical samples for client presentations and mood boards" },
+      "specs": { "title": "Spec sheets", "description": "Complete technical documentation and CAD files" },
+      "support": { "title": "Dedicated support", "description": "Direct line to our trade team for project consultation" }
+    }
+  },
+  "about": {
+    "heroHeadline": "The story of Steinheim",
+    "narrative": "At Steinheim, finishes are an essential design element, carefully developed to enhance both form and function. Every product reflects a philosophy where German precision engineering meets thoughtful, enduring design.",
+    "warrantyTitle": "Warranty",
+    "partnership": "Exclusively distributed in Egypt by El Sharbatly International Group"
+  },
+  "warranty": {
+    "title": "Warranty",
+    "lifetime": "Lifetime warranty",
+    "tenYear": "10-year warranty",
+    "fiveYear": "5-year warranty",
+    "threeYear": "3-year warranty",
+    "sedalCartridges": "Sedal cartridges",
+    "chromeNickelFinishes": "Chrome and Brushed Nickel finishes",
+    "neoperlAerators": "Neoperl aerators and brass body",
+    "pvdFinishes": "PVD finishes (Matte Black, Metal Gun, Brushed Gold, Coffee Gold)",
+    "validInEgypt": "Valid in Egypt only. Covers manufacturing defects, not misuse.",
+    "claimsProcess": "Claims process"
+  },
+  "journal": {
+    "title": "Journal",
+    "readMore": "Read more",
+    "relatedPosts": "Related posts",
+    "categories": {
+      "design": "Design",
+      "technical": "Technical",
+      "projects": "Projects"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send message",
+    "info": {
+      "address": "Cairo, Egypt",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp"
+    }
+  },
+  "footer": {
+    "tagline": "Premium German bathroom systems",
+    "distributor": "Exclusive distributor: El Sharbatly International Group",
+    "rights": "All rights reserved"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to checkout",
+    "remove": "Remove",
+    "continueShopping": "Continue shopping"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "viewAll": "View all",
+    "currency": "LE"
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "chrome",
+    "name": "Chrome",
+    "code": "001",
+    "hex": "#C0C0C0",
+    "type": "standard",
+    "series": ["joy", "up", "art", "quatro"],
+    "careInstructions": "Clean with a soft damp cloth and mild soap. Dry immediately to prevent water spots. Avoid abrasive cleaners or scouring pads."
+  },
+  {
+    "id": "brushed-nickel",
+    "name": "Brushed Nickel",
+    "code": "002",
+    "hex": "#A8A495",
+    "type": "standard",
+    "series": ["joy", "up", "art"],
+    "careInstructions": "Wipe with a soft cloth and warm water. For stubborn marks, use a mild non-abrasive cleaner. The brushed texture naturally resists fingerprints."
+  },
+  {
+    "id": "matte-black",
+    "name": "Matte Black",
+    "code": "003",
+    "hex": "#2A2A2A",
+    "type": "pvd",
+    "series": ["joy", "up", "art", "quatro"],
+    "careInstructions": "Clean with a soft damp cloth only. Avoid acidic or abrasive cleaners. PVD coating is durable but can be scratched by harsh chemicals."
+  },
+  {
+    "id": "brushed-gold",
+    "name": "Brushed Gold",
+    "code": "004",
+    "hex": "#C9A96E",
+    "type": "pvd",
+    "series": ["joy", "up", "quatro"],
+    "careInstructions": "Gently wipe with a soft damp cloth. Avoid vinegar, bleach, and abrasive pads. PVD coating provides fingerprint resistance and long-lasting lustre."
+  },
+  {
+    "id": "coffee-gold",
+    "name": "Coffee Gold",
+    "code": "009",
+    "hex": "#8B6914",
+    "type": "pvd",
+    "series": ["joy"],
+    "careInstructions": "Clean with a soft cloth and warm water. Avoid harsh chemicals and abrasive materials. PVD coating ensures durability and colour retention."
+  },
+  {
+    "id": "metal-gun",
+    "name": "Metal Gun",
+    "code": "005",
+    "hex": "#4A4A4A",
+    "type": "pvd",
+    "series": ["up"],
+    "careInstructions": "Wipe with a soft damp cloth. Avoid acidic cleaners and abrasive pads. The PVD gunmetal coating is scratch-resistant under normal use."
+  }
+]

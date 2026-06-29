@@ -1,0 +1,544 @@
+{
+  "series": [
+    {
+      "id": "joy",
+      "name": "Joy",
+      "code": "60",
+      "shape": "Round",
+      "description": "Round, refined forms for contemporary bathrooms. The Joy series embodies a philosophy of soft geometry — every curve is intentional, every radius considered. Designed for spaces where warmth and modernity coexist.",
+      "finishes": ["chrome", "brushed-nickel", "matte-black", "brushed-gold", "coffee-gold"]
+    },
+    {
+      "id": "up",
+      "name": "Up",
+      "code": "50",
+      "shape": "Streamline",
+      "description": "Streamlined silhouettes with flowing curves. The Up series draws inspiration from fluid dynamics — each form tapers and transitions with purpose. A collection for those who value movement in stillness.",
+      "finishes": ["chrome", "brushed-nickel", "matte-black", "brushed-gold", "metal-gun"]
+    },
+    {
+      "id": "art",
+      "name": "Art",
+      "code": "70",
+      "shape": "Stainless Steel Architectural",
+      "description": "Stainless steel architectural precision. The Art series is constructed from solid stainless steel, offering unmatched durability and a distinctly sculptural presence. For spaces that demand a statement.",
+      "finishes": ["chrome", "brushed-nickel", "matte-black"]
+    },
+    {
+      "id": "quatro",
+      "name": "Quatro",
+      "code": "40",
+      "shape": "Streamline Geometric",
+      "description": "Geometric lines for bold design statements. The Quatro series pairs angular precision with ergonomic comfort. Clean edges and defined planes create a striking visual language.",
+      "finishes": ["chrome", "matte-black", "brushed-gold"]
+    }
+  ],
+  "products": [
+    {
+      "slug": "joy-basin-mixer",
+      "series": "joy",
+      "name": "Basin Mixer",
+      "type": "basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M500-001", "price": 4950 },
+        { "finish": "brushed-nickel", "model": "STM-60-M500-002", "price": 5350 },
+        { "finish": "matte-black", "model": "STM-60-M500-003", "price": 5350 },
+        { "finish": "brushed-gold", "model": "STM-60-M500-004", "price": 6000 },
+        { "finish": "coffee-gold", "model": "STM-60-M500-009", "price": 6300 }
+      ]
+    },
+    {
+      "slug": "joy-tall-basin-mixer",
+      "series": "joy",
+      "name": "Tall Basin Mixer",
+      "type": "tall-basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M501-001", "price": 6550 },
+        { "finish": "brushed-nickel", "model": "STM-60-M501-002", "price": 7050 },
+        { "finish": "matte-black", "model": "STM-60-M501-003", "price": 7050 },
+        { "finish": "brushed-gold", "model": "STM-60-M501-004", "price": 7450 },
+        { "finish": "coffee-gold", "model": "STM-60-M501-009", "price": 8300 }
+      ]
+    },
+    {
+      "slug": "joy-wall-mounted-basin-mixer",
+      "series": "joy",
+      "name": "Wall-Mounted Basin Mixer",
+      "type": "wall-mounted",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M502-001", "price": 6600 },
+        { "finish": "brushed-nickel", "model": "STM-60-M502-002", "price": 7250 },
+        { "finish": "matte-black", "model": "STM-60-M502-003", "price": 7250 },
+        { "finish": "brushed-gold", "model": "STM-60-M502-004", "price": 7500 },
+        { "finish": "coffee-gold", "model": "STM-60-M502-009", "price": 8400 }
+      ]
+    },
+    {
+      "slug": "joy-concealed-shower",
+      "series": "joy",
+      "name": "Concealed Shower",
+      "type": "concealed-shower",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M605-001", "price": 11700 },
+        { "finish": "brushed-nickel", "model": "STM-60-M605-002", "price": 13600 },
+        { "finish": "matte-black", "model": "STM-60-M605-003", "price": 13600 },
+        { "finish": "brushed-gold", "model": "STM-60-M605-004", "price": 13800 },
+        { "finish": "coffee-gold", "model": "STM-60-M605-009", "price": 16600 }
+      ]
+    },
+    {
+      "slug": "joy-shower-column",
+      "series": "joy",
+      "name": "Shower Column with Bath Mixer",
+      "type": "shower-column",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M611-001", "price": 12850 },
+        { "finish": "brushed-nickel", "model": "STM-60-M611-002", "price": 13800 },
+        { "finish": "matte-black", "model": "STM-60-M611-003", "price": 13800 },
+        { "finish": "brushed-gold", "model": "STM-60-M611-004", "price": 15800 },
+        { "finish": "coffee-gold", "model": "STM-60-M611-009", "price": 17100 }
+      ]
+    },
+    {
+      "slug": "joy-free-standing-bath-mixer",
+      "series": "joy",
+      "name": "Free-Standing Bath Mixer",
+      "type": "free-standing",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-M620-001", "price": 35000 },
+        { "finish": "brushed-nickel", "model": "STM-60-M620-002", "price": 35000 },
+        { "finish": "matte-black", "model": "STM-60-M620-003", "price": 35000 },
+        { "finish": "brushed-gold", "model": "STM-60-M620-004", "price": 39200 },
+        { "finish": "coffee-gold", "model": "STM-60-M620-009", "price": 39200 }
+      ]
+    },
+    {
+      "slug": "joy-accessories-set",
+      "series": "joy",
+      "name": "Accessories Set (4pc SS)",
+      "type": "accessories",
+      "material": "Stainless steel",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-A900-001", "price": 3650 },
+        { "finish": "brushed-nickel", "model": "STM-60-A900-002", "price": 3650 },
+        { "finish": "matte-black", "model": "STM-60-A900-003", "price": 3900 },
+        { "finish": "brushed-gold", "model": "STM-60-A900-004", "price": 4200 },
+        { "finish": "coffee-gold", "model": "STM-60-A900-009", "price": 4600 }
+      ]
+    },
+    {
+      "slug": "joy-bidet-spray",
+      "series": "joy",
+      "name": "Bidet Spray",
+      "type": "bidet-spray",
+      "material": "Brass body",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-F800-001", "price": 3250 },
+        { "finish": "brushed-nickel", "model": "STM-50-F800-002", "price": 3650 },
+        { "finish": "matte-black", "model": "STM-50-F800-003", "price": 3450 },
+        { "finish": "brushed-gold", "model": "STM-50-F800-004", "price": 4100 },
+        { "finish": "coffee-gold", "model": "STM-50-F800-009", "price": 4100 }
+      ]
+    },
+    {
+      "slug": "joy-click-clack-waste",
+      "series": "joy",
+      "name": "Click-Clack Waste",
+      "type": "click-clack",
+      "material": "Brass",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-F700-001", "price": 1200 },
+        { "finish": "brushed-nickel", "model": "STM-60-F700-002", "price": 1350 },
+        { "finish": "matte-black", "model": "STM-60-F700-003", "price": 1300 },
+        { "finish": "brushed-gold", "model": "STM-60-F700-004", "price": 1500 },
+        { "finish": "coffee-gold", "model": "STM-60-F700-009", "price": 1500 },
+        { "finish": "metal-gun", "model": "STM-60-F700-005", "price": 1500 }
+      ]
+    },
+    {
+      "slug": "joy-angle-valve",
+      "series": "joy",
+      "name": "Angle Valve 1/2\" x 1/2\" Brass",
+      "type": "angle-valve",
+      "material": "Brass",
+      "variants": [
+        { "finish": "chrome", "model": "STM-60-ANG122-001", "price": 650 },
+        { "finish": "brushed-nickel", "model": "STM-60-ANG122-002", "price": 800 },
+        { "finish": "matte-black", "model": "STM-60-ANG122-003", "price": 800 },
+        { "finish": "brushed-gold", "model": "STM-60-ANG122-004", "price": 800 },
+        { "finish": "metal-gun", "model": "STM-60-ANG122-005", "price": 900 },
+        { "finish": "coffee-gold", "model": "STM-60-ANG122-009", "price": 900 }
+      ]
+    },
+    {
+      "slug": "up-basin-mixer",
+      "series": "up",
+      "name": "Basin Mixer",
+      "type": "basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M500-001", "price": 5500 },
+        { "finish": "brushed-nickel", "model": "STM-50-M500-002", "price": 5950 },
+        { "finish": "matte-black", "model": "STM-50-M500-003", "price": 5950 },
+        { "finish": "brushed-gold", "model": "STM-50-M500-004", "price": 6500 },
+        { "finish": "metal-gun", "model": "STM-50-M500-005", "price": 6500 }
+      ]
+    },
+    {
+      "slug": "up-tall-basin-mixer",
+      "series": "up",
+      "name": "Tall Basin Mixer",
+      "type": "tall-basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M501-001", "price": 8200 },
+        { "finish": "brushed-nickel", "model": "STM-50-M501-002", "price": 8750 },
+        { "finish": "matte-black", "model": "STM-50-M501-003", "price": 8750 },
+        { "finish": "brushed-gold", "model": "STM-50-M501-004", "price": 9900 },
+        { "finish": "metal-gun", "model": "STM-50-M501-005", "price": 9900 }
+      ]
+    },
+    {
+      "slug": "up-wall-mounted-basin-mixer",
+      "series": "up",
+      "name": "Wall-Mounted Basin Mixer",
+      "type": "wall-mounted",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M502-001", "price": 6800 },
+        { "finish": "brushed-nickel", "model": "STM-50-M502-002", "price": 7350 },
+        { "finish": "matte-black", "model": "STM-50-M502-003", "price": 7350 },
+        { "finish": "brushed-gold", "model": "STM-50-M502-004", "price": 7900 },
+        { "finish": "metal-gun", "model": "STM-50-M502-005", "price": 7900 }
+      ]
+    },
+    {
+      "slug": "up-concealed-shower",
+      "series": "up",
+      "name": "Concealed Shower",
+      "type": "concealed-shower",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M605-001", "price": 11350 },
+        { "finish": "brushed-nickel", "model": "STM-50-M605-002", "price": 12200 },
+        { "finish": "matte-black", "model": "STM-50-M605-003", "price": 12200 },
+        { "finish": "brushed-gold", "model": "STM-50-M605-004", "price": 13200 },
+        { "finish": "metal-gun", "model": "STM-50-M605-005", "price": 13200 }
+      ]
+    },
+    {
+      "slug": "up-shower-column",
+      "series": "up",
+      "name": "Shower Column with Bath Mixer",
+      "type": "shower-column",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M611-001", "price": 13350 },
+        { "finish": "brushed-nickel", "model": "STM-50-M611-002", "price": 14450 },
+        { "finish": "matte-black", "model": "STM-50-M611-003", "price": 14450 },
+        { "finish": "brushed-gold", "model": "STM-50-M611-004", "price": 16750 },
+        { "finish": "metal-gun", "model": "STM-50-M611-005", "price": 16750 }
+      ]
+    },
+    {
+      "slug": "up-free-standing-bath-mixer",
+      "series": "up",
+      "name": "Free-Standing Bath Mixer",
+      "type": "free-standing",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-M620-001", "price": 25400 },
+        { "finish": "brushed-nickel", "model": "STM-50-M620-002", "price": 27600 },
+        { "finish": "matte-black", "model": "STM-50-M620-003", "price": 27600 },
+        { "finish": "brushed-gold", "model": "STM-50-M620-004", "price": 32400 },
+        { "finish": "metal-gun", "model": "STM-50-M620-005", "price": 32400 }
+      ]
+    },
+    {
+      "slug": "up-accessories-set",
+      "series": "up",
+      "name": "Accessories Set (4pc SS)",
+      "type": "accessories",
+      "material": "Stainless steel",
+      "variants": [
+        { "finish": "chrome", "model": "STM-50-A900-001", "price": 4500 },
+        { "finish": "brushed-nickel", "model": "STM-50-A900-002", "price": 4500 },
+        { "finish": "matte-black", "model": "STM-50-A900-003", "price": 4500 },
+        { "finish": "brushed-gold", "model": "STM-50-A900-004", "price": 4700 },
+        { "finish": "metal-gun", "model": "STM-50-A900-005", "price": 4700 }
+      ]
+    },
+    {
+      "slug": "art-basin-mixer",
+      "series": "art",
+      "name": "Basin Mixer",
+      "type": "basin-mixer",
+      "material": "Stainless steel body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-70-M500-001", "price": 5900 },
+        { "finish": "brushed-nickel", "model": "STM-70-M500-002", "price": 6300 },
+        { "finish": "matte-black", "model": "STM-70-M500-003", "price": 6300 }
+      ]
+    },
+    {
+      "slug": "art-tall-basin-mixer",
+      "series": "art",
+      "name": "Tall Basin Mixer",
+      "type": "tall-basin-mixer",
+      "material": "Stainless steel body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-70-M501-001", "price": 10800 },
+        { "finish": "brushed-nickel", "model": "STM-70-M501-002", "price": 11400 },
+        { "finish": "matte-black", "model": "STM-70-M501-003", "price": 11400 }
+      ]
+    },
+    {
+      "slug": "art-wall-mounted-basin-mixer",
+      "series": "art",
+      "name": "Wall-Mounted Basin Mixer",
+      "type": "wall-mounted",
+      "material": "Stainless steel body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-70-M503-001", "price": 8850 },
+        { "finish": "brushed-nickel", "model": "STM-70-M503-002", "price": 9350 },
+        { "finish": "matte-black", "model": "STM-70-M503-003", "price": 9350 }
+      ]
+    },
+    {
+      "slug": "art-concealed-shower",
+      "series": "art",
+      "name": "Concealed Shower",
+      "type": "concealed-shower",
+      "material": "Stainless steel body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-70-M605-001", "price": 14500 },
+        { "finish": "brushed-nickel", "model": "STM-70-M605-002", "price": 15300 },
+        { "finish": "matte-black", "model": "STM-70-M605-003", "price": 15300 }
+      ]
+    },
+    {
+      "slug": "art-free-standing-bath-mixer",
+      "series": "art",
+      "name": "Free-Standing Bath Mixer",
+      "type": "free-standing",
+      "material": "Stainless steel body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-70-M620-001", "price": 37200 },
+        { "finish": "brushed-nickel", "model": "STM-70-M620-002", "price": 39000 },
+        { "finish": "matte-black", "model": "STM-70-M620-003", "price": 39000 }
+      ]
+    },
+    {
+      "slug": "quatro-basin-mixer",
+      "series": "quatro",
+      "name": "Basin Mixer",
+      "type": "basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-40-M500-001", "price": 5250 },
+        { "finish": "matte-black", "model": "STM-40-M500-003", "price": 5950 },
+        { "finish": "brushed-gold", "model": "STM-40-M500-004", "price": 6700 }
+      ]
+    },
+    {
+      "slug": "quatro-tall-basin-mixer",
+      "series": "quatro",
+      "name": "Tall Basin Mixer",
+      "type": "tall-basin-mixer",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "mountingAperture": "DIA 35mm",
+      "variants": [
+        { "finish": "chrome", "model": "STM-40-M501-001", "price": 7900 },
+        { "finish": "matte-black", "model": "STM-40-M501-003", "price": 8550 },
+        { "finish": "brushed-gold", "model": "STM-40-M501-004", "price": 9700 }
+      ]
+    },
+    {
+      "slug": "quatro-wall-mounted-basin-mixer",
+      "series": "quatro",
+      "name": "Wall-Mounted Basin Mixer",
+      "type": "wall-mounted",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "aerator": "Neoperl",
+      "inletPipe": "60cm SUS",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-40-M503-001", "price": 7500 },
+        { "finish": "matte-black", "model": "STM-40-M503-003", "price": 7900 },
+        { "finish": "brushed-gold", "model": "STM-40-M503-004", "price": 8300 }
+      ]
+    },
+    {
+      "slug": "quatro-concealed-shower",
+      "series": "quatro",
+      "name": "Concealed Shower",
+      "type": "concealed-shower",
+      "material": "Brass body",
+      "cartridge": "35mm Sedal",
+      "connectionSize": "1/2\"",
+      "pressureRange": "0.5–5 bar",
+      "maxPressure": "16 bar",
+      "maxTemperature": "90°C",
+      "operatingTemperature": "45°C",
+      "variants": [
+        { "finish": "chrome", "model": "STM-40-M605-001", "price": 11700 },
+        { "finish": "matte-black", "model": "STM-40-M605-003", "price": 12400 },
+        { "finish": "brushed-gold", "model": "STM-40-M605-004", "price": 13550 }
+      ]
+    }
+  ]
+}
