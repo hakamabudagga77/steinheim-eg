@@ -1,7 +1,6 @@
-﻿import Image from "next/image";
+import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import Container from "@/components/ui/Container";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
@@ -23,104 +22,96 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
 function TradePageContent() {
   return (
     <PageTransition>
-      <section className="relative flex min-h-[72svh] items-center overflow-hidden bg-charcoal pt-24 text-white">
-        <Image
-          src="/images/steinheim/final/trade-hero.jpg"
-          alt="Steinheim project installation"
-          fill
-          priority
-          quality={90}
-          className="object-cover object-[center_45%] opacity-60"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/15" />
-        <Container className="relative z-10 w-full py-16 sm:py-20">
-          <ScrollReveal>
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/60">
-              For professionals
-            </p>
-            <h1 className="mt-4 max-w-4xl font-heading text-[clamp(2.5rem,6vw,5.5rem)] leading-[0.9]">
-              Build project
-              <br />
-              specifications by scope.
-            </h1>
-            <p className="mt-5 max-w-xl text-[14px] leading-[1.8] text-white/65">
-              Separate standard rooms, suites, public washrooms, and show units — then combine every
-              product line into one Steinheim Egypt RFQ.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="#smart-room-calculator"
-                className="inline-flex h-[48px] items-center gap-2 bg-white px-8 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:bg-white/90"
+      <div className="bg-[#f3f1ed] text-[#111]">
+        {/* Hero */}
+        <section className="relative flex min-h-[75svh] items-end overflow-hidden bg-black pt-20 text-white">
+          <Image
+            src="/images/steinheim/final/trade-hero.jpg"
+            alt="Steinheim project installation"
+            fill
+            priority
+            quality={90}
+            className="object-cover object-[center_45%] opacity-50"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+          <div className="relative z-10 mx-auto w-full max-w-[1780px] px-5 pb-14 sm:px-8 lg:px-16 lg:pb-20">
+            <ScrollReveal>
+              <p className="text-[11px] uppercase tracking-[0.45em] text-white/45">For professionals</p>
+              <h1
+                className="mt-5 max-w-4xl font-heading text-[clamp(3rem,7.5vw,7.5rem)] leading-[0.88] tracking-[-0.04em]"
+                style={{ fontStyle: "italic" }}
               >
-                Start a scope
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </a>
-              <TradeOpenButton variant="outline" />
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-
-      <section className="border-b border-charcoal/8 bg-white py-14 sm:py-20">
-        <Container>
-          <ScrollReveal>
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-              How it works
-            </p>
-            <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2rem,4vw,3.6rem)] leading-[0.95] text-charcoal">
-              One project, as many scopes as you need.
-            </h2>
-            <p className="mt-5 max-w-2xl text-[13px] leading-[1.8] text-warm-gray">
-              Each scope carries its own collection, finish, and product logic. The board merges everything into one trade request.
-            </p>
-          </ScrollReveal>
-
-          <div className="mt-10 grid gap-px overflow-hidden border border-charcoal/10 bg-charcoal/10 sm:grid-cols-4">
-            {workflowSteps.map(([title, body], index) => (
-              <div key={title} className="flex flex-col bg-white p-6">
-                <span className="flex h-8 w-8 items-center justify-center bg-charcoal text-[11px] font-medium text-white">
-                  {index + 1}
-                </span>
-                <h3 className="mt-4 text-[13px] font-medium text-charcoal">
-                  {title}
-                </h3>
-                <p className="mt-2 text-[12px] leading-[1.7] text-warm-gray">{body}</p>
+                Build project specifications by scope.
+              </h1>
+              <p className="mt-6 max-w-xl text-[16px] leading-[1.85] text-white/55">
+                Separate standard rooms, suites, public washrooms, and show units — then combine every product line into one Steinheim Egypt RFQ.
+              </p>
+              <div className="mt-10 flex flex-wrap items-center gap-3">
+                <a
+                  href="#smart-room-calculator"
+                  className="rounded-full bg-white px-10 py-4 text-[13px] font-medium text-black transition hover:bg-white/85"
+                >
+                  Start a scope
+                </a>
+                <TradeOpenButton variant="outline" />
               </div>
-            ))}
+            </ScrollReveal>
           </div>
-        </Container>
-      </section>
+        </section>
 
-      <SmartRoomCalculator />
+        {/* How it works */}
+        <section className="px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+          <div className="mx-auto max-w-[1780px]">
+            <ScrollReveal>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">How it works</p>
+              <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]">
+                One project, as many scopes as you need.
+              </h2>
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
+                Each scope carries its own collection, finish, and product logic. The board merges everything into one trade request.
+              </p>
+            </ScrollReveal>
 
-      <section className="border-t border-charcoal/8 bg-[#FAFAF8] py-16 sm:py-20">
-        <Container>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-              Already know what you need?
-            </p>
-            <h2 className="mt-4 font-heading text-[clamp(1.8rem,4vw,3rem)] leading-[0.95] text-charcoal">
-              Browse products directly
-            </h2>
-            <p className="mt-4 text-[13px] leading-[1.8] text-warm-gray">
-              Add exact products to your project board from any product page. Mix collections,
-              finishes, and quantities freely. The board persists across sessions — come back anytime to adjust and send.
-            </p>
-            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <Link
-                href="/collections"
-                className="inline-flex h-[48px] items-center border border-charcoal px-8 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:bg-charcoal hover:text-white"
-              >
-                Browse collections
-              </Link>
-              <TradeOpenButton variant="outline" />
+            <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {workflowSteps.map(([title, body], index) => (
+                <div key={title} className="rounded-[18px] bg-white p-7">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-[13px] font-medium text-white">
+                    {index + 1}
+                  </span>
+                  <h3 className="mt-6 text-[16px] font-medium">{title}</h3>
+                  <p className="mt-3 text-[14px] leading-[1.7] text-black/50">{body}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </Container>
-      </section>
+        </section>
+
+        <SmartRoomCalculator />
+
+        {/* Browse CTA */}
+        <section className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32">
+          <div className="mx-auto max-w-[1780px]">
+            <div className="grid items-center gap-10 rounded-[22px] bg-black p-8 text-white sm:p-12 lg:grid-cols-[1.2fr_0.8fr] lg:p-16">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.4em] text-white/35">Already know what you need?</p>
+                <h2 className="mt-4 text-[clamp(2rem,4.5vw,4.4rem)] leading-[0.95] tracking-[-0.03em]">
+                  Browse products directly and build your board.
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-3 lg:justify-end">
+                <Link
+                  href="/collections"
+                  className="rounded-full bg-white px-8 py-4 text-[13px] font-medium text-black transition hover:bg-white/85"
+                >
+                  Browse collections
+                </Link>
+                <TradeOpenButton variant="outline" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </PageTransition>
   );
 }

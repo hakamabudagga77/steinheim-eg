@@ -16,14 +16,6 @@ const collections = [
   { id: "quatro", href: "/collections/quatro" },
 ];
 
-const navLinks = [
-  { label: "Collections", href: "/collections" },
-  { label: "Projects", href: "/projects" },
-  { label: "Trade", href: "/trade" },
-  { label: "Concierge", href: "/assistant" },
-  { label: "About", href: "/about" },
-];
-
 const menuLinks = [
   { key: "projects", href: "/projects" },
   { key: "trade", href: "/trade" },
@@ -66,12 +58,8 @@ export default function Navigation({ locale }: { locale: string }) {
     setHoveredCollection(null);
   }, []);
 
-  const isHome = pathname === "/";
+  const isHome = pathname === "/" || pathname === "/en" || pathname === "/ar";
   const isTransparent = isHome && !scrolled;
-
-  const activeImage = hoveredCollection && collectionBanners[hoveredCollection]
-    ? collectionBanners[hoveredCollection]
-    : null;
 
   return (
     <>
@@ -82,72 +70,91 @@ export default function Navigation({ locale }: { locale: string }) {
             : "bg-white/95 backdrop-blur-sm shadow-[0_1px_0_rgba(0,0,0,0.06)]"
         }`}
       >
-        <div className="mx-auto flex h-[72px] max-w-[1440px] items-center px-5 sm:px-8 lg:h-[80px] lg:px-12">
-          {/* Logo — left */}
+        <div className="relative mx-auto flex h-[72px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[80px] lg:px-16">
+          <button
+            onClick={() => setMenuOpen(true)}
+            className={`flex items-center gap-5 text-[14px] font-medium uppercase transition-colors duration-300 cursor-pointer ${
+              isTransparent
+                ? "text-white hover:text-white/70"
+                : "text-charcoal hover:text-charcoal/60"
+            }`}
+            aria-label={t("menu")}
+          >
+            <span className="flex h-9 w-12 flex-col justify-center gap-[7px]">
+              <span className="block h-px w-11 bg-current" />
+              <span className="block h-px w-11 bg-current" />
+            </span>
+            <span className="hidden sm:block">Menu</span>
+          </button>
+          {/* Logo */}
           <Link
             href="/"
-            className="shrink-0"
+            className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
             aria-label="Steinheim home"
           >
-            <Logo color={isTransparent ? "light" : "dark"} size="sm" />
+            <Logo color={isTransparent ? "light" : "dark"} size="sm" showWave={false} />
           </Link>
 
-          {/* Desktop inline links — center */}
-          <div className="ml-auto hidden items-center gap-7 lg:flex">
-            {navLinks.map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`text-[11px] font-medium transition-colors duration-300 ${
-                  isTransparent
-                    ? "text-white/55 hover:text-white"
-                    : "text-charcoal/45 hover:text-charcoal"
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Utility icons — far right */}
-          <div className="ml-auto flex items-center gap-3 lg:ml-8">
-            {/* Cart */}
+          <div className="flex items-center gap-3 lg:gap-6">
+            <Link
+              href="/trade"
+              className={`hidden text-[13px] font-medium uppercase transition-colors duration-300 lg:block ${
+                isTransparent
+                  ? "text-white/82 hover:text-white"
+                  : "text-charcoal/70 hover:text-charcoal"
+              }`}
+            >
+              Area Pro
+            </Link>
+            {/* Search */}
+            <Link
+              href="/collections"
+              className={`hidden transition-colors duration-300 sm:flex ${
+                isTransparent
+                  ? "text-white/65 hover:text-white"
+                  : "text-charcoal/50 hover:text-charcoal"
+              }`}
+              aria-label="Search collections"
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+            </Link>
+            {/* Wishlist / Heart — Gessi style */}
             <button
               onClick={() => setCartOpen(true)}
-              className={`relative flex h-9 w-9 items-center justify-center transition-colors duration-300 cursor-pointer ${
+              className={`hidden transition-colors duration-300 sm:flex cursor-pointer ${
                 isTransparent
-                  ? "text-white/45 hover:text-white"
-                  : "text-charcoal/35 hover:text-charcoal"
+                  ? "text-white/65 hover:text-white"
+                  : "text-charcoal/50 hover:text-charcoal"
               }`}
-              aria-label="Cart"
+              aria-label="Wishlist"
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" />
-                <path d="M16 10a4 4 0 01-8 0" />
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
               {itemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-charcoal px-1 text-[8px] font-medium text-white">
+                <span className="absolute -top-0.5 -right-0.5 flex h-[14px] min-w-[14px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[7px] font-medium text-white">
                   {itemCount}
                 </span>
               )}
             </button>
-
-            {/* Hamburger menu */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              className={`flex h-9 w-9 items-center justify-center transition-colors duration-300 cursor-pointer ${
+            {/* Country / Globe — Gessi style */}
+            <Link
+              href={`/${locale === "en" ? "ar" : "en"}`}
+              className={`hidden items-center gap-2 text-[11px] font-medium uppercase transition-colors duration-300 lg:flex ${
                 isTransparent
                   ? "text-white/55 hover:text-white"
                   : "text-charcoal/45 hover:text-charcoal"
               }`}
-              aria-label={t("menu")}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
-                <line x1="2" y1="6" x2="18" y2="6" />
-                <line x1="2" y1="10" x2="18" y2="10" />
-                <line x1="2" y1="14" x2="14" y2="14" />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
               </svg>
-            </button>
+              <span>{locale === "en" ? "EN" : "AR"}</span>
+            </Link>
           </div>
         </div>
       </nav>
@@ -160,48 +167,48 @@ export default function Navigation({ locale }: { locale: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
-            className="fixed inset-0 z-[60] bg-charcoal"
+            className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
-            {/* Close bar */}
-            <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-8 lg:h-[80px] lg:px-12">
+            {/* Close bar — Gessi: X CLOSE left, logo center, language right */}
+            <div className="mx-3 mt-3 flex h-[72px] max-w-[1120px] items-center justify-between rounded-t-[22px] bg-[#f5f3ee] px-7 shadow-[0_24px_80px_rgba(0,0,0,0.16)] lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer"
+                aria-label={t("close")}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.3">
+                  <line x1="4" y1="4" x2="16" y2="16" />
+                  <line x1="16" y1="4" x2="4" y2="16" />
+                </svg>
+                <span className="hidden sm:inline">Close</span>
+              </button>
+
               <Link
                 href="/"
                 onClick={handleNavigate}
-                className="shrink-0"
+                className="absolute left-1/2 -translate-x-1/2 shrink-0"
                 aria-label="Steinheim home"
               >
-                <Logo color="light" size="sm" />
+                <Logo color="dark" size="sm" showWave={false} />
               </Link>
 
-              <div className="flex items-center gap-6">
-                <Link
-                  href={pathname}
-                  locale={locale === "en" ? "ar" : "en"}
-                  onClick={handleNavigate}
-                  className="text-[11px] font-medium text-white/40 hover:text-white transition-colors duration-300"
-                >
-                  {locale === "en" ? "العربية" : "English"}
-                </Link>
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-300 cursor-pointer"
-                  aria-label={t("close")}
-                >
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
-                    <line x1="4" y1="4" x2="16" y2="16" />
-                    <line x1="16" y1="4" x2="4" y2="16" />
-                  </svg>
-                </button>
-              </div>
+              <Link
+                href={pathname}
+                locale={locale === "en" ? "ar" : "en"}
+                onClick={handleNavigate}
+                className="text-[11px] font-medium text-black/40 hover:text-black transition-colors duration-300"
+              >
+                {locale === "en" ? "Arabic" : "English"}
+              </Link>
             </div>
 
             {/* Menu content */}
-            <div className="flex h-[calc(100vh-72px)] lg:h-[calc(100vh-80px)]">
+            <div className="mx-3 mb-3 flex h-[calc(100vh-90px)] max-w-[1120px] overflow-hidden rounded-b-[22px] bg-[#f5f3ee] shadow-[0_24px_80px_rgba(0,0,0,0.16)] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
               {/* Left: Navigation links */}
-              <div className="flex-1 flex flex-col justify-center px-8 lg:px-20 xl:px-32">
+              <div className="flex w-full flex-col justify-center border-r border-black/10 px-8 lg:w-[36%] lg:px-10">
                 {/* Collections */}
                 <div className="mb-12">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/25 mb-8">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 mb-8">
                     {t("collections")}
                   </p>
                   <div className="space-y-1">
@@ -217,10 +224,10 @@ export default function Navigation({ locale }: { locale: string }) {
                           onClick={handleNavigate}
                           onMouseEnter={() => setHoveredCollection(c.id)}
                           onMouseLeave={() => setHoveredCollection(null)}
-                          className={`block py-2 font-heading text-[clamp(2rem,4vw,3.8rem)] uppercase tracking-[0.04em] leading-[1.15] transition-all duration-400 ${
+                          className={`block py-2 text-[clamp(1.5rem,2.3vw,2.8rem)] font-medium leading-[1.15] transition-all duration-400 ${
                             pathname.includes(c.id)
-                              ? "text-white"
-                              : "text-white/30 hover:text-white hover:translate-x-2"
+                              ? "text-black"
+                              : "text-black/50 hover:text-black hover:translate-x-2"
                           }`}
                         >
                           {tc(`${c.id}.name`)}
@@ -235,7 +242,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className="w-16 h-px bg-white/12 origin-left mb-12"
+                  className="w-16 h-px bg-black/12 origin-left mb-12"
                 />
 
                 {/* Other links */}
@@ -252,8 +259,8 @@ export default function Navigation({ locale }: { locale: string }) {
                         onClick={handleNavigate}
                         className={`block py-2 text-[13px] font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
                           pathname === link.href
-                            ? "text-white"
-                            : "text-white/25 hover:text-white hover:tracking-[0.25em]"
+                            ? "text-black"
+                            : "text-black/42 hover:text-black hover:tracking-[0.25em]"
                         }`}
                       >
                         {t(link.key)}
@@ -269,44 +276,60 @@ export default function Navigation({ locale }: { locale: string }) {
                   transition={{ delay: 0.8, duration: 0.5 }}
                   className="mt-16"
                 >
-                  <p className="text-[11px] text-white/20 tracking-[0.1em]">
+                  <p className="text-[11px] text-black/30 tracking-[0.1em]">
                     inquiries@steinheim-eg.com
                   </p>
                 </motion.div>
               </div>
 
-              {/* Right: Hover image (desktop only) */}
-              <div className="hidden lg:block w-[42%] xl:w-[38%] relative overflow-hidden">
-                <AnimatePresence mode="wait">
-                  {activeImage ? (
-                    <motion.div
-                      key={hoveredCollection}
-                      initial={{ opacity: 0, scale: 1.05 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.6, ease: [0.22, 0.76, 0.2, 1] }}
-                      className="absolute inset-0"
-                    >
-                      <Image
-                        src={activeImage}
-                        alt={hoveredCollection ? tc(`${hoveredCollection}.name`) : ""}
-                        fill
-                        sizes="42vw"
-                        className="object-cover"
-                        priority
-                      />
-                      <div className="absolute inset-0 bg-black/20" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="empty"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 bg-[#111]"
-                    />
-                  )}
-                </AnimatePresence>
+              {/* Right: Gessi-style visual cards */}
+              <div className="hidden flex-1 p-4 lg:block">
+                <div className="grid h-full grid-cols-2 gap-4">
+                  {collections.map((collection, index) => {
+                    const image = collectionBanners[collection.id];
+                    const isDimmed = hoveredCollection !== null && hoveredCollection !== collection.id;
+
+                    return (
+                      <motion.div
+                        key={collection.id}
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: isDimmed ? 0.38 : 1, y: 0 }}
+                        transition={{
+                          opacity: { duration: 0.35 },
+                          y: { delay: 0.2 + index * 0.04, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] },
+                        }}
+                      >
+                        <Link
+                          href={collection.href}
+                          onClick={handleNavigate}
+                          onMouseEnter={() => setHoveredCollection(collection.id)}
+                          onMouseLeave={() => setHoveredCollection(null)}
+                          className="group relative block h-full min-h-[220px] overflow-hidden rounded-[18px] bg-[#ebe8e1]"
+                        >
+                          {image ? (
+                            <Image
+                              src={image}
+                              alt={tc(`${collection.id}.name`)}
+                              fill
+                              sizes="32vw"
+                              className="object-cover transition duration-[1200ms] group-hover:scale-[1.045]"
+                              priority={index < 2}
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent opacity-85 transition duration-500 group-hover:opacity-65" />
+                          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                            <p className="text-[10px] uppercase tracking-[0.34em] text-white/62">
+                              Collection
+                            </p>
+                            <p className="mt-2 font-heading text-[30px] leading-none">
+                              {tc(`${collection.id}.name`)}
+                            </p>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </motion.div>

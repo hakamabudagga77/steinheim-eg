@@ -316,7 +316,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                 </button>
 
                 <p className="mt-3 text-center text-[9px] text-warm-gray/50">
-                  Checkout goes to Steinheim Egypt's secure payment page
+                  Checkout goes to Steinheim Egypt&apos;s secure payment page
                 </p>
               </footer>
             )}
