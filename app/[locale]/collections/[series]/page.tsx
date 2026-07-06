@@ -1,60 +1,91 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
-import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import ProductCard from "@/components/product/ProductCard";
 import PageTransition from "@/components/layout/PageTransition";
-import { collectionBanners, getFinishDiscImage } from "@/data/images";
 import {
-  formatPrice,
+  collectionBanners,
+  getCollectionContextImage,
+  getFinishDiscImage,
+} from "@/data/images";
+import {
   getAllFinishes,
   getProductsBySeries,
   getSeriesById,
-  type Product,
 } from "@/lib/utils";
+
+const collectionHeroVideos: Record<string, string> = {
+  joy: "/videos/joy-hero.mp4",
+  art: "/videos/art-hero.mp4",
+};
 
 const collectionStrategy: Record<
   string,
-  { headline: string; position: string; atmosphere: string }
+  {
+    family: string;
+    headline: string;
+    description: string;
+    cards: Array<{ eyebrow: string; title: string; body: string; image: string }>;
+    setup: string;
+  }
 > = {
   joy: {
-    headline: "The refined all-rounder for premium bathrooms.",
-    position:
-      "Joy is the collection to start with when the space needs to feel premium, warm, and easy to live with.",
-    atmosphere: "Soft geometry, calm reflections, and a warm modern character.",
+    family: "Series 60",
+    headline: "A refined balance of softness, reliability, and everyday premium comfort.",
+    description:
+      "Joy is the Steinheim collection for warm private bathrooms, hospitality rooms, and projects where the fittings should feel elevated without becoming loud.",
+    setup:
+      "Use Joy for guest bathrooms, master bathrooms, hotel rooms, and premium apartments where consistency and calm design matter.",
+    cards: [
+      { eyebrow: "Intro", title: "Soft Minimal", body: "Rounded forms and quiet proportions for spaces that need warmth.", image: "/images/steinheim/karim-2026/detail-joy-basin.webp" },
+      { eyebrow: "Concept", title: "Everyday Premium", body: "A practical collection that still feels considered and complete.", image: "/images/steinheim/karim-2026/home-joy.webp" },
+      { eyebrow: "Design", title: "Warm Precision", body: "Suitable for villas, hotel rooms, and repeatable premium bathrooms.", image: "/images/steinheim/karim-2026/landing-joy.webp" },
+    ],
   },
   up: {
-    headline: "A streamlined collection for repeatable modern projects.",
-    position:
-      "Up gives the bathroom a cleaner, more dynamic silhouette while staying practical for larger schedules.",
-    atmosphere: "Fluid transitions, slimmer profiles, and a quietly technical feel.",
+    family: "Series 50",
+    headline: "A streamlined modern collection for repeatable contemporary projects.",
+    description:
+      "Up gives the bathroom a cleaner, more dynamic silhouette while staying practical for larger schedules, designers, and developers.",
+    setup:
+      "Use Up when the project needs a sharper modern look, efficient specification, and a collection that can repeat across many units.",
+    cards: [
+      { eyebrow: "Intro", title: "Fluid Modern", body: "Slimmer lines and an easy contemporary silhouette.", image: "/images/steinheim/karim-2026/detail-up-shower.webp" },
+      { eyebrow: "Concept", title: "Project Ready", body: "Built for apartments, developments, and modern hospitality scopes.", image: "/images/steinheim/karim-2026/home-up.webp" },
+      { eyebrow: "Design", title: "Clean Momentum", body: "A directional collection without unnecessary visual noise.", image: "/images/steinheim/karim-2026/landing-up.webp" },
+    ],
   },
   art: {
-    headline: "Architectural stainless steel for statement bathrooms.",
-    position:
-      "Art is for projects where the fitting should feel like part of the architecture, not an accessory.",
-    atmosphere: "Sculptural, precise, confident, and intentionally more premium.",
+    family: "Series 70",
+    headline: "Architectural precision for bathrooms that need a stronger design signature.",
+    description:
+      "Art is for spaces where the fitting should feel intentional, sculptural, and closely connected to the architecture of the room.",
+    setup:
+      "Use Art for statement suites, villas, show bathrooms, and projects where the specification should feel more expressive.",
+    cards: [
+      { eyebrow: "Intro", title: "Sculptural Precision", body: "A more architectural language for statement bathrooms.", image: "/images/steinheim/karim-2026/detail-art-bath.webp" },
+      { eyebrow: "Concept", title: "Design-Led", body: "For clients who want the fixture to be part of the room identity.", image: "/images/steinheim/karim-2026/home-art.webp" },
+      { eyebrow: "Design", title: "Confident Lines", body: "Premium, controlled, and visually memorable.", image: "/images/steinheim/karim-2026/landing-art.webp" },
+    ],
   },
   quatro: {
-    headline: "Geometric clarity for sharp modern interiors.",
-    position:
-      "Quatro brings defined edges and a more graphic silhouette to contemporary bathrooms.",
-    atmosphere: "Crisp geometry, clean planes, and controlled visual tension.",
+    family: "Series 40",
+    headline: "Geometric clarity for sharp, contemporary bathrooms.",
+    description:
+      "Quatro brings defined edges, clean planes, and a more graphic silhouette to modern homes, offices, and developer schemes.",
+    setup:
+      "Use Quatro where the architecture is sharper: modern apartments, office washrooms, show units, and contemporary villas.",
+    cards: [
+      { eyebrow: "Intro", title: "Geometric Calm", body: "Crisp geometry with controlled visual tension.", image: "/images/steinheim/karim-2026/detail-quatro-wall.webp" },
+      { eyebrow: "Concept", title: "Sharp Modern", body: "A clean-edged collection for confident interiors.", image: "/images/steinheim/karim-2026/home-quatro.webp" },
+      { eyebrow: "Design", title: "Defined Planes", body: "For bathrooms that need structure and architectural clarity.", image: "/images/steinheim/karim-2026/landing-quatro.webp" },
+    ],
   },
 };
-
-function labelType(value: string) {
-  return value.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function getStartingPrice(products: Product[]) {
-  const prices = products.flatMap((product) => product.variants.map((variant) => variant.price));
-  return prices.length ? Math.min(...prices) : 0;
-}
 
 export default function CollectionPage() {
   const params = useParams();
@@ -62,15 +93,13 @@ export default function CollectionPage() {
   const series = getSeriesById(seriesId);
   const products = getProductsBySeries(seriesId);
   const finishes = getAllFinishes().filter((finish) => series?.finishes.includes(finish.id));
-  const types = useMemo(() => Array.from(new Set(products.map((product) => product.type))), [products]);
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [finishFilter, setFinishFilter] = useState("all");
-  const { addItem, setOpen: setProjectOpen } = useTradeProject();
+  const [globalFinish, setGlobalFinish] = useState<string | null>(finishes[0]?.id ?? null);
+  const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>>({});
 
   useEffect(() => {
     fetch("/api/shopify/prices")
-      .then((r) => r.ok ? r.json() : {})
+      .then((response) => (response.ok ? response.json() : {}))
       .then(setLiveData)
       .catch(() => {});
   }, []);
@@ -83,255 +112,231 @@ export default function CollectionPage() {
     );
   }
 
-  const [activeTab, setActiveTab] = useState<"overview" | "products">("products");
   const strategy = collectionStrategy[series.id];
-  const startingPrice = getStartingPrice(products);
-  const filtered = products.filter(
-    (product) =>
-      (typeFilter === "all" || product.type === typeFilter) &&
-      (finishFilter === "all" || product.variants.some((variant) => variant.finish === finishFilter))
-  );
+  const contextImage = getCollectionContextImage(series.id);
+  const selectedStoryCard = selectedStory
+    ? strategy.cards.find((card) => card.title === selectedStory)
+    : null;
 
   return (
     <PageTransition>
       <div className="bg-[#f3f1ed] text-[#111]">
-        {/* Cinematic Hero — Gessi: huge italic serif name on dark bg */}
-        <section className="relative flex min-h-[80svh] items-center justify-center overflow-hidden bg-black pt-20 text-white">
-          <Image
-            src={collectionBanners[series.id]}
-            alt={`${series.name} bathroom collection`}
-            fill
-            priority
-            sizes="100vw"
-            quality={90}
-            className="object-cover opacity-45"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20" />
-          {/* Breadcrumb — Gessi style top-left */}
-          <div className="absolute top-[88px] left-0 right-0 z-10 px-5 sm:px-8 lg:top-[96px] lg:px-16">
+        <section className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
+          {collectionHeroVideos[series.id] ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster={collectionBanners[series.id]}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            >
+              <source src={collectionHeroVideos[series.id]} type="video/mp4" />
+            </video>
+          ) : (
+            <Image
+              src={collectionBanners[series.id]}
+              alt={`${series.name} bathroom collection`}
+              fill
+              priority
+              sizes="100vw"
+              quality={92}
+              className="object-cover"
+            />
+          )}
+          <div className="absolute inset-0 bg-black/24" />
+
+          <div className="absolute left-0 right-0 top-[104px] z-10 px-6 sm:px-10 lg:px-16">
             <div className="mx-auto max-w-[1780px]">
-              <p className="text-[11px] text-white/40">
-                <Link href="/" className="hover:text-white/70 transition">Home</Link>
-                {" > "}
-                <Link href="/collections" className="hover:text-white/70 transition">Collections</Link>
-                {" > "}
-                <span className="text-white/60">{series.name}</span>
+              <p className="text-[18px] font-medium text-white">
+                <Link href="/" className="transition hover:text-white/70">Home</Link>
+                <span className="px-2 text-white/75">·</span>
+                <Link href="/collections" className="transition hover:text-white/70">Collections</Link>
+                <span className="px-2 text-white/75">·</span>
+                <span>{series.name}</span>
               </p>
             </div>
           </div>
-          <div className="relative z-10 text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
-              className="font-heading text-[clamp(5rem,14vw,13rem)] uppercase leading-[0.82] tracking-[-0.02em]"
-              style={{ fontStyle: "italic" }}
-            >
-              {series.name}
-            </motion.h1>
-          </div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
+            className="relative z-10 font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
+          >
+            {series.name}
+          </motion.h1>
         </section>
 
-        {/* Sub-nav tabs — Gessi: Overview / Catalogue / Products */}
-        <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#f3f1ed] px-5 sm:px-8 lg:top-[80px] lg:px-16">
-          <div className="mx-auto flex max-w-[1780px] items-center justify-between py-4">
-            <p className="text-[14px] font-medium">{series.name}</p>
-            <div className="flex gap-1">
-              {(["overview", "products"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-5 py-2 text-[12px] font-medium capitalize transition cursor-pointer ${
-                    activeTab === tab
-                      ? "bg-black text-white"
-                      : "text-black/50 hover:bg-black/5 hover:text-black"
+        <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#f3f1ed]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
+          <div className="mx-auto flex max-w-[1780px] items-center justify-between py-3">
+            <p className="text-[20px] font-medium tracking-[-0.03em]">{series.name}</p>
+            <div className="flex items-center gap-8 overflow-x-auto text-[16px]">
+              {([
+                ["overview", "Overview"],
+                ["setup", "Set-up"],
+                ["products", "Products"],
+              ] as Array<[string, string]>).map(([anchor, label]) => (
+                <a
+                  key={anchor}
+                  href={`#${anchor}`}
+                  className={`whitespace-nowrap py-2 text-black/70 transition hover:text-black ${
+                    anchor === "products" ? "rounded-full border-b-0 bg-black px-8 text-white hover:text-white" : ""
                   }`}
                 >
-                  {tab === "overview" ? "Overview" : "Products"}
-                </button>
+                  {label}
+                </a>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Overview tab content */}
-        {activeTab === "overview" && (
-          <>
-            <section className="px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
-              <div className="mx-auto max-w-[1780px]">
-                <div className="grid gap-16 lg:grid-cols-2">
-                  <div>
-                    <p className="max-w-xl font-heading text-[clamp(2rem,4vw,3.4rem)] leading-[1.1]">
-                      {strategy?.headline}
-                    </p>
-                    <p className="mt-6 max-w-lg text-[15px] leading-[1.85] text-black/55">
-                      {strategy?.position}
-                    </p>
-                    <p className="mt-4 max-w-lg text-[15px] leading-[1.85] text-black/45">
-                      {strategy?.atmosphere}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-10">
-                    {[
-                      [String(products.length), "Products"],
-                      [String(finishes.length), "Finishes"],
-                      [startingPrice > 0 ? formatPrice(startingPrice) : "—", "Starting from"],
-                    ].map(([value, label]) => (
-                      <div key={label}>
-                        <p className="font-heading text-[28px] leading-none">{value}</p>
-                        <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-black/40">{label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Available finishes */}
-            <section className="px-5 pb-20 sm:px-8 lg:px-16 lg:pb-28">
-              <div className="mx-auto max-w-[1780px]">
-                <p className="mb-8 text-[12px] uppercase tracking-[0.34em] text-black/40">Available finishes</p>
-                <div className="flex flex-wrap gap-3">
-                  {finishes.map((finish) => {
-                    const disc = getFinishDiscImage(finish.id);
-                    return (
-                      <div key={finish.id} className="flex items-center gap-3 rounded-full border border-black/10 bg-white px-5 py-3">
-                        <span className="relative h-7 w-7 overflow-hidden rounded-full">
-                          {disc ? (
-                            <Image src={disc} alt="" fill sizes="28px" className="object-cover" />
-                          ) : (
-                            <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish.hex }} />
-                          )}
-                        </span>
-                        <span className="text-[13px] font-medium">{finish.name}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-
-            <div className="px-5 pb-20 text-center sm:px-8 lg:px-16 lg:pb-28">
-              <button
-                type="button"
-                onClick={() => setActiveTab("products")}
-                className="rounded-full bg-black px-10 py-4 text-[13px] font-medium text-white transition hover:bg-black/85 cursor-pointer"
+        <section id="overview" className="scroll-mt-[140px] px-5 py-12 sm:px-8 lg:px-16">
+          <div className="mx-auto grid max-w-[1780px] gap-10 md:grid-cols-3">
+            {strategy.cards.map((card, index) => (
+              <motion.article
+                key={card.title}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.65, delay: index * 0.06 }}
+                className="group relative min-h-[640px] overflow-hidden rounded-[14px] bg-black text-white"
               >
-                View products
-              </button>
-            </div>
-          </>
-        )}
+                <Image
+                  src={card.image}
+                  alt={card.title}
+                  fill
+                  quality={90}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition duration-[1300ms] group-hover:scale-[1.035]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-8">
+                  <p className="text-[20px] font-medium uppercase text-white/86">{card.eyebrow}</p>
+                  <h2 className="mt-8 text-[clamp(2rem,3vw,3.1rem)] font-normal tracking-[-0.05em]">
+                    {card.title}
+                  </h2>
+                  <p className="mt-3 max-w-sm text-[16px] leading-[1.55] text-white/72">{card.body}</p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStory(card.title)}
+                    className="mt-5 inline-flex border-b border-white pb-1 text-[18px] font-medium transition hover:text-white/70 cursor-pointer"
+                  >
+                    Discover more
+                  </button>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </section>
 
-        {/* Products tab content */}
-        {activeTab === "products" && (
-          <>
-            {/* Finish filter */}
-            <section className="px-5 pt-10 sm:px-8 lg:px-16 lg:pt-14">
-              <div className="mx-auto max-w-[1780px]">
-                <div className="flex flex-wrap items-center gap-3">
-                  {finishes.map((finish) => {
-                    const disc = getFinishDiscImage(finish.id);
-                    const active = finishFilter === finish.id;
-                    return (
-                      <button
-                        key={finish.id}
-                        type="button"
-                        onClick={() => setFinishFilter(active ? "all" : finish.id)}
-                        className={`flex items-center gap-3 rounded-full border px-5 py-3 transition cursor-pointer ${
-                          active
-                            ? "border-black bg-black text-white"
-                            : "border-black/12 bg-white text-black/70 hover:border-black/30"
+        <section className="bg-[#ece9e4] px-5 py-24 text-center sm:px-8 lg:px-16 lg:py-32">
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.75 }}
+            className="mx-auto max-w-5xl text-[clamp(1.55rem,2vw,2.15rem)] font-normal leading-[1.42] tracking-[-0.025em]"
+          >
+            {strategy.description}
+          </motion.p>
+        </section>
+
+        <section id="products" className="scroll-mt-[140px] border-t border-black/8 px-5 py-16 sm:px-8 lg:px-16 lg:py-20">
+          <div className="mx-auto max-w-[1780px]">
+            <div className="mb-16 text-center">
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Choose a finish</p>
+              <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
+                See the entire {series.name} range in one finish.
+              </h2>
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+                {finishes.map((finish) => {
+                  const disc = getFinishDiscImage(finish.id);
+                  const active = globalFinish === finish.id;
+                  return (
+                    <button
+                      key={finish.id}
+                      type="button"
+                      onClick={() => setGlobalFinish(finish.id)}
+                      title={finish.name}
+                      aria-pressed={active}
+                      className="group flex flex-col items-center gap-2.5 cursor-pointer"
+                    >
+                      <span
+                        className={`relative h-14 w-14 overflow-hidden rounded-full border-2 transition-all duration-300 sm:h-16 sm:w-16 ${
+                          active ? "scale-110 border-black shadow-[0_8px_24px_rgba(0,0,0,0.18)]" : "border-transparent group-hover:border-black/25"
                         }`}
                       >
-                        <span className="relative h-6 w-6 overflow-hidden rounded-full">
-                          {disc ? (
-                            <Image src={disc} alt="" fill sizes="24px" className="object-cover" />
-                          ) : (
-                            <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />
-                          )}
-                        </span>
-                        <span className="text-[12px] font-medium">{finish.name}</span>
-                      </button>
-                    );
-                  })}
-                  {finishFilter !== "all" && (
-                    <button
-                      type="button"
-                      onClick={() => setFinishFilter("all")}
-                      className="rounded-full border border-black/15 px-5 py-3 text-[12px] text-black/50 transition hover:border-black hover:text-black cursor-pointer"
-                    >
-                      Clear
+                        {disc ? <Image src={disc} alt="" fill sizes="64px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
+                      </span>
+                      <span className={`text-[11px] uppercase tracking-[0.12em] transition-colors ${active ? "text-black font-medium" : "text-black/45 group-hover:text-black/70"}`}>
+                        {finish.name}
+                      </span>
                     </button>
-                  )}
-                </div>
+                  );
+                })}
               </div>
-            </section>
+            </div>
 
-            {/* Type filter */}
-            <section className="px-5 pt-6 sm:px-8 lg:px-16">
-              <div className="mx-auto max-w-[1780px] border-b border-black/8 pb-8">
-                <div className="flex flex-wrap gap-2">
-                  {["all", ...types].map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setTypeFilter(type)}
-                      className={`rounded-full border px-5 py-2 text-[12px] font-medium transition cursor-pointer ${
-                        typeFilter === type
-                          ? "border-black bg-black text-white"
-                          : "border-black/10 bg-white text-black/55 hover:border-black/25 hover:text-black"
-                      }`}
-                    >
-                      {type === "all" ? "All" : labelType(type)}
-                    </button>
-                  ))}
-                </div>
+            <motion.div
+              key={globalFinish}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="grid grid-cols-2 gap-10 md:gap-12 lg:grid-cols-3 lg:gap-y-20"
+            >
+              {products.map((product, index) => (
+                <motion.div
+                  key={product.slug}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.55, delay: Math.min(index * 0.05, 0.2) }}
+                >
+                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} hidePrice finish={globalFinish} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        <section id="setup" className="scroll-mt-[140px] border-t border-black/8 px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+          <div className="mx-auto grid max-w-[1780px] items-center gap-16 lg:grid-cols-2">
+            <div>
+              <p className="text-[18px] uppercase tracking-[0.3em] text-black/45">Set-up</p>
+              <h2 className="mt-8 max-w-3xl text-[clamp(3rem,6vw,6rem)] font-normal leading-[0.98] tracking-[-0.06em]">
+                How this collection belongs in a project.
+              </h2>
+              <p className="mt-8 max-w-2xl text-[20px] leading-[1.65] text-black/62">
+                {strategy.setup}
+              </p>
+              <div className="mt-12 flex flex-wrap gap-3">
+                {finishes.map((finish) => {
+                  const disc = getFinishDiscImage(finish.id);
+                  return (
+                    <span key={finish.id} className="flex items-center gap-3 rounded-full border border-black/10 px-5 py-3">
+                      <span className="relative h-7 w-7 overflow-hidden rounded-full">
+                        {disc ? <Image src={disc} alt="" fill sizes="28px" className="object-cover" /> : null}
+                      </span>
+                      <span className="text-[13px]">{finish.name}</span>
+                    </span>
+                  );
+                })}
               </div>
-            </section>
-
-            {/* Product grid — Gessi: collection name + model number */}
-            <section className="px-5 py-16 sm:px-8 lg:px-16 lg:py-20">
-              <div className="mx-auto max-w-[1780px]">
-                <div className="grid grid-cols-2 gap-5 md:gap-7 lg:grid-cols-3 lg:gap-y-16">
-                  {filtered.map((product, index) => (
-                    <motion.div
-                      key={product.slug}
-                      initial={{ opacity: 0, y: 28 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-60px" }}
-                      transition={{ duration: 0.55, delay: Math.min(index * 0.05, 0.2) }}
-                    >
-                      <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} hidePrice />
-                    </motion.div>
-                  ))}
-                </div>
-
-                {filtered.length === 0 && (
-                  <div className="flex flex-col items-center py-24 text-center">
-                    <p className="text-[15px] text-black/40">No products match this combination.</p>
-                    <button
-                      type="button"
-                      onClick={() => { setTypeFilter("all"); setFinishFilter("all"); }}
-                      className="mt-4 rounded-full border border-black/20 px-6 py-2.5 text-[13px] transition hover:bg-black hover:text-white cursor-pointer"
-                    >
-                      Reset filters
-                    </button>
-                  </div>
-                )}
+            </div>
+            {contextImage ? (
+              <div className="relative aspect-[4/5] overflow-hidden bg-black">
+                <Image src={contextImage} alt={`${series.name} in context`} fill quality={90} sizes="50vw" className="object-cover" />
               </div>
-            </section>
-          </>
-        )}
+            ) : null}
+          </div>
+        </section>
 
-        {/* CTA — Gessi-style service strip */}
         <section className="border-t border-black/8 px-5 py-20 sm:px-8 lg:px-16">
-          <div className="mx-auto grid max-w-[1780px] lg:grid-cols-3">
+          <div className="mx-auto grid max-w-[1780px] lg:grid-cols-2">
             {[
-              ["Explore more collections", "Compare all four Steinheim collections and find the right mood for your project.", "/collections"],
-              ["Project studio", "Build a trade scope and prepare a complete Steinheim specification.", "/trade"],
-              ["Get assistance", "Request pricing, lead times, and project-specific guidance.", "/contact"],
+              ["Back to overview", "Return to the story and design direction of the collection.", "#overview"],
+              ["Trade studio", "Build a project scope and prepare a Steinheim specification.", "/trade"],
             ].map(([title, body, href]) => (
               <Link
                 key={title}
@@ -347,6 +352,85 @@ export default function CollectionPage() {
             ))}
           </div>
         </section>
+
+        <AnimatePresence>
+          {selectedStoryCard && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-[80] flex items-center justify-center bg-black/72 px-4 py-6 backdrop-blur-[2px]"
+              onClick={() => setSelectedStory(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 24, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.985 }}
+                transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
+                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-hidden rounded-[8px] bg-[#f3f1ed] text-black lg:grid-cols-2"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  onClick={() => setSelectedStory(null)}
+                  aria-label="Close"
+                  className="absolute right-6 top-6 z-20 flex h-16 w-16 items-center justify-center rounded-full bg-black/8 text-black/45 transition hover:bg-black hover:text-white"
+                >
+                  <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
+                    <line x1="4" y1="4" x2="16" y2="16" />
+                    <line x1="16" y1="4" x2="4" y2="16" />
+                  </svg>
+                </button>
+                <div className="relative min-h-[42svh] lg:min-h-[82svh]">
+                  <Image
+                    src={selectedStoryCard.image}
+                    alt={selectedStoryCard.title}
+                    fill
+                    quality={92}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex items-center px-8 py-20 sm:px-14 lg:px-24">
+                  <div className="max-w-2xl">
+                    <p className="text-[18px] uppercase tracking-[0.32em] text-black/80">
+                      {selectedStoryCard.eyebrow}
+                    </p>
+                    <h2 className="mt-8 text-[clamp(3rem,5vw,6rem)] font-normal leading-[0.95] tracking-[-0.07em]">
+                      {selectedStoryCard.title}
+                    </h2>
+                    <p className="mt-8 text-[clamp(1.1rem,1.45vw,1.45rem)] leading-[1.65] text-black/72">
+                      {selectedStoryCard.body} {strategy.description}
+                    </p>
+                    <div className="mt-10 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedStory(null);
+                          document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="rounded-full border border-black px-10 py-3 text-[15px] transition hover:bg-black hover:text-white"
+                      >
+                        View products
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedStory(null);
+                          document.getElementById("setup")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="rounded-full border border-black/18 px-10 py-3 text-[15px] text-black/58 transition hover:border-black/45 hover:text-black"
+                      >
+                        View set-up
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </PageTransition>
   );

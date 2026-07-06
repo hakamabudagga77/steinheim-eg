@@ -5,13 +5,13 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
-import ProductCard from "@/components/product/ProductCard";
 import ProductAssistantPanel, { type ProductPackageItem } from "@/components/product/ProductAssistantPanel";
+import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
-import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 
 const supportPackageTypes = ["accessories", "bidet-spray", "click-clack", "angle-valve"];
 
@@ -31,6 +31,7 @@ type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
 export default function ProductDetailClient({ slug, liveData = null }: { slug: string; liveData?: LiveProductData }) {
   const product = getProductBySlug(slug)!;
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
+  const [finishOpen, setFinishOpen] = useState(false);
   const [expandedSpec, setExpandedSpec] = useState(false);
   const [cartAdded, setCartAdded] = useState(false);
   const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
@@ -40,22 +41,35 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const seriesName = series?.name ?? product.series;
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const finish = getFinishById(variant.finish);
-  const liveVariant = liveData?.variants.find((v) => v.finish === variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
-  const contextImage = getCollectionContextImage(product.series);
+  const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
+  const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
   const isInProposal = project.items.some((item) => item.slug === product.slug && item.finish === variant.finish);
   const packageTypes = Array.from(new Set(packageTypesForProduct(product.type)));
+  const activeFinishDisc = getFinishDiscImage(variant.finish);
+
   const packageBuild = (() => {
     const rows: ProductPackageItem[] = [];
     const omitted: string[] = [];
     const seriesProducts = getProductsBySeries(product.series);
+
     for (const type of packageTypes) {
       const packageProduct = type === product.type ? product : seriesProducts.find((entry) => entry.type === type);
       const packageVariant = packageProduct?.variants.find((entry) => entry.finish === variant.finish);
-      if (!packageProduct || !packageVariant) { omitted.push(type.replace(/-/g, " ")); continue; }
-      rows.push({ slug: packageProduct.slug, name: `${seriesName} ${packageProduct.name}`, finish: packageVariant.finish, model: packageVariant.model, quantity: type === "angle-valve" ? 2 : 1 });
+      if (!packageProduct || !packageVariant) {
+        omitted.push(type.replace(/-/g, " "));
+        continue;
+      }
+      rows.push({
+        slug: packageProduct.slug,
+        name: `${seriesName} ${packageProduct.name}`,
+        finish: packageVariant.finish,
+        model: packageVariant.model,
+        quantity: type === "angle-valve" ? 2 : 1,
+      });
     }
+
     return { rows, omitted };
   })();
 
@@ -71,171 +85,214 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
 
   return (
     <PageTransition>
-      <div className="bg-[#f3f1ed] text-[#111]">
-        {/* Breadcrumb — Gessi style */}
-        <div className="bg-[#f3f1ed] px-5 pt-[88px] pb-4 sm:px-8 lg:px-16 lg:pt-[96px]">
+      <div className="bg-[#ece9e2] text-[#111]">
+        <div className="bg-[#ece9e2] px-5 pb-4 pt-[92px] sm:px-8 lg:px-16 lg:pt-[104px]">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] text-black/40">
-              <Link href="/collections" className="hover:text-black transition">{seriesName}</Link>
+              <Link href={`/collections/${product.series}`} className="transition hover:text-black">
+                {seriesName}
+              </Link>
               {" · "}
               <span className="text-black/60">{variant.model}</span>
             </p>
           </div>
         </div>
 
-        {/* Main product section — Gessi split layout */}
-        <section className="bg-[#f3f1ed] px-5 pb-0 sm:px-8 lg:px-16">
-          <div className="mx-auto max-w-[1780px]">
-            <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:gap-0">
-              {/* Left — product image on warm beige, no rounded container (Gessi style) */}
-              <div className="relative flex min-h-[55svh] items-center justify-center bg-[#ece9e2] lg:sticky lg:top-[80px] lg:min-h-[calc(100svh-80px)]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={variant.finish}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                  >
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`}
-                        fill
-                        priority
-                        quality={90}
-                        sizes="(max-width: 1024px) 100vw, 55vw"
-                        className="object-contain p-[10%] lg:p-[12%]"
-                      />
-                    ) : (
-                      <div className="font-heading text-3xl text-black/15">{product.name}</div>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Right — product info panel (Gessi: model number as heading) */}
-              <div className="py-10 lg:py-16 lg:pl-16">
+        <section className="bg-[#ece9e2]">
+          <div className="grid min-h-[calc(100svh-124px)] lg:grid-cols-[56vw_44vw]">
+            <div className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-[80px] lg:min-h-[calc(100svh-80px)]">
+              <AnimatePresence mode="wait">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.15 }}
+                  key={variant.finish}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 flex items-center justify-center"
                 >
-                  <h1 className="font-heading text-[clamp(2.4rem,5vw,4.5rem)] leading-[0.95] tracking-[-0.03em]">
-                    {variant.model}
-                  </h1>
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`}
+                      fill
+                      priority
+                      quality={92}
+                      sizes="(max-width: 1024px) 100vw, 56vw"
+                      className="scale-[1.16] object-contain p-[4%] transition duration-[900ms] lg:scale-[1.24] lg:p-[5%]"
+                    />
+                  ) : (
+                    <div className="font-heading text-3xl text-black/15">{product.name}</div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-                  <p className="mt-5 max-w-lg text-[15px] leading-[1.75] text-black/55">
-                    {product.name}, {series?.description?.toLowerCase() || "designed for enduring performance and visual clarity."}
-                  </p>
+            <div className="flex items-center px-5 py-12 sm:px-8 lg:px-16 lg:py-20 xl:px-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="w-full max-w-[620px]"
+              >
+                <p className="text-[17px] text-black/82">{seriesName} Collection</p>
+                <h1 className="mt-6 font-heading text-[clamp(3.2rem,5.8vw,5.8rem)] font-light leading-[0.9] tracking-[-0.055em]">
+                  {variant.model}
+                </h1>
 
-                  {/* Finish selector — Gessi row style: swatch circle + code – name */}
-                  <div className="mt-10">
-                    <div className="overflow-y-auto rounded-[14px] border border-black/10" style={{ maxHeight: "220px" }}>
-                      {product.variants.map((entry, i) => {
-                        const entryFinish = getFinishById(entry.finish);
-                        const disc = getFinishDiscImage(entry.finish);
-                        const active = variant.finish === entry.finish;
-                        return (
-                          <button
-                            key={entry.finish}
-                            type="button"
-                            onClick={() => setSelectedFinish(entry.finish)}
-                            className={`flex w-full items-center gap-4 px-5 py-4 text-left transition cursor-pointer hover:bg-black/[0.02] ${
-                              i > 0 ? "border-t border-black/6" : ""
-                            }`}
-                          >
-                            <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
-                              {disc ? (
-                                <Image src={disc} alt="" fill sizes="28px" className="object-cover" />
-                              ) : (
-                                <span className="absolute inset-0 rounded-full" style={{ backgroundColor: entryFinish?.hex }} />
-                              )}
-                            </span>
-                            <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
-                              {entry.model} – {entryFinish?.name}{entryFinish?.type === "pvd" ? " Pvd" : ""}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <p className="mt-6 max-w-lg text-[17px] leading-[1.75] text-black/70">
+                  {product.name}, {series?.description?.toLowerCase() || "designed for enduring performance and visual clarity."}
+                </p>
 
-                  {/* Add to Wishlist — Gessi primary CTA */}
-                  <div className="mt-8">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToCart(product.slug, variant.finish);
-                        setCartAdded(true);
-                        setTimeout(() => setCartAdded(false), 2200);
-                      }}
-                      className="flex h-[52px] w-full items-center justify-center rounded-full bg-black text-[13px] font-medium uppercase tracking-[0.08em] text-white transition hover:bg-black/85 cursor-pointer"
-                    >
-                      {cartAdded ? "Added to cart" : "Add to Wishlist"}
-                    </button>
-                  </div>
+                <div className="relative mt-12">
+                  <button
+                    type="button"
+                    onClick={() => setFinishOpen((open) => !open)}
+                    className="flex h-[58px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.045)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)]"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
+                        {activeFinishDisc ? (
+                          <Image src={activeFinishDisc} alt="" fill sizes="36px" className="object-cover" />
+                        ) : (
+                          <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish?.hex }} />
+                        )}
+                      </span>
+                      <span className="truncate text-[16px] text-black">
+                        {variant.model} - {finish?.name}
+                        {finish?.type === "pvd" ? " Pvd" : ""}
+                      </span>
+                    </span>
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f0eee8] text-[18px] leading-none text-black/45">
+                      {finishOpen ? "⌃" : "⌄"}
+                    </span>
+                  </button>
 
-                  {/* Add to project — secondary */}
+                  <AnimatePresence>
+                    {finishOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute left-0 right-0 z-20 mt-3 overflow-hidden rounded-[28px] border border-black/8 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+                      >
+                        {product.variants.map((entry, i) => {
+                          const entryFinish = getFinishById(entry.finish);
+                          const disc = getFinishDiscImage(entry.finish);
+                          const active = variant.finish === entry.finish;
+
+                          return (
+                            <button
+                              key={entry.finish}
+                              type="button"
+                              onClick={() => {
+                                setSelectedFinish(entry.finish);
+                                setFinishOpen(false);
+                              }}
+                              className={`flex w-full cursor-pointer items-center gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                                i > 0 ? "border-t border-black/6" : ""
+                              }`}
+                            >
+                              <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
+                                {disc ? (
+                                  <Image src={disc} alt="" fill sizes="28px" className="object-cover" />
+                                ) : (
+                                  <span className="absolute inset-0 rounded-full" style={{ backgroundColor: entryFinish?.hex }} />
+                                )}
+                              </span>
+                              <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
+                                {entry.model} - {entryFinish?.name}
+                                {entryFinish?.type === "pvd" ? " Pvd" : ""}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addToCart(product.slug, variant.finish);
+                      setCartAdded(true);
+                      setTimeout(() => setCartAdded(false), 2200);
+                    }}
+                    className="flex h-[58px] w-full cursor-pointer items-center justify-center rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                  >
+                    {cartAdded ? "Added" : "Add to Wishlist"}
+                  </button>
                   <button
                     type="button"
                     onClick={addToProposal}
-                    className="mt-3 flex h-[44px] w-full items-center justify-center text-[12px] font-medium text-black/50 transition hover:text-black cursor-pointer"
+                    className="mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/45 transition hover:bg-white/55 hover:text-black"
                   >
-                    {isInProposal ? "View project board" : "Add to project board"}
+                    {isInProposal ? "Open project board" : "Add to project board"}
                   </button>
+                </div>
 
-                  <ProductAssistantPanel
-                    product={product}
-                    series={series}
-                    variant={variant}
-                    finish={finish}
-                    isInProject={isInProposal}
-                    onAddToProject={addToProposal}
-                    packageItems={packageBuild.rows}
-                    omittedPackageItems={packageBuild.omitted}
-                    onAddPackage={addPackageToProposal}
-                  />
-
-                  {/* Technical Features and Download — Gessi style */}
-                  <div className="mt-6 border-t border-black/8">
-                    <button
-                      type="button"
-                      onClick={() => setExpandedSpec(!expandedSpec)}
-                      className="flex w-full items-center justify-between py-6 text-left cursor-pointer"
-                    >
-                      <span className="text-[14px] font-medium">Technical Features and Download</span>
-                      <span className="text-[20px] text-black/40">{expandedSpec ? "−" : "+"}</span>
-                    </button>
-                    <AnimatePresence>
-                      {expandedSpec && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pb-8">
-                            <SpecTable product={product} />
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              </div>
+                <div className="mt-10 border-t border-black/10">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedSpec(!expandedSpec)}
+                    className="flex w-full cursor-pointer items-center justify-between py-6 text-left"
+                  >
+                    <span className="text-[18px] font-medium">Technical Features and Download</span>
+                    <span className="text-[20px] text-black/40">{expandedSpec ? "-" : "+"}</span>
+                  </button>
+                  <AnimatePresence>
+                    {expandedSpec && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-8">
+                          <SpecTable product={product} />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
 
-        {/* Context image */}
+        <section className="border-t border-black/8 bg-[#ece9e2] px-5 py-16 sm:px-8 lg:px-16 lg:py-24">
+          <div className="mx-auto grid max-w-[1780px] items-start gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-16">
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/42">Steinheim Concierge</p>
+              <h2 className="mt-5 max-w-xl font-heading text-[clamp(2.6rem,5vw,5.2rem)] font-light leading-[0.92] tracking-[-0.055em]">
+                Specify it with context.
+              </h2>
+              <p className="mt-6 max-w-lg text-[16px] leading-[1.85] text-black/58">
+                Ask whether this model fits a hotel, villa, guest bathroom, or developer schedule. The assistant stays inside Steinheim Egypt catalogue logic.
+              </p>
+            </div>
+            <ProductAssistantPanel
+              product={product}
+              series={series}
+              variant={variant}
+              finish={finish}
+              isInProject={isInProposal}
+              onAddToProject={addToProposal}
+              packageItems={packageBuild.rows}
+              omittedPackageItems={packageBuild.omitted}
+              onAddPackage={addPackageToProposal}
+            />
+          </div>
+        </section>
+
         {contextImage && (
           <section className="px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] bg-black">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-black">
                   <Image
                     src={contextImage}
                     alt={`${seriesName} collection in a bathroom setting`}
@@ -247,10 +304,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </div>
                 <div className="max-w-lg">
                   <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">In context</p>
-                  <h2 className="mt-4 text-[clamp(2rem,4vw,3.8rem)] font-normal leading-[0.95] tracking-[-0.04em]">
+                  <h2 className="mt-4 font-heading text-[clamp(2.4rem,4.6vw,4.4rem)] font-light leading-[0.92] tracking-[-0.055em]">
                     Part of a complete bathroom language.
                   </h2>
-                  <p className="mt-5 text-[15px] leading-[1.85] text-black/50">
+                  <p className="mt-6 text-[16px] leading-[1.85] text-black/55">
                     See how the {seriesName} collection&apos;s form, finish, and proportions work within a resolved bathroom environment.
                   </p>
                   <Link
@@ -265,14 +322,13 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           </section>
         )}
 
-        {/* Related products */}
         {related.length > 0 && (
           <section className="border-t border-black/6 px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="mb-14 flex items-end justify-between">
                 <div>
                   <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Related</p>
-                  <h2 className="mt-3 text-[clamp(2rem,4.5vw,4.4rem)] font-normal leading-[0.92] tracking-[-0.04em]">
+                  <h2 className="mt-3 font-heading text-[clamp(2.4rem,4.5vw,4.6rem)] font-light leading-[0.92] tracking-[-0.055em]">
                     Continue the {seriesName} language.
                   </h2>
                 </div>

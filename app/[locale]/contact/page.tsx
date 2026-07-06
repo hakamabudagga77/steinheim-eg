@@ -15,7 +15,7 @@ export default function ContactPage() {
   const [enquiryType, setEnquiryType] = useState<string>("homeowner");
 
   const inputBase =
-    "w-full rounded-[14px] border border-black/10 bg-white px-5 py-4 text-[15px] text-[#111] placeholder:text-black/25 focus:border-black/30 focus:outline-none transition-colors duration-300";
+    "w-full border-b border-black/15 bg-transparent px-1 py-4 text-[15px] text-[#111] placeholder:text-black/25 focus:border-black/40 focus:outline-none transition-colors duration-300";
 
   return (
     <PageTransition>
@@ -63,7 +63,7 @@ export default function ContactPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center rounded-[22px] bg-white py-24 text-center"
+                    className="flex flex-col items-center justify-center rounded-[14px] bg-white py-24 text-center"
                   >
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black/5">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -77,7 +77,7 @@ export default function ContactPage() {
                   </motion.div>
                 ) : (
                   <form
-                    className="rounded-[22px] bg-white p-8 sm:p-10 lg:p-12"
+                    className="rounded-[14px] bg-white p-8 sm:p-10 lg:p-12"
                     onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
                   >
                     {/* Enquiry type */}
@@ -140,7 +140,7 @@ export default function ContactPage() {
 
                     <button
                       type="submit"
-                      className="mt-8 flex h-[54px] w-full items-center justify-center rounded-full bg-black text-[13px] font-medium text-white transition hover:bg-black/85 sm:w-auto sm:px-14 cursor-pointer"
+                      className="mt-8 flex h-[50px] items-center justify-center rounded-full border border-black/30 px-14 text-[13px] font-medium text-black transition hover:bg-black hover:text-white cursor-pointer"
                     >
                       Send message
                     </button>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                   { label: "Email", lines: ["inquiries@steinheim-eg.com"], href: "mailto:inquiries@steinheim-eg.com" },
                   { label: "WhatsApp", lines: ["+20 122 399 8124"], href: "https://wa.me/201223998124" },
                 ].map((block) => (
-                  <div key={block.label} className="rounded-[18px] bg-white p-6">
+                  <div key={block.label} className="rounded-[12px] bg-white p-6">
                     <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{block.label}</p>
                     {block.lines.map((line) =>
                       block.href ? (
@@ -169,7 +169,7 @@ export default function ContactPage() {
                   </div>
                 ))}
 
-                <div className="rounded-[18px] border border-black/6 bg-white p-6">
+                <div className="rounded-[12px] border border-black/6 bg-white p-6">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">Response time</p>
                   <p className="mt-3 font-heading text-[24px]">Under 24 hours</p>
                   <p className="mt-2 text-[13px] leading-[1.7] text-black/45">

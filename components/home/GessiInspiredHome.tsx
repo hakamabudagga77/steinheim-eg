@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
+import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 
 const heroVideo =
   "https://steinheim-eg.com/cdn/shop/videos/c/vp/85071c8806704603be22828dee32397c/85071c8806704603be22828dee32397c.HD-1080p-7.2Mbps-77449179.mp4?v=0";
@@ -17,25 +18,25 @@ const collections = [
   {
     name: "Joy",
     href: "/collections/joy",
-    image: "/images/steinheim/karim-2026/home-joy.webp",
+    image: "/images/collections/home/joy-card-v3.jpeg",
     line: "Soft balance for private villas, suites, and warm hospitality rooms.",
   },
   {
     name: "Up",
     href: "/collections/up",
-    image: "/images/steinheim/karim-2026/home-up.webp",
+    image: "/images/collections/home/up-card-v3.png",
     line: "A repeatable modern language for developments and project schedules.",
   },
   {
     name: "Art",
     href: "/collections/art",
-    image: "/images/steinheim/karim-2026/home-art.webp",
+    image: "/images/collections/home/art-card-v4.png",
     line: "Architectural precision for statement bathrooms and design-led spaces.",
   },
   {
     name: "Quatro",
     href: "/collections/quatro",
-    image: "/images/steinheim/karim-2026/home-quatro.webp",
+    image: "/images/collections/home/quatro-card-v5.png",
     line: "Crisp geometry for sharp, contemporary interiors.",
   },
 ];
@@ -54,12 +55,12 @@ const references = [
   {
     title: "Development schedules",
     place: "Repeatable premium specifications",
-    image: "/images/steinheim/final/trade-hero.jpg",
+    image: "/images/generated/gessi/steinheim-specification-story.png",
   },
   {
     title: "Show bathrooms",
     place: "Owner units and sales galleries",
-    image: "/images/steinheim/final/about-craft.jpg",
+    image: "/images/generated/gessi/steinheim-wellness-architecture.png",
   },
 ];
 
@@ -265,24 +266,19 @@ export default function GessiInspiredHome() {
 
       <section className="bg-[#f3f1ed] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
         <div className="mx-auto max-w-[1780px]">
-          <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/45">References</p>
-              <h2
-                className="mt-4 max-w-4xl text-[clamp(2.5rem,5.5vw,6.6rem)] leading-[0.92] tracking-[-0.052em]"
-                style={{ fontStyle: "italic" }}
-              >
-                Designed for projects that need permanence.
-              </h2>
-            </div>
-            <Link href="/projects" className="rounded-full border border-black/30 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white">
-              Discover more
-            </Link>
+          <div className="mb-14 text-center">
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">References</p>
+            <h2
+              className="mx-auto mt-5 max-w-4xl text-[clamp(2.5rem,5.5vw,6.6rem)] leading-[0.92] tracking-[-0.052em]"
+              style={{ fontStyle: "italic" }}
+            >
+              Designed for projects that need permanence.
+            </h2>
           </div>
-          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {references.map((item) => (
               <Link key={item.title} href="/projects" className="group block">
-                <div className="relative aspect-[1.35] overflow-hidden rounded-[18px] bg-black">
+                <div className="relative aspect-[1.35] overflow-hidden rounded-[14px] bg-black">
                   <Image
                     src={item.image}
                     alt={item.title}
@@ -291,10 +287,15 @@ export default function GessiInspiredHome() {
                     className="object-cover transition duration-[1300ms] group-hover:scale-[1.04]"
                   />
                 </div>
-                <h3 className="mt-6 text-[26px] font-semibold leading-tight">{item.title}</h3>
-                <p className="mt-1 text-[18px] text-black/62">{item.place}</p>
+                <h3 className="mt-5 font-heading text-[20px] leading-tight" style={{ fontStyle: "italic" }}>{item.title}</h3>
+                <p className="mt-1 text-[14px] text-black/50">{item.place}</p>
               </Link>
             ))}
+          </div>
+          <div className="mt-12 text-center">
+            <Link href="/projects" className="rounded-full border border-black/25 px-8 py-3.5 text-[13px] transition hover:bg-black hover:text-white">
+              Discover more
+            </Link>
           </div>
         </div>
       </section>
@@ -341,16 +342,18 @@ export default function GessiInspiredHome() {
               })}
             </div>
             <div className="mt-12 flex flex-wrap gap-3">
-              <Link href="/products/joy-basin-mixer" className="rounded-full bg-black px-10 py-4 text-[14px] text-white transition hover:bg-black/80">
-                View product
+              <Link href="/products/joy-basin-mixer" className="rounded-full border border-black/30 px-10 py-4 text-[13px] font-medium transition hover:bg-black hover:text-white">
+                Discover more
               </Link>
-              <Link href="/trade" className="rounded-full border border-black/25 px-10 py-4 text-[14px] transition hover:border-black">
+              <Link href="/trade" className="rounded-full border border-black/15 px-10 py-4 text-[13px] text-black/60 transition hover:border-black/40">
                 Add to project
               </Link>
             </div>
           </div>
         </div>
       </section>
+
+      <FinishPlanetsSection />
 
       <section className="bg-[#f3f1ed] px-5 py-20 sm:px-8 lg:px-16">
         <div className="mx-auto grid max-w-[1780px] border-y border-black/12 lg:grid-cols-3">
