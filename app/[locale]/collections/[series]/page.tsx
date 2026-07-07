@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
+import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
+import OverviewCardsSpread from "@/components/collections/OverviewCardsSpread";
 import PageTransition from "@/components/layout/PageTransition";
 import {
   collectionBanners,
@@ -191,44 +193,9 @@ export default function CollectionPage() {
           </div>
         </section>
 
-        <section id="overview" className="scroll-mt-[140px] px-5 py-12 sm:px-8 lg:px-16">
-          <div className="mx-auto grid max-w-[1780px] gap-10 md:grid-cols-3">
-            {strategy.cards.map((card, index) => (
-              <motion.article
-                key={card.title}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.65, delay: index * 0.06 }}
-                className="group relative min-h-[640px] overflow-hidden rounded-[14px] bg-black text-white"
-              >
-                <Image
-                  src={card.image}
-                  alt={card.title}
-                  fill
-                  quality={90}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition duration-[1300ms] group-hover:scale-[1.035]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-8">
-                  <p className="text-[20px] font-medium uppercase text-white/86">{card.eyebrow}</p>
-                  <h2 className="mt-8 text-[clamp(2rem,3vw,3.1rem)] font-normal tracking-[-0.05em]">
-                    {card.title}
-                  </h2>
-                  <p className="mt-3 max-w-sm text-[16px] leading-[1.55] text-white/72">{card.body}</p>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStory(card.title)}
-                    className="mt-5 inline-flex border-b border-white pb-1 text-[18px] font-medium transition hover:text-white/70 cursor-pointer"
-                  >
-                    Discover more
-                  </button>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </section>
+        <div id="overview" className="scroll-mt-[140px]">
+          <OverviewCardsSpread cards={strategy.cards} onSelectStory={setSelectedStory} />
+        </div>
 
         <section className="bg-[#ece9e4] px-5 py-24 text-center sm:px-8 lg:px-16 lg:py-32">
           <motion.p
@@ -331,6 +298,8 @@ export default function CollectionPage() {
             ) : null}
           </div>
         </section>
+
+        <ProjectsCarousel collectionSlug={series.id as "joy" | "up" | "art" | "quatro"} collectionName={series.name} />
 
         <section className="border-t border-black/8 px-5 py-20 sm:px-8 lg:px-16">
           <div className="mx-auto grid max-w-[1780px] lg:grid-cols-2">

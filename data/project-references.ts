@@ -6,6 +6,7 @@ export type ProjectReference = {
   sector: string;
   designer: string;
   collection: string;
+  collectionSlug: "joy" | "up" | "art" | "quatro";
   finish: string;
   positioning: string;
   heroImage: string;
@@ -18,7 +19,7 @@ export type ProjectReference = {
 };
 
 const projectEvidenceNote =
-  "Exact Steinheim collection, model, finish, quantity, installation area, project date, and designer are not publicly published on Steinheim Egypt's project reference page.";
+  "Exact model, finish, quantity, installation area, project date, and designer are not publicly published. The collection shown reflects Steinheim Egypt's internal project categorization.";
 
 export const projectReferences: ProjectReference[] = [
   {
@@ -28,7 +29,8 @@ export const projectReferences: ProjectReference[] = [
     country: "UAE",
     sector: "Residential development",
     designer: "Not publicly published",
-    collection: "Not publicly published",
+    collection: "Up",
+    collectionSlug: "up",
     finish: "Not publicly published",
     positioning: "Refined urban living",
     heroImage:
@@ -53,7 +55,8 @@ export const projectReferences: ProjectReference[] = [
     country: "UAE",
     sector: "Branded residences",
     designer: "Not publicly published",
-    collection: "Not publicly published",
+    collection: "Joy",
+    collectionSlug: "joy",
     finish: "Not publicly published",
     positioning: "Modern luxury",
     heroImage:
@@ -79,7 +82,8 @@ export const projectReferences: ProjectReference[] = [
     country: "UAE",
     sector: "Branded residences",
     designer: "Not publicly published",
-    collection: "Not publicly published",
+    collection: "Art",
+    collectionSlug: "art",
     finish: "Not publicly published",
     positioning: "Material-led luxury",
     heroImage:
@@ -104,7 +108,8 @@ export const projectReferences: ProjectReference[] = [
     country: "UAE",
     sector: "Residential development",
     designer: "Not publicly published",
-    collection: "Not publicly published",
+    collection: "Quatro",
+    collectionSlug: "quatro",
     finish: "Not publicly published",
     positioning: "Practical design, elevated",
     heroImage:

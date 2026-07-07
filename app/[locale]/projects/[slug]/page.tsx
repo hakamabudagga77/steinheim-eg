@@ -88,7 +88,12 @@ export default async function ProjectReferencePage({
               </div>
               <div>
                 <p className="text-[15px] font-semibold">Steinheim collection</p>
-                <p className="mt-3 text-white/72">{project.collection}</p>
+                <Link
+                  href={`/collections/${project.collectionSlug}`}
+                  className="mt-3 inline-block text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white hover:decoration-white/60"
+                >
+                  {project.collection}
+                </Link>
               </div>
               <div>
                 <p className="text-[15px] font-semibold">Finish direction</p>
