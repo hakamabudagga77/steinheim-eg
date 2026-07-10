@@ -231,7 +231,7 @@ export default function Navigation({ locale }: { locale: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
-            <div className="mx-3 mt-3 flex h-[72px] max-w-[1120px] items-center justify-between rounded-t-[22px] bg-[#f5f3ee] px-7 shadow-[0_24px_80px_rgba(0,0,0,0.16)] lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
+            <div className="mx-0 mt-0 flex h-[66px] max-w-[1120px] items-center justify-between bg-[#f5f3ee] px-5 shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mt-3 sm:h-[72px] sm:rounded-t-[22px] sm:px-7 lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
               <button
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer"
@@ -263,10 +263,10 @@ export default function Navigation({ locale }: { locale: string }) {
               </Link>
             </div>
 
-            <div className="mx-3 mb-3 flex h-[calc(100vh-90px)] max-w-[1120px] overflow-hidden rounded-b-[22px] bg-[#f5f3ee] shadow-[0_24px_80px_rgba(0,0,0,0.16)] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
-              <div className="flex w-full flex-col justify-center border-r border-black/10 px-8 lg:w-[36%] lg:px-10">
-                <div className="mb-12">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 mb-8">
+            <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#f5f3ee] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
+              <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 py-8 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:py-0">
+                <div className="mb-8 lg:mb-12">
+                  <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 lg:mb-8">
                     {t("collections")}
                   </p>
                   <div className="space-y-1">
@@ -284,7 +284,7 @@ export default function Navigation({ locale }: { locale: string }) {
                             setActivePanel("collections");
                             setHoveredCollection(collection.id);
                           }}
-                          className={`block py-2 text-[clamp(1.5rem,2.3vw,2.8rem)] font-medium leading-[1.15] transition-all duration-400 ${
+                          className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-medium leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
                             (activePanel === "collections" && activeCollection === collection.id) || pathname.includes(collection.id)
                               ? "text-black"
                               : "text-black/50 hover:translate-x-2 hover:text-black"
@@ -297,14 +297,52 @@ export default function Navigation({ locale }: { locale: string }) {
                   </div>
                 </div>
 
+                {activePanel === "collections" && (
+                  <motion.div
+                    key={activeCollection}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35 }}
+                    className="mb-8 grid grid-cols-2 gap-3 lg:hidden"
+                  >
+                    {activeProducts.map((product) => {
+                      const image = menuProductImages[product.slug] ?? getProductDefaultImage(product.slug);
+                      return (
+                        <Link
+                          key={product.slug}
+                          href={`/products/${product.slug}`}
+                          onClick={handleNavigate}
+                          className="group overflow-hidden rounded-[16px] bg-black text-white"
+                        >
+                          <div className="relative aspect-[1.05]">
+                            {image ? (
+                              <Image
+                                src={image}
+                                alt={product.name}
+                                fill
+                                sizes="45vw"
+                                className="object-cover transition duration-700 group-active:scale-[1.03]"
+                              />
+                            ) : null}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-transparent to-transparent" />
+                            <p className="absolute inset-x-0 bottom-0 p-3 font-heading text-[18px] leading-none">
+                              {product.name}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </motion.div>
+                )}
+
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className="mb-8 h-px w-16 origin-left bg-black/12"
+                  className="mb-6 h-px w-16 origin-left bg-black/12 lg:mb-8"
                 />
 
-                <div className="mb-10">
+                <div className="mb-8 lg:mb-10">
                   <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35">
                     Our World
                   </p>
@@ -360,7 +398,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8, duration: 0.5 }}
-                  className="mt-16"
+                  className="mt-8 lg:mt-16"
                 >
                   <p className="text-[11px] tracking-[0.1em] text-black/30">
                     inquiries@steinheim-eg.com
