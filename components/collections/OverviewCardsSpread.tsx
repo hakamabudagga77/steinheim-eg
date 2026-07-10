@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 
 type StoryCard = { eyebrow: string; title: string; body: string; image: string };
 
@@ -20,6 +20,11 @@ export default function OverviewCardsSpread({
     target: containerRef,
     offset: ["start start", "end end"],
   });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 22,
+    mass: 0.4,
+  });
 
   return (
     <section ref={containerRef} className="relative" style={{ height: "220vh" }}>
@@ -30,7 +35,7 @@ export default function OverviewCardsSpread({
               key={card.title}
               card={card}
               index={index}
-              scrollYProgress={scrollYProgress}
+              scrollYProgress={smoothProgress}
               onSelectStory={onSelectStory}
             />
           ))}
