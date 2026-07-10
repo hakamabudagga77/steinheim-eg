@@ -51,15 +51,15 @@ function SpreadCard({
   scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
   onSelectStory: (title: string) => void;
 }) {
-  const x = useTransform(scrollYProgress, [0, 0.55], [CARD_OFFSETS[index], "0%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
-  const scale = useTransform(scrollYProgress, [0, 0.55], [0.88, 1]);
-  const textOpacity = useTransform(scrollYProgress, [0.45, 0.7], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0.45, 0.7], [16, 0]);
+  const x = useTransform(scrollYProgress, [0, 0.45, 1], [CARD_OFFSETS[index], "0%", "0%"], { clamp: true });
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [0, 1, 1], { clamp: true });
+  const scale = useTransform(scrollYProgress, [0, 0.45, 1], [0.88, 1, 1], { clamp: true });
+  const textOpacity = useTransform(scrollYProgress, [0.35, 0.6, 1], [0, 1, 1], { clamp: true });
+  const textY = useTransform(scrollYProgress, [0.35, 0.6, 1], [16, 0, 0], { clamp: true });
 
   return (
     <motion.article
-      style={{ x, opacity, scale }}
+      style={{ x, opacity, scale, willChange: "transform, opacity" }}
       className="group relative min-h-[560px] overflow-hidden rounded-[14px] bg-black text-white lg:min-h-[640px]"
     >
       <Image
