@@ -31,12 +31,6 @@ const worldLinks = [
     image: "/images/generated/gessi/steinheim-specification-story.png",
   },
   {
-    label: "Collections",
-    eyebrow: "Bathroom languages",
-    href: "/collections",
-    image: "/images/generated/gessi/steinheim-collection-plinths.png",
-  },
-  {
     label: "Our Finishes",
     eyebrow: "Surface language",
     href: "/about#finishes",
@@ -266,9 +260,19 @@ export default function Navigation({ locale }: { locale: string }) {
             <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#f5f3ee] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
               <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 py-8 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:py-0">
                 <div className="mb-8 lg:mb-12">
-                  <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 lg:mb-8">
-                    {t("collections")}
-                  </p>
+                  <div className="mb-5 flex items-center justify-between lg:mb-8">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35">
+                      {t("collections")}
+                    </p>
+                    <Link
+                      href="/collections"
+                      onClick={handleNavigate}
+                      onMouseEnter={() => setActivePanel("collections")}
+                      className="border-b border-black/20 pb-0.5 text-[11px] font-medium uppercase tracking-[0.16em] text-black/45 transition hover:border-black hover:text-black"
+                    >
+                      All collections
+                    </Link>
+                  </div>
                   <div className="space-y-1">
                     {collections.map((collection, index) => (
                       <motion.div
