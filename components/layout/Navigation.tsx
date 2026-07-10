@@ -273,8 +273,8 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/collections"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-medium italic leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
-                          pathname === "/collections" ? "text-black" : "text-black/40 hover:translate-x-2 hover:text-black"
+                        className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-normal leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
+                          pathname === "/collections" ? "text-black" : "text-black/35 hover:translate-x-2 hover:text-black"
                         }`}
                       >
                         Collections
