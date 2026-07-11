@@ -224,7 +224,7 @@ export default function Navigation({ locale }: { locale: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
-            <div className="mx-0 mt-0 flex h-[66px] max-w-[1120px] items-center justify-between bg-[#f5f3ee] px-5 shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mt-3 sm:h-[72px] sm:rounded-t-[22px] sm:px-7 lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
+            <div className="mx-0 mt-0 flex h-[66px] max-w-[1120px] items-center justify-between bg-[#ece9e2] px-5 shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mt-3 sm:h-[72px] sm:rounded-t-[22px] sm:px-7 lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
               <button
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer"
@@ -256,7 +256,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </Link>
             </div>
 
-            <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#f5f3ee] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
+            <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
               <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 py-8 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:py-0">
                 <div className="mb-8 lg:mb-12">
                   <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 lg:mb-8">
@@ -416,7 +416,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </div>
 
               <div className="hidden flex-1 p-4 lg:block">
-                <div className="flex h-full flex-col rounded-[18px] bg-[#ebe8e1] p-4">
+                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-4">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div

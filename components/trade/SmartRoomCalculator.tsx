@@ -346,7 +346,7 @@ export default function SmartRoomCalculator() {
           <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-warm-gray">
             Use this for one area of the project: guestrooms, suites, villas, public washrooms, or owner units.
           </p>
-          <p className="mx-auto mt-3 max-w-lg border border-charcoal/10 bg-[#FAFAF8] px-4 py-3 text-[11px] leading-[1.65] text-warm-gray">
+          <p className="mx-auto mt-3 max-w-lg border border-charcoal/10 bg-[#ece9e2] px-4 py-3 text-[11px] leading-[1.65] text-warm-gray">
             Need two collections? Build the first scope, add it to the board, then start another scope or add exact products manually. The board combines everything into one RFQ.
           </p>
         </div>
@@ -461,7 +461,7 @@ export default function SmartRoomCalculator() {
 
               <div className="space-y-3">
                 {roomConfig.map(({ key, label, icon, helper }) => (
-                  <div key={key} className="flex items-center gap-4 border border-charcoal/8 bg-[#FAFAF8] p-5">
+                  <div key={key} className="flex items-center gap-4 border border-charcoal/8 bg-[#ece9e2] p-5">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-charcoal/8">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-charcoal">
                         <path d={icon} />
@@ -585,7 +585,7 @@ export default function SmartRoomCalculator() {
                             : "border-charcoal/10 hover:border-charcoal"
                         }`}
                       >
-                        <div className={`relative h-16 w-16 shrink-0 ${seriesId === s.id ? "bg-white/10" : "bg-[#F0F0EC]"}`}>
+                        <div className={`relative h-16 w-16 shrink-0 ${seriesId === s.id ? "bg-white/10" : "bg-[#ece9e2]"}`}>
                           {heroImg && (
                             <Image src={heroImg} alt={s.name} fill sizes="64px" className="object-contain p-1" />
                           )}
@@ -641,7 +641,7 @@ export default function SmartRoomCalculator() {
               </div>
 
               {/* Collection note */}
-              <div className="border border-charcoal/8 bg-[#FAFAF8] p-5">
+              <div className="border border-charcoal/8 bg-[#ece9e2] p-5">
                 <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">Selection summary</p>
                 <p className="mt-2 font-heading text-[20px] leading-tight text-charcoal">
                   {selectedSeries.name} · {activeFinishName}
@@ -670,7 +670,7 @@ export default function SmartRoomCalculator() {
                   ["Product units", String(totalUnits)],
                   ["Retail reference", formatPrice(totalPrice)],
                 ].map(([label, value]) => (
-                  <div key={label} className="border border-charcoal/8 bg-[#FAFAF8] p-4">
+                  <div key={label} className="border border-charcoal/8 bg-[#ece9e2] p-4">
                     <p className="text-[9px] font-medium uppercase tracking-[0.17em] text-warm-gray">{label}</p>
                     <p className="mt-1 font-heading text-[22px] leading-none text-charcoal">{value}</p>
                   </div>
@@ -686,7 +686,7 @@ export default function SmartRoomCalculator() {
                     const finishDisc = getFinishDiscImage(row.finish);
                     return (
                       <div key={`${row.product.slug}-${row.finish}`} className="flex items-center gap-4 bg-white p-4">
-                        <div className="relative h-14 w-14 shrink-0 bg-[#F5F5F3]">
+                        <div className="relative h-14 w-14 shrink-0 bg-[#ece9e2]">
                           {img ? (
                             <Image src={img} alt={row.product.name} fill sizes="56px" className="object-contain p-1.5" />
                           ) : (
@@ -763,7 +763,7 @@ export default function SmartRoomCalculator() {
                   </button>
 
                   {added && (
-                    <div className="mt-4 border border-charcoal/12 bg-[#FAFAF8] p-4">
+                    <div className="mt-4 border border-charcoal/12 bg-[#ece9e2] p-4">
                       <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-charcoal">
                         Scope added to board
                       </p>

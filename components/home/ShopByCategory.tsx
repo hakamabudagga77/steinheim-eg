@@ -36,7 +36,7 @@ const categories = [
 
 export default function ShopByCategory() {
   return (
-    <section className="border-t border-border-light bg-[#f7f7f5] py-20 sm:py-28">
+    <section className="border-t border-border-light bg-[#ece9e2] py-20 sm:py-28">
       <Container>
         <ScrollReveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
@@ -59,7 +59,7 @@ export default function ShopByCategory() {
           {categories.map((category) => (
             <StaggerItem key={category.title}>
               <Link href={category.href} className="group block h-full bg-white">
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#efefec]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#ece9e2]">
                   <Image
                     src={category.image}
                     alt={category.title}

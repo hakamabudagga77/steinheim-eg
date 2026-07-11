@@ -15,11 +15,11 @@ export default function ContactPage() {
   const [enquiryType, setEnquiryType] = useState<string>("homeowner");
 
   const inputBase =
-    "w-full border-b border-black/15 bg-transparent px-1 py-4 text-[15px] text-[#111] placeholder:text-black/25 focus:border-black/40 focus:outline-none transition-colors duration-300";
+    "w-full border-b border-black/15 bg-transparent px-1 py-4 text-[15px] text-[#0a0a0a] placeholder:text-black/25 focus:border-black/40 focus:outline-none transition-colors duration-300";
 
   return (
     <PageTransition>
-      <div className="bg-[#f3f1ed] text-[#111]">
+      <div className="bg-[#ece9e2] text-[#0a0a0a]">
         {/* Hero */}
         <section className="bg-black pt-[72px] lg:pt-[80px]">
           <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">

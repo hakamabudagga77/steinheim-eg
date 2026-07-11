@@ -42,7 +42,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
 
   return (
     <PageTransition>
-      <div className="bg-[#ece9e2] text-[#111]">
+      <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <div className="bg-[#ece9e2] px-5 pb-4 pt-[92px] sm:px-8 lg:px-16 lg:pt-[104px]">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] text-black/40">
@@ -119,7 +119,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         {finish?.type === "pvd" ? " Pvd" : ""}
                       </span>
                     </span>
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f0eee8] text-[18px] leading-none text-black/45">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[18px] leading-none text-black/45">
                       {finishOpen ? "⌃" : "⌄"}
                     </span>
                   </button>

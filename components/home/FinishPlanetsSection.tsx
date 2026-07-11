@@ -23,7 +23,7 @@ export default function FinishPlanetsSection() {
   const isInView = useInView(ref, { once: true, margin: "-8%" });
 
   return (
-    <section className="relative overflow-hidden bg-[#070707] text-white">
+    <section className="relative overflow-hidden bg-[#0a0a0a] text-white">
       {/* Heading */}
       <div className="relative z-20 mx-auto max-w-[1440px] px-8 pt-32 lg:px-12 lg:pt-48">
         <motion.div
@@ -62,8 +62,8 @@ export default function FinishPlanetsSection() {
           {/* Cinematic vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,transparent_0%,rgba(7,7,7,0.65)_100%)]" />
           {/* Top/bottom fade to section bg */}
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#070707] to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#070707] to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0a0a0a] to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
 
           {/* Discs in an arc */}
           {discs.map((disc, index) => (

@@ -200,7 +200,7 @@ export default function CollectionAssistantPanel({
                 {packageRows.map((row) => (
                   <div
                     key={`${row.slug}-${row.finish}`}
-                    className="flex items-center justify-between gap-3 border border-charcoal/6 bg-[#FAFAF8] px-3 py-2"
+                    className="flex items-center justify-between gap-3 border border-charcoal/6 bg-[#ece9e2] px-3 py-2"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-[12px] font-medium text-charcoal">{row.name}</p>
@@ -225,7 +225,7 @@ export default function CollectionAssistantPanel({
           )}
         </div>
 
-        <div className="border border-charcoal/10 bg-[#FAFAF8] p-5 sm:p-6">
+        <div className="border border-charcoal/10 bg-[#ece9e2] p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="font-heading text-[28px] leading-none text-charcoal">{series.name} guide</p>

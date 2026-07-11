@@ -230,7 +230,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
   }
 
   return (
-    <section className="min-h-screen bg-[#ebe8e1] pt-28 text-[#111]">
+    <section className="min-h-screen bg-[#ece9e2] pt-28 text-[#0a0a0a]">
       <div className="mx-auto grid max-w-[1780px] gap-10 px-5 pb-20 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <p className="text-[11px] font-medium uppercase tracking-[0.36em] text-black/42">
@@ -262,7 +262,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
             </div>
           </div>
 
-          <div className="mt-8 rounded-[24px] border border-black/10 bg-[#f6f3ee] p-6">
+          <div className="mt-8 rounded-[24px] border border-black/10 bg-[#ece9e2] p-6">
             <p className="text-[10px] font-medium uppercase tracking-[0.26em] text-black/42">
               Guardrails
             </p>
@@ -289,8 +289,8 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
           </div>
         </aside>
 
-        <div className="overflow-hidden rounded-[30px] border border-black/10 bg-[#f8f6f1] shadow-[0_32px_90px_rgba(0,0,0,0.09)]">
-          <div className="border-b border-black/10 bg-[#f3f0ea] p-5 sm:p-7">
+        <div className="overflow-hidden rounded-[30px] border border-black/10 bg-[#ece9e2] shadow-[0_32px_90px_rgba(0,0,0,0.09)]">
+          <div className="border-b border-black/10 bg-[#ece9e2] p-5 sm:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-heading text-[34px] font-light leading-none tracking-[-0.04em]">Concierge</p>
@@ -340,7 +340,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
             </div>
           </div>
 
-          <div className="border-t border-black/10 bg-[#f3f0ea] p-4 sm:p-6">
+          <div className="border-t border-black/10 bg-[#ece9e2] p-4 sm:p-6">
             <div className="mb-4 grid gap-2 sm:grid-cols-2">
               {starterPrompts.map((prompt) => (
                 <button

@@ -85,7 +85,7 @@ function WarrantyPageContent() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {warrantyTiers.map((tier, i) => (
               <ScrollReveal key={tier.term} delay={i * 0.06}>
-                <div className="flex h-full flex-col border border-border-light bg-[#FAFAF8] p-6 sm:p-7">
+                <div className="flex h-full flex-col border border-border-light bg-[#ece9e2] p-6 sm:p-7">
                   <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-charcoal">
                     {tier.term}
                   </p>

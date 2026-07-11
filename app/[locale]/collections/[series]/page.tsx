@@ -122,7 +122,7 @@ export default function CollectionPage() {
 
   return (
     <PageTransition>
-      <div className="bg-[#f3f1ed] text-[#111]">
+      <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <section className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
           {collectionHeroVideos[series.id] ? (
             <video
@@ -170,7 +170,7 @@ export default function CollectionPage() {
           </motion.h1>
         </section>
 
-        <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#f3f1ed]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
+        <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
           <div className="mx-auto flex max-w-[1780px] items-center justify-between py-3">
             <p className="text-[20px] font-medium tracking-[-0.03em]">{series.name}</p>
             <div className="flex items-center gap-8 overflow-x-auto text-[16px]">
@@ -197,7 +197,7 @@ export default function CollectionPage() {
           <OverviewCardsSpread cards={strategy.cards} onSelectStory={setSelectedStory} />
         </div>
 
-        <section className="bg-[#ece9e4] px-5 py-24 text-center sm:px-8 lg:px-16 lg:py-32">
+        <section className="bg-[#ece9e2] px-5 py-24 text-center sm:px-8 lg:px-16 lg:py-32">
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -337,7 +337,7 @@ export default function CollectionPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 16, scale: 0.985 }}
                 transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
-                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-hidden rounded-[8px] bg-[#f3f1ed] text-black lg:grid-cols-2"
+                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-hidden rounded-[8px] bg-[#ece9e2] text-black lg:grid-cols-2"
                 onClick={(event) => event.stopPropagation()}
               >
                 <button

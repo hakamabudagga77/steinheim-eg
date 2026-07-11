@@ -38,9 +38,9 @@ export default function JoyProduct3DFeature() {
         onReady={() => setViewerReady(true)}
       />
 
-      <div className="mx-auto max-w-[1440px] overflow-hidden border border-charcoal/10 bg-[#0b0b0b] shadow-[0_30px_90px_rgba(0,0,0,0.12)]">
+      <div className="mx-auto max-w-[1440px] overflow-hidden border border-charcoal/10 bg-[#0a0a0a] shadow-[0_30px_90px_rgba(0,0,0,0.12)]">
         <div className="grid min-h-[720px] lg:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)]">
-          <div className="relative min-h-[560px] overflow-hidden bg-[#070707]">
+          <div className="relative min-h-[560px] overflow-hidden bg-[#0a0a0a]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_44%,rgba(255,255,255,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.72))]" />
             <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-7 py-7 text-white/42 sm:px-10">
               <span className="text-[10px] font-semibold uppercase tracking-[0.3em]">
@@ -90,7 +90,7 @@ export default function JoyProduct3DFeature() {
             </div>
           </div>
 
-          <div className="relative flex flex-col justify-between bg-[#f7f5f0] px-7 py-10 sm:px-10 lg:px-14 lg:py-16">
+          <div className="relative flex flex-col justify-between bg-[#ece9e2] px-7 py-10 sm:px-10 lg:px-14 lg:py-16">
             <div>
               <motion.p
                 initial={{ opacity: 0, y: 12 }}

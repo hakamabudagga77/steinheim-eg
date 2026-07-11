@@ -226,7 +226,7 @@ export default function ProductAssistantPanel({
   }
 
   return (
-    <div className="rounded-[32px] border border-black/10 bg-[#f8f6f1] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.06)] sm:p-7">
+    <div className="rounded-[32px] border border-black/10 bg-[#ece9e2] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.06)] sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-black/42">
@@ -280,7 +280,7 @@ export default function ProductAssistantPanel({
             {packageItems.map((item) => (
               <div
                 key={`${item.slug}-${item.finish}`}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-black/6 bg-[#f8f6f1] px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-black/6 bg-[#ece9e2] px-4 py-3"
               >
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-medium text-black">{item.name}</p>

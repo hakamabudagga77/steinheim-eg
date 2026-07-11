@@ -22,7 +22,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
 function TradePageContent() {
   return (
     <PageTransition>
-      <div className="bg-[#f3f1ed] text-[#111]">
+      <div className="bg-[#ece9e2] text-[#0a0a0a]">
         {/* Hero */}
         <section className="relative flex min-h-[75svh] items-end overflow-hidden bg-black pt-20 text-white">
           <Image

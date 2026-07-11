@@ -315,7 +315,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         <div className="space-y-5">
                           {scopeGroups.map((group) => (
                             <section key={group.id} className="border border-charcoal/10 bg-white">
-                              <div className="border-b border-charcoal/8 bg-[#FAFAF8] p-4">
+                              <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
@@ -348,7 +348,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                       className="group bg-white"
                                     >
                                       <div className="flex gap-4 p-4">
-                                        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#FAFAF8]">
+                                        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#ece9e2]">
                                           {img && (
                                             <Image
                                               src={img}
@@ -442,7 +442,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     className="px-7 py-5"
                   >
                     {/* Summary strip */}
-                    <div className="mb-6 border border-charcoal/8 bg-[#FAFAF8] p-4">
+                    <div className="mb-6 border border-charcoal/8 bg-[#ece9e2] p-4">
                       <p className="text-[9px] font-medium uppercase tracking-[0.15em] text-warm-gray">
                         Your selection
                       </p>

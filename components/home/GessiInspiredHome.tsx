@@ -100,14 +100,14 @@ export default function GessiInspiredHome() {
   };
 
   return (
-    <div className="bg-[#f3f1ed] text-[#111]">
+    <div className="bg-[#ece9e2] text-[#0a0a0a]">
       <AnimatePresence>
         {showIntro && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 0.76, 0.2, 1] }}
-            className="fixed inset-0 z-[90] flex items-center justify-center bg-[#f3f1ed]"
+            className="fixed inset-0 z-[90] flex items-center justify-center bg-[#ece9e2]"
           >
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.96 }}
@@ -189,7 +189,7 @@ export default function GessiInspiredHome() {
         <ScrollCue />
       </section>
 
-      <section className="bg-[#f3f1ed] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+      <section className="bg-[#ece9e2] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
         <div className="mx-auto max-w-[1780px]">
           <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
             <div>
@@ -264,7 +264,7 @@ export default function GessiInspiredHome() {
         </div>
       </section>
 
-      <section className="bg-[#f3f1ed] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+      <section className="bg-[#ece9e2] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
         <div className="mx-auto max-w-[1780px]">
           <div className="mb-14 text-center">
             <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">References</p>
@@ -302,7 +302,7 @@ export default function GessiInspiredHome() {
 
       <section className="bg-white px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
         <div className="mx-auto grid max-w-[1500px] gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="relative min-h-[520px] bg-[#f7f6f2]">
+          <div className="relative min-h-[520px] bg-[#ece9e2]">
             {productImage ? (
               <Image
                 src={productImage}
@@ -324,7 +324,7 @@ export default function GessiInspiredHome() {
             <p className="mt-5 max-w-xl text-[19px] leading-[1.75] text-black/62">
               A calm, balanced mixer for premium bathrooms, guest suites, and repeatable project schedules.
             </p>
-            <div className="mt-12 max-w-md overflow-hidden rounded-[18px] border border-black/8 bg-[#f5f4f0]">
+            <div className="mt-12 max-w-md overflow-hidden rounded-[18px] border border-black/8 bg-[#ece9e2]">
               {finishIds.map((finish) => {
                 const disc = getFinishDiscImage(finish);
                 const label = finish
@@ -355,7 +355,7 @@ export default function GessiInspiredHome() {
 
       <FinishPlanetsSection />
 
-      <section className="bg-[#f3f1ed] px-5 py-20 sm:px-8 lg:px-16">
+      <section className="bg-[#ece9e2] px-5 py-20 sm:px-8 lg:px-16">
         <div className="mx-auto grid max-w-[1780px] border-y border-black/12 lg:grid-cols-3">
           {[
             ["Assistance", "Do you need assistance or would you like to request information?", "/contact"],

@@ -22,7 +22,7 @@ export default async function ProjectReferencePage({
 
   return (
     <PageTransition>
-      <main className="bg-[#0f0e0b] text-white">
+      <main className="bg-[#0a0a0a] text-white">
         <section className="relative min-h-screen overflow-hidden">
           {project.heroVideo ? (
             <video
@@ -46,7 +46,7 @@ export default async function ProjectReferencePage({
               className="object-cover opacity-72"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/12 to-[#0f0e0b]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/12 to-[#0a0a0a]" />
           <div className="absolute inset-0 bg-black/22" />
 
           {/* Breadcrumb — Gessi style top-left */}

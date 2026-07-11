@@ -68,7 +68,7 @@ export default function CustomerPathways() {
               <StaggerItem key={pathway.title}>
                 <Link
                   href={pathway.href}
-                  className="group flex min-h-[240px] flex-col justify-between bg-[#101010] p-7 transition-colors duration-300 hover:bg-[#151515] sm:p-8"
+                  className="group flex min-h-[240px] flex-col justify-between bg-[#0a0a0a] p-7 transition-colors duration-300 hover:bg-[#0a0a0a] sm:p-8"
                 >
                   <div>
                     <p className="text-[9px] font-medium uppercase tracking-[0.22em] text-white/28">

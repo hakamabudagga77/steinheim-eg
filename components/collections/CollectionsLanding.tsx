@@ -48,7 +48,7 @@ export default function CollectionsLanding() {
   };
 
   return (
-    <main className="bg-[#f3f1ed] text-[#111]">
+    <main className="bg-[#ece9e2] text-[#0a0a0a]">
       <section className="relative bg-black text-white">
         <div className="sticky top-0 h-svh min-h-[760px] overflow-hidden">
           <video
@@ -140,7 +140,7 @@ export default function CollectionsLanding() {
         </div>
       </section>
 
-      <section className="bg-[#f3f1ed] px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
+      <section className="bg-[#ece9e2] px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
         <div className="mx-auto max-w-[1780px]">
           <h2 className="mb-12 text-[clamp(2rem,3.4vw,3.5rem)] font-normal tracking-[-0.045em]">
             Steinheim Collections

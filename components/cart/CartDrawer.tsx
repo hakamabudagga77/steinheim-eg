@@ -166,7 +166,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                             <Link
                               href={`/products/${product.slug}`}
                               onClick={() => setOpen(false)}
-                              className="relative h-[80px] w-[80px] shrink-0 bg-[#F5F5F3]"
+                              className="relative h-[80px] w-[80px] shrink-0 bg-[#ece9e2]"
                             >
                               {img && (
                                 <Image

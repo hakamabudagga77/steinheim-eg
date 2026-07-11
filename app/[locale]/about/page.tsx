@@ -63,7 +63,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 function AboutPageContent() {
   return (
     <PageTransition>
-      <main className="bg-[#ebe8e1] text-[#111]">
+      <main className="bg-[#ece9e2] text-[#0a0a0a]">
         <section id="intro" className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-black text-white">
           <video
             autoPlay
@@ -95,7 +95,7 @@ function AboutPageContent() {
             </ScrollReveal>
           </div>
 
-          <div className="pointer-events-auto absolute bottom-7 left-1/2 z-20 hidden -translate-x-1/2 rounded-full bg-[#ebe8e1]/86 p-1.5 text-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-md md:flex">
+          <div className="pointer-events-auto absolute bottom-7 left-1/2 z-20 hidden -translate-x-1/2 rounded-full bg-[#ece9e2]/86 p-1.5 text-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-md md:flex">
             {[
               ["Intro", "#intro"],
               ["Identity", "#identity"],
@@ -237,8 +237,8 @@ function AboutPageContent() {
             sizes="100vw"
             className="object-cover opacity-18 blur-[2px]"
           />
-          <div className="absolute inset-0 bg-[#ebe8e1]/78" />
-          <div className="relative mx-auto max-w-[1780px] rounded-[14px] bg-[#e5e0d7]/82 px-8 py-14 backdrop-blur-sm sm:px-12 lg:px-20 lg:py-20">
+          <div className="absolute inset-0 bg-[#ece9e2]/78" />
+          <div className="relative mx-auto max-w-[1780px] rounded-[14px] bg-[#ece9e2]/82 px-8 py-14 backdrop-blur-sm sm:px-12 lg:px-20 lg:py-20">
             <div className="grid gap-14 lg:grid-cols-[0.48fr_0.52fr]">
               <ScrollReveal>
                 <h2 className="text-[clamp(3rem,5.6vw,6.2rem)] font-light leading-none tracking-[-0.07em]">
