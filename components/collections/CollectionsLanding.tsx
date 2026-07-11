@@ -79,9 +79,7 @@ export default function CollectionsLanding() {
                 <p className="text-[18px] font-medium text-white">
                   <Link href="/" className="transition hover:text-white/70">Home</Link>
                   <span className="px-2 text-white/75">·</span>
-                  <Link href="/collections" className="transition hover:text-white/70">Collections</Link>
-                  <span className="px-2 text-white/75">·</span>
-                  <span>Bath</span>
+                  <span>Collections</span>
                 </p>
               </div>
             </div>
@@ -95,7 +93,7 @@ export default function CollectionsLanding() {
                 Collections
               </p>
               <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white">
-                Bath
+                The collections.
               </h1>
             </motion.div>
           </section>
