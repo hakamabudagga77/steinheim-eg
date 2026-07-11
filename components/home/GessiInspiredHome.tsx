@@ -19,24 +19,28 @@ const collections = [
     name: "Joy",
     href: "/collections/joy",
     image: "/images/collections/home/joy-card-v3.jpeg",
+    hoverImage: "/images/collections/home/joy-bath-hover.png",
     line: "Soft balance for private villas, suites, and warm hospitality rooms.",
   },
   {
     name: "Up",
     href: "/collections/up",
     image: "/images/collections/home/up-card-v3.png",
+    hoverImage: "/images/collections/home/up-bath-hover.png",
     line: "A repeatable modern language for developments and project schedules.",
   },
   {
     name: "Art",
     href: "/collections/art",
     image: "/images/collections/home/art-card-v4.png",
+    hoverImage: "/images/collections/home/art-bath-hover.png",
     line: "Architectural precision for statement bathrooms and design-led spaces.",
   },
   {
     name: "Quatro",
     href: "/collections/quatro",
     image: "/images/collections/home/quatro-card-v5.png",
+    hoverImage: "/images/collections/home/quatro-shower-hover.png",
     line: "Crisp geometry for sharp, contemporary interiors.",
   },
 ];
@@ -71,6 +75,56 @@ function ScrollCue() {
     <span className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 text-[10px] uppercase tracking-[0.34em] text-white/55 sm:block">
       Scroll
     </span>
+  );
+}
+
+function CollectionCard({ item, index }: { item: (typeof collections)[number]; index: number }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, delay: index * 0.06 }}
+    >
+      <Link
+        href={item.href}
+        className="group block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className="relative aspect-[0.92] overflow-hidden rounded-[22px] bg-black">
+          <Image
+            src={item.image}
+            alt={`${item.name} collection`}
+            fill
+            sizes="(max-width: 768px) 100vw, 25vw"
+            priority
+            className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              hovered ? "opacity-0 scale-[1.03]" : "opacity-100 scale-100"
+            }`}
+          />
+          <Image
+            src={item.hoverImage}
+            alt={`${item.name} collection lifestyle`}
+            fill
+            sizes="(max-width: 768px) 100vw, 25vw"
+            quality={82}
+            priority
+            className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              hovered ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
+            }`}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          <h3 className="absolute bottom-6 left-6 font-heading text-[42px] leading-none text-white">
+            {item.name}
+          </h3>
+        </div>
+        <p className="mt-5 text-[20px] font-medium leading-tight">{item.name}</p>
+        <p className="mt-1 max-w-[320px] text-[15px] leading-[1.55] text-black/62">{item.line}</p>
+      </Link>
+    </motion.article>
   );
 }
 
@@ -208,31 +262,7 @@ export default function GessiInspiredHome() {
 
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
             {collections.map((item, index) => (
-              <motion.article
-                key={item.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.7, delay: index * 0.06 }}
-              >
-                <Link href={item.href} className="group block">
-                  <div className="relative aspect-[0.92] overflow-hidden rounded-[22px] bg-black">
-                    <Image
-                      src={item.image}
-                      alt={`${item.name} collection`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 25vw"
-                      className="object-cover transition duration-[1400ms] group-hover:scale-[1.045]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-                    <h3 className="absolute bottom-6 left-6 font-heading text-[42px] leading-none text-white">
-                      {item.name}
-                    </h3>
-                  </div>
-                  <p className="mt-5 text-[20px] font-medium leading-tight">{item.name}</p>
-                  <p className="mt-1 max-w-[320px] text-[15px] leading-[1.55] text-black/62">{item.line}</p>
-                </Link>
-              </motion.article>
+              <CollectionCard key={item.name} item={item} index={index} />
             ))}
           </div>
         </div>
