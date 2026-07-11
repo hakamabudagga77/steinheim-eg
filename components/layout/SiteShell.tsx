@@ -8,7 +8,6 @@ import TradeProjectDrawer from "@/components/catalogue/TradeProjectDrawer";
 import { TradeProjectProvider } from "@/components/catalogue/TradeProjectContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import { CartProvider } from "@/components/cart/CartContext";
-import AssistantFloatingButton from "@/components/assistant/AssistantFloatingButton";
 
 export default function SiteShell({
   children,
@@ -25,7 +24,6 @@ export default function SiteShell({
         <ConditionalFooter />
         <TradeProjectDrawer locale={locale} />
         <CartDrawer locale={locale} />
-        <AssistantFloatingButton />
         <BackToTop />
         <SmoothScroll />
       </TradeProjectProvider>

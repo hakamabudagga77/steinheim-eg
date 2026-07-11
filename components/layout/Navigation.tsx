@@ -19,7 +19,6 @@ const collections = [
 
 const menuLinks = [
   { key: "projects", href: "/projects" },
-  { key: "assistant", href: "/assistant" },
   { key: "contact", href: "/contact" },
 ];
 

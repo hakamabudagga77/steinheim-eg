@@ -5,25 +5,12 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
-import ProductAssistantPanel, { type ProductPackageItem } from "@/components/product/ProductAssistantPanel";
 import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
-
-const supportPackageTypes = ["accessories", "bidet-spray", "click-clack", "angle-valve"];
-
-function packageTypesForProduct(type: string) {
-  if (type === "free-standing") return ["wall-mounted", "concealed-shower", "free-standing", ...supportPackageTypes];
-  if (type === "shower-column") return ["basin-mixer", "shower-column", ...supportPackageTypes];
-  if (type === "wall-mounted") return ["wall-mounted", "concealed-shower", ...supportPackageTypes];
-  if (type === "tall-basin-mixer") return ["tall-basin-mixer", "concealed-shower", ...supportPackageTypes];
-  if (type === "concealed-shower") return ["basin-mixer", "concealed-shower", ...supportPackageTypes];
-  if (supportPackageTypes.includes(type)) return ["basin-mixer", "concealed-shower", type, ...supportPackageTypes];
-  return ["basin-mixer", "concealed-shower", ...supportPackageTypes];
-}
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
@@ -46,40 +33,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
   const isInProposal = project.items.some((item) => item.slug === product.slug && item.finish === variant.finish);
-  const packageTypes = Array.from(new Set(packageTypesForProduct(product.type)));
   const activeFinishDisc = getFinishDiscImage(variant.finish);
-
-  const packageBuild = (() => {
-    const rows: ProductPackageItem[] = [];
-    const omitted: string[] = [];
-    const seriesProducts = getProductsBySeries(product.series);
-
-    for (const type of packageTypes) {
-      const packageProduct = type === product.type ? product : seriesProducts.find((entry) => entry.type === type);
-      const packageVariant = packageProduct?.variants.find((entry) => entry.finish === variant.finish);
-      if (!packageProduct || !packageVariant) {
-        omitted.push(type.replace(/-/g, " "));
-        continue;
-      }
-      rows.push({
-        slug: packageProduct.slug,
-        name: `${seriesName} ${packageProduct.name}`,
-        finish: packageVariant.finish,
-        model: packageVariant.model,
-        quantity: type === "angle-valve" ? 2 : 1,
-      });
-    }
-
-    return { rows, omitted };
-  })();
 
   function addToProposal() {
     if (!isInProposal) addItem(product.slug, variant.finish);
-    setProposalOpen(true);
-  }
-
-  function addPackageToProposal() {
-    for (const item of packageBuild.rows) addItem(item.slug, item.finish, item.quantity);
     setProposalOpen(true);
   }
 
@@ -260,31 +217,6 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </div>
               </motion.div>
             </div>
-          </div>
-        </section>
-
-        <section className="border-t border-black/8 bg-[#ece9e2] px-5 py-16 sm:px-8 lg:px-16 lg:py-24">
-          <div className="mx-auto grid max-w-[1780px] items-start gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:gap-16">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/42">Steinheim Concierge</p>
-              <h2 className="mt-5 max-w-xl font-heading text-[clamp(2.6rem,5vw,5.2rem)] font-light leading-[0.92] tracking-[-0.055em]">
-                Specify it with context.
-              </h2>
-              <p className="mt-6 max-w-lg text-[16px] leading-[1.85] text-black/58">
-                Ask whether this model fits a hotel, villa, guest bathroom, or developer schedule. The assistant stays inside Steinheim Egypt catalogue logic.
-              </p>
-            </div>
-            <ProductAssistantPanel
-              product={product}
-              series={series}
-              variant={variant}
-              finish={finish}
-              isInProject={isInProposal}
-              onAddToProject={addToProposal}
-              packageItems={packageBuild.rows}
-              omittedPackageItems={packageBuild.omitted}
-              onAddPackage={addPackageToProposal}
-            />
           </div>
         </section>
 

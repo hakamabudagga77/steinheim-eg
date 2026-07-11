@@ -16,7 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/shipping", priority: 0.5, changeFrequency: "yearly" as const },
     { path: "/returns", priority: 0.5, changeFrequency: "yearly" as const },
     { path: "/privacy", priority: 0.4, changeFrequency: "yearly" as const },
-    { path: "/assistant", priority: 0.6, changeFrequency: "monthly" as const },
   ];
 
   const locales = ["en", "ar"];
