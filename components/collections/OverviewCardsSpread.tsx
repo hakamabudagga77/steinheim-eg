@@ -25,7 +25,7 @@ export default function OverviewCardsSpread({
   });
 
   return (
-    <section ref={containerRef} className="relative bg-black" style={{ height: "180vh" }}>
+    <section ref={containerRef} className="relative bg-[#ece9e2]" style={{ height: "180vh" }}>
       <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden px-5 pt-[132px] sm:px-8 lg:px-16 lg:pt-[144px]">
         <div className="mx-auto grid w-full max-w-[1780px] gap-6 md:grid-cols-3">
           {cards.map((card, index) => (
