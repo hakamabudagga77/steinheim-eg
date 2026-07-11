@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
-import { getFinishDiscImage, getProductImage } from "@/data/images";
+import { getProductImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 
@@ -67,8 +67,6 @@ const references = [
     image: "/images/generated/gessi/steinheim-wellness-architecture.png",
   },
 ];
-
-const finishIds = ["chrome", "brushed-nickel", "matte-black", "brushed-gold", "coffee-gold"];
 
 function ScrollCue() {
   return (
@@ -354,23 +352,6 @@ export default function GessiInspiredHome() {
             <p className="mt-5 max-w-xl text-[19px] leading-[1.75] text-black/62">
               A calm, balanced mixer for premium bathrooms, guest suites, and repeatable project schedules.
             </p>
-            <div className="mt-12 max-w-md overflow-hidden rounded-[18px] border border-black/8 bg-[#ece9e2]">
-              {finishIds.map((finish) => {
-                const disc = getFinishDiscImage(finish);
-                const label = finish
-                  .split("-")
-                  .map((part) => part[0].toUpperCase() + part.slice(1))
-                  .join(" ");
-                return (
-                  <div key={finish} className="flex items-center gap-5 border-b border-black/6 px-5 py-4 last:border-b-0">
-                    <span className="relative h-9 w-9 overflow-hidden rounded-full bg-black/10">
-                      {disc ? <Image src={disc} alt="" fill sizes="36px" className="object-cover" /> : null}
-                    </span>
-                    <span className="text-[18px]">{label}</span>
-                  </div>
-                );
-              })}
-            </div>
             <div className="mt-12 flex flex-wrap gap-3">
               <Link href="/products/joy-basin-mixer" className="rounded-full border border-black/30 px-10 py-4 text-[13px] font-medium transition hover:bg-black hover:text-white">
                 Discover more
