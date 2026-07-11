@@ -93,7 +93,7 @@ export default function CollectionsLanding() {
                 Collections
               </p>
               <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white">
-                The collections.
+                Four systems.
               </h1>
             </motion.div>
           </section>
