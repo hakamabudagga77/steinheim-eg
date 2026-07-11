@@ -365,24 +365,6 @@ export default function GessiInspiredHome() {
       </section>
 
       <FinishPlanetsSection />
-
-      <section className="bg-[#ece9e2] px-5 py-20 sm:px-8 lg:px-16">
-        <div className="mx-auto grid max-w-[1780px] border-y border-black/12 lg:grid-cols-3">
-          {[
-            ["Assistance", "Do you need assistance or would you like to request information?", "/contact"],
-            ["Project studio", "Build a trade scope and prepare a Steinheim specification board.", "/trade"],
-            ["Catalogues", "Explore collections, finishes, and product families.", "/collections"],
-          ].map(([title, body, href]) => (
-            <Link key={title} href={href} className="group flex min-h-[170px] items-center justify-between gap-8 border-b border-black/12 px-8 py-8 transition hover:bg-white lg:border-b-0 lg:border-r lg:last:border-r-0">
-              <span>
-                <span className="block text-[22px] font-semibold">{title}</span>
-                <span className="mt-4 block max-w-sm text-[16px] leading-[1.65] text-black/62">{body}</span>
-              </span>
-              <span className="text-[38px] transition group-hover:translate-x-2">→</span>
-            </Link>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
