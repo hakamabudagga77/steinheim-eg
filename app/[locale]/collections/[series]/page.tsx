@@ -21,7 +21,7 @@ import {
 } from "@/lib/utils";
 
 const collectionHeroVideos: Record<string, string> = {
-  joy: "/videos/joy-hero.mp4",
+  joy: "/videos/joy-hero-v2.mp4",
   art: "/videos/art-hero.mp4",
 };
 
