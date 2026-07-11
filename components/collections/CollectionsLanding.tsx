@@ -7,8 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { collectionLandingImages } from "@/data/images";
 import { getAllSeries } from "@/lib/utils";
 
-const collectionsVideo =
-  "https://steinheim-eg.com/cdn/shop/videos/c/vp/85071c8806704603be22828dee32397c/85071c8806704603be22828dee32397c.HD-1080p-7.2Mbps-77449179.mp4?v=0";
+const collectionsVideo = "/videos/one-yard-jvc-hero.mp4";
 
 const collectionCopy: Record<string, { line: string; family: string }> = {
   joy: {
