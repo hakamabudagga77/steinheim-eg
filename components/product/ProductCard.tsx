@@ -54,7 +54,6 @@ export default function ProductCard({
         <div className="pt-4">
           <p className="text-[10px] uppercase tracking-[0.2em] text-black/35" style={{ fontStyle: "italic" }}>{seriesName}</p>
           <p className="mt-1 text-[15px] font-medium text-black">{product.name}</p>
-          <p className="mt-0.5 text-[12px] text-black/45">{variant.model}</p>
           {!hidePrice && (
             <div className="mt-2 flex items-center gap-2">
               <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
@@ -69,8 +68,8 @@ export default function ProductCard({
         </div>
       </Link>
 
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1.5" aria-label="Available finishes">
+      <div className="mt-3 flex items-center justify-between gap-1.5 sm:gap-2">
+        <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
           {product.variants.map((entry) => {
             const finish = getFinishById(entry.finish);
             const disc = getFinishDiscImage(entry.finish);
@@ -83,7 +82,7 @@ export default function ProductCard({
                 title={finish.name}
                 aria-label={`Show ${finish.name}`}
                 aria-pressed={selectedFinish === entry.finish}
-                className={`relative h-6 w-6 overflow-hidden rounded-full border transition cursor-pointer ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-2" : "border-black/10 hover:border-black/40"}`}
+                className={`relative h-5 w-5 shrink-0 overflow-hidden rounded-full border transition cursor-pointer sm:h-6 sm:w-6 ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1 sm:ring-offset-2" : "border-black/10 hover:border-black/40"}`}
               >
                 {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
               </button>
@@ -98,11 +97,13 @@ export default function ProductCard({
             setAdded(true);
             setTimeout(() => setAdded(false), 1600);
           }}
-          className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium transition cursor-pointer ${
+          aria-label={added ? "Added to cart" : "Quick add to cart"}
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
             added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
           }`}
         >
-          {added ? "Added" : "Quick add"}
+          <span className="sm:hidden">{added ? "✓" : "+"}</span>
+          <span className="hidden sm:inline">{added ? "Added" : "Quick add"}</span>
         </button>
       </div>
     </article>
