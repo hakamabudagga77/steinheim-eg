@@ -15,7 +15,7 @@ export default function ProjectsCarousel({
   if (projects.length === 0) return null;
 
   return (
-    <section className="border-t border-white/10 bg-black px-5 py-20 text-white sm:px-8 lg:px-16 lg:py-28">
+    <section className="border-t border-black/8 bg-[#ece9e2] px-5 py-20 text-[#0a0a0a] sm:px-8 lg:px-16 lg:py-28">
       <div className="mx-auto max-w-[1780px]">
         <h2 className="text-[clamp(1.8rem,3.4vw,2.8rem)] font-normal tracking-[-0.03em]">
           Discover projects with <span className="font-medium">{collectionName}</span>
@@ -28,7 +28,7 @@ export default function ProjectsCarousel({
               href={`/projects/${project.slug}`}
               className="group block w-[280px] shrink-0 snap-start sm:w-[340px]"
             >
-              <div className="relative aspect-[4/5] overflow-hidden bg-white/5">
+              <div className="relative aspect-[4/5] overflow-hidden bg-black/5">
                 <Image
                   src={project.cardImage}
                   alt={project.name}
@@ -39,7 +39,7 @@ export default function ProjectsCarousel({
                 />
               </div>
               <p className="mt-5 text-[17px] font-medium leading-tight">{project.name}</p>
-              <p className="mt-1.5 text-[13px] text-white/50">{project.location} - {project.country}</p>
+              <p className="mt-1.5 text-[13px] text-black/55">{project.location} - {project.country}</p>
             </Link>
           ))}
         </div>
