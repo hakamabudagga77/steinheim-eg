@@ -229,18 +229,6 @@ export default function CollectionPage() {
           <OverviewCardsSpread cards={strategy.cards} onSelectStory={setSelectedStory} />
         </div>
 
-        <section className="bg-[#ece9e2] px-5 py-24 text-center sm:px-8 lg:px-16 lg:py-32">
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.75 }}
-            className="mx-auto max-w-5xl text-[clamp(1.55rem,2vw,2.15rem)] font-normal leading-[1.42] tracking-[-0.025em]"
-          >
-            {strategy.description}
-          </motion.p>
-        </section>
-
         <section id="products" className="scroll-mt-[140px] border-t border-black/8 px-5 py-16 sm:px-8 lg:px-16 lg:py-20">
           <div className="mx-auto max-w-[1780px]">
             <div className="mb-16 text-center">
