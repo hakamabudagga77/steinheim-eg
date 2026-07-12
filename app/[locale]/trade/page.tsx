@@ -54,7 +54,7 @@ function TradePageContent() {
                 >
                   Start a scope
                 </a>
-                <TradeOpenButton variant="outline" />
+                <TradeOpenButton variant="outline-light" />
               </div>
             </ScrollReveal>
           </div>
@@ -103,7 +103,7 @@ function TradePageContent() {
                 >
                   Browse collections
                 </Link>
-                <TradeOpenButton variant="outline" />
+                <TradeOpenButton variant="outline-light" />
               </div>
             </div>
           </div>
