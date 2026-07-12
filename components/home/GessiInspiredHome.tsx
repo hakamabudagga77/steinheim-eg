@@ -93,7 +93,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative aspect-[0.92] overflow-hidden rounded-[22px] bg-black">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[16px] bg-black sm:aspect-[0.92] sm:rounded-[22px]">
           <Image
             src={item.image}
             alt={`${item.name} collection`}
@@ -120,8 +120,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             {item.name}
           </h3>
         </div>
-        <p className="mt-3 text-[14px] font-medium leading-tight sm:mt-5 sm:text-[20px]">{item.name}</p>
-        <p className="mt-1 max-w-[320px] text-[12px] leading-[1.4] text-black/62 sm:text-[15px] sm:leading-[1.55]">{item.line}</p>
+        <p className="mt-3 max-w-[320px] text-[12px] leading-[1.4] text-black/62 sm:mt-5 sm:text-[15px] sm:leading-[1.55]">{item.line}</p>
       </Link>
     </motion.article>
   );
