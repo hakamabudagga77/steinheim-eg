@@ -179,7 +179,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     }}
                     className="flex h-[58px] w-full cursor-pointer items-center justify-center rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
                   >
-                    {cartAdded ? "Added" : "Add to Wishlist"}
+                    {cartAdded ? "Added" : "Add to Cart"}
                   </button>
                   <button
                     type="button"
