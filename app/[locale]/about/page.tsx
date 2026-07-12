@@ -2,6 +2,7 @@ import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
+import WorldCard from "@/components/about/WorldCard";
 import { Link } from "@/i18n/navigation";
 
 const heroVideo = "/videos/joy-shower-macro.mp4";
@@ -13,24 +14,28 @@ const worldCards = [
     eyebrow: "Company",
     title: "The Steinheim standard",
     image: "/images/generated/gessi/steinheim-specification-story.png",
+    hoverImage: "/images/steinheim/karim-2026/home-joy.webp",
     href: "#identity",
   },
   {
     eyebrow: "Collections",
     title: "Four bathroom languages",
     image: "/images/generated/gessi/steinheim-collection-plinths.png",
+    hoverImage: "/images/steinheim/karim-2026/landing-art.webp",
     href: "/collections",
   },
   {
     eyebrow: "Finishes",
     title: "Surfaces with presence",
     image: "/images/generated/gessi/steinheim-finish-stack.png",
+    hoverImage: "/images/steinheim/karim-2026/landing-joy.webp",
     href: "#finishes",
   },
   {
     eyebrow: "Trade",
     title: "Built for specification",
     image: "/images/generated/gessi/steinheim-wellness-architecture.png",
+    hoverImage: "/images/steinheim/karim-2026/home-art.webp",
     href: "/trade",
   },
 ];
@@ -126,23 +131,7 @@ function AboutPageContent() {
             <StaggerContainer className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
               {worldCards.map((card) => (
                 <StaggerItem key={card.title}>
-                  <Link href={card.href} className="group block">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-black">
-                      <Image
-                        src={card.image}
-                        alt={card.title}
-                        fill
-                        sizes="(min-width: 1280px) 24vw, (min-width: 768px) 48vw, 100vw"
-                        className="object-cover transition duration-[1400ms] group-hover:scale-[1.045]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/58 via-black/8 to-transparent" />
-                      <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                        <p className="text-[10px] uppercase tracking-[0.34em] text-white/62">{card.eyebrow}</p>
-                        <p className="mt-3 text-[28px] font-light leading-tight tracking-[-0.04em]">{card.title}</p>
-                        <span className="mt-5 inline-block border-b border-white/70 pb-1 text-[13px]">Discover more</span>
-                      </div>
-                    </div>
-                  </Link>
+                  <WorldCard card={card} />
                 </StaggerItem>
               ))}
             </StaggerContainer>
