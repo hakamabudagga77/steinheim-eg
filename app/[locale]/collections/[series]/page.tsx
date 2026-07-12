@@ -133,55 +133,73 @@ export default function CollectionPage() {
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
-          <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
-            {collectionHeroVideos[series.id] ? (
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                poster={collectionBanners[series.id]}
-                className="h-full w-full object-cover object-center"
-              >
-                <source src={collectionHeroVideos[series.id]} type="video/mp4" />
-              </video>
-            ) : (
-              <Image
-                src={collectionBanners[series.id]}
-                alt={`${series.name} bathroom collection`}
-                fill
-                priority
-                sizes="100vw"
-                quality={92}
-                className="object-cover"
-              />
-            )}
-          </motion.div>
-          <div className="absolute inset-0 bg-black/24" />
-
-          <div className="absolute left-0 right-0 top-[104px] z-10 px-6 sm:px-10 lg:px-16">
-            <div className="mx-auto max-w-[1780px]">
-              <p className="text-[18px] font-medium text-white">
-                <Link href="/" className="transition hover:text-white/70">Home</Link>
-                <span className="px-2 text-white/75">·</span>
-                <Link href="/collections" className="transition hover:text-white/70">Collections</Link>
-                <span className="px-2 text-white/75">·</span>
-                <span>{series.name}</span>
-              </p>
-            </div>
+        <section className="relative bg-black text-white">
+          <div className="sticky top-0 h-svh min-h-[86svh] overflow-hidden">
+            <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+              {collectionHeroVideos[series.id] ? (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster={collectionBanners[series.id]}
+                  className="h-full w-full object-cover object-center"
+                >
+                  <source src={collectionHeroVideos[series.id]} type="video/mp4" />
+                </video>
+              ) : (
+                <Image
+                  src={collectionBanners[series.id]}
+                  alt={`${series.name} bathroom collection`}
+                  fill
+                  priority
+                  sizes="100vw"
+                  quality={92}
+                  className="object-cover"
+                />
+              )}
+            </motion.div>
+            <div className="absolute inset-0 bg-black/24" />
           </div>
 
-          <motion.div style={{ y: heroTitleY, opacity: heroTitleOpacity }} className="relative z-10">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
-              className="font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
-            >
-              {series.name}
-            </motion.h1>
-          </motion.div>
+          <div className="relative z-10 -mt-[100svh]">
+            <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center px-6">
+              <div className="absolute left-0 right-0 top-[104px] px-6 sm:px-10 lg:px-16">
+                <div className="mx-auto max-w-[1780px]">
+                  <p className="text-[18px] font-medium text-white">
+                    <Link href="/" className="transition hover:text-white/70">Home</Link>
+                    <span className="px-2 text-white/75">·</span>
+                    <Link href="/collections" className="transition hover:text-white/70">Collections</Link>
+                    <span className="px-2 text-white/75">·</span>
+                    <span>{series.name}</span>
+                  </p>
+                </div>
+              </div>
+
+              <motion.div style={{ y: heroTitleY, opacity: heroTitleOpacity }}>
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
+                  className="font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
+                >
+                  {series.name}
+                </motion.h1>
+              </motion.div>
+            </section>
+
+            <section className="flex h-svh min-h-[86svh] items-center justify-center px-6 text-center">
+              <motion.h2
+                initial={{ opacity: 0, y: 34 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ amount: 0.6, once: false }}
+                transition={{ duration: 0.9, ease: [0.22, 0.76, 0.2, 1] }}
+                className="max-w-4xl text-[clamp(2.2rem,4.4vw,4.6rem)] font-normal leading-[1.08] tracking-[-0.05em] text-white/90"
+              >
+                {strategy.headline}
+              </motion.h2>
+            </section>
+          </div>
         </section>
 
         <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
