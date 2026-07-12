@@ -116,12 +116,12 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          <h3 className="absolute bottom-6 left-6 font-heading text-[42px] leading-none text-white">
+          <h3 className="absolute bottom-3 left-3 font-heading text-[26px] leading-none text-white sm:bottom-6 sm:left-6 sm:text-[42px]">
             {item.name}
           </h3>
         </div>
-        <p className="mt-5 text-[20px] font-medium leading-tight">{item.name}</p>
-        <p className="mt-1 max-w-[320px] text-[15px] leading-[1.55] text-black/62">{item.line}</p>
+        <p className="mt-3 text-[14px] font-medium leading-tight sm:mt-5 sm:text-[20px]">{item.name}</p>
+        <p className="mt-1 max-w-[320px] text-[12px] leading-[1.4] text-black/62 sm:text-[15px] sm:leading-[1.55]">{item.line}</p>
       </Link>
     </motion.article>
   );
@@ -275,7 +275,7 @@ export default function GessiInspiredHome() {
             </Link>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-8 xl:grid-cols-4">
             {collections.map((item, index) => (
               <CollectionCard key={item.name} item={item} index={index} />
             ))}
