@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
@@ -98,6 +98,13 @@ export default function CollectionPage() {
   const [globalFinish, setGlobalFinish] = useState<string | null>(finishes[0]?.id ?? null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>>({});
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heroProgressSmooth = useSpring(heroProgress, { stiffness: 100, damping: 30, mass: 0.4 });
+  const heroMediaY = useTransform(heroProgressSmooth, [0, 1], ["0%", "12%"]);
 
   useEffect(() => {
     fetch("/api/shopify/prices")
@@ -123,29 +130,31 @@ export default function CollectionPage() {
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <section className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
-          {collectionHeroVideos[series.id] ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              poster={collectionBanners[series.id]}
-              className="absolute inset-0 h-full w-full object-cover object-center"
-            >
-              <source src={collectionHeroVideos[series.id]} type="video/mp4" />
-            </video>
-          ) : (
-            <Image
-              src={collectionBanners[series.id]}
-              alt={`${series.name} bathroom collection`}
-              fill
-              priority
-              sizes="100vw"
-              quality={92}
-              className="object-cover"
-            />
-          )}
+        <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
+          <motion.div style={{ y: heroMediaY }} className="absolute inset-x-0 -top-[8%] h-[116%]">
+            {collectionHeroVideos[series.id] ? (
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                poster={collectionBanners[series.id]}
+                className="h-full w-full object-cover object-center"
+              >
+                <source src={collectionHeroVideos[series.id]} type="video/mp4" />
+              </video>
+            ) : (
+              <Image
+                src={collectionBanners[series.id]}
+                alt={`${series.name} bathroom collection`}
+                fill
+                priority
+                sizes="100vw"
+                quality={92}
+                className="object-cover"
+              />
+            )}
+          </motion.div>
           <div className="absolute inset-0 bg-black/24" />
 
           <div className="absolute left-0 right-0 top-[104px] z-10 px-6 sm:px-10 lg:px-16">
