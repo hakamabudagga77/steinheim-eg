@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "@/i18n/navigation";
-import { getProductImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 
@@ -131,8 +130,6 @@ export default function GessiInspiredHome() {
   const heroSectionRef = useRef<HTMLElement>(null);
   const [heroPaused, setHeroPaused] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-  const productImage = getProductImage("joy-basin-mixer", "brushed-gold")
-    ?? getProductImage("joy-basin-mixer", "chrome");
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroSectionRef,
@@ -340,42 +337,6 @@ export default function GessiInspiredHome() {
             <Link href="/projects" className="rounded-full border border-black/25 px-8 py-3.5 text-[13px] transition hover:bg-black hover:text-white">
               Discover more
             </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
-        <div className="mx-auto grid max-w-[1500px] gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="relative min-h-[520px] bg-[#ece9e2]">
-            {productImage ? (
-              <Image
-                src={productImage}
-                alt="Joy basin mixer in brushed gold"
-                fill
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="object-contain p-10 sm:p-16"
-              />
-            ) : null}
-          </div>
-          <div>
-            <p className="text-[14px] text-black/50">Steinheim Area Pro · Series 60</p>
-            <h2
-              className="mt-8 text-[clamp(2.4rem,5vw,5.8rem)] leading-[0.95] tracking-[-0.052em]"
-              style={{ fontStyle: "italic" }}
-            >
-              Joy Basin Mixer
-            </h2>
-            <p className="mt-5 max-w-xl text-[19px] leading-[1.75] text-black/62">
-              A calm, balanced mixer for premium bathrooms, guest suites, and repeatable project schedules.
-            </p>
-            <div className="mt-12 flex flex-wrap gap-3">
-              <Link href="/products/joy-basin-mixer" className="rounded-full border border-black/30 px-10 py-4 text-[13px] font-medium transition hover:bg-black hover:text-white">
-                Discover more
-              </Link>
-              <Link href="/trade" className="rounded-full border border-black/15 px-10 py-4 text-[13px] text-black/60 transition hover:border-black/40">
-                Add to project
-              </Link>
-            </div>
           </div>
         </div>
       </section>
