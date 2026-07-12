@@ -25,7 +25,7 @@ export default function OverviewCardsSpread({
   });
 
   return (
-    <section ref={containerRef} className="relative bg-[#ece9e2]" style={{ height: "180vh" }}>
+    <section ref={containerRef} className="relative bg-[#ece9e2]" style={{ height: "140vh" }}>
       <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden px-5 pt-[132px] sm:px-8 lg:px-16 lg:pt-[144px]">
         <div className="mx-auto grid w-full max-w-[1780px] gap-6 md:grid-cols-3">
           {cards.map((card, index) => (
@@ -58,26 +58,38 @@ function RevealCard({
   onSelectStory: (title: string) => void;
 }) {
   const stagger = total > 1 ? index / (total - 1) : 0;
-  const start = stagger * 0.4;
-  const end = start + 0.4;
+  const start = stagger * 0.28;
+  const end = start + 0.32;
+  const rotateFrom = (index - (total - 1) / 2) * 4;
 
-  const y = useTransform(progress, [start, end], [48, 0], { clamp: true });
+  const y = useTransform(progress, [start, end], [90, 0], { clamp: true });
   const opacity = useTransform(progress, [start, end], [0, 1], { clamp: true });
-  const scale = useTransform(progress, [start, end], [0.94, 1], { clamp: true });
+  const scale = useTransform(progress, [start, end], [0.86, 1], { clamp: true });
+  const rotate = useTransform(progress, [start, end], [rotateFrom, 0], { clamp: true });
+  const imageScale = useTransform(progress, [start, end], [1.22, 1], { clamp: true });
+  const clip = useTransform(
+    progress,
+    [start, end],
+    ["inset(100% 0% 0% 0% round 14px)", "inset(0% 0% 0% 0% round 14px)"],
+  );
 
   return (
     <motion.article
-      style={{ y, opacity, scale, willChange: "transform, opacity" }}
+      style={{ y, opacity, scale, rotate, willChange: "transform, opacity" }}
       className="group relative h-[64svh] overflow-hidden rounded-[14px] bg-black text-white lg:h-[68svh]"
     >
-      <Image
-        src={card.image}
-        alt={card.title}
-        fill
-        quality={90}
-        sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover transition duration-[1300ms] group-hover:scale-[1.035]"
-      />
+      <motion.div style={{ clipPath: clip }} className="absolute inset-0">
+        <motion.div style={{ scale: imageScale }} className="relative h-full w-full">
+          <Image
+            src={card.image}
+            alt={card.title}
+            fill
+            quality={90}
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition duration-[1300ms] group-hover:scale-[1.035]"
+          />
+        </motion.div>
+      </motion.div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/10 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8">
         <p className="text-[13px] font-medium uppercase tracking-[0.2em] text-white/80 lg:text-[14px]">
