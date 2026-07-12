@@ -9,6 +9,7 @@ import ProductCard from "@/components/product/ProductCard";
 import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
 import OverviewCardsSpread from "@/components/collections/OverviewCardsSpread";
 import PageTransition from "@/components/layout/PageTransition";
+import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import {
   collectionBanners,
   getCollectionContextImage,
@@ -137,16 +138,11 @@ export default function CollectionPage() {
           <div className="sticky top-0 h-svh min-h-[86svh] overflow-hidden">
             <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
               {collectionHeroVideos[series.id] ? (
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
+                <AutoplayVideo
+                  src={collectionHeroVideos[series.id]}
                   poster={collectionBanners[series.id]}
                   className="h-full w-full object-cover object-center"
-                >
-                  <source src={collectionHeroVideos[series.id]} type="video/mp4" />
-                </video>
+                />
               ) : (
                 <Image
                   src={collectionBanners[series.id]}

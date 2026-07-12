@@ -6,6 +6,8 @@ import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "fra
 import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
+import AutoplayVideo from "@/components/ui/AutoplayVideo";
+import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const heroVideo =
   "https://steinheim-eg.com/cdn/shop/videos/c/vp/85071c8806704603be22828dee32397c/85071c8806704603be22828dee32397c.HD-1080p-7.2Mbps-77449179.mp4?v=0";
@@ -130,6 +132,7 @@ export default function GessiInspiredHome() {
   const heroSectionRef = useRef<HTMLElement>(null);
   const [heroPaused, setHeroPaused] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  useAutoplayVideo(heroVideoRef, heroVideo);
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroSectionRef,
@@ -188,6 +191,7 @@ export default function GessiInspiredHome() {
             muted
             loop
             playsInline
+            preload="auto"
             poster="/images/lifestyle/hero.png"
             className="h-full w-full object-cover"
           >
@@ -280,16 +284,7 @@ export default function GessiInspiredHome() {
       </section>
 
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/steinheim/final/about-hero.jpg"
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src={ritualVideo} type="video/mp4" />
-        </video>
+        <AutoplayVideo src={ritualVideo} poster="/images/steinheim/final/about-hero.jpg" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 grid min-h-[760px] items-center gap-12 px-6 py-28 sm:px-10 lg:grid-cols-2 lg:px-24">
           <h2

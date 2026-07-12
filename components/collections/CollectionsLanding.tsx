@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { collectionLandingImages } from "@/data/images";
 import { getAllSeries } from "@/lib/utils";
+import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const collectionsVideo = "/videos/one-yard-jvc-hero.mp4";
 
@@ -32,6 +33,7 @@ export default function CollectionsLanding() {
   const series = getAllSeries();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [paused, setPaused] = useState(false);
+  useAutoplayVideo(videoRef, collectionsVideo);
 
   const toggleVideo = () => {
     const video = videoRef.current;
@@ -56,6 +58,7 @@ export default function CollectionsLanding() {
             muted
             loop
             playsInline
+            preload="auto"
             poster="/images/steinheim/final/collections-hero.jpg"
             className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
           >

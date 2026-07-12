@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
 import WorldCard from "@/components/about/WorldCard";
+import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { Link } from "@/i18n/navigation";
 
 const heroVideo = "/videos/joy-shower-macro.mp4";
@@ -70,16 +71,11 @@ function AboutPageContent() {
     <PageTransition>
       <main className="bg-[#ece9e2] text-[#0a0a0a]">
         <section id="intro" className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-black text-white">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
+          <AutoplayVideo
+            src={heroVideo}
             poster="/images/steinheim/final/about-hero.jpg"
             className="absolute inset-0 h-full w-full object-cover object-center"
-          >
-            <source src={heroVideo} type="video/mp4" />
-          </video>
+          />
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/45" />
 
@@ -205,9 +201,7 @@ function AboutPageContent() {
         </section>
 
         <section className="relative min-h-[72svh] overflow-hidden bg-black text-white">
-          <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
-            <source src={craftVideo} type="video/mp4" />
-          </video>
+          <AutoplayVideo src={craftVideo} className="absolute inset-0 h-full w-full object-cover object-center" />
           <div className="absolute inset-0 bg-black/38" />
           <div className="relative z-10 mx-auto flex min-h-[76svh] max-w-[1780px] items-center px-5 sm:px-8 lg:px-16">
             <ScrollReveal>

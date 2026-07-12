@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
+import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { getProjectReference, projectReferences } from "@/data/project-references";
 
 export function generateStaticParams() {
@@ -25,16 +26,11 @@ export default async function ProjectReferencePage({
       <main className="bg-[#0a0a0a] text-white">
         <section className="relative min-h-screen overflow-hidden">
           {project.heroVideo ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
+            <AutoplayVideo
+              src={project.heroVideo}
               poster={project.heroImage}
               className="absolute inset-0 h-full w-full object-cover opacity-90"
-            >
-              <source src={project.heroVideo} type="video/mp4" />
-            </video>
+            />
           ) : (
             <Image
               src={project.heroImage}
