@@ -8,6 +8,7 @@ import Image from "next/image";
 import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { getProductsBySeries } from "@/lib/utils";
 
 const collections = [
@@ -71,6 +72,7 @@ export default function Navigation({ locale }: { locale: string }) {
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen } = useCart();
+  const { itemCount: wishlistCount, setOpen: setWishlistOpen } = useWishlist();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -180,7 +182,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </svg>
             </Link>
             <button
-              onClick={() => setCartOpen(true)}
+              onClick={() => setWishlistOpen(true)}
               className={`relative hidden transition-colors duration-300 sm:flex cursor-pointer ${
                 isTransparent
                   ? "text-white/65 hover:text-white"
@@ -190,6 +192,24 @@ export default function Navigation({ locale }: { locale: string }) {
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1.5 flex h-[14px] min-w-[14px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[7px] font-medium text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setCartOpen(true)}
+              className={`relative flex transition-colors duration-300 cursor-pointer ${
+                isTransparent
+                  ? "text-white/65 hover:text-white"
+                  : "text-charcoal/50 hover:text-charcoal"
+              }`}
+              aria-label="Cart"
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
               </svg>
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1.5 flex h-[14px] min-w-[14px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[7px] font-medium text-white">

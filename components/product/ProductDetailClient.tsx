@@ -9,6 +9,7 @@ import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const [cartAdded, setCartAdded] = useState(false);
   const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
   const { addItem: addToCart } = useCart();
+  const { toggleItem: toggleWishlist, isInWishlist } = useWishlist();
 
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series;
@@ -170,17 +172,37 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </div>
 
                 <div className="mt-8">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      addToCart(product.slug, variant.finish);
-                      setCartAdded(true);
-                      setTimeout(() => setCartAdded(false), 2200);
-                    }}
-                    className="flex h-[58px] w-full cursor-pointer items-center justify-center rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
-                  >
-                    {cartAdded ? "Added" : "Add to Cart"}
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToCart(product.slug, variant.finish);
+                        setCartAdded(true);
+                        setTimeout(() => setCartAdded(false), 2200);
+                      }}
+                      className="flex h-[58px] flex-1 cursor-pointer items-center justify-center rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                    >
+                      {cartAdded ? "Added" : "Add to Cart"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleWishlist(product.slug, variant.finish)}
+                      aria-label={isInWishlist(product.slug, variant.finish) ? "Remove from wishlist" : "Add to wishlist"}
+                      aria-pressed={isInWishlist(product.slug, variant.finish)}
+                      className="flex h-[58px] w-[58px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/15 transition hover:border-black/40"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill={isInWishlist(product.slug, variant.finish) ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                  </div>
                   <button
                     type="button"
                     onClick={addToProposal}
