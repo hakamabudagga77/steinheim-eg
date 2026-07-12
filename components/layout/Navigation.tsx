@@ -183,7 +183,7 @@ export default function Navigation({ locale }: { locale: string }) {
             </Link>
             <button
               onClick={() => setWishlistOpen(true)}
-              className={`relative hidden transition-colors duration-300 sm:flex cursor-pointer ${
+              className={`relative flex transition-colors duration-300 cursor-pointer ${
                 isTransparent
                   ? "text-white/65 hover:text-white"
                   : "text-charcoal/50 hover:text-charcoal"
