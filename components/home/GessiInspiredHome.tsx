@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { getProductImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
@@ -128,10 +128,18 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
 
 export default function GessiInspiredHome() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
   const [heroPaused, setHeroPaused] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const productImage = getProductImage("joy-basin-mixer", "brushed-gold")
     ?? getProductImage("joy-basin-mixer", "chrome");
+
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heroProgressSmooth = useSpring(heroProgress, { stiffness: 100, damping: 30, mass: 0.4 });
+  const heroVideoY = useTransform(heroProgressSmooth, [0, 1], ["0%", "12%"]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShowIntro(false), 950);
@@ -172,18 +180,20 @@ export default function GessiInspiredHome() {
         )}
       </AnimatePresence>
 
-      <section className="relative h-svh min-h-[760px] overflow-hidden bg-black text-white">
-        <video
-          ref={heroVideoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/lifestyle/hero.png"
-          className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+      <section ref={heroSectionRef} className="relative h-svh min-h-[760px] overflow-hidden bg-black text-white">
+        <motion.div style={{ y: heroVideoY }} className="absolute inset-x-0 -top-[8%] h-[116%]">
+          <video
+            ref={heroVideoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/images/lifestyle/hero.png"
+            className="h-full w-full object-cover"
+          >
+            <source src={heroVideo} type="video/mp4" />
+          </video>
+        </motion.div>
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-x-0 bottom-[12%] z-10 flex flex-col items-center px-6 text-center">
           <motion.p
