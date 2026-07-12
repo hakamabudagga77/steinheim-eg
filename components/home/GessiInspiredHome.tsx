@@ -93,7 +93,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative aspect-square overflow-hidden rounded-[16px] bg-black sm:aspect-[0.92] sm:rounded-[22px]">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-black sm:aspect-[0.92] sm:rounded-[22px]">
           <Image
             src={item.image}
             alt={`${item.name} collection`}
