@@ -104,7 +104,10 @@ export default function CollectionPage() {
     offset: ["start start", "end start"],
   });
   const heroProgressSmooth = useSpring(heroProgress, { stiffness: 100, damping: 30, mass: 0.4 });
-  const heroMediaY = useTransform(heroProgressSmooth, [0, 1], ["0%", "12%"]);
+  const heroMediaY = useTransform(heroProgressSmooth, [0, 1], ["0%", "22%"]);
+  const heroMediaScale = useTransform(heroProgressSmooth, [0, 1], [1, 1.18]);
+  const heroTitleY = useTransform(heroProgressSmooth, [0, 1], ["0%", "60%"]);
+  const heroTitleOpacity = useTransform(heroProgressSmooth, [0, 0.7], [1, 0]);
 
   useEffect(() => {
     fetch("/api/shopify/prices")
@@ -131,7 +134,7 @@ export default function CollectionPage() {
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center overflow-hidden bg-black text-white">
-          <motion.div style={{ y: heroMediaY }} className="absolute inset-x-0 -top-[8%] h-[116%]">
+          <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
             {collectionHeroVideos[series.id] ? (
               <video
                 autoPlay
@@ -169,14 +172,16 @@ export default function CollectionPage() {
             </div>
           </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
-            className="relative z-10 font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
-          >
-            {series.name}
-          </motion.h1>
+          <motion.div style={{ y: heroTitleY, opacity: heroTitleOpacity }} className="relative z-10">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
+              className="font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
+            >
+              {series.name}
+            </motion.h1>
+          </motion.div>
         </section>
 
         <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">

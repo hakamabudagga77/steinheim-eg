@@ -139,7 +139,10 @@ export default function GessiInspiredHome() {
     offset: ["start start", "end start"],
   });
   const heroProgressSmooth = useSpring(heroProgress, { stiffness: 100, damping: 30, mass: 0.4 });
-  const heroVideoY = useTransform(heroProgressSmooth, [0, 1], ["0%", "12%"]);
+  const heroVideoY = useTransform(heroProgressSmooth, [0, 1], ["0%", "22%"]);
+  const heroVideoScale = useTransform(heroProgressSmooth, [0, 1], [1, 1.18]);
+  const heroTextY = useTransform(heroProgressSmooth, [0, 1], ["0%", "40%"]);
+  const heroTextOpacity = useTransform(heroProgressSmooth, [0, 0.7], [1, 0]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShowIntro(false), 950);
@@ -181,7 +184,7 @@ export default function GessiInspiredHome() {
       </AnimatePresence>
 
       <section ref={heroSectionRef} className="relative h-svh min-h-[760px] overflow-hidden bg-black text-white">
-        <motion.div style={{ y: heroVideoY }} className="absolute inset-x-0 -top-[8%] h-[116%]">
+        <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
           <video
             ref={heroVideoRef}
             autoPlay
@@ -195,7 +198,10 @@ export default function GessiInspiredHome() {
           </video>
         </motion.div>
         <div className="absolute inset-0 bg-black/35" />
-        <div className="absolute inset-x-0 bottom-[12%] z-10 flex flex-col items-center px-6 text-center">
+        <motion.div
+          style={{ y: heroTextY, opacity: heroTextOpacity }}
+          className="absolute inset-x-0 bottom-[12%] z-10 flex flex-col items-center px-6 text-center"
+        >
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -239,7 +245,7 @@ export default function GessiInspiredHome() {
               View products
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
         <button
           type="button"
           onClick={toggleHeroVideo}
