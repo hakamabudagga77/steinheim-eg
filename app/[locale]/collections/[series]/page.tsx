@@ -203,9 +203,9 @@ export default function CollectionPage() {
         </section>
 
         <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
-          <div className="mx-auto flex max-w-[1780px] items-center justify-between py-3">
-            <p className="text-[20px] font-medium tracking-[-0.03em]">{series.name}</p>
-            <div className="flex items-center gap-8 overflow-x-auto text-[16px]">
+          <div className="mx-auto flex max-w-[1780px] items-center justify-between gap-4 py-3">
+            <p className="shrink-0 text-[16px] font-medium tracking-[-0.03em] sm:text-[20px]">{series.name}</p>
+            <div className="flex items-center gap-4 overflow-x-auto text-[14px] sm:gap-8 sm:text-[16px]">
               {([
                 ["overview", "Overview"],
                 ["setup", "Set-up"],
@@ -215,7 +215,7 @@ export default function CollectionPage() {
                   key={anchor}
                   href={`#${anchor}`}
                   className={`whitespace-nowrap py-2 text-black/70 transition hover:text-black ${
-                    anchor === "products" ? "rounded-full border-b-0 bg-black px-8 text-white hover:text-white" : ""
+                    anchor === "products" ? "rounded-full border-b-0 bg-black px-5 text-white hover:text-white sm:px-8" : ""
                   }`}
                 >
                   {label}
