@@ -236,7 +236,7 @@ export default function CollectionPage() {
               <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
                 See the entire {series.name} range in one finish.
               </h2>
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <div className="mt-10 flex flex-nowrap items-start justify-center gap-3 sm:flex-wrap sm:gap-4">
                 {finishes.map((finish) => {
                   const disc = getFinishDiscImage(finish.id);
                   const active = globalFinish === finish.id;
@@ -247,16 +247,17 @@ export default function CollectionPage() {
                       onClick={() => setGlobalFinish(finish.id)}
                       title={finish.name}
                       aria-pressed={active}
-                      className="group flex flex-col items-center gap-2.5 cursor-pointer"
+                      aria-label={finish.name}
+                      className="group flex shrink-0 flex-col items-center gap-2.5 cursor-pointer"
                     >
                       <span
-                        className={`relative h-14 w-14 overflow-hidden rounded-full border-2 transition-all duration-300 sm:h-16 sm:w-16 ${
+                        className={`relative h-11 w-11 overflow-hidden rounded-full border-2 transition-all duration-300 sm:h-16 sm:w-16 ${
                           active ? "scale-110 border-black shadow-[0_8px_24px_rgba(0,0,0,0.18)]" : "border-transparent group-hover:border-black/25"
                         }`}
                       >
                         {disc ? <Image src={disc} alt="" fill sizes="64px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
                       </span>
-                      <span className={`text-[11px] uppercase tracking-[0.12em] transition-colors ${active ? "text-black font-medium" : "text-black/45 group-hover:text-black/70"}`}>
+                      <span className={`hidden text-[11px] uppercase tracking-[0.12em] transition-colors sm:block ${active ? "text-black font-medium" : "text-black/45 group-hover:text-black/70"}`}>
                         {finish.name}
                       </span>
                     </button>

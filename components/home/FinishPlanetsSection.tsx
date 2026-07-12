@@ -144,16 +144,37 @@ export default function FinishPlanetsSection() {
           ))}
         </div>
 
-        {/* Mobile: static fallback */}
-        <div className="relative aspect-[16/9] w-full md:hidden">
-          <Image
-            src={`${BASE}/finish-planets-static.webp`}
-            alt="Steinheim PVD finish discs — Chrome, Brushed Nickel, Matte Black, Brushed Gold, Coffee Gold, Metal Gun"
-            fill
-            quality={85}
-            sizes="100vw"
-            className="object-cover object-center"
-          />
+        {/* Mobile: animated grid */}
+        <div className="grid grid-cols-3 gap-x-4 gap-y-12 px-6 py-8 md:hidden">
+          {discs.map((disc, index) => (
+            <motion.div
+              key={disc.id}
+              className="relative flex flex-col items-center"
+              initial={{ opacity: 0, y: 36, scale: 0.85 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{
+                duration: 0.9,
+                delay: index * 0.12,
+                ease: [0.16, 0.9, 0.3, 1.08],
+              }}
+            >
+              <Image
+                src={`${BASE}/disc-${disc.id}.webp`}
+                alt={disc.label}
+                width={200}
+                height={200}
+                quality={82}
+                sizes="30vw"
+                className="h-auto w-full drop-shadow-[0_14px_30px_rgba(0,0,0,0.5)]"
+              />
+              <p className="mt-3 text-center text-[9px] font-semibold uppercase tracking-[0.2em] text-white/65">
+                {disc.label}
+              </p>
+              <p className="mt-1 text-center text-[7px] uppercase tracking-[0.15em] text-white/20">
+                {disc.tag}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
 
