@@ -60,6 +60,7 @@ const menuProductImages: Record<string, string> = {
   "art-tall-basin-mixer": "/images/nav-menu/products/art-tall-basin-mixer.png",
   "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer.png",
   "art-concealed-shower": "/images/nav-menu/products/art-concealed-shower.png",
+  "art-free-standing-bath-mixer": "/images/nav-menu/products/art-free-standing-bath-mixer.png",
   "quatro-basin-mixer": "/images/nav-menu/products/quatro-basin-mixer.png",
   "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer.png",
   "quatro-wall-mounted-basin-mixer": "/images/nav-menu/products/quatro-wall-mounted-basin-mixer.png",
@@ -68,6 +69,7 @@ const menuProductImages: Record<string, string> = {
 
 const navMenuSlugs: Record<string, string[]> = {
   up: ["up-basin-mixer", "up-wall-mounted-basin-mixer", "up-shower-column", "up-free-standing-bath-mixer"],
+  art: ["art-basin-mixer", "art-wall-mounted-basin-mixer", "art-concealed-shower", "art-free-standing-bath-mixer"],
 };
 
 export default function Navigation({ locale }: { locale: string }) {
@@ -390,8 +392,8 @@ export default function Navigation({ locale }: { locale: string }) {
                 </motion.div>
               </div>
 
-              <div className="hidden flex-1 p-4 lg:block">
-                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-4">
+              <div className="hidden flex-1 p-1.5 lg:block">
+                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-1.5">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div
@@ -424,7 +426,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                   priority={index < 2}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/48" />
-                                <div className="absolute inset-x-0 bottom-0 px-4 pb-3 pt-8 text-white">
+                                <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
                                     {item.eyebrow}
                                   </p>
@@ -473,7 +475,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                     />
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/8 to-transparent transition duration-500 group-hover:from-black/66" />
-                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-3 pt-8 text-white">
+                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
                                     <p className="font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
                                       {product.name}
                                     </p>
