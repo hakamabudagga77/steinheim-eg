@@ -307,7 +307,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           onClick={handleNavigate}
                           className="group overflow-hidden rounded-[16px] bg-black text-white"
                         >
-                          <div className="relative aspect-[1.05]">
+                          <div className="relative aspect-[4/5]">
                             {image ? (
                               <Image
                                 src={image}
@@ -429,19 +429,18 @@ export default function Navigation({ locale }: { locale: string }) {
                           </Link>
                         </div>
 
-                        <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           {worldLinks.map((item, index) => (
                             <motion.div
                               key={item.label}
                               initial={{ opacity: 0, y: 14 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
-                              className="h-full"
                             >
                               <Link
                                 href={item.href}
                                 onClick={handleNavigate}
-                                className="group relative block h-full overflow-hidden rounded-[18px] bg-black"
+                                className="group relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-black"
                               >
                                 <Image
                                   src={item.image}
@@ -492,7 +491,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           </Link>
                         </div>
 
-                        <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                           {activeProducts.map((product, index) => {
                             const image = menuProductImages[product.slug] ?? getProductDefaultImage(product.slug);
 
@@ -502,12 +501,11 @@ export default function Navigation({ locale }: { locale: string }) {
                                 initial={{ opacity: 0, y: 14 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
-                                className="h-full"
                               >
                                 <Link
                                   href={`/products/${product.slug}`}
                                   onClick={handleNavigate}
-                                  className="group relative block h-full overflow-hidden rounded-[18px] bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
+                                  className="group relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
                                 >
                                   {image ? (
                                     <Image
