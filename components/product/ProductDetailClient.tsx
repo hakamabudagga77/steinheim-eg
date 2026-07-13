@@ -290,13 +290,13 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       </p>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="bg-white p-8">
+                      <div className="border border-black/10 p-8">
                         <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Best for</p>
                         <p className="mt-4 text-[18px] leading-[1.55]">
                           Homes, villas, hospitality bathrooms, and trade specifications where the collection language needs to stay consistent.
                         </p>
                       </div>
-                      <div className="bg-white p-8">
+                      <div className="border border-black/10 p-8">
                         <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Selected finish</p>
                         <div className="mt-4 flex items-center gap-4">
                           <span className="relative h-12 w-12 overflow-hidden rounded-full">
@@ -315,7 +315,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
 
                 {activeInfoTab === "Product Detail" && (
                   <>
-                    <div className="bg-white p-8 lg:p-10">
+                    <div className="border border-black/10 p-8 lg:p-10">
                       <div className="grid gap-5 text-[16px]">
                         <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
                           <span className="text-black/52">Product Number</span>
@@ -335,7 +335,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         </div>
                       </div>
                     </div>
-                    <div className="bg-white p-8 lg:p-10">
+                    <div className="border border-black/10 p-8 lg:p-10">
                       <SpecTable product={product} />
                     </div>
                   </>
@@ -357,14 +357,14 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         href="/catalogues/steinheim-catalogue-2026.pdf"
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-between border border-black/12 bg-white px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                        className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
                         <span>Open Steinheim Catalogue 2026</span>
                         <span aria-hidden="true">↗</span>
                       </a>
                       <Link
                         href="/contact"
-                        className="flex items-center justify-between border border-black/12 bg-white px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                        className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
                         <span>Request technical sheet for {variant.model}</span>
                         <span aria-hidden="true">→</span>
