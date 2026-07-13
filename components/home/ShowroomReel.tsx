@@ -1,94 +1,95 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
-import { Link } from "@/i18n/navigation";
 
 const clips: Array<{
   src: string;
   poster: string;
-  caption: string;
   orientation: "portrait" | "landscape";
 }> = [
-  {
-    src: "/videos/showroom/showroom-1.mp4",
-    poster: "/images/showroom-1-poster.jpg",
-    caption: "The showroom floor",
-    orientation: "portrait",
-  },
-  {
-    src: "/videos/showroom/showroom-2.mp4",
-    poster: "/images/showroom-2-poster.jpg",
-    caption: "Finishes, in hand",
-    orientation: "landscape",
-  },
-  {
-    src: "/videos/showroom/showroom-3.mp4",
-    poster: "/images/showroom-3-poster.jpg",
-    caption: "Every mechanism, tested",
-    orientation: "portrait",
-  },
-  {
-    src: "/videos/showroom/showroom-4.mp4",
-    poster: "/images/showroom-4-poster.jpg",
-    caption: "A walk through Cairo",
-    orientation: "portrait",
-  },
-  {
-    src: "/videos/showroom/showroom-5.mp4",
-    poster: "/images/showroom-5-poster.jpg",
-    caption: "Where projects begin",
-    orientation: "portrait",
-  },
+  { src: "/videos/showroom/showroom-1.mp4", poster: "/images/showroom-1-poster.jpg", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-2.mp4", poster: "/images/showroom-2-poster.jpg", orientation: "landscape" },
+  { src: "/videos/showroom/showroom-3.mp4", poster: "/images/showroom-3-poster.jpg", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-4.mp4", poster: "/images/showroom-4-poster.jpg", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-5.mp4", poster: "/images/showroom-5-poster.jpg", orientation: "portrait" },
 ];
 
 export default function ShowroomReel() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    let frame: number;
+    const speed = 0.55;
+
+    const step = () => {
+      if (!pausedRef.current) {
+        const singleSetWidth = track.scrollWidth / 2;
+        const next = track.scrollLeft + speed;
+        track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
+      }
+      frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <section className="bg-black py-24 text-white sm:py-32">
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
-        <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
-          <div>
-            <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
-            <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-              The showroom, as it is.
-            </h2>
-            <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
-              Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms,
-              and the space where clients specify a complete bathroom in person.
-            </p>
-          </div>
-          <Link
-            href="/contact"
-            className="rounded-full border border-white/30 px-7 py-3 text-[13px] transition hover:border-white/70"
-          >
-            Book a showroom visit
-          </Link>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8 }}
+          className="mb-12"
+        >
+          <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
+          <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
+            The showroom, as it is.
+          </h2>
+          <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
+            Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms,
+            and the space where clients specify a complete bathroom in person.
+          </p>
+        </motion.div>
 
-        <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {clips.map((clip, index) => (
+        <div
+          ref={trackRef}
+          onMouseEnter={() => {
+            pausedRef.current = true;
+          }}
+          onMouseLeave={() => {
+            pausedRef.current = false;
+            setHoveredIndex(null);
+          }}
+          onPointerDown={() => {
+            pausedRef.current = true;
+          }}
+          className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {[...clips, ...clips].map((clip, index) => (
             <motion.div
-              key={clip.src}
+              key={`${clip.src}-${index}`}
               initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.7, delay: Math.min(index * 0.07, 0.28) }}
-              className={`group relative shrink-0 snap-start overflow-hidden rounded-[18px] bg-[#111] ${
+              onMouseEnter={() => setHoveredIndex(index)}
+              animate={{
+                opacity: hoveredIndex === null ? 1 : hoveredIndex === index ? 1 : 0.45,
+                y: 0,
+                scale: hoveredIndex === index ? 1.045 : hoveredIndex === null ? 1 : 0.97,
+              }}
+              transition={{ duration: 0.5, delay: index < clips.length ? Math.min(index * 0.07, 0.28) : 0, ease: [0.22, 0.76, 0.2, 1] }}
+              className={`group relative shrink-0 overflow-hidden rounded-[18px] bg-[#111] ${
                 clip.orientation === "portrait" ? "aspect-[9/16] w-[62vw] sm:w-[300px]" : "aspect-[16/9] w-[86vw] sm:w-[560px]"
               }`}
             >
-              <AutoplayVideo
-                src={clip.src}
-                poster={clip.poster}
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <p className="absolute bottom-5 left-5 right-5 text-[15px] leading-tight text-white/90">
-                {clip.caption}
-              </p>
-              <span className="absolute right-5 top-5 text-[11px] tracking-[0.2em] text-white/50">
-                0{index + 1}
-              </span>
+              <AutoplayVideo src={clip.src} poster={clip.poster} className="h-full w-full object-cover" />
             </motion.div>
           ))}
         </div>

@@ -45,7 +45,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div className="bg-[#ece9e2] px-5 pb-4 pt-[92px] sm:px-8 lg:px-16 lg:pt-[104px]">
+        <div className="bg-[#ece9e2] px-5 pb-4 pt-8 sm:px-8 lg:px-16">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] text-black/40">
               <Link href={`/collections/${product.series}`} className="transition hover:text-black">
@@ -58,10 +58,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </div>
 
         <section className="bg-[#ece9e2]">
-          <div className="grid min-h-[calc(100svh-124px)] lg:grid-cols-[56vw_44vw]">
+          <div className="grid min-h-[calc(100svh-140px)] lg:grid-cols-[56vw_44vw]">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-[80px] lg:min-h-[calc(100svh-80px)]"
+              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-0 lg:min-h-[100svh]"
             >
               <AnimatePresence mode="wait">
                 <motion.div

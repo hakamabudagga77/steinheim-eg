@@ -283,8 +283,6 @@ export default function GessiInspiredHome() {
         </div>
       </section>
 
-      <ShowroomReel />
-
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
         <AutoplayVideo src={ritualVideo} poster="/images/steinheim/final/about-hero.jpg" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/45" />
@@ -337,6 +335,8 @@ export default function GessiInspiredHome() {
           </div>
         </div>
       </section>
+
+      <ShowroomReel />
 
       <FinishPlanetsSection />
     </div>

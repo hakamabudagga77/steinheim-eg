@@ -10,8 +10,6 @@ import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
 import { getProductsBySeries } from "@/lib/utils";
 
-const LIGHT_TOP_PATTERN = /^\/products\//;
-
 const collections = [
   { id: "joy", href: "/collections/joy" },
   { id: "up", href: "/collections/up" },
@@ -72,17 +70,6 @@ export default function Navigation({ locale }: { locale: string }) {
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
-  const [scrolled, setScrolled] = useState(false);
-
-  const isLightTopPage = LIGHT_TOP_PATTERN.test(pathname);
-  const useWhite = !isLightTopPage && !scrolled;
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -111,18 +98,16 @@ export default function Navigation({ locale }: { locale: string }) {
 
   return (
     <>
-      <nav className="fixed inset-x-0 top-0 z-50 bg-transparent transition-colors duration-500">
-        <div className="relative mx-auto flex h-[72px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[80px] lg:px-16">
+      <nav className="relative z-30 bg-transparent">
+        <div className="relative mx-auto flex h-[84px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[100px] lg:px-16">
           <button
             onClick={() => setMenuOpen(true)}
-            className={`flex items-center gap-5 text-[14px] font-medium uppercase transition-colors duration-300 cursor-pointer ${
-              useWhite ? "text-white hover:text-white/70" : "text-charcoal hover:text-charcoal/60"
-            }`}
+            className="flex items-center gap-5 text-[15px] font-medium uppercase text-charcoal transition-colors duration-300 hover:text-charcoal/60 cursor-pointer"
             aria-label={t("menu")}
           >
-            <span className="flex h-9 w-12 flex-col justify-center gap-[7px]">
-              <span className="block h-px w-11 bg-current" />
-              <span className="block h-px w-11 bg-current" />
+            <span className="flex h-10 w-14 flex-col justify-center gap-[8px]">
+              <span className="block h-[1.5px] w-[52px] bg-current" />
+              <span className="block h-[1.5px] w-[52px] bg-current" />
             </span>
             <span className="hidden sm:block">Menu</span>
           </button>
@@ -132,30 +117,26 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
             aria-label="Steinheim home"
           >
-            <Logo color={useWhite ? "light" : "dark"} size="sm" showWave={false} />
+            <Logo color="dark" size="md" showWave={false} />
           </Link>
 
-          <div className="flex items-center gap-3 lg:gap-5">
+          <div className="flex items-center gap-4 lg:gap-6">
             <Link
               href="/collections"
-              className={`hidden transition-colors duration-300 sm:flex ${
-                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="hidden text-charcoal/55 transition-colors duration-300 hover:text-charcoal sm:flex"
               aria-label="Search collections"
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="11" cy="11" r="7" />
                 <path d="M20 20l-3.5-3.5" />
               </svg>
             </Link>
             <Link
               href="/contact"
-              className={`hidden transition-colors duration-300 sm:flex ${
-                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="hidden text-charcoal/55 transition-colors duration-300 hover:text-charcoal sm:flex"
               aria-label="Account"
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M5.5 21a6.5 6.5 0 0113 0" />
               </svg>
@@ -163,9 +144,7 @@ export default function Navigation({ locale }: { locale: string }) {
             <button
               ref={cartIconRef}
               onClick={() => setCartOpen(true)}
-              className={`relative flex transition-colors duration-300 cursor-pointer ${
-                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="relative flex text-charcoal/55 transition-colors duration-300 hover:text-charcoal cursor-pointer"
               aria-label="Cart"
             >
               <motion.span
@@ -174,7 +153,7 @@ export default function Navigation({ locale }: { locale: string }) {
                 animate={{ scale: bump ? [1, 1.32, 1] : 1 }}
                 transition={{ duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
               >
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M7 8V6a5 5 0 0110 0v2" />
                   <path d="M5.5 8h13l1 12.5a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5L5.5 8z" />
                 </svg>
@@ -185,9 +164,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   initial={{ scale: 0.6 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.35, ease: [0.22, 0.76, 0.2, 1] }}
-                  className={`absolute -top-1.5 -right-1.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-0.5 text-[7px] font-medium ${
-                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
-                  }`}
+                  className="absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[8px] font-medium text-white"
                 >
                   {itemCount}
                 </motion.span>
@@ -195,11 +172,9 @@ export default function Navigation({ locale }: { locale: string }) {
             </button>
             <Link
               href={`/${locale === "en" ? "ar" : "en"}`}
-              className={`hidden items-center gap-2 text-[11px] font-medium uppercase transition-colors duration-300 lg:flex ${
-                useWhite ? "text-white/70 hover:text-white" : "text-charcoal/45 hover:text-charcoal"
-              }`}
+              className="hidden items-center gap-2 text-[12px] font-medium uppercase text-charcoal/50 transition-colors duration-300 hover:text-charcoal lg:flex"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
               </svg>
