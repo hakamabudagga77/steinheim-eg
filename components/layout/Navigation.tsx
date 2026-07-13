@@ -219,7 +219,7 @@ export default function Navigation({ locale }: { locale: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
-            <div className="relative mx-0 my-0 h-[100svh] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:my-3 sm:h-[calc(100svh-24px)] sm:rounded-[22px] lg:mx-6 lg:my-6 lg:h-[calc(100vh-48px)]">
+            <div className="relative mx-0 my-0 h-[100svh] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:my-3 sm:h-[calc(100svh-24px)] lg:mx-6 lg:my-6 lg:h-[calc(100vh-48px)]">
               <button
                 onClick={() => setMenuOpen(false)}
                 className="absolute left-5 top-5 z-10 flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer sm:left-7 sm:top-6 lg:left-10 lg:top-8"
@@ -307,7 +307,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               />
                             ) : null}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-transparent to-transparent" />
-                            <p className="absolute inset-x-0 bottom-0 p-3 font-heading text-[18px] leading-none">
+                            <p className="absolute inset-x-0 bottom-4 px-3 text-center font-heading text-[18px] leading-none tracking-[-0.04em]">
                               {product.name}
                             </p>
                           </div>
@@ -389,7 +389,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </div>
 
               <div className="hidden flex-1 p-4 lg:block">
-                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2]">
+                <div className="flex h-full flex-col bg-[#ece9e2]">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div
@@ -473,12 +473,8 @@ export default function Navigation({ locale }: { locale: string }) {
                                     />
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/8 to-transparent transition duration-500 group-hover:from-black/88 group-hover:via-black/25" />
-                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
-                                    <p
-                                      className={`font-heading leading-none tracking-[-0.04em] text-white ${
-                                        product.name.length > 18 ? "text-[18px]" : "text-[24px]"
-                                      }`}
-                                    >
+                                  <div className="absolute inset-x-0 bottom-6 px-5 pt-8 text-center text-white">
+                                    <p className="font-heading text-[18px] leading-none tracking-[-0.04em] text-white">
                                       {product.name}
                                     </p>
                                   </div>

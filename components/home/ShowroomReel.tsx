@@ -19,24 +19,24 @@ const clips: Array<{
 export default function ShowroomReel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
-  const resumeTimeoutRef = useRef<number | undefined>(undefined);
+  const hoverPausedRef = useRef(false);
+  const touchPausedRef = useRef(false);
   const centeredRef = useRef<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
 
-  const pause = () => {
-    pausedRef.current = true;
-    window.clearTimeout(resumeTimeoutRef.current);
-    // Safety net: a mobile browser can miss a matching pointerup/pointercancel,
-    // so never let the marquee stay paused forever.
-    resumeTimeoutRef.current = window.setTimeout(() => {
-      pausedRef.current = false;
-    }, 2500);
+  const syncPausedState = () => {
+    pausedRef.current = hoverPausedRef.current || touchPausedRef.current;
   };
 
-  const resume = () => {
-    pausedRef.current = false;
-    window.clearTimeout(resumeTimeoutRef.current);
+  const setHoverPaused = (paused: boolean) => {
+    hoverPausedRef.current = paused;
+    syncPausedState();
+  };
+
+  const setTouchPaused = (paused: boolean) => {
+    touchPausedRef.current = paused;
+    syncPausedState();
   };
 
   useEffect(() => {
@@ -45,12 +45,16 @@ export default function ShowroomReel() {
 
     let frame: number;
     let lastCenterCheck = 0;
-    const speed = 0.55;
+    let lastTimestamp: number | null = null;
+    const pixelsPerSecond = 34;
 
     const step = (timestamp: number) => {
+      const delta = lastTimestamp === null ? 16.67 : Math.min(timestamp - lastTimestamp, 80);
+      lastTimestamp = timestamp;
+
       if (!pausedRef.current) {
         const singleSetWidth = track.scrollWidth / 2;
-        const next = track.scrollLeft + speed;
+        const next = track.scrollLeft + (pixelsPerSecond * delta) / 1000;
         track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
       }
 
@@ -70,16 +74,26 @@ export default function ShowroomReel() {
         });
         if (closest !== centeredRef.current) {
           centeredRef.current = closest;
-          setCenteredIndex(closest);
+          setCenteredIndex(closest === null ? null : closest % clips.length);
         }
       }
 
       frame = requestAnimationFrame(step);
     };
+
+    const releaseTouchPause = () => setTouchPaused(false);
+    window.addEventListener("pointerup", releaseTouchPause);
+    window.addEventListener("pointercancel", releaseTouchPause);
+    window.addEventListener("blur", releaseTouchPause);
+    document.addEventListener("visibilitychange", releaseTouchPause);
+
     frame = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(frame);
-      window.clearTimeout(resumeTimeoutRef.current);
+      window.removeEventListener("pointerup", releaseTouchPause);
+      window.removeEventListener("pointercancel", releaseTouchPause);
+      window.removeEventListener("blur", releaseTouchPause);
+      document.removeEventListener("visibilitychange", releaseTouchPause);
     };
   }, []);
 
@@ -109,17 +123,23 @@ export default function ShowroomReel() {
       <div
         ref={trackRef}
         onPointerEnter={(e) => {
-          if (e.pointerType === "mouse") pause();
+          if (e.pointerType === "mouse") setHoverPaused(true);
         }}
         onPointerLeave={(e) => {
           if (e.pointerType === "mouse") {
-            resume();
+            setHoverPaused(false);
             setHoveredIndex(null);
           }
         }}
-        onPointerDown={() => pause()}
-        onPointerUp={() => resume()}
-        onPointerCancel={() => resume()}
+        onPointerDown={(e) => {
+          if (e.pointerType !== "mouse") setTouchPaused(true);
+        }}
+        onPointerUp={(e) => {
+          if (e.pointerType !== "mouse") setTouchPaused(false);
+        }}
+        onPointerCancel={(e) => {
+          if (e.pointerType !== "mouse") setTouchPaused(false);
+        }}
         className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {[...clips, ...clips].map((clip, index) => {

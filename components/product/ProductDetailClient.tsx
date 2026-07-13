@@ -14,12 +14,13 @@ import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getS
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
+const productInfoTabs = ["Product Description", "Product Detail", "Downloads"] as const;
 
 export default function ProductDetailClient({ slug, liveData = null }: { slug: string; liveData?: LiveProductData }) {
   const product = getProductBySlug(slug)!;
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
   const [finishOpen, setFinishOpen] = useState(false);
-  const [expandedSpec, setExpandedSpec] = useState(false);
+  const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
   const [cartAdded, setCartAdded] = useState(false);
   const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
   const { addItem: addToCart, flyToCart } = useCart();
@@ -61,7 +62,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           <div className="grid min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw]">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-0 lg:min-h-[100svh]"
+              className="relative flex min-h-[58svh] items-start justify-center overflow-hidden bg-[#ece9e2] pt-2 sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -80,7 +81,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="scale-[1.16] object-contain p-[4%] transition duration-[900ms] lg:scale-[1.24] lg:p-[5%]"
+                      className="object-contain object-[center_top] px-[6%] pb-[9%] pt-[3%] transition duration-[900ms] sm:px-[8%] sm:pb-[10%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
@@ -232,33 +233,147 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </button>
                 </div>
 
-                <div className="mt-10 border-t border-black/10">
-                  <button
-                    type="button"
-                    onClick={() => setExpandedSpec(!expandedSpec)}
-                    className="flex w-full cursor-pointer items-center justify-between py-6 text-left"
-                  >
-                    <span className="text-[18px] font-medium">Technical Features and Download</span>
-                    <span className="text-[20px] text-black/40">{expandedSpec ? "-" : "+"}</span>
-                  </button>
-                  <AnimatePresence>
-                    {expandedSpec && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pb-8">
-                          <SpecTable product={product} />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                <div className="mt-10 border-t border-black/10 pt-6">
+                  <p className="text-[13px] leading-[1.8] text-black/45">
+                    Technical information, product details, and catalogue downloads are available below.
+                  </p>
                 </div>
               </motion.div>
             </div>
+          </div>
+        </section>
+
+        <section className="border-y border-black/10 bg-[#f3f1ec] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
+          <div className="mx-auto max-w-[1560px]">
+            <div className="border-b border-black/18">
+              <div className="grid grid-cols-1 gap-0 sm:grid-cols-3">
+                {productInfoTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveInfoTab(tab)}
+                    className={`relative px-2 py-5 text-center text-[20px] font-semibold tracking-[-0.04em] transition sm:text-[25px] lg:text-[31px] ${
+                      activeInfoTab === tab ? "text-black" : "text-black/42 hover:text-black/70"
+                    }`}
+                  >
+                    {tab}
+                    <span
+                      className={`absolute bottom-[-1px] left-1/2 h-[2px] -translate-x-1/2 bg-black transition-all duration-300 ${
+                        activeInfoTab === tab ? "w-full" : "w-0"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeInfoTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28 }}
+                className="grid gap-10 py-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-14"
+              >
+                {activeInfoTab === "Product Description" && (
+                  <>
+                    <div className="space-y-6">
+                      <p className="max-w-xl text-[17px] leading-[1.85] text-black/72">
+                        {product.name} from the {seriesName} collection brings Steinheim&apos;s
+                        architectural bathroom language into a precise, project-ready product.
+                        The current selection is shown in {finish?.name ?? "the selected finish"} with model
+                        number {variant.model}.
+                      </p>
+                      <p className="max-w-xl text-[15px] leading-[1.9] text-black/52">
+                        {series?.description || "Designed for enduring performance, visual clarity, and long-term specification."}
+                      </p>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="bg-white p-8">
+                        <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Best for</p>
+                        <p className="mt-4 text-[18px] leading-[1.55]">
+                          Homes, villas, hospitality bathrooms, and trade specifications where the collection language needs to stay consistent.
+                        </p>
+                      </div>
+                      <div className="bg-white p-8">
+                        <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Selected finish</p>
+                        <div className="mt-4 flex items-center gap-4">
+                          <span className="relative h-12 w-12 overflow-hidden rounded-full">
+                            {activeFinishDisc ? (
+                              <Image src={activeFinishDisc} alt="" fill sizes="48px" className="object-cover" />
+                            ) : (
+                              <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish?.hex }} />
+                            )}
+                          </span>
+                          <span className="text-[18px]">{finish?.name ?? variant.finish}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {activeInfoTab === "Product Detail" && (
+                  <>
+                    <div className="bg-white p-8 lg:p-10">
+                      <div className="grid gap-5 text-[16px]">
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Product Number</span>
+                          <span className="text-right font-medium">{variant.model}</span>
+                        </div>
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Collection</span>
+                          <span className="text-right font-medium">{seriesName}</span>
+                        </div>
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Finish</span>
+                          <span className="text-right font-medium">{finish?.name ?? variant.finish}</span>
+                        </div>
+                        <div className="flex justify-between gap-8">
+                          <span className="text-black/52">Application</span>
+                          <span className="text-right font-medium">{product.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-8 lg:p-10">
+                      <SpecTable product={product} />
+                    </div>
+                  </>
+                )}
+
+                {activeInfoTab === "Downloads" && (
+                  <>
+                    <div>
+                      <p className="max-w-xl text-[17px] leading-[1.85] text-black/70">
+                        Download the current Steinheim catalogue or request the exact technical sheet for
+                        {` ${seriesName} ${product.name}`} in {finish?.name ?? "the selected finish"}.
+                      </p>
+                      <p className="mt-5 max-w-xl text-[14px] leading-[1.85] text-black/45">
+                        Final stock, trade pricing, lead times, and project quantities should still be confirmed with Steinheim Egypt.
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <a
+                        href="/catalogues/steinheim-catalogue-2026.pdf"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-between border border-black/12 bg-white px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                      >
+                        <span>Open Steinheim Catalogue 2026</span>
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                      <Link
+                        href="/contact"
+                        className="flex items-center justify-between border border-black/12 bg-white px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                      >
+                        <span>Request technical sheet for {variant.model}</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </section>
 
