@@ -233,7 +233,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </button>
 
               <div className="flex h-full">
-              <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-20 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-24">
+              <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-20 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="mb-8 lg:mb-12">
                   <div className="space-y-1">
                     <motion.div
@@ -419,11 +419,11 @@ export default function Navigation({ locale }: { locale: string }) {
                                   alt={item.label}
                                   fill
                                   sizes="32vw"
-                                  className="object-cover transition duration-[1200ms] group-hover:scale-[1.045]"
+                                  className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
                                   priority={index < 2}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/48" />
-                                <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
+                                <div className="absolute inset-x-0 bottom-0 px-4 pb-1 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
                                     {item.eyebrow}
                                   </p>
@@ -468,18 +468,15 @@ export default function Navigation({ locale }: { locale: string }) {
                                       alt={product.name}
                                       fill
                                       sizes="32vw"
-                                      className="object-cover transition duration-[1200ms] group-hover:scale-[1.055]"
+                                      className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
                                       priority={index < 2}
                                     />
                                   ) : null}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/8 to-transparent transition duration-500 group-hover:from-black/66" />
-                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/8 to-transparent transition duration-500 group-hover:from-black/88 group-hover:via-black/25" />
+                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-1 pt-8 text-white">
                                     <p className="font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
                                       {product.name}
                                     </p>
-                                    <span className="mt-4 inline-block border-b border-white/60 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70 opacity-0 transition duration-500 group-hover:opacity-100">
-                                      Open product
-                                    </span>
                                   </div>
                                 </Link>
                               </motion.div>
