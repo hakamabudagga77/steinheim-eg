@@ -277,7 +277,7 @@ export default function CollectionPage() {
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.55, delay: Math.min(index * 0.05, 0.2) }}
                 >
-                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} hidePrice finish={globalFinish} />
+                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} finish={globalFinish} />
                 </motion.div>
               ))}
             </motion.div>

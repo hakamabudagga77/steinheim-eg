@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { collectionLandingImages } from "@/data/images";
 import { getAllSeries } from "@/lib/utils";
@@ -32,8 +32,17 @@ const collectionCopy: Record<string, { line: string; family: string }> = {
 export default function CollectionsLanding() {
   const series = getAllSeries();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
   const [paused, setPaused] = useState(false);
   useAutoplayVideo(videoRef, collectionsVideo);
+
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heroProgressSmooth = useSpring(heroProgress, { stiffness: 100, damping: 30, mass: 0.4 });
+  const heroVideoY = useTransform(heroProgressSmooth, [0, 1], ["0%", "22%"]);
+  const heroVideoScale = useTransform(heroProgressSmooth, [0, 1], [1, 1.18]);
 
   const toggleVideo = () => {
     const video = videoRef.current;
@@ -50,20 +59,22 @@ export default function CollectionsLanding() {
 
   return (
     <main className="bg-[#ece9e2] text-[#0a0a0a]">
-      <section className="relative bg-black text-white">
+      <section ref={heroSectionRef} className="relative bg-black text-white">
         <div className="sticky top-0 h-svh min-h-[760px] overflow-hidden">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/images/steinheim/final/collections-hero.jpg"
-            className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
-          >
-            <source src={collectionsVideo} type="video/mp4" />
-          </video>
+          <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/images/steinheim/final/collections-hero.jpg"
+              className="h-full w-full object-cover"
+            >
+              <source src={collectionsVideo} type="video/mp4" />
+            </video>
+          </motion.div>
           <div className="absolute inset-0 bg-black/34" />
           <button
             type="button"
