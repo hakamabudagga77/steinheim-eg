@@ -289,27 +289,6 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         {series?.description || "Designed for enduring performance, visual clarity, and long-term specification."}
                       </p>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="border border-black/10 p-8">
-                        <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Best for</p>
-                        <p className="mt-4 text-[18px] leading-[1.55]">
-                          Homes, villas, hospitality bathrooms, and trade specifications where the collection language needs to stay consistent.
-                        </p>
-                      </div>
-                      <div className="border border-black/10 p-8">
-                        <p className="text-[11px] uppercase tracking-[0.24em] text-black/36">Selected finish</p>
-                        <div className="mt-4 flex items-center gap-4">
-                          <span className="relative h-12 w-12 overflow-hidden rounded-full">
-                            {activeFinishDisc ? (
-                              <Image src={activeFinishDisc} alt="" fill sizes="48px" className="object-cover" />
-                            ) : (
-                              <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish?.hex }} />
-                            )}
-                          </span>
-                          <span className="text-[18px]">{finish?.name ?? variant.finish}</span>
-                        </div>
-                      </div>
-                    </div>
                   </>
                 )}
 
@@ -360,14 +339,14 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
                         <span>Open Steinheim Catalogue 2026</span>
-                        <span aria-hidden="true">↗</span>
+                        <span aria-hidden="true" className="hidden sm:inline">↗</span>
                       </a>
                       <Link
                         href="/contact"
                         className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
                         <span>Request technical sheet for {variant.model}</span>
-                        <span aria-hidden="true">→</span>
+                        <span aria-hidden="true" className="hidden sm:inline">→</span>
                       </Link>
                     </div>
                   </>
