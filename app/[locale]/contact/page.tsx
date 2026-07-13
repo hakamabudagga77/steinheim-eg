@@ -21,7 +21,7 @@ export default function ContactPage() {
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         {/* Hero */}
-        <section className="bg-black pt-8">
+        <section className="bg-black pt-[124px]">
           <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
             <div className="py-20 lg:py-28">
               <motion.p

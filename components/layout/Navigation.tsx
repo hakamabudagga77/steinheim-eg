@@ -10,6 +10,8 @@ import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
 import { getProductsBySeries } from "@/lib/utils";
 
+const LIGHT_TOP_PATTERN = /^\/products\//;
+
 const collections = [
   { id: "joy", href: "/collections/joy" },
   { id: "up", href: "/collections/up" },
@@ -70,6 +72,7 @@ export default function Navigation({ locale }: { locale: string }) {
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
+  const useWhite = !LIGHT_TOP_PATTERN.test(pathname);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -98,11 +101,13 @@ export default function Navigation({ locale }: { locale: string }) {
 
   return (
     <>
-      <nav className="relative z-30 bg-transparent">
+      <nav className="absolute inset-x-0 top-0 z-30 bg-transparent">
         <div className="relative mx-auto flex h-[84px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[100px] lg:px-16">
           <button
             onClick={() => setMenuOpen(true)}
-            className="flex items-center gap-5 text-[15px] font-medium uppercase text-charcoal transition-colors duration-300 hover:text-charcoal/60 cursor-pointer"
+            className={`flex items-center gap-5 text-[15px] font-medium uppercase transition-colors duration-300 cursor-pointer ${
+              useWhite ? "text-white hover:text-white/70" : "text-charcoal hover:text-charcoal/60"
+            }`}
             aria-label={t("menu")}
           >
             <span className="flex h-10 w-14 flex-col justify-center gap-[8px]">
@@ -117,13 +122,15 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
             aria-label="Steinheim home"
           >
-            <Logo color="dark" size="md" showWave={false} />
+            <Logo color={useWhite ? "light" : "dark"} size="md" showWave={false} />
           </Link>
 
           <div className="flex items-center gap-4 lg:gap-6">
             <Link
               href="/collections"
-              className="hidden text-charcoal/55 transition-colors duration-300 hover:text-charcoal sm:flex"
+              className={`hidden transition-colors duration-300 sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
               aria-label="Search collections"
             >
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -133,7 +140,9 @@ export default function Navigation({ locale }: { locale: string }) {
             </Link>
             <Link
               href="/contact"
-              className="hidden text-charcoal/55 transition-colors duration-300 hover:text-charcoal sm:flex"
+              className={`hidden transition-colors duration-300 sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
               aria-label="Account"
             >
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -144,7 +153,9 @@ export default function Navigation({ locale }: { locale: string }) {
             <button
               ref={cartIconRef}
               onClick={() => setCartOpen(true)}
-              className="relative flex text-charcoal/55 transition-colors duration-300 hover:text-charcoal cursor-pointer"
+              className={`relative flex transition-colors duration-300 cursor-pointer ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
               aria-label="Cart"
             >
               <motion.span
@@ -164,7 +175,9 @@ export default function Navigation({ locale }: { locale: string }) {
                   initial={{ scale: 0.6 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.35, ease: [0.22, 0.76, 0.2, 1] }}
-                  className="absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[8px] font-medium text-white"
+                  className={`absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full px-0.5 text-[8px] font-medium ${
+                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
+                  }`}
                 >
                   {itemCount}
                 </motion.span>
@@ -172,7 +185,9 @@ export default function Navigation({ locale }: { locale: string }) {
             </button>
             <Link
               href={`/${locale === "en" ? "ar" : "en"}`}
-              className="hidden items-center gap-2 text-[12px] font-medium uppercase text-charcoal/50 transition-colors duration-300 hover:text-charcoal lg:flex"
+              className={`hidden items-center gap-2 text-[12px] font-medium uppercase transition-colors duration-300 lg:flex ${
+                useWhite ? "text-white/70 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
+              }`}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="12" r="10" />

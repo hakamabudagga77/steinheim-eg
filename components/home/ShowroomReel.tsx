@@ -19,7 +19,9 @@ const clips: Array<{
 export default function ShowroomReel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
+  const centeredRef = useRef<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -34,11 +36,31 @@ export default function ShowroomReel() {
         const next = track.scrollLeft + speed;
         track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
       }
+
+      const trackRect = track.getBoundingClientRect();
+      const center = trackRect.left + trackRect.width / 2;
+      let closest: number | null = null;
+      let closestDistance = Infinity;
+      Array.from(track.children).forEach((child, idx) => {
+        const rect = (child as HTMLElement).getBoundingClientRect();
+        const distance = Math.abs(rect.left + rect.width / 2 - center);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closest = idx;
+        }
+      });
+      if (closest !== centeredRef.current) {
+        centeredRef.current = closest;
+        setCenteredIndex(closest);
+      }
+
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  const activeIndex = hoveredIndex ?? centeredIndex;
 
   return (
     <section className="bg-black py-24 text-white sm:py-32">
@@ -72,6 +94,12 @@ export default function ShowroomReel() {
           onPointerDown={() => {
             pausedRef.current = true;
           }}
+          onPointerUp={() => {
+            pausedRef.current = false;
+          }}
+          onPointerCancel={() => {
+            pausedRef.current = false;
+          }}
           className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {[...clips, ...clips].map((clip, index) => (
@@ -80,9 +108,9 @@ export default function ShowroomReel() {
               initial={{ opacity: 0, y: 24 }}
               onMouseEnter={() => setHoveredIndex(index)}
               animate={{
-                opacity: hoveredIndex === null ? 1 : hoveredIndex === index ? 1 : 0.45,
+                opacity: activeIndex === null ? 1 : activeIndex === index ? 1 : 0.45,
                 y: 0,
-                scale: hoveredIndex === index ? 1.045 : hoveredIndex === null ? 1 : 0.97,
+                scale: activeIndex === index ? 1.045 : activeIndex === null ? 1 : 0.97,
               }}
               transition={{ duration: 0.5, delay: index < clips.length ? Math.min(index * 0.07, 0.28) : 0, ease: [0.22, 0.76, 0.2, 1] }}
               className={`group relative shrink-0 overflow-hidden rounded-[18px] bg-[#111] ${
