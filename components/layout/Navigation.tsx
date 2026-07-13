@@ -8,7 +8,7 @@ import Image from "next/image";
 import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
-import { getProductsBySeries } from "@/lib/utils";
+import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
 
 const LIGHT_TOP_PATTERN = /^\/products\//;
 
@@ -54,6 +54,8 @@ const menuProductImages: Record<string, string> = {
   "up-tall-basin-mixer": "/images/nav-menu/products/up-tall-basin-mixer.png",
   "up-wall-mounted-basin-mixer": "/images/nav-menu/products/up-wall-mounted-basin-mixer.png",
   "up-concealed-shower": "/images/nav-menu/products/up-concealed-shower.png",
+  "up-shower-column": "/images/nav-menu/products/up-shower-column.png",
+  "up-free-standing-bath-mixer": "/images/nav-menu/products/up-free-standing-bath-mixer.png",
   "art-basin-mixer": "/images/nav-menu/products/art-basin-mixer.png",
   "art-tall-basin-mixer": "/images/nav-menu/products/art-tall-basin-mixer.png",
   "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer.png",
@@ -62,6 +64,10 @@ const menuProductImages: Record<string, string> = {
   "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer.png",
   "quatro-wall-mounted-basin-mixer": "/images/nav-menu/products/quatro-wall-mounted-basin-mixer.png",
   "quatro-concealed-shower": "/images/nav-menu/products/quatro-concealed-shower.png",
+};
+
+const navMenuSlugs: Record<string, string[]> = {
+  up: ["up-basin-mixer", "up-wall-mounted-basin-mixer", "up-shower-column", "up-free-standing-bath-mixer"],
 };
 
 export default function Navigation({ locale }: { locale: string }) {
@@ -97,7 +103,10 @@ export default function Navigation({ locale }: { locale: string }) {
   }, []);
 
   const activeCollection = hoveredCollection ?? "joy";
-  const activeProducts = getProductsBySeries(activeCollection).slice(0, 4);
+  const curatedSlugs = navMenuSlugs[activeCollection];
+  const activeProducts = curatedSlugs
+    ? curatedSlugs.map((slug) => getProductBySlug(slug)).filter((product): product is NonNullable<typeof product> => Boolean(product))
+    : getProductsBySeries(activeCollection).slice(0, 4);
 
   return (
     <>
@@ -220,24 +229,6 @@ export default function Navigation({ locale }: { locale: string }) {
                 </svg>
                 <span className="hidden sm:inline">Close</span>
               </button>
-
-              <Link
-                href="/"
-                onClick={handleNavigate}
-                className="absolute left-1/2 -translate-x-1/2 shrink-0"
-                aria-label="Steinheim home"
-              >
-                <Logo color="dark" size="sm" showWave={false} />
-              </Link>
-
-              <Link
-                href={pathname}
-                locale={locale === "en" ? "ar" : "en"}
-                onClick={handleNavigate}
-                className="text-[11px] font-medium text-black/40 hover:text-black transition-colors duration-300"
-              >
-                {locale === "en" ? "Arabic" : "English"}
-              </Link>
             </div>
 
             <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
@@ -305,7 +296,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           key={product.slug}
                           href={`/products/${product.slug}`}
                           onClick={handleNavigate}
-                          className="group overflow-hidden rounded-[16px] bg-black text-white"
+                          className="group overflow-hidden bg-black text-white"
                         >
                           <div className="relative aspect-[4/5]">
                             {image ? (
@@ -411,24 +402,6 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
                         className="flex h-full flex-col"
                       >
-                        <div className="mb-4 flex items-end justify-between px-1">
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-black/35">
-                              Our World
-                            </p>
-                            <p className="mt-1 font-heading text-[28px] leading-none">
-                              Steinheim Egypt
-                            </p>
-                          </div>
-                          <Link
-                            href="/about"
-                            onClick={handleNavigate}
-                            className="border-b border-black/20 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/42 transition hover:border-black hover:text-black"
-                          >
-                            Open story
-                          </Link>
-                        </div>
-
                         <div className="grid grid-cols-2 gap-4">
                           {worldLinks.map((item, index) => (
                             <motion.div
@@ -440,7 +413,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               <Link
                                 href={item.href}
                                 onClick={handleNavigate}
-                                className="group relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-black"
+                                className="group relative block aspect-[4/5] overflow-hidden bg-black"
                               >
                                 <Image
                                   src={item.image}
@@ -451,7 +424,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                   priority={index < 2}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/48" />
-                                <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                                <div className="absolute inset-x-0 bottom-0 px-4 pb-3 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
                                     {item.eyebrow}
                                   </p>
@@ -473,24 +446,6 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
                         className="flex h-full flex-col"
                       >
-                        <div className="mb-4 flex items-end justify-between px-1">
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-black/35">
-                              Products
-                            </p>
-                            <p className="mt-1 font-heading text-[28px] leading-none">
-                              {tc(`${activeCollection}.name`)}
-                            </p>
-                          </div>
-                          <Link
-                            href={`/collections/${activeCollection}`}
-                            onClick={handleNavigate}
-                            className="border-b border-black/20 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/42 transition hover:border-black hover:text-black"
-                          >
-                            View collection
-                          </Link>
-                        </div>
-
                         <div className="grid grid-cols-2 gap-4">
                           {activeProducts.map((product, index) => {
                             const image = menuProductImages[product.slug] ?? getProductDefaultImage(product.slug);
@@ -505,7 +460,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                 <Link
                                   href={`/products/${product.slug}`}
                                   onClick={handleNavigate}
-                                  className="group relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
+                                  className="group relative block aspect-[4/5] overflow-hidden bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
                                 >
                                   {image ? (
                                     <Image
@@ -518,7 +473,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                     />
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/8 to-transparent transition duration-500 group-hover:from-black/66" />
-                                  <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-3 pt-8 text-white">
                                     <p className="font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
                                       {product.name}
                                     </p>
