@@ -219,10 +219,10 @@ export default function Navigation({ locale }: { locale: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
-            <div className="mx-0 mt-0 flex h-[66px] max-w-[1120px] items-center justify-between bg-[#ece9e2] px-5 shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mt-3 sm:h-[72px] sm:rounded-t-[22px] sm:px-7 lg:mx-6 lg:mt-6 lg:h-[78px] lg:px-10">
+            <div className="relative mx-0 my-0 h-[100svh] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:my-3 sm:h-[calc(100svh-24px)] sm:rounded-[22px] lg:mx-6 lg:my-6 lg:h-[calc(100vh-48px)]">
               <button
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer"
+                className="absolute left-5 top-5 z-10 flex items-center gap-3 text-[14px] font-medium uppercase text-black/65 hover:text-black transition-colors duration-300 cursor-pointer sm:left-7 sm:top-6 lg:left-10 lg:top-8"
                 aria-label={t("close")}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.3">
@@ -231,10 +231,9 @@ export default function Navigation({ locale }: { locale: string }) {
                 </svg>
                 <span className="hidden sm:inline">Close</span>
               </button>
-            </div>
 
-            <div className="mx-0 mb-0 flex h-[calc(100svh-66px)] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:mb-3 sm:h-[calc(100svh-87px)] sm:rounded-b-[22px] lg:mx-6 lg:mb-6 lg:h-[calc(100vh-108px)]">
-              <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 py-8 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:py-0">
+              <div className="flex h-full">
+              <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 pb-8 pt-20 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:pb-0 lg:pt-0">
                 <div className="mb-8 lg:mb-12">
                   <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 lg:mb-8">
                     {t("collections")}
@@ -392,7 +391,7 @@ export default function Navigation({ locale }: { locale: string }) {
                 </motion.div>
               </div>
 
-              <div className="hidden flex-1 p-0.5 lg:block">
+              <div className="hidden flex-1 px-0.5 pb-0.5 pt-6 lg:block lg:pt-8">
                 <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-0.5">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
@@ -492,6 +491,7 @@ export default function Navigation({ locale }: { locale: string }) {
                     )}
                   </AnimatePresence>
                 </div>
+              </div>
               </div>
             </div>
           </motion.div>
