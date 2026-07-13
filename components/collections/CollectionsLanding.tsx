@@ -88,7 +88,7 @@ export default function CollectionsLanding() {
 
         <div className="relative z-10 -mt-[100svh]">
           <section className="relative flex h-svh min-h-[760px] items-center justify-center px-6 text-center">
-            <div className="absolute left-0 right-0 top-[104px] px-6 text-left sm:px-10 lg:px-16">
+            <div className="absolute left-0 right-0 top-8 px-6 text-left sm:px-10 lg:px-16">
               <div className="mx-auto max-w-[1780px]">
                 <p className="text-[18px] font-medium text-white">
                   <Link href="/" className="transition hover:text-white/70">Home</Link>

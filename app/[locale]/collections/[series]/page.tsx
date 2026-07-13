@@ -160,7 +160,7 @@ export default function CollectionPage() {
 
           <div className="relative z-10 -mt-[100svh]">
             <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center px-6">
-              <div className="absolute left-0 right-0 top-[104px] px-6 sm:px-10 lg:px-16">
+              <div className="absolute left-0 right-0 top-8 px-6 sm:px-10 lg:px-16">
                 <div className="mx-auto max-w-[1780px]">
                   <p className="text-[18px] font-medium text-white">
                     <Link href="/" className="transition hover:text-white/70">Home</Link>
@@ -198,7 +198,7 @@ export default function CollectionPage() {
           </div>
         </section>
 
-        <section className="sticky top-[72px] z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:top-[80px] lg:px-16">
+        <section className="sticky top-0 z-30 border-b border-black/8 bg-[#ece9e2]/96 px-5 backdrop-blur-sm sm:px-8 lg:px-16">
           <div className="mx-auto flex max-w-[1780px] items-center justify-between gap-4 py-3">
             <p className="shrink-0 text-[16px] font-medium tracking-[-0.03em] sm:text-[20px]">{series.name}</p>
             <div className="flex items-center gap-4 overflow-x-auto text-[14px] sm:gap-8 sm:text-[16px]">

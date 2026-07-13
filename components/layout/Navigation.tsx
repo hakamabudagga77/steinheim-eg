@@ -66,17 +66,10 @@ export default function Navigation({ locale }: { locale: string }) {
   const t = useTranslations("nav");
   const tc = useTranslations("collections");
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen } = useCart();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -100,29 +93,16 @@ export default function Navigation({ locale }: { locale: string }) {
     setActivePanel("collections");
   }, []);
 
-  const isHome = pathname === "/" || pathname === "/en" || pathname === "/ar";
-  const isCollectionPage = pathname === "/collections" || pathname.startsWith("/collections/");
-  const isTransparent = (isHome || isCollectionPage) && !scrolled;
   const activeCollection = hoveredCollection ?? "joy";
   const activeProducts = getProductsBySeries(activeCollection).slice(0, 4);
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isTransparent
-            ? "bg-transparent"
-            : "bg-white/95 backdrop-blur-sm shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-        }`}
-      >
+      <nav className="relative z-30 bg-white shadow-[0_1px_0_rgba(0,0,0,0.06)]">
         <div className="relative mx-auto flex h-[72px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[80px] lg:px-16">
           <button
             onClick={() => setMenuOpen(true)}
-            className={`flex items-center gap-5 text-[14px] font-medium uppercase transition-colors duration-300 cursor-pointer ${
-              isTransparent
-                ? "text-white hover:text-white/70"
-                : "text-charcoal hover:text-charcoal/60"
-            }`}
+            className="flex items-center gap-5 text-[14px] font-medium uppercase text-charcoal transition-colors duration-300 hover:text-charcoal/60 cursor-pointer"
             aria-label={t("menu")}
           >
             <span className="flex h-9 w-12 flex-col justify-center gap-[7px]">
@@ -137,27 +117,19 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
             aria-label="Steinheim home"
           >
-            <Logo color={isTransparent ? "light" : "dark"} size="sm" showWave={false} />
+            <Logo color="dark" size="sm" showWave={false} />
           </Link>
 
           <div className="flex items-center gap-3 lg:gap-5">
             <Link
               href="/trade"
-              className={`hidden text-[13px] font-medium uppercase transition-colors duration-300 lg:block ${
-                isTransparent
-                  ? "text-white/82 hover:text-white"
-                  : "text-charcoal/70 hover:text-charcoal"
-              }`}
+              className="hidden text-[13px] font-medium uppercase text-charcoal/70 transition-colors duration-300 hover:text-charcoal lg:block"
             >
               Area Pro
             </Link>
             <Link
               href="/collections"
-              className={`hidden transition-colors duration-300 sm:flex ${
-                isTransparent
-                  ? "text-white/65 hover:text-white"
-                  : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="hidden text-charcoal/50 transition-colors duration-300 hover:text-charcoal sm:flex"
               aria-label="Search collections"
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -167,11 +139,7 @@ export default function Navigation({ locale }: { locale: string }) {
             </Link>
             <Link
               href="/contact"
-              className={`hidden transition-colors duration-300 sm:flex ${
-                isTransparent
-                  ? "text-white/65 hover:text-white"
-                  : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="hidden text-charcoal/50 transition-colors duration-300 hover:text-charcoal sm:flex"
               aria-label="Account"
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -181,11 +149,7 @@ export default function Navigation({ locale }: { locale: string }) {
             </Link>
             <button
               onClick={() => setCartOpen(true)}
-              className={`relative flex transition-colors duration-300 cursor-pointer ${
-                isTransparent
-                  ? "text-white/65 hover:text-white"
-                  : "text-charcoal/50 hover:text-charcoal"
-              }`}
+              className="relative flex text-charcoal/50 transition-colors duration-300 hover:text-charcoal cursor-pointer"
               aria-label="Cart"
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -199,11 +163,7 @@ export default function Navigation({ locale }: { locale: string }) {
             </button>
             <Link
               href={`/${locale === "en" ? "ar" : "en"}`}
-              className={`hidden items-center gap-2 text-[11px] font-medium uppercase transition-colors duration-300 lg:flex ${
-                isTransparent
-                  ? "text-white/55 hover:text-white"
-                  : "text-charcoal/45 hover:text-charcoal"
-              }`}
+              className="hidden items-center gap-2 text-[11px] font-medium uppercase text-charcoal/45 transition-colors duration-300 hover:text-charcoal lg:flex"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="12" r="10" />
