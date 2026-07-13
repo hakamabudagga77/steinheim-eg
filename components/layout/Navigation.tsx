@@ -50,21 +50,21 @@ const menuProductImages: Record<string, string> = {
   "joy-tall-basin-mixer": "/images/nav-menu/products/joy-tall-basin-mixer.png",
   "joy-wall-mounted-basin-mixer": "/images/nav-menu/products/joy-wall-mounted-basin-mixer.png",
   "joy-concealed-shower": "/images/nav-menu/products/joy-concealed-shower.png",
-  "up-basin-mixer": "/images/nav-menu/products/up-basin-mixer.png",
+  "up-basin-mixer": "/images/nav-menu/products/up-basin-mixer-v2.png",
   "up-tall-basin-mixer": "/images/nav-menu/products/up-tall-basin-mixer.png",
-  "up-wall-mounted-basin-mixer": "/images/nav-menu/products/up-wall-mounted-basin-mixer.png",
+  "up-wall-mounted-basin-mixer": "/images/nav-menu/products/up-wall-mounted-basin-mixer-v2.png",
   "up-concealed-shower": "/images/nav-menu/products/up-concealed-shower.png",
   "up-shower-column": "/images/nav-menu/products/up-shower-column.png",
   "up-free-standing-bath-mixer": "/images/nav-menu/products/up-free-standing-bath-mixer.png",
-  "art-basin-mixer": "/images/nav-menu/products/art-basin-mixer.png",
+  "art-basin-mixer": "/images/nav-menu/products/art-basin-mixer-v2.png",
   "art-tall-basin-mixer": "/images/nav-menu/products/art-tall-basin-mixer.png",
-  "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer.png",
+  "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer-v2.png",
   "art-concealed-shower": "/images/nav-menu/products/art-concealed-shower.png",
   "art-free-standing-bath-mixer": "/images/nav-menu/products/art-free-standing-bath-mixer.png",
-  "quatro-basin-mixer": "/images/nav-menu/products/quatro-basin-mixer.png",
-  "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer.png",
-  "quatro-wall-mounted-basin-mixer": "/images/nav-menu/products/quatro-wall-mounted-basin-mixer.png",
-  "quatro-concealed-shower": "/images/nav-menu/products/quatro-concealed-shower.png",
+  "quatro-basin-mixer": "/images/nav-menu/products/quatro-basin-mixer-v2.png",
+  "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
+  "quatro-wall-mounted-basin-mixer": "/images/nav-menu/products/quatro-wall-mounted-basin-mixer-v2.png",
+  "quatro-concealed-shower": "/images/nav-menu/products/quatro-concealed-shower-v2.png",
 };
 
 const navMenuSlugs: Record<string, string[]> = {
@@ -392,8 +392,8 @@ export default function Navigation({ locale }: { locale: string }) {
                 </motion.div>
               </div>
 
-              <div className="hidden flex-1 p-1.5 lg:block">
-                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-1.5">
+              <div className="hidden flex-1 p-0.5 lg:block">
+                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-0.5">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div
