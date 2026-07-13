@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 
@@ -17,76 +17,21 @@ const clips: Array<{
 ];
 
 export default function ShowroomReel() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
-  const centeredRef = useRef<number | null>(null);
-  const resumeTimeoutRef = useRef<number | undefined>(undefined);
+  const [paused, setPaused] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
-
-  const pause = () => {
-    pausedRef.current = true;
-    window.clearTimeout(resumeTimeoutRef.current);
-    // Safety net: a mobile browser can miss a matching pointerup/pointercancel,
-    // so never let the marquee stay paused forever.
-    resumeTimeoutRef.current = window.setTimeout(() => {
-      pausedRef.current = false;
-    }, 2500);
-  };
-
-  const resume = () => {
-    pausedRef.current = false;
-    window.clearTimeout(resumeTimeoutRef.current);
-  };
+  const [sweepIndex, setSweepIndex] = useState(0);
 
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    let frame: number;
-    let lastCenterCheck = 0;
-    const speed = 0.55;
-
-    const step = (timestamp: number) => {
-      if (!pausedRef.current) {
-        const singleSetWidth = track.scrollWidth / 2;
-        const next = track.scrollLeft + speed;
-        track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
-      }
-
-      if (timestamp - lastCenterCheck > 120) {
-        lastCenterCheck = timestamp;
-        const trackRect = track.getBoundingClientRect();
-        const center = trackRect.left + trackRect.width / 2;
-        let closest: number | null = null;
-        let closestDistance = Infinity;
-        Array.from(track.children).forEach((child, idx) => {
-          const rect = (child as HTMLElement).getBoundingClientRect();
-          const distance = Math.abs(rect.left + rect.width / 2 - center);
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closest = idx;
-          }
-        });
-        if (closest !== centeredRef.current) {
-          centeredRef.current = closest;
-          setCenteredIndex(closest);
-        }
-      }
-
-      frame = requestAnimationFrame(step);
-    };
-    frame = requestAnimationFrame(step);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.clearTimeout(resumeTimeoutRef.current);
-    };
+    const id = window.setInterval(() => {
+      setSweepIndex((i) => (i + 1) % clips.length);
+    }, 2600);
+    return () => window.clearInterval(id);
   }, []);
 
-  const activeIndex = hoveredIndex ?? centeredIndex;
+  const spotlightIndex = hoveredIndex ?? sweepIndex;
 
   return (
-    <section className="bg-black py-24 text-white sm:py-32">
+    <section className="overflow-hidden bg-black py-24 text-white sm:py-32">
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -104,44 +49,50 @@ export default function ShowroomReel() {
             and the space where clients specify a complete bathroom in person.
           </p>
         </motion.div>
+      </div>
 
-        <div
-          ref={trackRef}
-          onPointerEnter={(e) => {
-            if (e.pointerType === "mouse") pause();
-          }}
-          onPointerLeave={(e) => {
-            if (e.pointerType === "mouse") {
-              resume();
-              setHoveredIndex(null);
-            }
-          }}
-          onPointerDown={() => pause()}
-          onPointerUp={() => resume()}
-          onPointerCancel={() => resume()}
-          className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {[...clips, ...clips].map((clip, index) => (
+      <div
+        className="flex w-max gap-4 pl-5 sm:pl-8 lg:pl-16"
+        style={{
+          animation: "marquee-scroll 34s linear infinite",
+          animationPlayState: paused ? "paused" : "running",
+        }}
+        onPointerEnter={(e) => {
+          if (e.pointerType === "mouse") setPaused(true);
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType === "mouse") {
+            setPaused(false);
+            setHoveredIndex(null);
+          }
+        }}
+        onPointerDown={() => setPaused(true)}
+        onPointerUp={() => setPaused(false)}
+        onPointerCancel={() => setPaused(false)}
+      >
+        {[...clips, ...clips].map((clip, index) => {
+          const clipIndex = index % clips.length;
+          const isActive = spotlightIndex === clipIndex;
+
+          return (
             <motion.div
               key={`${clip.src}-${index}`}
-              initial={{ opacity: 0, y: 24 }}
               onPointerEnter={(e) => {
-                if (e.pointerType === "mouse") setHoveredIndex(index);
+                if (e.pointerType === "mouse") setHoveredIndex(clipIndex);
               }}
               animate={{
-                opacity: activeIndex === null ? 1 : activeIndex === index ? 1 : 0.45,
-                y: 0,
-                scale: activeIndex === index ? 1.045 : activeIndex === null ? 1 : 0.97,
+                opacity: isActive ? 1 : 0.45,
+                scale: isActive ? 1.045 : 0.97,
               }}
-              transition={{ duration: 0.5, delay: index < clips.length ? Math.min(index * 0.07, 0.28) : 0, ease: [0.22, 0.76, 0.2, 1] }}
+              transition={{ duration: 0.6, ease: [0.22, 0.76, 0.2, 1] }}
               className={`group relative shrink-0 overflow-hidden rounded-[18px] bg-[#111] ${
                 clip.orientation === "portrait" ? "aspect-[9/16] w-[62vw] sm:w-[300px]" : "aspect-[16/9] w-[86vw] sm:w-[560px]"
               }`}
             >
               <AutoplayVideo src={clip.src} poster={clip.poster} className="h-full w-full object-cover" />
             </motion.div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </section>
   );
