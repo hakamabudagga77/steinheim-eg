@@ -233,7 +233,7 @@ export default function Navigation({ locale }: { locale: string }) {
               </button>
 
               <div className="flex h-full">
-              <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-6 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-8">
+              <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-20 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-24">
                 <div className="mb-8 lg:mb-12">
                   <div className="space-y-1">
                     <motion.div
@@ -388,8 +388,8 @@ export default function Navigation({ locale }: { locale: string }) {
                 </motion.div>
               </div>
 
-              <div className="hidden flex-1 px-0.5 pb-0.5 pt-6 lg:block lg:pt-8">
-                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2] p-0.5">
+              <div className="hidden flex-1 p-4 lg:block">
+                <div className="flex h-full flex-col rounded-[18px] bg-[#ece9e2]">
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div
