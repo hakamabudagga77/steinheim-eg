@@ -62,7 +62,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           <div className="grid min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw]">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[44svh] items-start justify-center overflow-hidden bg-[#ece9e2] pt-6 sm:min-h-[58svh] sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
+              className="relative flex min-h-[52svh] items-start justify-center overflow-hidden bg-[#ece9e2] pt-6 sm:min-h-[58svh] sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -81,7 +81,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="object-contain object-[center_top] px-[16%] pb-[12%] pt-[4%] transition duration-[900ms] sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
+                      className="object-contain object-[center_top] px-[9%] pb-[9%] pt-[3%] transition duration-[900ms] sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
@@ -98,7 +98,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 className="w-full max-w-[620px]"
               >
                 <p className="text-[17px] text-black/82">{seriesName} Collection</p>
-                <h1 className="mt-6 font-heading text-[clamp(3.2rem,5.8vw,5.8rem)] font-light leading-[0.9] tracking-[-0.055em]">
+                <h1
+                  className={`mt-6 font-heading font-light leading-[0.95] tracking-[-0.055em] ${
+                    product.name.length > 15 ? "text-[clamp(2.1rem,5.8vw,5.8rem)]" : "text-[clamp(3.2rem,5.8vw,5.8rem)]"
+                  }`}
+                >
                   {product.name}
                 </h1>
 
