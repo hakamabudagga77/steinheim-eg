@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 
@@ -17,21 +17,76 @@ const clips: Array<{
 ];
 
 export default function ShowroomReel() {
-  const [paused, setPaused] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
+  const resumeTimeoutRef = useRef<number | undefined>(undefined);
+  const centeredRef = useRef<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [sweepIndex, setSweepIndex] = useState(0);
+  const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
+
+  const pause = () => {
+    pausedRef.current = true;
+    window.clearTimeout(resumeTimeoutRef.current);
+    // Safety net: a mobile browser can miss a matching pointerup/pointercancel,
+    // so never let the marquee stay paused forever.
+    resumeTimeoutRef.current = window.setTimeout(() => {
+      pausedRef.current = false;
+    }, 2500);
+  };
+
+  const resume = () => {
+    pausedRef.current = false;
+    window.clearTimeout(resumeTimeoutRef.current);
+  };
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setSweepIndex((i) => (i + 1) % clips.length);
-    }, 2600);
-    return () => window.clearInterval(id);
+    const track = trackRef.current;
+    if (!track) return;
+
+    let frame: number;
+    let lastCenterCheck = 0;
+    const speed = 0.55;
+
+    const step = (timestamp: number) => {
+      if (!pausedRef.current) {
+        const singleSetWidth = track.scrollWidth / 2;
+        const next = track.scrollLeft + speed;
+        track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
+      }
+
+      if (timestamp - lastCenterCheck > 120) {
+        lastCenterCheck = timestamp;
+        const trackRect = track.getBoundingClientRect();
+        const center = trackRect.left + trackRect.width / 2;
+        let closest: number | null = null;
+        let closestDistance = Infinity;
+        Array.from(track.children).forEach((child, idx) => {
+          const rect = (child as HTMLElement).getBoundingClientRect();
+          const distance = Math.abs(rect.left + rect.width / 2 - center);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closest = idx;
+          }
+        });
+        if (closest !== centeredRef.current) {
+          centeredRef.current = closest;
+          setCenteredIndex(closest);
+        }
+      }
+
+      frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(resumeTimeoutRef.current);
+    };
   }, []);
 
-  const spotlightIndex = hoveredIndex ?? sweepIndex;
+  const activeIndex = hoveredIndex ?? centeredIndex;
 
   return (
-    <section className="overflow-hidden bg-black py-24 text-white sm:py-32">
+    <section className="bg-black py-24 text-white sm:py-32">
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -52,27 +107,24 @@ export default function ShowroomReel() {
       </div>
 
       <div
-        className="flex w-max gap-4 pl-5 sm:pl-8 lg:pl-16"
-        style={{
-          animation: "marquee-scroll 34s linear infinite",
-          animationPlayState: paused ? "paused" : "running",
-        }}
+        ref={trackRef}
         onPointerEnter={(e) => {
-          if (e.pointerType === "mouse") setPaused(true);
+          if (e.pointerType === "mouse") pause();
         }}
         onPointerLeave={(e) => {
           if (e.pointerType === "mouse") {
-            setPaused(false);
+            resume();
             setHoveredIndex(null);
           }
         }}
-        onPointerDown={() => setPaused(true)}
-        onPointerUp={() => setPaused(false)}
-        onPointerCancel={() => setPaused(false)}
+        onPointerDown={() => pause()}
+        onPointerUp={() => resume()}
+        onPointerCancel={() => resume()}
+        className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {[...clips, ...clips].map((clip, index) => {
           const clipIndex = index % clips.length;
-          const isActive = spotlightIndex === clipIndex;
+          const isActive = activeIndex === clipIndex;
 
           return (
             <motion.div
@@ -81,10 +133,10 @@ export default function ShowroomReel() {
                 if (e.pointerType === "mouse") setHoveredIndex(clipIndex);
               }}
               animate={{
-                opacity: isActive ? 1 : 0.45,
-                scale: isActive ? 1.045 : 0.97,
+                opacity: activeIndex === null ? 1 : isActive ? 1 : 0.45,
+                scale: isActive ? 1.045 : activeIndex === null ? 1 : 0.97,
               }}
-              transition={{ duration: 0.6, ease: [0.22, 0.76, 0.2, 1] }}
+              transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
               className={`group relative shrink-0 overflow-hidden rounded-[18px] bg-[#111] ${
                 clip.orientation === "portrait" ? "aspect-[9/16] w-[62vw] sm:w-[300px]" : "aspect-[16/9] w-[86vw] sm:w-[560px]"
               }`}

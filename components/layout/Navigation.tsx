@@ -423,7 +423,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                   priority={index < 2}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
-                                <div className="absolute inset-x-0 bottom-0 px-4 pb-1 pt-8 text-white">
+                                <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
                                     {item.eyebrow}
                                   </p>
@@ -473,8 +473,12 @@ export default function Navigation({ locale }: { locale: string }) {
                                     />
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/8 to-transparent transition duration-500 group-hover:from-black/88 group-hover:via-black/25" />
-                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-1 pt-8 text-white">
-                                    <p className="font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
+                                  <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
+                                    <p
+                                      className={`font-heading leading-none tracking-[-0.04em] text-white ${
+                                        product.name.length > 18 ? "text-[18px]" : "text-[24px]"
+                                      }`}
+                                    >
                                       {product.name}
                                     </p>
                                   </div>
