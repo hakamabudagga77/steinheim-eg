@@ -10,6 +10,8 @@ import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
 import { getProductsBySeries } from "@/lib/utils";
 
+const LIGHT_TOP_PATTERN = /^\/products\//;
+
 const collections = [
   { id: "joy", href: "/collections/joy" },
   { id: "up", href: "/collections/up" },
@@ -69,7 +71,18 @@ export default function Navigation({ locale }: { locale: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
-  const { itemCount, setOpen: setCartOpen } = useCart();
+  const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
+  const [scrolled, setScrolled] = useState(false);
+
+  const isLightTopPage = LIGHT_TOP_PATTERN.test(pathname);
+  const useWhite = !isLightTopPage && !scrolled;
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -98,11 +111,13 @@ export default function Navigation({ locale }: { locale: string }) {
 
   return (
     <>
-      <nav className="relative z-30 bg-white shadow-[0_1px_0_rgba(0,0,0,0.06)]">
+      <nav className="fixed inset-x-0 top-0 z-50 bg-transparent transition-colors duration-500">
         <div className="relative mx-auto flex h-[72px] max-w-[1920px] items-center justify-between px-5 sm:px-8 lg:h-[80px] lg:px-16">
           <button
             onClick={() => setMenuOpen(true)}
-            className="flex items-center gap-5 text-[14px] font-medium uppercase text-charcoal transition-colors duration-300 hover:text-charcoal/60 cursor-pointer"
+            className={`flex items-center gap-5 text-[14px] font-medium uppercase transition-colors duration-300 cursor-pointer ${
+              useWhite ? "text-white hover:text-white/70" : "text-charcoal hover:text-charcoal/60"
+            }`}
             aria-label={t("menu")}
           >
             <span className="flex h-9 w-12 flex-col justify-center gap-[7px]">
@@ -117,19 +132,15 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
             aria-label="Steinheim home"
           >
-            <Logo color="dark" size="sm" showWave={false} />
+            <Logo color={useWhite ? "light" : "dark"} size="sm" showWave={false} />
           </Link>
 
           <div className="flex items-center gap-3 lg:gap-5">
             <Link
-              href="/trade"
-              className="hidden text-[13px] font-medium uppercase text-charcoal/70 transition-colors duration-300 hover:text-charcoal lg:block"
-            >
-              Area Pro
-            </Link>
-            <Link
               href="/collections"
-              className="hidden text-charcoal/50 transition-colors duration-300 hover:text-charcoal sm:flex"
+              className={`hidden transition-colors duration-300 sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
+              }`}
               aria-label="Search collections"
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -139,7 +150,9 @@ export default function Navigation({ locale }: { locale: string }) {
             </Link>
             <Link
               href="/contact"
-              className="hidden text-charcoal/50 transition-colors duration-300 hover:text-charcoal sm:flex"
+              className={`hidden transition-colors duration-300 sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
+              }`}
               aria-label="Account"
             >
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -148,22 +161,43 @@ export default function Navigation({ locale }: { locale: string }) {
               </svg>
             </Link>
             <button
+              ref={cartIconRef}
               onClick={() => setCartOpen(true)}
-              className="relative flex text-charcoal/50 transition-colors duration-300 hover:text-charcoal cursor-pointer"
+              className={`relative flex transition-colors duration-300 cursor-pointer ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
+              }`}
               aria-label="Cart"
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
-              </svg>
+              <motion.span
+                key={bump}
+                initial={{ scale: 1 }}
+                animate={{ scale: bump ? [1, 1.32, 1] : 1 }}
+                transition={{ duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
+              >
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 8V6a5 5 0 0110 0v2" />
+                  <path d="M5.5 8h13l1 12.5a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5L5.5 8z" />
+                </svg>
+              </motion.span>
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1.5 flex h-[14px] min-w-[14px] items-center justify-center rounded-full bg-charcoal px-0.5 text-[7px] font-medium text-white">
+                <motion.span
+                  key={`count-${bump}`}
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.35, ease: [0.22, 0.76, 0.2, 1] }}
+                  className={`absolute -top-1.5 -right-1.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full px-0.5 text-[7px] font-medium ${
+                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
+                  }`}
+                >
                   {itemCount}
-                </span>
+                </motion.span>
               )}
             </button>
             <Link
               href={`/${locale === "en" ? "ar" : "en"}`}
-              className="hidden items-center gap-2 text-[11px] font-medium uppercase text-charcoal/45 transition-colors duration-300 hover:text-charcoal lg:flex"
+              className={`hidden items-center gap-2 text-[11px] font-medium uppercase transition-colors duration-300 lg:flex ${
+                useWhite ? "text-white/70 hover:text-white" : "text-charcoal/45 hover:text-charcoal"
+              }`}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="12" cy="12" r="10" />
@@ -471,7 +505,6 @@ export default function Navigation({ locale }: { locale: string }) {
                         <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
                           {activeProducts.map((product, index) => {
                             const image = menuProductImages[product.slug] ?? getProductDefaultImage(product.slug);
-                            const model = product.variants[0]?.model ?? product.name;
 
                             return (
                               <motion.div
@@ -498,10 +531,7 @@ export default function Navigation({ locale }: { locale: string }) {
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/8 to-transparent transition duration-500 group-hover:from-black/66" />
                                   <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                                    <p className="text-[10px] uppercase tracking-[0.28em] text-white/52">
-                                      {model}
-                                    </p>
-                                    <p className="mt-2 font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
+                                    <p className="font-heading text-[24px] leading-none tracking-[-0.04em] text-white">
                                       {product.name}
                                     </p>
                                     <span className="mt-4 inline-block border-b border-white/60 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70 opacity-0 transition duration-500 group-hover:opacity-100">

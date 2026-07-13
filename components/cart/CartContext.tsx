@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   createEmptyCart,
   sanitizeCart,
@@ -18,6 +19,16 @@ interface CartContextValue {
   removeItem: (slug: string, finish: string) => void;
   clearCart: () => void;
   itemCount: number;
+  cartIconRef: React.RefObject<HTMLButtonElement | null>;
+  flyToCart: (originEl: HTMLElement | null, image: string) => void;
+  bump: number;
+}
+
+interface Flight {
+  id: number;
+  image: string;
+  start: DOMRect;
+  end: DOMRect;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -36,6 +47,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart>(createEmptyCart);
   const [open, setOpen] = useState(false);
   const hydrated = useRef(false);
+  const cartIconRef = useRef<HTMLButtonElement | null>(null);
+  const flightId = useRef(0);
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [bump, setBump] = useState(0);
+
+  const flyToCart = useCallback((originEl: HTMLElement | null, image: string) => {
+    if (!originEl || !cartIconRef.current) return;
+    const start = originEl.getBoundingClientRect();
+    const end = cartIconRef.current.getBoundingClientRect();
+    const id = ++flightId.current;
+    setFlights((f) => [...f, { id, image, start, end }]);
+    window.setTimeout(() => {
+      setFlights((f) => f.filter((item) => item.id !== id));
+      setBump((b) => b + 1);
+    }, 750);
+  }, []);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -117,9 +144,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, open, setOpen, addItem, updateQuantity, removeItem, clearCart, itemCount }}
+      value={{
+        cart,
+        open,
+        setOpen,
+        addItem,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        itemCount,
+        cartIconRef,
+        flyToCart,
+        bump,
+      }}
     >
       {children}
+      <AnimatePresence>
+        {flights.map((flight) => (
+          <motion.div
+            key={flight.id}
+            initial={{
+              left: flight.start.left,
+              top: flight.start.top,
+              width: flight.start.width,
+              height: flight.start.height,
+              opacity: 1,
+              borderRadius: 20,
+            }}
+            animate={{
+              left: flight.end.left + flight.end.width / 2 - 13,
+              top: flight.end.top + flight.end.height / 2 - 13,
+              width: 26,
+              height: 26,
+              opacity: [1, 1, 0],
+              borderRadius: 999,
+            }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            style={{ position: "fixed", zIndex: 200, overflow: "hidden", pointerEvents: "none" }}
+          >
+            <img src={flight.image} alt="" className="h-full w-full object-cover" />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </CartContext.Provider>
   );
 }

@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "fra
 import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
+import ShowroomReel from "@/components/home/ShowroomReel";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
@@ -281,6 +282,8 @@ export default function GessiInspiredHome() {
           </div>
         </div>
       </section>
+
+      <ShowroomReel />
 
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
         <AutoplayVideo src={ritualVideo} poster="/images/steinheim/final/about-hero.jpg" className="absolute inset-0 h-full w-full object-cover" />

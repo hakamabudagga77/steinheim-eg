@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
@@ -22,7 +22,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const [expandedSpec, setExpandedSpec] = useState(false);
   const [cartAdded, setCartAdded] = useState(false);
   const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
-  const { addItem: addToCart } = useCart();
+  const { addItem: addToCart, flyToCart } = useCart();
+  const imageWrapRef = useRef<HTMLDivElement>(null);
 
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series;
@@ -44,7 +45,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div className="bg-[#ece9e2] px-5 pb-4 pt-8 sm:px-8 lg:px-16">
+        <div className="bg-[#ece9e2] px-5 pb-4 pt-[92px] sm:px-8 lg:px-16 lg:pt-[104px]">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] text-black/40">
               <Link href={`/collections/${product.series}`} className="transition hover:text-black">
@@ -57,8 +58,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </div>
 
         <section className="bg-[#ece9e2]">
-          <div className="grid min-h-[calc(100svh-140px)] lg:grid-cols-[56vw_44vw]">
-            <div className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-0 lg:min-h-[100svh]">
+          <div className="grid min-h-[calc(100svh-124px)] lg:grid-cols-[56vw_44vw]">
+            <div
+              ref={imageWrapRef}
+              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] lg:sticky lg:top-[80px] lg:min-h-[calc(100svh-80px)]"
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={variant.finish}
@@ -184,13 +188,40 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   <button
                     type="button"
                     onClick={() => {
+                      if (imageUrl) flyToCart(imageWrapRef.current, imageUrl);
                       addToCart(product.slug, variant.finish);
                       setCartAdded(true);
                       setTimeout(() => setCartAdded(false), 2200);
                     }}
-                    className="flex h-[58px] w-full cursor-pointer items-center justify-center rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                    className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
                   >
-                    {cartAdded ? "Added" : "Add to Cart"}
+                    <AnimatePresence mode="wait" initial={false}>
+                      {cartAdded ? (
+                        <motion.span
+                          key="added"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.25 }}
+                          className="flex items-center gap-2"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 12l6 6L20 6" />
+                          </svg>
+                          Added to Cart
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="add"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.25 }}
+                        >
+                          Add to Cart
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </button>
                   <button
                     type="button"
