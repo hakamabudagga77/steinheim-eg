@@ -246,13 +246,13 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         <section className="border-y border-black/10 bg-[#f3f1ec] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
           <div className="mx-auto max-w-[1560px]">
             <div className="border-b border-black/18">
-              <div className="grid grid-cols-1 gap-0 sm:grid-cols-3">
+              <div className="grid grid-cols-3 gap-0">
                 {productInfoTabs.map((tab) => (
                   <button
                     key={tab}
                     type="button"
                     onClick={() => setActiveInfoTab(tab)}
-                    className={`relative px-2 py-5 text-center text-[20px] font-semibold tracking-[-0.04em] transition sm:text-[25px] lg:text-[31px] ${
+                    className={`relative px-1 py-3 text-center text-[12px] font-semibold leading-tight tracking-[-0.02em] transition sm:px-2 sm:py-5 sm:text-[20px] sm:tracking-[-0.04em] lg:text-[27px] ${
                       activeInfoTab === tab ? "text-black" : "text-black/42 hover:text-black/70"
                     }`}
                   >
