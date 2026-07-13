@@ -233,11 +233,8 @@ export default function Navigation({ locale }: { locale: string }) {
               </button>
 
               <div className="flex h-full">
-              <div className="flex w-full flex-col overflow-y-auto border-r border-black/10 px-6 pb-8 pt-20 lg:w-[36%] lg:justify-center lg:overflow-visible lg:px-10 lg:pb-0 lg:pt-0">
+              <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-6 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-8">
                 <div className="mb-8 lg:mb-12">
-                  <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35 lg:mb-8">
-                    {t("collections")}
-                  </p>
                   <div className="space-y-1">
                     <motion.div
                       initial={{ opacity: 0, y: 16 }}
@@ -403,18 +400,19 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
                         className="flex h-full flex-col"
                       >
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
                           {worldLinks.map((item, index) => (
                             <motion.div
                               key={item.label}
                               initial={{ opacity: 0, y: 14 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
+                              className="h-full"
                             >
                               <Link
                                 href={item.href}
                                 onClick={handleNavigate}
-                                className="group relative block aspect-[4/5] overflow-hidden bg-black"
+                                className="group relative block h-full overflow-hidden bg-black"
                               >
                                 <Image
                                   src={item.image}
@@ -447,7 +445,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
                         className="flex h-full flex-col"
                       >
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
                           {activeProducts.map((product, index) => {
                             const image = menuProductImages[product.slug] ?? getProductDefaultImage(product.slug);
 
@@ -457,11 +455,12 @@ export default function Navigation({ locale }: { locale: string }) {
                                 initial={{ opacity: 0, y: 14 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
+                                className="h-full"
                               >
                                 <Link
                                   href={`/products/${product.slug}`}
                                   onClick={handleNavigate}
-                                  className="group relative block aspect-[4/5] overflow-hidden bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
+                                  className="group relative block h-full overflow-hidden bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]"
                                 >
                                   {image ? (
                                     <Image
