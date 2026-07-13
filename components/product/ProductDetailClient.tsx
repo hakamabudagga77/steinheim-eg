@@ -10,7 +10,7 @@ import SpecTable from "@/components/product/SpecTable";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
-import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
@@ -27,6 +27,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series;
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
+  const liveVariant = liveData?.variants.find((entry) => entry.finish === variant.finish);
   const finish = getFinishById(variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
   const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
@@ -99,6 +100,20 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 <p className="mt-6 max-w-lg text-[17px] leading-[1.75] text-black/70">
                   {product.name}, {series?.description?.toLowerCase() || "designed for enduring performance and visual clarity."}
                 </p>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <p className="text-[24px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+                  {liveVariant && (
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] ${
+                        liveVariant.inStock ? "text-emerald-600" : "text-red-400"
+                      }`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
+                      {liveVariant.inStock ? "In stock" : "Out of stock"}
+                    </span>
+                  )}
+                </div>
 
                 <div className="relative mt-12">
                   <button
