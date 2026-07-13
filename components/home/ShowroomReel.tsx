@@ -20,44 +20,67 @@ export default function ShowroomReel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
   const centeredRef = useRef<number | null>(null);
+  const resumeTimeoutRef = useRef<number | undefined>(undefined);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
+
+  const pause = () => {
+    pausedRef.current = true;
+    window.clearTimeout(resumeTimeoutRef.current);
+    // Safety net: a mobile browser can miss a matching pointerup/pointercancel,
+    // so never let the marquee stay paused forever.
+    resumeTimeoutRef.current = window.setTimeout(() => {
+      pausedRef.current = false;
+    }, 2500);
+  };
+
+  const resume = () => {
+    pausedRef.current = false;
+    window.clearTimeout(resumeTimeoutRef.current);
+  };
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
     let frame: number;
+    let lastCenterCheck = 0;
     const speed = 0.55;
 
-    const step = () => {
+    const step = (timestamp: number) => {
       if (!pausedRef.current) {
         const singleSetWidth = track.scrollWidth / 2;
         const next = track.scrollLeft + speed;
         track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
       }
 
-      const trackRect = track.getBoundingClientRect();
-      const center = trackRect.left + trackRect.width / 2;
-      let closest: number | null = null;
-      let closestDistance = Infinity;
-      Array.from(track.children).forEach((child, idx) => {
-        const rect = (child as HTMLElement).getBoundingClientRect();
-        const distance = Math.abs(rect.left + rect.width / 2 - center);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closest = idx;
+      if (timestamp - lastCenterCheck > 120) {
+        lastCenterCheck = timestamp;
+        const trackRect = track.getBoundingClientRect();
+        const center = trackRect.left + trackRect.width / 2;
+        let closest: number | null = null;
+        let closestDistance = Infinity;
+        Array.from(track.children).forEach((child, idx) => {
+          const rect = (child as HTMLElement).getBoundingClientRect();
+          const distance = Math.abs(rect.left + rect.width / 2 - center);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closest = idx;
+          }
+        });
+        if (closest !== centeredRef.current) {
+          centeredRef.current = closest;
+          setCenteredIndex(closest);
         }
-      });
-      if (closest !== centeredRef.current) {
-        centeredRef.current = closest;
-        setCenteredIndex(closest);
       }
 
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(resumeTimeoutRef.current);
+    };
   }, []);
 
   const activeIndex = hoveredIndex ?? centeredIndex;
@@ -84,29 +107,27 @@ export default function ShowroomReel() {
 
         <div
           ref={trackRef}
-          onMouseEnter={() => {
-            pausedRef.current = true;
+          onPointerEnter={(e) => {
+            if (e.pointerType === "mouse") pause();
           }}
-          onMouseLeave={() => {
-            pausedRef.current = false;
-            setHoveredIndex(null);
+          onPointerLeave={(e) => {
+            if (e.pointerType === "mouse") {
+              resume();
+              setHoveredIndex(null);
+            }
           }}
-          onPointerDown={() => {
-            pausedRef.current = true;
-          }}
-          onPointerUp={() => {
-            pausedRef.current = false;
-          }}
-          onPointerCancel={() => {
-            pausedRef.current = false;
-          }}
+          onPointerDown={() => pause()}
+          onPointerUp={() => resume()}
+          onPointerCancel={() => resume()}
           className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {[...clips, ...clips].map((clip, index) => (
             <motion.div
               key={`${clip.src}-${index}`}
               initial={{ opacity: 0, y: 24 }}
-              onMouseEnter={() => setHoveredIndex(index)}
+              onPointerEnter={(e) => {
+                if (e.pointerType === "mouse") setHoveredIndex(index);
+              }}
               animate={{
                 opacity: activeIndex === null ? 1 : activeIndex === index ? 1 : 0.45,
                 y: 0,
