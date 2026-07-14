@@ -243,7 +243,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           </div>
         </section>
 
-        <section className="border-y border-black/10 bg-[#f3f1ec] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
+        <section className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
           <div className="mx-auto max-w-[1560px]">
             <div className="border-b border-black/18">
               <div className="grid grid-cols-3 gap-0">
@@ -282,8 +282,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       <p className="max-w-xl text-[17px] leading-[1.85] text-black/72">
                         {product.name} from the {seriesName} collection brings Steinheim&apos;s
                         architectural bathroom language into a precise, project-ready product.
-                        The current selection is shown in {finish?.name ?? "the selected finish"} with model
-                        number {variant.model}.
+                        The current selection is shown in {finish?.name ?? "the selected finish"}.
                       </p>
                       <p className="max-w-xl text-[15px] leading-[1.9] text-black/52">
                         {series?.description || "Designed for enduring performance, visual clarity, and long-term specification."}
