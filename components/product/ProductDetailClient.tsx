@@ -102,11 +102,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   {product.name}
                 </h1>
 
-                <p className="mt-4 max-w-lg text-[20px] leading-[1.35] tracking-[-0.025em] text-black/78 sm:mt-6 sm:text-[17px] sm:leading-[1.75] sm:tracking-normal sm:text-black/70">
-                  {series?.description?.toLowerCase() || "Designed for enduring performance and visual clarity."}
-                </p>
-
-                <div className="mt-3 hidden items-center gap-3 sm:mt-6 sm:flex">
+                <div className="mt-4 hidden items-center gap-3 sm:mt-6 sm:flex">
                   <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
@@ -283,9 +279,6 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         {product.name} from the {seriesName} collection brings Steinheim&apos;s
                         architectural bathroom language into a precise, project-ready product.
                         The current selection is shown in {finish?.name ?? "the selected finish"}.
-                      </p>
-                      <p className="max-w-xl text-[15px] leading-[1.9] text-black/52">
-                        {series?.description || "Designed for enduring performance, visual clarity, and long-term specification."}
                       </p>
                     </div>
                   </>
