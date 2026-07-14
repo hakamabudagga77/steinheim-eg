@@ -62,7 +62,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(58svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] pt-[92px] sm:min-h-[58svh] sm:items-start sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
+              className="relative flex min-h-[58svh] items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -71,7 +71,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute inset-x-0 bottom-0 top-[100px] flex items-center justify-center sm:top-4 lg:top-10"
                 >
                   {imageUrl ? (
                     <Image
@@ -81,7 +81,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="scale-[1.68] object-contain object-center px-[6%] py-[8%] transition duration-[900ms] sm:scale-100 sm:object-[center_top] sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
+                      className="scale-[1.1] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
