@@ -103,14 +103,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </h1>
 
                 <p className="mt-4 max-w-lg text-[20px] leading-[1.35] tracking-[-0.025em] text-black/78 sm:mt-6 sm:text-[17px] sm:leading-[1.75] sm:tracking-normal sm:text-black/70">
-                  <span className="sm:hidden">{variant.model}</span>
-                  <span className="hidden sm:inline">
-                    {series?.description?.toLowerCase() || "Designed for enduring performance and visual clarity."}
-                  </span>
-                </p>
-
-                <p className="mt-3 text-[15px] leading-[1.55] text-black/55 sm:hidden">
-                  {product.name}, {finish?.name ?? "selected finish"}.
+                  {series?.description?.toLowerCase() || "Designed for enduring performance and visual clarity."}
                 </p>
 
                 <div className="mt-3 hidden items-center gap-3 sm:mt-6 sm:flex">
