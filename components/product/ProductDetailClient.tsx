@@ -138,7 +138,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         )}
                       </span>
                       <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
-                        {variant.model} - {finish?.name}
+                        {finish?.name}
                         {finish?.type === "pvd" ? " Pvd" : ""}
                       </span>
                     </span>
@@ -181,7 +181,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 )}
                               </span>
                               <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
-                                {entry.model} - {entryFinish?.name}
+                                {entryFinish?.name}
                                 {entryFinish?.type === "pvd" ? " Pvd" : ""}
                               </span>
                             </button>
