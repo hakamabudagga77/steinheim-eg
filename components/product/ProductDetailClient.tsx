@@ -98,7 +98,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 className="w-full max-w-[620px]"
               >
                 <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
-                <h1 className="mt-2 text-[44px] font-normal leading-[0.98] tracking-[-0.055em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
+                <h1 className="mt-2 text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
 
