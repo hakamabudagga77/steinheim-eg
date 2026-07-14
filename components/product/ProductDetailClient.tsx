@@ -59,10 +59,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </div>
 
         <section className="bg-[#ece9e2]">
-          <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(58svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
+          <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(64svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[58svh] items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
+              className="relative flex min-h-[64svh] items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -81,7 +81,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="scale-[1.1] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
+                      className="origin-top scale-[1.45] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
@@ -98,7 +98,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 className="w-full max-w-[620px]"
               >
                 <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
-                <h1 className="mt-2 text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
+                <h1 className="mt-6 text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
 
@@ -112,7 +112,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   )}
                 </div>
 
-                <div className="relative mt-7 sm:mt-12">
+                <div className="relative mt-16 sm:mt-12">
                   <button
                     type="button"
                     onClick={() => setFinishOpen((open) => !open)}
@@ -181,7 +181,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </AnimatePresence>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-20 sm:mt-8">
                   <button
                     type="button"
                     onClick={() => {
