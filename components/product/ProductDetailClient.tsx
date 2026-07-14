@@ -46,7 +46,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div className="bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:px-8 lg:px-16">
+        <div className="hidden bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:block sm:px-8 lg:px-16">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] text-black/40">
               <Link href={`/collections/${product.series}`} className="transition hover:text-black">
@@ -59,10 +59,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </div>
 
         <section className="bg-[#ece9e2]">
-          <div className="grid min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw]">
+          <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(58svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[52svh] items-start justify-center overflow-hidden bg-[#ece9e2] pt-6 sm:min-h-[58svh] sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
+              className="relative flex min-h-[58svh] items-center justify-center overflow-hidden bg-[#ece9e2] pt-[92px] sm:min-h-[58svh] sm:items-start sm:pt-4 lg:sticky lg:top-0 lg:min-h-[100svh] lg:pt-10"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -81,7 +81,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="object-contain object-[center_top] px-[9%] pb-[9%] pt-[3%] transition duration-[900ms] sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
+                      className="scale-[1.68] object-contain object-center px-[6%] py-[8%] transition duration-[900ms] sm:scale-100 sm:object-[center_top] sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
@@ -90,24 +90,31 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center px-5 py-12 sm:px-8 lg:px-16 lg:py-20 xl:px-20">
+            <div className="flex items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:items-center sm:px-8 sm:py-12 lg:px-16 lg:py-20 xl:px-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.15 }}
                 className="w-full max-w-[620px]"
               >
-                <p className="text-[17px] text-black/82">{seriesName} Collection</p>
-                <h1 className="mt-6 font-heading text-[clamp(1.8rem,5.8vw,5.8rem)] font-light leading-[0.95] tracking-[-0.055em]">
+                <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
+                <h1 className="mt-2 text-[44px] font-normal leading-[0.98] tracking-[-0.055em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
 
-                <p className="mt-6 max-w-lg text-[17px] leading-[1.75] text-black/70">
-                  {series?.description?.toLowerCase() || "Designed for enduring performance and visual clarity."}
+                <p className="mt-4 max-w-lg text-[20px] leading-[1.35] tracking-[-0.025em] text-black/78 sm:mt-6 sm:text-[17px] sm:leading-[1.75] sm:tracking-normal sm:text-black/70">
+                  <span className="sm:hidden">{variant.model}</span>
+                  <span className="hidden sm:inline">
+                    {series?.description?.toLowerCase() || "Designed for enduring performance and visual clarity."}
+                  </span>
                 </p>
 
-                <div className="mt-6 flex items-center gap-3">
-                  <p className="text-[24px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+                <p className="mt-3 text-[15px] leading-[1.55] text-black/55 sm:hidden">
+                  {product.name}, {finish?.name ?? "selected finish"}.
+                </p>
+
+                <div className="mt-3 hidden items-center gap-3 sm:mt-6 sm:flex">
+                  <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
@@ -116,11 +123,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   )}
                 </div>
 
-                <div className="relative mt-12">
+                <div className="relative mt-7 sm:mt-12">
                   <button
                     type="button"
                     onClick={() => setFinishOpen((open) => !open)}
-                    className="flex h-[58px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.045)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)]"
+                    className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
@@ -130,12 +137,12 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                           <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish?.hex }} />
                         )}
                       </span>
-                      <span className="truncate text-[16px] text-black">
+                      <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
                         {variant.model} - {finish?.name}
                         {finish?.type === "pvd" ? " Pvd" : ""}
                       </span>
                     </span>
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[18px] leading-none text-black/45">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[0px] leading-none text-black/45 after:text-[18px] after:content-['↓']">
                       {finishOpen ? "⌃" : "⌄"}
                     </span>
                   </button>
@@ -233,7 +240,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </button>
                 </div>
 
-                <div className="mt-10 border-t border-black/10 pt-6">
+                <div className="mt-10 hidden border-t border-black/10 pt-6 sm:block">
                   <p className="text-[13px] leading-[1.8] text-black/45">
                     Technical information, product details, and catalogue downloads are available below.
                   </p>
