@@ -37,9 +37,18 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
   const isInProposal = project.items.some((item) => item.slug === product.slug && item.finish === variant.finish);
   const activeFinishDisc = getFinishDiscImage(variant.finish);
+  const activeRoomGroups = (project.roomPlan?.groups ?? []).filter((group) => group.count > 0);
+  const [scopeChoice, setScopeChoice] = useState("");
 
   function addToProposal() {
-    if (!isInProposal) addItem(product.slug, variant.finish);
+    if (!isInProposal) {
+      const group = activeRoomGroups.find((entry) => entry.scopeId === scopeChoice);
+      addItem(product.slug, variant.finish, 1, group ? {
+        scopeId: group.scopeId,
+        scopeName: group.roomLabel,
+        scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
+      } : undefined);
+    }
     setProposalOpen(true);
   }
 
@@ -220,6 +229,21 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       )}
                     </AnimatePresence>
                   </button>
+                  {!isInProposal && activeRoomGroups.length > 0 && (
+                    <select
+                      value={scopeChoice}
+                      onChange={(e) => setScopeChoice(e.target.value)}
+                      className="mt-3 h-10 w-full rounded-full border border-black/12 bg-white/60 px-4 text-[12px] text-black/70 outline-none"
+                      aria-label="Add to room group"
+                    >
+                      <option value="">Add to: no group (manual)</option>
+                      {activeRoomGroups.map((group) => (
+                        <option key={group.scopeId} value={group.scopeId}>
+                          Add to: {group.roomLabel} ({group.count})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <button
                     type="button"
                     onClick={addToProposal}

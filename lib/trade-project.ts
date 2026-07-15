@@ -1,6 +1,10 @@
 export const TRADE_PROJECT_STORAGE_KEY = "steinheim-trade-project-v1";
 export const TRADE_WORKSPACE_STORAGE_KEY = "steinheim-trade-workspace-v2";
 
+export type RoomKey = "master" | "standard" | "powder" | "suite";
+export type LevelKey = "practical" | "premium" | "signature";
+export const ROOM_KEYS: RoomKey[] = ["master", "standard", "powder", "suite"];
+
 export interface TradeProjectItem {
   slug: string;
   finish: string;
@@ -8,6 +12,31 @@ export interface TradeProjectItem {
   scopeId?: string;
   scopeName?: string;
   scopeSummary?: string;
+}
+
+export interface RoomGroupAssignment {
+  mode: "tier" | "custom";
+  // Tier mode only: one collection + finish + coverage level drives auto-generation.
+  seriesId?: string;
+  finish?: string;
+  level?: LevelKey;
+}
+
+export interface RoomGroup {
+  scopeId: string; // stable: `scope-${roomKey}`
+  roomKey: RoomKey;
+  roomLabel: string;
+  count: number;
+  assignment: RoomGroupAssignment | null;
+}
+
+export interface TradeProjectRoomPlan {
+  presetId: string | null;
+  groups: RoomGroup[];
+}
+
+export function scopeIdForRoom(roomKey: RoomKey) {
+  return `scope-${roomKey}`;
 }
 
 export interface TradeProjectDetails {
@@ -27,6 +56,7 @@ export interface TradeProject {
   id: string;
   items: TradeProjectItem[];
   details: TradeProjectDetails;
+  roomPlan: TradeProjectRoomPlan | null;
   createdAt: string;
   updatedAt: string;
   status: "draft" | "submitted";
@@ -58,10 +88,55 @@ export function createEmptyTradeProject(id = ""): TradeProject {
       phone: "",
       notes: "",
     },
+    roomPlan: null,
     createdAt: "",
     updatedAt: "",
     status: "draft",
     submittedLeadId: "",
+  };
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function sanitizeRoomGroupAssignment(value: unknown): RoomGroupAssignment | null {
+  if (!value || typeof value !== "object") return null;
+  const candidate = value as Partial<RoomGroupAssignment>;
+  if (candidate.mode !== "tier" && candidate.mode !== "custom") return null;
+  const level: LevelKey | undefined =
+    candidate.level === "practical" || candidate.level === "premium" || candidate.level === "signature"
+      ? candidate.level
+      : undefined;
+  return {
+    mode: candidate.mode,
+    seriesId: typeof candidate.seriesId === "string" ? candidate.seriesId.slice(0, 60) : undefined,
+    finish: typeof candidate.finish === "string" ? candidate.finish.slice(0, 60) : undefined,
+    level,
+  };
+}
+
+export function sanitizeRoomPlan(value: unknown): TradeProjectRoomPlan | null {
+  if (!value || typeof value !== "object") return null;
+  const source = value as Partial<TradeProjectRoomPlan>;
+  if (!Array.isArray(source.groups)) return null;
+
+  const groups: RoomGroup[] = ROOM_KEYS.map((roomKey) => {
+    const stored = source.groups?.find(
+      (entry) => entry && typeof entry === "object" && (entry as Partial<RoomGroup>).roomKey === roomKey
+    ) as Partial<RoomGroup> | undefined;
+    return {
+      scopeId: scopeIdForRoom(roomKey),
+      roomKey,
+      roomLabel: typeof stored?.roomLabel === "string" && stored.roomLabel ? stored.roomLabel.slice(0, 80) : capitalize(roomKey),
+      count: Math.max(0, Math.min(500, Math.round(Number(stored?.count) || 0))),
+      assignment: sanitizeRoomGroupAssignment(stored?.assignment),
+    };
+  });
+
+  return {
+    presetId: typeof source.presetId === "string" ? source.presetId.slice(0, 40) : null,
+    groups,
   };
 }
 
@@ -95,6 +170,7 @@ export function sanitizeTradeProject(value: unknown): TradeProject | null {
     id: typeof source.id === "string" ? source.id.slice(0, 80) : "",
     items,
     details,
+    roomPlan: sanitizeRoomPlan(source.roomPlan),
     createdAt: typeof source.createdAt === "string" ? source.createdAt.slice(0, 40) : "",
     updatedAt: typeof source.updatedAt === "string" ? source.updatedAt.slice(0, 40) : "",
     status: source.status === "submitted" ? "submitted" : "draft",

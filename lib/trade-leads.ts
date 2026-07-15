@@ -4,6 +4,15 @@ export const tradeLeadStatuses = ["new", "reviewing", "contacted", "quoted", "wo
 export type TradeLeadStatus = (typeof tradeLeadStatuses)[number];
 export type TradeLeadPriority = "hot" | "warm" | "exploratory";
 
+export interface TradeLeadScope {
+  scopeId: string;
+  scopeName: string;
+  scopeSummary: string;
+  totalUnits: number;
+  retailReferenceTotal: number;
+  lineCount: number;
+}
+
 export interface TradeLead {
   id: string;
   reference: string;
@@ -21,6 +30,7 @@ export interface TradeLead {
   riskFlags: string[];
   internalNotes: string;
   project: TradeProject;
+  scopeBreakdown: TradeLeadScope[];
 }
 
 export function isTradeLeadStatus(value: unknown): value is TradeLeadStatus {

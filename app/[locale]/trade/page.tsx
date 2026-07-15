@@ -7,10 +7,10 @@ import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 
 const workflowSteps = [
-  ["Define a scope", "Pick a room group — standard rooms, suites, washrooms, villas, or show units."],
-  ["Choose direction", "Select the collection and finish for that scope. It does not lock the whole project."],
-  ["Add to board", "Repeat for another scope, or add exact products from collection pages."],
-  ["Submit one RFQ", "The board combines every line into one Steinheim Egypt trade request."],
+  ["Set your rooms", "Enter your property once — master, standard, powder, suite, and how many of each."],
+  ["Assign per group", "Pick a collection and finish for each room group, or hand-pick exact products across collections."],
+  ["Edit anytime", "Reopen any group to change its collection — it replaces that group cleanly, nothing to delete by hand."],
+  ["Submit one RFQ", "The board combines every group into one Steinheim Egypt trade request."],
 ] as const;
 
 export default async function TradePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -42,17 +42,17 @@ function TradePageContent() {
                 className="mt-5 max-w-4xl font-heading text-[clamp(3rem,7.5vw,7.5rem)] leading-[0.88] tracking-[-0.04em]"
                 style={{ fontStyle: "italic" }}
               >
-                Build project specifications by scope.
+                Specify by room, not by cart.
               </h1>
               <p className="mt-6 max-w-xl text-[16px] leading-[1.85] text-white/55">
-                Separate standard rooms, suites, public washrooms, and show units — then combine every product line into one Steinheim Egypt RFQ.
+                Set your property&apos;s room composition once, then assign a collection to each room group — mix collections freely — and combine everything into one Steinheim Egypt RFQ.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-3">
                 <a
                   href="#smart-room-calculator"
                   className="rounded-full border border-white/40 px-10 py-4 text-[13px] font-medium text-white transition hover:bg-white hover:text-black"
                 >
-                  Start a scope
+                  Set up your property
                 </a>
                 <TradeOpenButton variant="outline-light" />
               </div>
@@ -66,10 +66,10 @@ function TradePageContent() {
             <ScrollReveal>
               <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">How it works</p>
               <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
-                One project, as many scopes as you need.
+                One property, one setup, any mix of collections.
               </h2>
               <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
-                Each scope carries its own collection, finish, and product logic. The board merges everything into one trade request.
+                Each room group can carry its own collection, finish, and even mix products across collections. Reassigning a group updates it in place — nothing to delete by hand.
               </p>
             </ScrollReveal>
 

@@ -3,10 +3,96 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { formatPrice, getAllFinishes, getProductBySlug } from "@/lib/utils";
+import { formatPrice, getAllFinishes, getProductBySlug, type Finish, type Product, type Variant } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import TradeProjectReviewPanel from "@/components/catalogue/TradeProjectReviewPanel";
+import RoomAssignmentEditor from "@/components/trade/RoomAssignmentEditor";
+import type { RoomKey, TradeProjectItem } from "@/lib/trade-project";
+
+function ProjectItemRow({
+  item,
+  product,
+  variant,
+  finish,
+  onRemove,
+  onQuantityChange,
+}: {
+  item: TradeProjectItem;
+  product: Product;
+  variant: Variant;
+  finish: Finish | undefined;
+  onRemove: () => void;
+  onQuantityChange: (quantity: number) => void;
+}) {
+  const img = getProductImage(product.slug, variant.finish);
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="group bg-white"
+    >
+      <div className="flex gap-4 p-4">
+        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#ece9e2]">
+          {img && <Image src={img} alt={product.name} fill sizes="72px" className="object-contain p-1" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="font-heading text-[17px] leading-tight">{product.name}</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-warm-gray">
+                {product.series[0].toUpperCase() + product.series.slice(1)} · {finish?.name ?? item.finish}
+              </p>
+              <p className="mt-0.5 text-[9px] text-warm-gray/60">{variant.model}</p>
+            </div>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
+              aria-label="Remove"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex items-center border border-charcoal/12">
+              <button
+                type="button"
+                onClick={() => onQuantityChange(item.quantity - 1)}
+                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                min="1"
+                max="10000"
+                value={item.quantity}
+                onChange={(e) => onQuantityChange(Number(e.target.value))}
+                className="h-7 w-12 border-x border-charcoal/12 bg-transparent text-center text-[12px] outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => onQuantityChange(item.quantity + 1)}
+                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
+              >
+                +
+              </button>
+            </div>
+            <p className="text-[12px] font-medium text-charcoal">
+              {formatPrice(variant.price * item.quantity)}
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const isArabic = locale === "ar";
@@ -26,6 +112,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
   const [pdfDownloading, setPdfDownloading] = useState(false);
+  const [editingRoomKey, setEditingRoomKey] = useState<RoomKey | null>(null);
   const finishes = useMemo(() => getAllFinishes(), []);
 
   const rows = project.items.flatMap((item) => {
@@ -39,6 +126,12 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const selectedSeries = Array.from(new Set(rows.map((row) => row.product.series)));
   const selectedFinishes = Array.from(new Set(rows.map((row) => row.finish?.name ?? row.item.finish)));
   const retailReferenceTotal = rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
+
+  const roomPlan = project.roomPlan;
+  const roomPlanScopeIds = new Set((roomPlan?.groups ?? []).map((group) => group.scopeId));
+  const activeRoomGroups = (roomPlan?.groups ?? []).filter((group) => group.count > 0);
+  const editingGroup = activeRoomGroups.find((group) => group.roomKey === editingRoomKey) ?? null;
+
   const scopeGroups = Array.from(
     rows.reduce((groups, row) => {
       const key = row.item.scopeId || "manual";
@@ -57,6 +150,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     totalUnits: group.rows.reduce((sum, row) => sum + row.item.quantity, 0),
     totalValue: group.rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0),
   }));
+  // Room-plan groups get their own dedicated card with an "Edit assignment" action below —
+  // exclude them here so they aren't rendered twice. Legacy counter-scoped items and true
+  // manual adds still render through this generic list, unchanged.
+  const otherScopeGroups = scopeGroups.filter((group) => !roomPlanScopeIds.has(group.id));
 
   async function handleSubmit() {
     if (!project.items.length) {
@@ -232,7 +329,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {rows.length === 0 ? (
+                    {rows.length === 0 && activeRoomGroups.length === 0 ? (
                       <div className="flex flex-col items-center justify-center px-7 py-20 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-charcoal/10">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-warm-gray">
@@ -244,14 +341,14 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           Start your project
                         </h3>
                         <p className="mt-3 max-w-[260px] text-[13px] leading-relaxed text-warm-gray">
-                          Start with a scope from the trade page, or browse products and tap &ldquo;Add to project&rdquo; to build a mixed specification list.
+                          Set up your property&apos;s room composition from the trade page, or browse products and tap &ldquo;Add to project&rdquo; to build a mixed specification list.
                         </p>
                         <a
                           href={`/${locale}/trade#smart-room-calculator`}
                           onClick={() => setOpen(false)}
                           className="mt-8 flex h-[46px] items-center justify-center bg-charcoal px-6 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
                         >
-                          Start first scope
+                          Set up your property
                         </a>
                       </div>
                     ) : (
@@ -298,7 +395,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             onClick={() => setOpen(false)}
                             className="mt-4 flex h-[42px] items-center justify-center border border-white/20 bg-white/5 text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:border-white hover:bg-white/10"
                           >
-                            Add another scope
+                            {roomPlan ? "Edit property composition" : "Set up your property"}
                           </a>
                         </div>
 
@@ -313,7 +410,65 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         />
 
                         <div className="space-y-5">
-                          {scopeGroups.map((group) => (
+                          {activeRoomGroups.map((group) => {
+                            const groupRows = rows.filter((row) => row.item.scopeId === group.scopeId);
+                            const totalUnits = groupRows.reduce((sum, row) => sum + row.item.quantity, 0);
+                            const totalValue = groupRows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
+                            return (
+                              <section key={group.scopeId} className="border border-charcoal/10 bg-white">
+                                <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                      <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                                        {group.count} {group.count === 1 ? "room" : "rooms"}
+                                      </p>
+                                      <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
+                                        {group.roomLabel}
+                                      </h3>
+                                      {group.assignment ? (
+                                        <p className="mt-2 text-[11px] leading-[1.6] text-warm-gray">
+                                          {totalUnits} units · {formatPrice(totalValue)}
+                                        </p>
+                                      ) : (
+                                        <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.1em] text-amber-700">
+                                          Not yet assigned
+                                        </p>
+                                      )}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingRoomKey(group.roomKey)}
+                                      className={`shrink-0 rounded-full border px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
+                                        group.assignment
+                                          ? "border-charcoal/20 text-charcoal hover:border-charcoal"
+                                          : "border-charcoal bg-charcoal text-white hover:bg-black"
+                                      }`}
+                                    >
+                                      {group.assignment ? "Edit assignment" : "Assign collection"}
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {groupRows.length > 0 && (
+                                  <div className="divide-y divide-charcoal/8">
+                                    {groupRows.map(({ item, product, variant, finish }) => (
+                                      <ProjectItemRow
+                                        key={`${item.scopeId}-${item.slug}-${item.finish}`}
+                                        item={item}
+                                        product={product}
+                                        variant={variant}
+                                        finish={finish}
+                                        onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
+                                        onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+                              </section>
+                            );
+                          })}
+
+                          {otherScopeGroups.map((group) => (
                             <section key={group.id} className="border border-charcoal/10 bg-white">
                               <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
                                 <div className="flex items-start justify-between gap-4">
@@ -336,91 +491,17 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               </div>
 
                               <div className="divide-y divide-charcoal/8">
-                                {group.rows.map(({ item, product, variant, finish }) => {
-                                  const img = getProductImage(product.slug, variant.finish);
-                                  return (
-                                    <motion.div
-                                      key={`${item.scopeId || "manual"}-${item.slug}-${item.finish}`}
-                                      layout
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: -10 }}
-                                      className="group bg-white"
-                                    >
-                                      <div className="flex gap-4 p-4">
-                                        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#ece9e2]">
-                                          {img && (
-                                            <Image
-                                              src={img}
-                                              alt={product.name}
-                                              fill
-                                              sizes="72px"
-                                              className="object-contain p-1"
-                                            />
-                                          )}
-                                        </div>
-
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex items-start justify-between">
-                                            <div>
-                                              <p className="font-heading text-[17px] leading-tight">
-                                                {product.name}
-                                              </p>
-                                              <p className="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-warm-gray">
-                                                {product.series[0].toUpperCase() + product.series.slice(1)} · {finish?.name ?? item.finish}
-                                              </p>
-                                              <p className="mt-0.5 text-[9px] text-warm-gray/60">
-                                                {variant.model}
-                                              </p>
-                                            </div>
-                                            <button
-                                              type="button"
-                                              onClick={() => removeItem(item.slug, item.finish, item.scopeId)}
-                                              className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-                                              aria-label="Remove"
-                                            >
-                                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                <path d="M18 6L6 18M6 6l12 12" />
-                                              </svg>
-                                            </button>
-                                          </div>
-
-                                          <div className="mt-3 flex items-center gap-3">
-                                            <div className="flex items-center border border-charcoal/12">
-                                              <button
-                                                type="button"
-                                                onClick={() => updateQuantity(item.slug, item.finish, item.quantity - 1, item.scopeId)}
-                                                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-                                              >
-                                                −
-                                              </button>
-                                              <input
-                                                type="number"
-                                                min="1"
-                                                max="10000"
-                                                value={item.quantity}
-                                                onChange={(e) =>
-                                                  updateQuantity(item.slug, item.finish, Number(e.target.value), item.scopeId)
-                                                }
-                                                className="h-7 w-12 border-x border-charcoal/12 bg-transparent text-center text-[12px] outline-none"
-                                              />
-                                              <button
-                                                type="button"
-                                                onClick={() => updateQuantity(item.slug, item.finish, item.quantity + 1, item.scopeId)}
-                                                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-                                              >
-                                                +
-                                              </button>
-                                            </div>
-                                            <p className="text-[12px] font-medium text-charcoal">
-                                              {formatPrice(variant.price * item.quantity)}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </motion.div>
-                                  );
-                                })}
+                                {group.rows.map(({ item, product, variant, finish }) => (
+                                  <ProjectItemRow
+                                    key={`${item.scopeId || "manual"}-${item.slug}-${item.finish}`}
+                                    item={item}
+                                    product={product}
+                                    variant={variant}
+                                    finish={finish}
+                                    onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
+                                    onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
+                                  />
+                                ))}
                               </div>
                             </section>
                           ))}
@@ -461,7 +542,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         onClick={() => setOpen(false)}
                         className="mt-3 inline-flex text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray underline underline-offset-2 transition hover:text-charcoal"
                       >
-                        Add another scope before sending
+                        {roomPlan ? "Edit property composition before sending" : "Set up your property before sending"}
                       </a>
                     </div>
 
@@ -627,7 +708,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     onClick={() => setOpen(false)}
                     className="flex h-[50px] items-center justify-center border border-charcoal/15 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                   >
-                    Add another scope
+                    {roomPlan ? "Edit property" : "Set up property"}
                   </a>
                   <button
                     type="button"
@@ -675,6 +756,16 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
               </footer>
             )}
           </motion.aside>
+
+          {editingGroup && (
+            <RoomAssignmentEditor
+              roomGroup={editingGroup}
+              existingItems={rows
+                .filter((row) => row.item.scopeId === editingGroup.scopeId)
+                .map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }))}
+              onClose={() => setEditingRoomKey(null)}
+            />
+          )}
         </>
       )}
     </AnimatePresence>

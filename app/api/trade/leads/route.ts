@@ -1,7 +1,7 @@
 import { randomUUID, timingSafeEqual } from "node:crypto";
 import productsData from "@/data/products.json";
 import { getProjectCompletion, sanitizeTradeProject } from "@/lib/trade-project";
-import { isTradeLeadStatus, type TradeLead, type TradeLeadPriority } from "@/lib/trade-leads";
+import { isTradeLeadStatus, type TradeLead, type TradeLeadPriority, type TradeLeadScope } from "@/lib/trade-leads";
 import { listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
 
 export const runtime = "nodejs";
@@ -34,6 +34,28 @@ function isAdmin(request: Request) {
   return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
 }
 
+function buildScopeBreakdown(
+  rows: Array<{ item: NonNullable<ReturnType<typeof sanitizeTradeProject>>["items"][number]; variant: { price: number } }>
+): TradeLeadScope[] {
+  const map = new Map<string, TradeLeadScope>();
+  for (const { item, variant } of rows) {
+    const scopeId = item.scopeId || "manual";
+    const existing = map.get(scopeId) ?? {
+      scopeId,
+      scopeName: item.scopeName || "Manually added products",
+      scopeSummary: item.scopeSummary || "Products added directly from collection and product pages.",
+      totalUnits: 0,
+      retailReferenceTotal: 0,
+      lineCount: 0,
+    };
+    existing.totalUnits += item.quantity;
+    existing.retailReferenceTotal += item.quantity * variant.price;
+    existing.lineCount += 1;
+    map.set(scopeId, existing);
+  }
+  return Array.from(map.values());
+}
+
 function analyzeProject(project: NonNullable<ReturnType<typeof sanitizeTradeProject>>) {
   const rows = project.items.flatMap((item) => {
     const product = productsData.products.find((entry) => entry.slug === item.slug);
@@ -53,7 +75,8 @@ function analyzeProject(project: NonNullable<ReturnType<typeof sanitizeTradeProj
   const scalePoints = totalUnits >= 250 ? 30 : totalUnits >= 100 ? 24 : totalUnits >= 25 ? 16 : totalUnits >= 5 ? 8 : 3;
   const score = Math.min(100, Math.round(20 + completion * 0.45 + scalePoints + (project.details.company ? 5 : 0)));
   const priority: TradeLeadPriority = score >= 78 || totalUnits >= 100 ? "hot" : score >= 55 ? "warm" : "exploratory";
-  return { totalUnits, retailReferenceTotal, completion, riskFlags, score, priority, lineCount: rows.length };
+  const scopeBreakdown = buildScopeBreakdown(rows);
+  return { totalUnits, retailReferenceTotal, completion, riskFlags, score, priority, lineCount: rows.length, scopeBreakdown };
 }
 
 export async function POST(request: Request) {

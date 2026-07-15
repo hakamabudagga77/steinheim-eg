@@ -6,13 +6,18 @@ import {
   createProjectId,
   sanitizeTradeProject,
   sanitizeTradeWorkspace,
+  scopeIdForRoom,
   TRADE_PROJECT_STORAGE_KEY,
   TRADE_WORKSPACE_STORAGE_KEY,
+  type RoomGroupAssignment,
+  type RoomKey,
   type TradeProject,
   type TradeProjectDetails,
   type TradeProjectItem,
+  type TradeProjectRoomPlan,
   type TradeWorkspace,
 } from "@/lib/trade-project";
+import { createEmptyRoomPlan } from "@/lib/trade-schedule";
 
 interface TradeProjectContextValue {
   project: TradeProject;
@@ -28,6 +33,15 @@ interface TradeProjectContextValue {
   deleteProject: (id: string) => void;
   markSubmitted: (leadId: string) => void;
   clearProject: () => void;
+  setRoomPlan: (plan: TradeProjectRoomPlan) => void;
+  assignRoomGroup: (
+    roomKey: RoomKey,
+    assignment: RoomGroupAssignment,
+    rows: Array<{ slug: string; finish: string; quantity: number }>,
+    scopeName: string,
+    scopeSummary: string
+  ) => void;
+  clearRoomGroupAssignment: (roomKey: RoomKey) => void;
 }
 
 const TradeProjectContext = createContext<TradeProjectContextValue | null>(null);
@@ -207,6 +221,57 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => createEmptyTradeProject(current.id));
   }, [updateActive]);
 
+  const setRoomPlan = useCallback((plan: TradeProjectRoomPlan) => {
+    updateActive((current) => ({ ...current, roomPlan: plan }));
+  }, [updateActive]);
+
+  const assignRoomGroup = useCallback((
+    roomKey: RoomKey,
+    assignment: RoomGroupAssignment,
+    rows: Array<{ slug: string; finish: string; quantity: number }>,
+    scopeName: string,
+    scopeSummary: string
+  ) => {
+    const scopeId = scopeIdForRoom(roomKey);
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const nextItems = [
+        ...current.items.filter((item) => item.scopeId !== scopeId),
+        ...rows.map((row) => ({
+          slug: row.slug,
+          finish: row.finish,
+          quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
+          scopeId,
+          scopeName,
+          scopeSummary,
+        })),
+      ];
+      return {
+        ...current,
+        items: nextItems,
+        roomPlan: {
+          ...plan,
+          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, assignment } : group),
+        },
+      };
+    });
+  }, [updateActive]);
+
+  const clearRoomGroupAssignment = useCallback((roomKey: RoomKey) => {
+    const scopeId = scopeIdForRoom(roomKey);
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      return {
+        ...current,
+        items: current.items.filter((item) => item.scopeId !== scopeId),
+        roomPlan: {
+          ...plan,
+          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, assignment: null } : group),
+        },
+      };
+    });
+  }, [updateActive]);
+
   return (
     <TradeProjectContext.Provider value={{
       project,
@@ -222,6 +287,9 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       deleteProject,
       markSubmitted,
       clearProject,
+      setRoomPlan,
+      assignRoomGroup,
+      clearRoomGroupAssignment,
     }}>
       {children}
     </TradeProjectContext.Provider>

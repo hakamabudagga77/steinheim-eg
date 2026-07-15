@@ -26,6 +26,33 @@ interface ResolvedItem {
   finish: (typeof finishesData)[number] | undefined;
   quantity: number;
   lineTotal: number;
+  scopeId: string;
+  scopeName: string;
+  scopeSummary: string;
+}
+
+interface ScopeGroup {
+  id: string;
+  name: string;
+  summary: string;
+  rows: ResolvedItem[];
+  totalUnits: number;
+  totalValue: number;
+}
+
+function groupByScope(rows: ResolvedItem[]): ScopeGroup[] {
+  const map = new Map<string, { name: string; summary: string; rows: ResolvedItem[] }>();
+  for (const row of rows) {
+    const existing = map.get(row.scopeId) ?? { name: row.scopeName, summary: row.scopeSummary, rows: [] };
+    existing.rows.push(row);
+    map.set(row.scopeId, existing);
+  }
+  return Array.from(map.entries()).map(([id, group]) => ({
+    id,
+    ...group,
+    totalUnits: group.rows.reduce((sum, row) => sum + row.quantity, 0),
+    totalValue: group.rows.reduce((sum, row) => sum + row.lineTotal, 0),
+  }));
 }
 
 function hexToRgb(hex: string) {
@@ -80,7 +107,16 @@ function resolveItems(project: TradeProject): ResolvedItem[] {
     const variant = product?.variants.find((v) => v.finish === item.finish);
     if (!product || !variant) return [];
     const finish = finishesData.find((f) => f.id === item.finish);
-    return [{ product, variant, finish, quantity: item.quantity, lineTotal: variant.price * item.quantity }];
+    return [{
+      product,
+      variant,
+      finish,
+      quantity: item.quantity,
+      lineTotal: variant.price * item.quantity,
+      scopeId: item.scopeId || "manual",
+      scopeName: item.scopeName || "Manually added products",
+      scopeSummary: item.scopeSummary || "Products added directly from collection and product pages.",
+    }];
   });
 }
 
@@ -88,6 +124,7 @@ async function buildPremiumPdf(project: TradeProject) {
   const now = new Date();
   const reference = `STM-RFQ-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getTime()).slice(-6)}`;
   const rows = resolveItems(project);
+  const groups = groupByScope(rows);
   const total = rows.reduce((sum, r) => sum + r.lineTotal, 0);
   const detail = project.details;
 
@@ -289,12 +326,13 @@ async function buildPremiumPdf(project: TradeProject) {
 
   y = drawTableHeader(currentPage, y);
 
-  // Product rows with images
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const ROW_HEIGHT = 72;
+  // Product rows with images, grouped by room/scope
+  let rowNumber = 0;
+  for (const group of groups) {
+    const GROUP_BAND_HEIGHT = 34;
+    const GROUP_HEADER_HEIGHT = GROUP_BAND_HEIGHT + 10;
 
-    if (y - ROW_HEIGHT < 60) {
+    if (y - GROUP_HEADER_HEIGHT < 90) {
       pageNum++;
       currentPage = doc.addPage([PAGE_W, PAGE_H]);
       drawPageHeader(currentPage, pageNum);
@@ -304,100 +342,127 @@ async function buildPremiumPdf(project: TradeProject) {
       y = drawTableHeader(currentPage, y);
     }
 
-    // Alternating row background
-    if (i % 2 === 0) {
-      currentPage.drawRectangle({
-        x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: ROW_HEIGHT, color: rgb(0.985, 0.985, 0.98),
-      });
-    }
-
-    // Row separator
-    currentPage.drawRectangle({
-      x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: 0.5, color: rgb(0.9, 0.9, 0.88),
+    // Group subsection header
+    currentPage.drawRectangle({ x: MARGIN, y: y - GROUP_BAND_HEIGHT, width: CONTENT_W, height: GROUP_BAND_HEIGHT, color: WARM_BG });
+    currentPage.drawText(group.name, { x: MARGIN + 8, y: y - 13, size: 10.5, font: helveticaBold, color: CHARCOAL });
+    const groupSummaryLine = wrapText(group.summary, helvetica, 7.5, CONTENT_W - 220)[0] ?? "";
+    currentPage.drawText(groupSummaryLine, { x: MARGIN + 8, y: y - 26, size: 7.5, font: helvetica, color: MID_GRAY });
+    const groupTotalsStr = `${group.totalUnits} ${group.totalUnits === 1 ? "unit" : "units"} · LE ${group.totalValue.toLocaleString("en-US")}`;
+    const groupTotalsWidth = helveticaBold.widthOfTextAtSize(groupTotalsStr, 8.5);
+    currentPage.drawText(groupTotalsStr, {
+      x: PAGE_W - MARGIN - groupTotalsWidth - 8, y: y - 19, size: 8.5, font: helveticaBold, color: CHARCOAL,
     });
+    y -= GROUP_HEADER_HEIGHT;
 
-    const series = productsData.series.find((s) => s.id === row.product.series);
-    const seriesName = series?.name ?? row.product.series;
+    for (const row of group.rows) {
+      const ROW_HEIGHT = 72;
 
-    // Product image
-    try {
-      const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
-      if (imgBytes) {
-        const img = await doc.embedPng(imgBytes);
-        const imgSize = 48;
-        const imgDims = img.scaleToFit(imgSize, imgSize);
+      if (y - ROW_HEIGHT < 60) {
+        pageNum++;
+        currentPage = doc.addPage([PAGE_W, PAGE_H]);
+        drawPageHeader(currentPage, pageNum);
+        y = PAGE_H - 100;
+        currentPage.drawText("Product Schedule (continued)", { x: MARGIN, y, size: 16, font: timesRoman, color: CHARCOAL });
+        y -= 30;
+        y = drawTableHeader(currentPage, y);
+      }
+
+      // Alternating row background
+      if (rowNumber % 2 === 0) {
         currentPage.drawRectangle({
-          x: MARGIN + 30, y: y - 40, width: 52, height: 52, color: rgb(0.96, 0.96, 0.95),
-        });
-        currentPage.drawImage(img, {
-          x: MARGIN + 30 + (52 - imgDims.width) / 2,
-          y: y - 40 + (52 - imgDims.height) / 2,
-          width: imgDims.width,
-          height: imgDims.height,
+          x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: ROW_HEIGHT, color: rgb(0.985, 0.985, 0.98),
         });
       }
-    } catch {
-      // Skip image if it can't be loaded
-    }
 
-    // Row number
-    currentPage.drawText(`${i + 1}`, {
-      x: MARGIN + 10, y: y - 10, size: 9, font: helvetica, color: MID_GRAY,
-    });
-
-    // Product name and series
-    currentPage.drawText(`${seriesName} ${row.product.name}`, {
-      x: MARGIN + 88, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-    currentPage.drawText(row.product.type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), {
-      x: MARGIN + 88, y: y - 20, size: 7.5, font: helvetica, color: MID_GRAY,
-    });
-
-    // Model number
-    currentPage.drawText(row.variant.model, {
-      x: MARGIN + 230, y: y - 6, size: 9, font: helvetica, color: DARK_GRAY,
-    });
-
-    // Finish name with color swatch
-    const finishName = row.finish?.name ?? row.variant.finish;
-    if (row.finish?.hex) {
-      currentPage.drawCircle({
-        x: MARGIN + 324, y: y - 7, size: 5, color: hexToRgb(row.finish.hex),
-      });
-      currentPage.drawCircle({
-        x: MARGIN + 324, y: y - 7, size: 5, borderColor: rgb(0.8, 0.8, 0.78), borderWidth: 0.5,
-      });
-    }
-    currentPage.drawText(finishName, {
-      x: MARGIN + 334, y: y - 10, size: 8, font: helvetica, color: DARK_GRAY,
-    });
-
-    // PVD badge
-    if (row.finish?.type === "pvd") {
-      const pvdX = MARGIN + 334 + helvetica.widthOfTextAtSize(finishName, 8) + 5;
+      // Row separator
       currentPage.drawRectangle({
-        x: pvdX, y: y - 14, width: 20, height: 11, color: rgb(0.94, 0.94, 0.92),
+        x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: 0.5, color: rgb(0.9, 0.9, 0.88),
       });
-      currentPage.drawText("PVD", { x: pvdX + 3, y: y - 11, size: 6, font: helveticaBold, color: MID_GRAY });
+
+      const series = productsData.series.find((s) => s.id === row.product.series);
+      const seriesName = series?.name ?? row.product.series;
+
+      // Product image
+      try {
+        const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
+        if (imgBytes) {
+          const img = await doc.embedPng(imgBytes);
+          const imgSize = 48;
+          const imgDims = img.scaleToFit(imgSize, imgSize);
+          currentPage.drawRectangle({
+            x: MARGIN + 30, y: y - 40, width: 52, height: 52, color: rgb(0.96, 0.96, 0.95),
+          });
+          currentPage.drawImage(img, {
+            x: MARGIN + 30 + (52 - imgDims.width) / 2,
+            y: y - 40 + (52 - imgDims.height) / 2,
+            width: imgDims.width,
+            height: imgDims.height,
+          });
+        }
+      } catch {
+        // Skip image if it can't be loaded
+      }
+
+      // Row number
+      rowNumber++;
+      currentPage.drawText(`${rowNumber}`, {
+        x: MARGIN + 10, y: y - 10, size: 9, font: helvetica, color: MID_GRAY,
+      });
+
+      // Product name and series
+      currentPage.drawText(`${seriesName} ${row.product.name}`, {
+        x: MARGIN + 88, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+      });
+      currentPage.drawText(row.product.type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), {
+        x: MARGIN + 88, y: y - 20, size: 7.5, font: helvetica, color: MID_GRAY,
+      });
+
+      // Model number
+      currentPage.drawText(row.variant.model, {
+        x: MARGIN + 230, y: y - 6, size: 9, font: helvetica, color: DARK_GRAY,
+      });
+
+      // Finish name with color swatch
+      const finishName = row.finish?.name ?? row.variant.finish;
+      if (row.finish?.hex) {
+        currentPage.drawCircle({
+          x: MARGIN + 324, y: y - 7, size: 5, color: hexToRgb(row.finish.hex),
+        });
+        currentPage.drawCircle({
+          x: MARGIN + 324, y: y - 7, size: 5, borderColor: rgb(0.8, 0.8, 0.78), borderWidth: 0.5,
+        });
+      }
+      currentPage.drawText(finishName, {
+        x: MARGIN + 334, y: y - 10, size: 8, font: helvetica, color: DARK_GRAY,
+      });
+
+      // PVD badge
+      if (row.finish?.type === "pvd") {
+        const pvdX = MARGIN + 334 + helvetica.widthOfTextAtSize(finishName, 8) + 5;
+        currentPage.drawRectangle({
+          x: pvdX, y: y - 14, width: 20, height: 11, color: rgb(0.94, 0.94, 0.92),
+        });
+        currentPage.drawText("PVD", { x: pvdX + 3, y: y - 11, size: 6, font: helveticaBold, color: MID_GRAY });
+      }
+
+      // Quantity
+      currentPage.drawText(`${row.quantity}`, {
+        x: MARGIN + 410, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+      });
+
+      // Line total
+      const totalStr = `LE ${row.lineTotal.toLocaleString("en-US")}`;
+      currentPage.drawText(totalStr, {
+        x: MARGIN + 435, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+      });
+
+      // Unit price
+      currentPage.drawText(`@ LE ${row.variant.price.toLocaleString("en-US")} each`, {
+        x: MARGIN + 435, y: y - 20, size: 7, font: helvetica, color: MID_GRAY,
+      });
+
+      y -= ROW_HEIGHT;
     }
-
-    // Quantity
-    currentPage.drawText(`${row.quantity}`, {
-      x: MARGIN + 410, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-
-    // Line total
-    const totalStr = `LE ${row.lineTotal.toLocaleString("en-US")}`;
-    currentPage.drawText(totalStr, {
-      x: MARGIN + 435, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-
-    // Unit price
-    currentPage.drawText(`@ LE ${row.variant.price.toLocaleString("en-US")} each`, {
-      x: MARGIN + 435, y: y - 20, size: 7, font: helvetica, color: MID_GRAY,
-    });
-
-    y -= ROW_HEIGHT;
   }
 
   // Totals row
