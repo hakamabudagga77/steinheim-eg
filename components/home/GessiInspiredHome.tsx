@@ -20,29 +20,29 @@ const collections = [
   {
     name: "Joy",
     href: "/collections/joy",
-    image: "/images/collections/home/joy-card-v3.jpeg",
-    hoverImage: "/images/collections/home/joy-bath-hover.png",
+    image: "/images/nav-menu/products/joy-basin-mixer.png",
+    hoverImage: "/images/nav-menu/products/joy-wall-mounted-basin-mixer.png",
     line: "Soft balance for private villas, suites, and warm hospitality rooms.",
   },
   {
     name: "Up",
     href: "/collections/up",
-    image: "/images/collections/home/up-card-v3.png",
-    hoverImage: "/images/collections/home/up-bath-hover.png",
+    image: "/images/nav-menu/products/up-wall-mounted-basin-mixer-v2.png",
+    hoverImage: "/images/nav-menu/products/up-basin-mixer-v2.png",
     line: "A repeatable modern language for developments and project schedules.",
   },
   {
     name: "Art",
     href: "/collections/art",
-    image: "/images/collections/home/art-card-v4.png",
-    hoverImage: "/images/collections/home/art-bath-hover.png",
+    image: "/images/nav-menu/products/art-basin-mixer-v2.png",
+    hoverImage: "/images/nav-menu/products/art-free-standing-bath-mixer.png",
     line: "Architectural precision for statement bathrooms and design-led spaces.",
   },
   {
     name: "Quatro",
     href: "/collections/quatro",
-    image: "/images/collections/home/quatro-card-v5.png",
-    hoverImage: "/images/collections/home/quatro-shower-hover.png",
+    image: "/images/nav-menu/products/quatro-concealed-shower-v2.png",
+    hoverImage: "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
     line: "Crisp geometry for sharp, contemporary interiors.",
   },
 ];
@@ -83,10 +83,10 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 36, filter: "blur(8px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay: index * 0.06 }}
+      transition={{ duration: 0.9, delay: index * 0.08, ease: [0.22, 0.76, 0.2, 1] }}
     >
       <Link
         href={item.href}
@@ -94,7 +94,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-black sm:aspect-[0.92] sm:rounded-[22px]">
+        <div className="relative aspect-[4/5] overflow-hidden bg-black shadow-[0_24px_70px_rgba(0,0,0,0.08)] transition duration-[900ms] ease-[cubic-bezier(0.22,0.76,0.2,1)] group-hover:-translate-y-1 group-hover:shadow-[0_34px_90px_rgba(0,0,0,0.14)]">
           <Image
             src={item.image}
             alt={`${item.name} collection`}
@@ -102,7 +102,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             sizes="(max-width: 768px) 100vw, 25vw"
             priority
             className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              hovered ? "opacity-0 scale-[1.03]" : "opacity-100 scale-100"
+              hovered ? "opacity-0 scale-[1.045]" : "opacity-100 scale-100 group-hover:scale-[1.025]"
             }`}
           />
           <Image
@@ -113,15 +113,18 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             quality={82}
             priority
             className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              hovered ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
+              hovered ? "opacity-100 scale-100" : "opacity-0 scale-[1.045]"
             }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-          <h3 className="absolute bottom-3 left-3 font-heading text-[26px] leading-none text-white sm:bottom-6 sm:left-6 sm:text-[42px]">
-            {item.name}
-          </h3>
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_58%,rgba(0,0,0,0.16))] opacity-0 transition duration-700 group-hover:opacity-100" />
         </div>
-        <p className="mt-3 max-w-[320px] text-[12px] leading-[1.4] text-black/62 sm:mt-5 sm:text-[15px] sm:leading-[1.55]">{item.line}</p>
+        <h3 className="mt-4 text-center text-[22px] font-semibold leading-none tracking-[-0.035em] text-black sm:mt-5 sm:text-[26px]">
+          {item.name}
+        </h3>
+        <span className="mx-auto mt-3 block h-px w-8 bg-black/20 transition-all duration-700 group-hover:w-16 group-hover:bg-black/60" />
+        <p className="mx-auto mt-2 max-w-[320px] text-center text-[13px] leading-[1.5] text-black/55 sm:text-[14px] sm:leading-[1.55]">
+          {item.line}
+        </p>
       </Link>
     </motion.article>
   );
@@ -258,24 +261,15 @@ export default function GessiInspiredHome() {
         <ScrollCue />
       </section>
 
-      <section className="bg-[#ece9e2] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
-        <div className="mx-auto max-w-[1780px]">
-          <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
-            <div>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/45">Collections</p>
-              <h2
-                className="mt-4 max-w-4xl text-[clamp(2.8rem,6.3vw,7.4rem)] font-normal leading-[0.9] tracking-[-0.055em]"
-                style={{ fontStyle: "italic" }}
-              >
-                Icons for the bathroom.
-              </h2>
-            </div>
-            <Link href="/collections" className="rounded-full border border-black/30 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white">
-              View all
-            </Link>
+      <section className="overflow-hidden bg-[#ece9e2] px-6 py-20 sm:px-10 lg:px-16 lg:py-24">
+        <div className="mx-auto max-w-[1160px]">
+          <div className="mb-10 text-center sm:mb-12">
+            <h2 className="text-[32px] font-normal leading-tight tracking-[-0.055em] text-black sm:text-[42px] lg:text-[48px]">
+              Explore our collections
+            </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-8 xl:grid-cols-4">
+          <div className="mx-auto grid max-w-[980px] gap-x-9 gap-y-12 sm:grid-cols-2 lg:gap-x-12 lg:gap-y-14">
             {collections.map((item, index) => (
               <CollectionCard key={item.name} item={item} index={index} />
             ))}

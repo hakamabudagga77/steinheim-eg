@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import AutoplayVideo from "@/components/ui/AutoplayVideo";
+import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const clips: Array<{
   src: string;
@@ -15,6 +15,72 @@ const clips: Array<{
   { src: "/videos/showroom/showroom-4.mp4", poster: "/images/showroom-4-poster.jpg", orientation: "portrait" },
   { src: "/videos/showroom/showroom-5.mp4", poster: "/images/showroom-5-poster.jpg", orientation: "portrait" },
 ];
+
+function ReelVideo({
+  src,
+  poster,
+  active,
+}: {
+  src: string;
+  poster: string;
+  active: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+  useAutoplayVideo(videoRef, src);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = muted;
+    if (!muted) {
+      video.play().catch(() => undefined);
+    }
+  }, [muted]);
+
+  return (
+    <>
+      <video
+        ref={videoRef}
+        autoPlay
+        muted={muted}
+        loop
+        playsInline
+        preload="auto"
+        poster={poster}
+        className="h-full w-full object-cover"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setMuted((value) => !value);
+        }}
+        aria-label={muted ? "Turn video sound on" : "Mute video"}
+        className={`absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-md transition duration-500 hover:bg-white hover:text-black ${
+          active ? "opacity-100" : "opacity-70"
+        }`}
+      >
+        {muted ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+            <path d="m19 9-4 4" />
+            <path d="m15 9 4 4" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+          </svg>
+        )}
+      </button>
+    </>
+  );
+}
 
 export default function ShowroomReel() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -53,9 +119,12 @@ export default function ShowroomReel() {
       lastTimestamp = timestamp;
 
       if (!pausedRef.current) {
-        const singleSetWidth = track.scrollWidth / 2;
+        const singleSetWidth = track.scrollWidth / 3;
+        if (singleSetWidth > 0 && track.scrollLeft < singleSetWidth * 0.5) {
+          track.scrollLeft += singleSetWidth;
+        }
         const next = track.scrollLeft + (pixelsPerSecond * delta) / 1000;
-        track.scrollLeft = next >= singleSetWidth ? next - singleSetWidth : next;
+        track.scrollLeft = next >= singleSetWidth * 2 ? next - singleSetWidth : next;
       }
 
       if (timestamp - lastCenterCheck > 120) {
@@ -87,6 +156,7 @@ export default function ShowroomReel() {
     window.addEventListener("blur", releaseTouchPause);
     document.addEventListener("visibilitychange", releaseTouchPause);
 
+    track.scrollLeft = track.scrollWidth / 3;
     frame = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(frame);
@@ -100,7 +170,7 @@ export default function ShowroomReel() {
   const activeIndex = hoveredIndex ?? centeredIndex;
 
   return (
-    <section className="bg-black py-24 text-white sm:py-32">
+    <section className="overflow-hidden bg-black py-24 text-white sm:py-32">
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -120,29 +190,30 @@ export default function ShowroomReel() {
         </motion.div>
       </div>
 
-      <div
-        ref={trackRef}
-        onPointerEnter={(e) => {
-          if (e.pointerType === "mouse") setHoverPaused(true);
-        }}
-        onPointerLeave={(e) => {
-          if (e.pointerType === "mouse") {
-            setHoverPaused(false);
-            setHoveredIndex(null);
-          }
-        }}
-        onPointerDown={(e) => {
-          if (e.pointerType !== "mouse") setTouchPaused(true);
-        }}
-        onPointerUp={(e) => {
-          if (e.pointerType !== "mouse") setTouchPaused(false);
-        }}
-        onPointerCancel={(e) => {
-          if (e.pointerType !== "mouse") setTouchPaused(false);
-        }}
-        className="-mx-5 flex gap-4 overflow-x-auto px-5 pb-4 sm:-mx-8 sm:px-8 lg:-mx-16 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {[...clips, ...clips].map((clip, index) => {
+      <div className="overflow-hidden">
+        <div
+          ref={trackRef}
+          onPointerEnter={(e) => {
+            if (e.pointerType === "mouse") setHoverPaused(true);
+          }}
+          onPointerLeave={(e) => {
+            if (e.pointerType === "mouse") {
+              setHoverPaused(false);
+              setHoveredIndex(null);
+            }
+          }}
+          onPointerDown={(e) => {
+            if (e.pointerType !== "mouse") setTouchPaused(true);
+          }}
+          onPointerUp={(e) => {
+            if (e.pointerType !== "mouse") setTouchPaused(false);
+          }}
+          onPointerCancel={(e) => {
+            if (e.pointerType !== "mouse") setTouchPaused(false);
+          }}
+          className="flex gap-4 overflow-x-auto px-5 pb-4 sm:px-8 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+        {[...clips, ...clips, ...clips].map((clip, index) => {
           const clipIndex = index % clips.length;
           const isActive = activeIndex === clipIndex;
 
@@ -161,10 +232,11 @@ export default function ShowroomReel() {
                 clip.orientation === "portrait" ? "aspect-[9/16] w-[62vw] sm:w-[300px]" : "aspect-[16/9] w-[86vw] sm:w-[560px]"
               }`}
             >
-              <AutoplayVideo src={clip.src} poster={clip.poster} className="h-full w-full object-cover" />
+              <ReelVideo src={clip.src} poster={clip.poster} active={isActive} />
             </motion.div>
           );
         })}
+        </div>
       </div>
     </section>
   );

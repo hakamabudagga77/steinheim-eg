@@ -61,8 +61,8 @@ const menuProductImages: Record<string, string> = {
   "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer-v2.png",
   "art-concealed-shower": "/images/nav-menu/products/art-concealed-shower.png",
   "art-free-standing-bath-mixer": "/images/nav-menu/products/art-free-standing-bath-mixer.png",
-  "quatro-basin-mixer": "/images/nav-menu/products/quatro-basin-mixer-v2.png",
-  "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
+  "quatro-basin-mixer": "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
+  "quatro-tall-basin-mixer": "/images/nav-menu/products/quatro-basin-mixer-v2.png",
   "quatro-wall-mounted-basin-mixer": "/images/nav-menu/products/quatro-wall-mounted-basin-mixer-v2.png",
   "quatro-concealed-shower": "/images/nav-menu/products/quatro-concealed-shower-v2.png",
 };
