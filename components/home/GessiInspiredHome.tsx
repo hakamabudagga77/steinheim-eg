@@ -9,6 +9,7 @@ import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 import ShowroomReel from "@/components/home/ShowroomReel";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
+import { projectReferences, type ProjectReference } from "@/data/project-references";
 
 const heroVideo =
   "https://steinheim-eg.com/cdn/shop/videos/c/vp/85071c8806704603be22828dee32397c/85071c8806704603be22828dee32397c.HD-1080p-7.2Mbps-77449179.mp4?v=0";
@@ -44,29 +45,6 @@ const collections = [
     image: "/images/nav-menu/products/quatro-concealed-shower-v2.png",
     hoverImage: "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
     line: "Crisp geometry for sharp, contemporary interiors.",
-  },
-];
-
-const references = [
-  {
-    title: "Private residences",
-    place: "Cairo and coastal homes",
-    image: "/images/lifestyle/14.png",
-  },
-  {
-    title: "Hospitality suites",
-    place: "Hotels, villas, serviced apartments",
-    image: "/images/lifestyle/21.png",
-  },
-  {
-    title: "Development schedules",
-    place: "Repeatable premium specifications",
-    image: "/images/generated/gessi/steinheim-specification-story.png",
-  },
-  {
-    title: "Show bathrooms",
-    place: "Owner units and sales galleries",
-    image: "/images/generated/gessi/steinheim-wellness-architecture.png",
   },
 ];
 
@@ -127,6 +105,55 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
         </p>
       </Link>
     </motion.article>
+  );
+}
+
+function ProjectCard({ project, index }: { project: ProjectReference; index: number }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32, filter: "blur(6px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 0.76, 0.2, 1] }}
+      className="w-[82vw] shrink-0 sm:w-[420px] lg:w-[480px]"
+    >
+      <Link
+        href={`/projects/${project.slug}`}
+        className="group block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <div className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-black">
+          <Image
+            src={project.cardImage}
+            alt={project.name}
+            fill
+            priority={index === 0}
+            quality={90}
+            sizes="(max-width: 768px) 82vw, 480px"
+            className={`object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,0.76,0.2,1)] ${
+              hovered ? "scale-[1.06]" : "scale-100"
+            }`}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-white/65">
+              {project.location}, {project.country}
+            </p>
+            <h3 className="mt-3 font-heading text-[24px] leading-tight text-white" style={{ fontStyle: "italic" }}>
+              {project.name}
+            </h3>
+            <span
+              className={`mt-4 block h-px bg-white/50 transition-all duration-700 ${
+                hovered ? "w-16" : "w-8"
+              }`}
+            />
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
 
@@ -294,39 +321,35 @@ export default function GessiInspiredHome() {
         </div>
       </section>
 
-      <section className="bg-[#ece9e2] px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
-        <div className="mx-auto max-w-[1780px]">
-          <div className="mb-14 text-center">
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">References</p>
-            <h2
-              className="mx-auto mt-5 max-w-4xl text-[clamp(2.5rem,5.5vw,6.6rem)] leading-[0.92] tracking-[-0.052em]"
-              style={{ fontStyle: "italic" }}
-            >
-              Designed for projects that need permanence.
+      <section className="overflow-hidden bg-[#ece9e2] py-24 text-black sm:py-32">
+        <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8 }}
+            className="mb-12 text-center"
+          >
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Project references</p>
+            <h2 className="mx-auto mt-4 max-w-xl text-[28px] font-normal leading-tight tracking-[-0.03em] text-black sm:text-[36px]">
+              Where design takes shape.
             </h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {references.map((item) => (
-              <Link key={item.title} href="/projects" className="group block">
-                <div className="relative aspect-[1.35] overflow-hidden rounded-[14px] bg-black">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-cover transition duration-[1300ms] group-hover:scale-[1.04]"
-                  />
-                </div>
-                <h3 className="mt-5 font-heading text-[20px] leading-tight" style={{ fontStyle: "italic" }}>{item.title}</h3>
-                <p className="mt-1 text-[14px] text-black/50">{item.place}</p>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Link href="/projects" className="rounded-full border border-black/25 px-8 py-3.5 text-[13px] transition hover:bg-black hover:text-white">
-              Discover more
-            </Link>
-          </div>
+          </motion.div>
+        </div>
+
+        <div className="scroll-snap-x flex gap-5 overflow-x-auto px-5 pb-4 sm:px-8 lg:px-16 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {projectReferences.map((project, index) => (
+            <ProjectCard key={project.slug} project={project} index={index} />
+          ))}
+        </div>
+
+        <div className="mt-10 px-5 text-center">
+          <Link
+            href="/projects"
+            className="inline-flex h-11 items-center rounded-full border border-black/25 px-7 text-[13px] uppercase tracking-[0.2em] text-black transition hover:bg-black hover:text-white"
+          >
+            View all projects
+          </Link>
         </div>
       </section>
 
