@@ -321,7 +321,7 @@ export default function GessiInspiredHome() {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#ece9e2] py-24 text-black sm:py-32">
+      <section className="overflow-hidden bg-[#ece9e2] py-10 text-black sm:py-14">
         <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -332,7 +332,7 @@ export default function GessiInspiredHome() {
           >
             <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Project references</p>
             <h2 className="mx-auto mt-4 max-w-xl text-[28px] font-normal leading-tight tracking-[-0.03em] text-black sm:text-[36px]">
-              Where design takes shape.
+              Where design takes shape
             </h2>
           </motion.div>
         </div>
