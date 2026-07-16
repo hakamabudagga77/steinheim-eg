@@ -1,25 +1,20 @@
 import { getProductsBySeries, type Product, type Series } from "@/lib/utils";
 import {
+  REQUIREMENT_TYPE_LABELS,
   ROOM_KEYS,
   scopeIdForRoom,
   type LevelKey,
+  type RequirementType,
+  type RoomGroup,
   type RoomKey,
+  type RoomProductNeed,
   type TradeProjectRoomPlan,
 } from "@/lib/trade-project";
 
-export type { LevelKey, RoomKey };
-export type RequirementType =
-  | "basin-mixer"
-  | "tall-basin-mixer"
-  | "wall-mounted"
-  | "concealed-shower"
-  | "free-standing"
-  | "accessories"
-  | "bidet-spray";
+export type { LevelKey, RequirementType, RoomKey };
 
 export interface Requirement {
   type: RequirementType;
-  label: string;
   quantity: number;
   optional?: boolean;
 }
@@ -123,6 +118,65 @@ export const roomConfig: Array<{ key: RoomKey; label: string; icon: string; help
   },
 ];
 
+/** Smart starting checklist for a room type at a given coverage level — used only to pre-fill
+ * the property-setup checklist step. Not used for generation anymore; `buildSchedule()` reads
+ * directly off whatever the user confirms in `RoomGroup.productNeeds`. */
+export function requirementsFor(room: RoomKey, level: LevelKey): Requirement[] {
+  if (room === "powder") {
+    return [{ type: "basin-mixer", quantity: 1 }];
+  }
+  if (room === "suite") {
+    return [
+      { type: "wall-mounted", quantity: 1 },
+      { type: "concealed-shower", quantity: 1 },
+      { type: "free-standing", quantity: 1, optional: true },
+      { type: "bidet-spray", quantity: 1, optional: true },
+      { type: "accessories", quantity: 1, optional: true },
+    ];
+  }
+  if (level === "signature") {
+    const signatureRequirements: Requirement[] = [
+      { type: "wall-mounted", quantity: 1 },
+      { type: "concealed-shower", quantity: 1 },
+      { type: "free-standing", quantity: room === "master" ? 1 : 0, optional: true },
+      { type: "bidet-spray", quantity: 1, optional: true },
+      { type: "accessories", quantity: 1, optional: true },
+    ];
+    return signatureRequirements.filter((item) => item.quantity > 0 || item.optional);
+  }
+  if (level === "premium") {
+    return [
+      { type: room === "master" ? "tall-basin-mixer" : "basin-mixer", quantity: 1 },
+      { type: "concealed-shower", quantity: 1 },
+      { type: "bidet-spray", quantity: 1, optional: true },
+      { type: "accessories", quantity: 1, optional: true },
+    ];
+  }
+  return [
+    { type: "basin-mixer", quantity: 1 },
+    { type: "concealed-shower", quantity: 1 },
+    { type: "accessories", quantity: 1, optional: true },
+  ];
+}
+
+/** The checklist rows to show in the property-setup step for a room type: required items
+ * pre-checked with their default quantity, optional items shown unchecked (quantity 0). */
+export function productNeedDefaultsFor(room: RoomKey, level: LevelKey): RoomProductNeed[] {
+  return requirementsFor(room, level)
+    .filter((req) => !req.optional)
+    .map((req) => ({ type: req.type, quantity: req.quantity }));
+}
+
+/** Every product type that could plausibly apply to a room type, for building the full
+ * checklist UI (required + optional), independent of which are checked by default. */
+export function allRequirementTypesFor(room: RoomKey): RequirementType[] {
+  const seen = new Set<RequirementType>();
+  (["practical", "premium", "signature"] as LevelKey[]).forEach((level) => {
+    requirementsFor(room, level).forEach((req) => seen.add(req.type));
+  });
+  return Array.from(seen);
+}
+
 export function createEmptyRoomPlan(): TradeProjectRoomPlan {
   return {
     presetId: null,
@@ -131,17 +185,63 @@ export function createEmptyRoomPlan(): TradeProjectRoomPlan {
       roomKey,
       roomLabel: roomConfig.find((entry) => entry.key === roomKey)?.label ?? roomKey,
       count: 0,
-      assignment: null,
+      productNeeds: productNeedDefaultsFor(roomKey, "premium"),
+      allocations: [],
     })),
   };
 }
 
-export function roomPlanFromCounts(presetId: string | null, counts: Record<RoomKey, number>): TradeProjectRoomPlan {
-  const base = createEmptyRoomPlan();
+export function createEmptyCustomRoomGroup(roomKey: string, label: string, count: number): RoomGroup {
   return {
-    presetId,
-    groups: base.groups.map((group) => ({ ...group, count: clampCount(counts[group.roomKey] ?? 0) })),
+    scopeId: scopeIdForRoom(roomKey),
+    roomKey,
+    roomLabel: label,
+    count: clampCount(count),
+    isCustom: true,
+    productNeeds: productNeedDefaultsFor("master", "premium"),
+    allocations: [],
   };
+}
+
+/** Builds/updates a room plan from the property-setup step, preserving any existing
+ * allocations for rooms that already existed (matched by roomKey) — re-visiting property
+ * setup should never silently discard collection assignments already made. */
+export function buildRoomPlan(
+  existingPlan: TradeProjectRoomPlan | null,
+  presetId: string | null,
+  counts: Record<RoomKey, number>,
+  productNeedsByRoom: Record<string, RoomProductNeed[]>,
+  customRooms: Array<{ roomKey: string; label: string; count: number }>
+): TradeProjectRoomPlan {
+  const existingByKey = new Map((existingPlan?.groups ?? []).map((group) => [group.roomKey, group]));
+  const level = presets.find((preset) => preset.id === presetId)?.level ?? "premium";
+
+  const fixedGroups: RoomGroup[] = ROOM_KEYS.map((roomKey) => {
+    const existing = existingByKey.get(roomKey);
+    return {
+      scopeId: scopeIdForRoom(roomKey),
+      roomKey,
+      roomLabel: roomConfig.find((entry) => entry.key === roomKey)?.label ?? roomKey,
+      count: clampCount(counts[roomKey] ?? 0),
+      productNeeds: productNeedsByRoom[roomKey] ?? existing?.productNeeds ?? productNeedDefaultsFor(roomKey, level),
+      allocations: existing?.allocations ?? [],
+    };
+  });
+
+  const customGroups: RoomGroup[] = customRooms.map((room) => {
+    const existing = existingByKey.get(room.roomKey);
+    return {
+      scopeId: scopeIdForRoom(room.roomKey),
+      roomKey: room.roomKey,
+      roomLabel: room.label,
+      count: clampCount(room.count),
+      isCustom: true,
+      productNeeds: productNeedsByRoom[room.roomKey] ?? existing?.productNeeds ?? productNeedDefaultsFor("master", "premium"),
+      allocations: existing?.allocations ?? [],
+    };
+  });
+
+  return { presetId, groups: [...fixedGroups, ...customGroups] };
 }
 
 export const collectionIntelligence: Record<string, { bestUse: string; note: string }> = {
@@ -167,73 +267,20 @@ export function clampCount(value: number) {
   return Math.max(0, Math.min(500, Math.round(value) || 0));
 }
 
-export function requirementsFor(room: RoomKey, level: LevelKey): Requirement[] {
-  if (room === "powder") {
-    return [{ type: "basin-mixer", label: "Basin mixer", quantity: 1 }];
-  }
-  if (room === "suite") {
-    return [
-      { type: "wall-mounted", label: "Wall-mounted basin mixer", quantity: 1 },
-      { type: "concealed-shower", label: "Concealed shower", quantity: 1 },
-      { type: "free-standing", label: "Free-standing bath mixer", quantity: 1, optional: true },
-      { type: "bidet-spray", label: "Bidet spray", quantity: 1, optional: true },
-      { type: "accessories", label: "Accessories set", quantity: 1, optional: true },
-    ];
-  }
-  if (level === "signature") {
-    const signatureRequirements: Requirement[] = [
-      { type: "wall-mounted", label: "Wall-mounted basin mixer", quantity: 1 },
-      { type: "concealed-shower", label: "Concealed shower", quantity: 1 },
-      { type: "free-standing", label: "Free-standing bath mixer", quantity: room === "master" ? 1 : 0, optional: true },
-      { type: "bidet-spray", label: "Bidet spray", quantity: 1, optional: true },
-      { type: "accessories", label: "Accessories set", quantity: 1, optional: true },
-    ];
-
-    return signatureRequirements.filter((item) => item.quantity > 0);
-  }
-  if (level === "premium") {
-    return [
-      { type: room === "master" ? "tall-basin-mixer" : "basin-mixer", label: room === "master" ? "Tall basin mixer" : "Basin mixer", quantity: 1 },
-      { type: "concealed-shower", label: "Concealed shower", quantity: 1 },
-      { type: "bidet-spray", label: "Bidet spray", quantity: 1, optional: true },
-      { type: "accessories", label: "Accessories set", quantity: 1, optional: true },
-    ];
-  }
-  return [
-    { type: "basin-mixer", label: "Basin mixer", quantity: 1 },
-    { type: "concealed-shower", label: "Concealed shower", quantity: 1 },
-    { type: "accessories", label: "Accessories set", quantity: 1, optional: true },
-  ];
-}
-
-export function buildSchedule(series: Series, finish: string, level: LevelKey, counts: Record<RoomKey, number>) {
+/** Generates product rows for ONE allocation: a single collection+finish, a single room count,
+ * against an explicit list of needed product types (already decided at the room-group level). */
+export function buildSchedule(series: Series, finish: string, productNeeds: RoomProductNeed[], roomCount: number) {
   const products = getProductsBySeries(series.id);
-  const aggregated = new Map<RequirementType, { quantity: number; label: string; optional: boolean }>();
-
-  (Object.keys(counts) as RoomKey[]).forEach((room) => {
-    const roomCount = counts[room];
-    if (roomCount <= 0) return;
-    for (const requirement of requirementsFor(room, level)) {
-      const current = aggregated.get(requirement.type);
-      const quantity = roomCount * requirement.quantity;
-      aggregated.set(requirement.type, {
-        quantity: (current?.quantity ?? 0) + quantity,
-        label: requirement.label,
-        optional: Boolean(current?.optional && requirement.optional) || Boolean(requirement.optional),
-      });
-    }
-  });
-
   const rows: GeneratedRow[] = [];
   const omitted: string[] = [];
 
-  for (const [type, requirement] of aggregated) {
-    const product = products.find((entry) => entry.type === type);
+  for (const need of productNeeds) {
+    if (need.quantity <= 0 || roomCount <= 0) continue;
+    const product = products.find((entry) => entry.type === need.type);
     const variant = product?.variants.find((entry) => entry.finish === finish);
+    const totalQuantity = need.quantity * roomCount;
     if (!product || !variant) {
-      omitted.push(
-        `${requirement.label}${requirement.optional ? " (not available in this selection)" : " (missing from catalogue)"}`
-      );
+      omitted.push(`${REQUIREMENT_TYPE_LABELS[need.type]} (not available in ${series.name} in this finish)`);
       continue;
     }
     rows.push({
@@ -241,8 +288,8 @@ export function buildSchedule(series: Series, finish: string, level: LevelKey, c
       finish,
       model: variant.model,
       unitPrice: variant.price,
-      quantity: requirement.quantity,
-      lineTotal: requirement.quantity * variant.price,
+      quantity: totalQuantity,
+      lineTotal: totalQuantity * variant.price,
     });
   }
 

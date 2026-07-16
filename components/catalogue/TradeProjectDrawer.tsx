@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { ScaleIn, StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { formatPrice, getAllFinishes, getProductBySlug, type Finish, type Product, type Variant } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
-import TradeProjectReviewPanel from "@/components/catalogue/TradeProjectReviewPanel";
 import RoomAssignmentEditor from "@/components/trade/RoomAssignmentEditor";
-import type { RoomKey, TradeProjectItem } from "@/lib/trade-project";
+import type { RoomGroup, RoomGroupAllocation, TradeProjectItem } from "@/lib/trade-project";
 
 function ProjectItemRow({
   item,
@@ -94,25 +94,95 @@ function ProjectItemRow({
   );
 }
 
+function AllocationCard({
+  allocation,
+  itemRows,
+  titleOverride,
+  onEdit,
+  onDuplicate,
+  onRemoveItem,
+  onQuantityChange,
+}: {
+  allocation: RoomGroupAllocation;
+  itemRows: Array<{ item: TradeProjectItem; product: Product; variant: Variant; finish: Finish | undefined }>;
+  titleOverride?: string;
+  onEdit: () => void;
+  onDuplicate: () => void;
+  onRemoveItem: (slug: string, finish: string) => void;
+  onQuantityChange: (slug: string, finish: string, quantity: number) => void;
+}) {
+  const totalUnits = itemRows.reduce((sum, row) => sum + row.item.quantity, 0);
+  const totalValue = itemRows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
+  const scopeName = titleOverride || itemRows[0]?.item.scopeName || allocation.label || "Allocation";
+  const scopeSummary = itemRows[0]?.item.scopeSummary;
+
+  return (
+    <div className="border border-charcoal/8">
+      <div className="flex items-start justify-between gap-3 bg-white p-3">
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-medium text-charcoal">{scopeName}</p>
+          {scopeSummary && <p className="mt-0.5 text-[10px] text-warm-gray">{scopeSummary}</p>}
+          {itemRows.length > 0 && (
+            <p className="mt-0.5 text-[10px] text-warm-gray/70">{totalUnits} units · {formatPrice(totalValue)}</p>
+          )}
+        </div>
+        <div className="flex shrink-0 gap-1.5">
+          <button type="button" onClick={onDuplicate} className="rounded-full border border-charcoal/15 px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-charcoal transition hover:border-charcoal" title="Duplicate & edit">
+            Duplicate
+          </button>
+          <button type="button" onClick={onEdit} className="rounded-full border border-charcoal/15 px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-charcoal transition hover:border-charcoal">
+            Edit
+          </button>
+        </div>
+      </div>
+      {itemRows.length > 0 && (
+        <div className="divide-y divide-charcoal/8 border-t border-charcoal/8">
+          {itemRows.map(({ item, product, variant, finish }) => (
+            <ProjectItemRow
+              key={`${item.scopeId}-${item.slug}-${item.finish}`}
+              item={item}
+              product={product}
+              variant={variant}
+              finish={finish}
+              onRemove={() => onRemoveItem(item.slug, item.finish)}
+              onQuantityChange={(quantity) => onQuantityChange(item.slug, item.finish, quantity)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const isArabic = locale === "ar";
   const {
     project,
+    projects,
     open,
     setOpen,
-    addItem,
     updateQuantity,
     removeItem,
     updateDetails,
     markSubmitted,
     clearProject,
+    newProject,
+    switchProject,
+    deleteProject,
+    duplicateProject,
+    addAllocation,
+    removeAllocation,
   } = useTradeProject();
   const [step, setStep] = useState<"board" | "details" | "sent">("board");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
   const [pdfDownloading, setPdfDownloading] = useState(false);
-  const [editingRoomKey, setEditingRoomKey] = useState<RoomKey | null>(null);
+  const [editingTarget, setEditingTarget] = useState<{ roomKey: string; allocationId: string | null } | null>(null);
+  const [showProjectsMenu, setShowProjectsMenu] = useState(false);
+  const [includePrices, setIncludePrices] = useState(true);
+  const [includeSpecs, setIncludeSpecs] = useState(false);
+  const [viewMode, setViewMode] = useState<"rooms" | "phases">("rooms");
   const finishes = useMemo(() => getAllFinishes(), []);
 
   const rows = project.items.flatMap((item) => {
@@ -128,9 +198,19 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const retailReferenceTotal = rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
 
   const roomPlan = project.roomPlan;
-  const roomPlanScopeIds = new Set((roomPlan?.groups ?? []).map((group) => group.scopeId));
   const activeRoomGroups = (roomPlan?.groups ?? []).filter((group) => group.count > 0);
-  const editingGroup = activeRoomGroups.find((group) => group.roomKey === editingRoomKey) ?? null;
+  const roomPlanScopeIds = new Set(
+    activeRoomGroups.flatMap((group) => [group.scopeId, ...group.allocations.map((a) => a.scopeId)])
+  );
+  const editingGroup = activeRoomGroups.find((group) => group.roomKey === editingTarget?.roomKey) ?? null;
+  const editingAllocation = editingGroup?.allocations.find((a) => a.id === editingTarget?.allocationId) ?? null;
+  const editingCapacity = editingGroup
+    ? Math.max(
+        1,
+        editingGroup.count
+          - editingGroup.allocations.filter((a) => a.id !== editingTarget?.allocationId).reduce((sum, a) => sum + a.roomCount, 0)
+      )
+    : 1;
 
   const scopeGroups = Array.from(
     rows.reduce((groups, row) => {
@@ -150,10 +230,56 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     totalUnits: group.rows.reduce((sum, row) => sum + row.item.quantity, 0),
     totalValue: group.rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0),
   }));
-  // Room-plan groups get their own dedicated card with an "Edit assignment" action below —
-  // exclude them here so they aren't rendered twice. Legacy counter-scoped items and true
-  // manual adds still render through this generic list, unchanged.
+  // Room-group allocations get their own dedicated cards below — exclude them here so they
+  // aren't rendered twice. Legacy counter-scoped items and true manual adds still render
+  // through this generic list, unchanged.
   const otherScopeGroups = scopeGroups.filter((group) => !roomPlanScopeIds.has(group.id));
+
+  type PhaseEntry = { group: RoomGroup; allocation: RoomGroupAllocation };
+  type PhaseBucket = { label: string; entries: PhaseEntry[] };
+  const phaseBucketMap = new Map<string, PhaseBucket>();
+  for (const group of activeRoomGroups) {
+    for (const allocation of group.allocations) {
+      const key = allocation.label?.trim() || "";
+      const existing = phaseBucketMap.get(key) ?? { label: key || "Unlabeled allocations", entries: [] };
+      existing.entries.push({ group, allocation });
+      phaseBucketMap.set(key, existing);
+    }
+  }
+  const phaseBuckets = Array.from(phaseBucketMap.values()).map((bucket) => {
+    const itemRowsByAllocation = bucket.entries.map(({ group, allocation }) => ({
+      group,
+      allocation,
+      itemRows: rows.filter((row) => row.item.scopeId === allocation.scopeId),
+    }));
+    const totalRooms = bucket.entries.reduce((sum, e) => sum + e.allocation.roomCount, 0);
+    const totalUnits = itemRowsByAllocation.reduce((sum, e) => sum + e.itemRows.reduce((s, r) => s + r.item.quantity, 0), 0);
+    const totalValue = itemRowsByAllocation.reduce((sum, e) => sum + e.itemRows.reduce((s, r) => s + r.variant.price * r.item.quantity, 0), 0);
+    return { ...bucket, itemRowsByAllocation, totalRooms, totalUnits, totalValue };
+  });
+  const distinctPhaseLabels = new Set(
+    activeRoomGroups.flatMap((group) => group.allocations.map((a) => a.label?.trim()).filter(Boolean))
+  );
+  const canShowPhaseView = distinctPhaseLabels.size >= 2;
+
+  function handleDuplicateAllocation(group: RoomGroup, allocation: RoomGroupAllocation) {
+    const sourceItems = rows
+      .filter((row) => row.item.scopeId === allocation.scopeId)
+      .map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }));
+    const remaining = group.count - group.allocations.reduce((sum, a) => sum + a.roomCount, 0);
+    const roomCount = Math.max(1, Math.min(allocation.roomCount, Math.max(1, remaining)));
+    const newLabel = allocation.label ? `${allocation.label} (copy)` : undefined;
+    const newId = addAllocation(
+      group.roomKey,
+      roomCount,
+      allocation.assignment,
+      sourceItems,
+      newLabel || group.roomLabel,
+      `${roomCount} ${roomCount === 1 ? "room" : "rooms"} · duplicated from a previous allocation`,
+      newLabel
+    );
+    setEditingTarget({ roomKey: group.roomKey, allocationId: newId });
+  }
 
   async function handleSubmit() {
     if (!project.items.length) {
@@ -205,7 +331,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       const res = await fetch("/api/trade/rfq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(project),
+        body: JSON.stringify({ project, includePrices, includeSpecs }),
       });
       if (!res.ok) throw new Error();
       const blob = await res.blob();
@@ -269,9 +395,16 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             <header className="shrink-0 border-b border-charcoal/8 px-7 py-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
+                  <button
+                    type="button"
+                    onClick={() => setShowProjectsMenu((v) => !v)}
+                    className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray transition hover:text-charcoal"
+                  >
                     Steinheim
-                  </p>
+                    {projects.length > 1 && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
+                    )}
+                  </button>
                   <h2 className="mt-1 font-heading text-[28px] leading-tight">
                     {step === "board" ? "Project board" : step === "details" ? "Your details" : "Sent"}
                   </h2>
@@ -287,6 +420,41 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                   </svg>
                 </button>
               </div>
+
+              {showProjectsMenu && (
+                <div className="mt-4 border border-charcoal/10 bg-[#ece9e2]">
+                  {projects.map((entry) => (
+                    <div key={entry.id} className={`flex items-center justify-between gap-2 border-b border-charcoal/8 p-3 last:border-b-0 ${entry.id === project.id ? "bg-white" : ""}`}>
+                      <button
+                        type="button"
+                        onClick={() => { switchProject(entry.id); setShowProjectsMenu(false); }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <p className="truncate text-[12px] font-medium text-charcoal">{entry.details.projectName || "Untitled project"}</p>
+                        <p className="text-[10px] text-warm-gray">{entry.items.length} products</p>
+                      </button>
+                      <div className="flex shrink-0 gap-1">
+                        <button type="button" onClick={() => duplicateProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
+                          Duplicate
+                        </button>
+                        {projects.length > 1 && (
+                          <button type="button" onClick={() => deleteProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { newProject(); setShowProjectsMenu(false); }}
+                    className="flex w-full items-center justify-center gap-2 p-3 text-[10px] font-medium uppercase tracking-[0.12em] text-charcoal transition hover:bg-white"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 4v16m-8-8h16" /></svg>
+                    New project
+                  </button>
+                </div>
+              )}
 
               {step !== "sent" && (
                 <div className="mt-5 flex gap-2">
@@ -319,7 +487,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             </header>
 
             {/* Content */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {step === "board" ? (
                   <motion.div
@@ -330,14 +498,14 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     transition={{ duration: 0.2 }}
                   >
                     {rows.length === 0 && activeRoomGroups.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center px-7 py-20 text-center">
+                      <ScaleIn className="flex flex-col items-center justify-center px-7 py-20 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-charcoal/10">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-warm-gray">
                             <rect x="3" y="3" width="18" height="18" rx="2" />
                             <path d="M12 8v8M8 12h8" />
                           </svg>
                         </div>
-                        <h3 className="mt-6 font-heading text-2xl">
+                        <h3 className="mt-6 font-heading text-2xl" style={{ fontStyle: "italic" }}>
                           Start your project
                         </h3>
                         <p className="mt-3 max-w-[260px] text-[13px] leading-relaxed text-warm-gray">
@@ -350,7 +518,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         >
                           Set up your property
                         </a>
-                      </div>
+                      </ScaleIn>
                     ) : (
                       <div className="px-7 py-5">
                         <div className="flex items-center justify-between pb-4">
@@ -385,37 +553,98 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             ))}
                           </div>
                           <p className="mt-4 text-[11px] leading-[1.7] text-white/55">
-                            This board can combine multiple scopes: standard rooms, suites, public washrooms, and custom product lines.
+                            This board can combine multiple room groups, allocations across collections, and custom product lines.
                           </p>
                           <p className="mt-2 text-[10px] text-white/35">
                             Retail reference total: {formatPrice(retailReferenceTotal)}
                           </p>
-                          <a
-                            href={`/${locale}/trade#smart-room-calculator`}
-                            onClick={() => setOpen(false)}
-                            className="mt-4 flex h-[42px] items-center justify-center border border-white/20 bg-white/5 text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:border-white hover:bg-white/10"
-                          >
-                            {roomPlan ? "Edit property composition" : "Set up your property"}
-                          </a>
+                          <div className="mt-4 grid grid-cols-2 gap-2">
+                            <a
+                              href={`/${locale}/trade#smart-room-calculator`}
+                              onClick={() => setOpen(false)}
+                              className="flex h-[42px] items-center justify-center border border-white/20 bg-white/5 text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:border-white hover:bg-white/10"
+                            >
+                              {roomPlan ? "Edit property composition" : "Set up your property"}
+                            </a>
+                            <button
+                              type="button"
+                              disabled={pdfDownloading}
+                              onClick={handleDownloadPdf}
+                              className="flex h-[42px] items-center justify-center border border-white/20 bg-white/5 text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:border-white hover:bg-white/10 disabled:opacity-50"
+                            >
+                              {pdfDownloading ? "Generating…" : "Download PDF"}
+                            </button>
+                          </div>
                         </div>
 
-                        <TradeProjectReviewPanel
-                          project={project}
-                          rows={rows}
-                          totalItems={totalItems}
-                          onAddItem={addItem}
-                          onGoDetails={() => setStep("details")}
-                          onDownloadPdf={handleDownloadPdf}
-                          pdfDownloading={pdfDownloading}
-                        />
+                        {canShowPhaseView && (
+                          <div className="mb-4 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setViewMode("rooms")}
+                              className={`flex-1 border px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
+                                viewMode === "rooms" ? "border-charcoal bg-charcoal text-white" : "border-charcoal/15 text-warm-gray hover:border-charcoal hover:text-charcoal"
+                              }`}
+                            >
+                              By room type
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setViewMode("phases")}
+                              className={`flex-1 border px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
+                                viewMode === "phases" ? "border-charcoal bg-charcoal text-white" : "border-charcoal/15 text-warm-gray hover:border-charcoal hover:text-charcoal"
+                              }`}
+                            >
+                              By phase
+                            </button>
+                          </div>
+                        )}
 
-                        <div className="space-y-5">
+                        {viewMode === "phases" && canShowPhaseView ? (
+                          <StaggerContainer className="space-y-5">
+                            {phaseBuckets.map((bucket) => (
+                              <StaggerItem key={bucket.label}>
+                              <section className="border border-charcoal/10 bg-white">
+                                <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
+                                  <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                                    {bucket.totalRooms} {bucket.totalRooms === 1 ? "room" : "rooms"}
+                                  </p>
+                                  <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
+                                    {bucket.label}
+                                  </h3>
+                                  <p className="mt-2 text-[11px] text-warm-gray">
+                                    {bucket.totalUnits} units · {formatPrice(bucket.totalValue)}
+                                  </p>
+                                </div>
+                                <div className="space-y-3 p-3">
+                                  {bucket.itemRowsByAllocation.map(({ group, allocation, itemRows }) => (
+                                    <AllocationCard
+                                      key={allocation.id}
+                                      allocation={allocation}
+                                      itemRows={itemRows}
+                                      titleOverride={group.roomLabel}
+                                      onEdit={() => setEditingTarget({ roomKey: group.roomKey, allocationId: allocation.id })}
+                                      onDuplicate={() => handleDuplicateAllocation(group, allocation)}
+                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, allocation.scopeId)}
+                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, allocation.scopeId)}
+                                    />
+                                  ))}
+                                </div>
+                              </section>
+                              </StaggerItem>
+                            ))}
+                          </StaggerContainer>
+                        ) : (
+                        <StaggerContainer className="space-y-5">
                           {activeRoomGroups.map((group) => {
-                            const groupRows = rows.filter((row) => row.item.scopeId === group.scopeId);
-                            const totalUnits = groupRows.reduce((sum, row) => sum + row.item.quantity, 0);
-                            const totalValue = groupRows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
+                            const allocatedSum = group.allocations.reduce((sum, a) => sum + a.roomCount, 0);
+                            const remaining = Math.max(0, group.count - allocatedSum);
+                            const overAllocated = allocatedSum > group.count;
+                            const otherRoomRows = rows.filter((row) => row.item.scopeId === group.scopeId);
+
                             return (
-                              <section key={group.scopeId} className="border border-charcoal/10 bg-white">
+                              <StaggerItem key={group.scopeId}>
+                              <section className="border border-charcoal/10 bg-white">
                                 <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
                                   <div className="flex items-start justify-between gap-4">
                                     <div>
@@ -425,51 +654,67 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                       <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
                                         {group.roomLabel}
                                       </h3>
-                                      {group.assignment ? (
-                                        <p className="mt-2 text-[11px] leading-[1.6] text-warm-gray">
-                                          {totalUnits} units · {formatPrice(totalValue)}
-                                        </p>
-                                      ) : (
-                                        <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.1em] text-amber-700">
-                                          Not yet assigned
-                                        </p>
-                                      )}
+                                      <p className={`mt-2 text-[11px] font-medium uppercase tracking-[0.08em] ${overAllocated ? "text-amber-700" : "text-warm-gray"}`}>
+                                        {allocatedSum} of {group.count} rooms allocated{overAllocated ? " — check allocation counts" : ""}
+                                      </p>
                                     </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => setEditingRoomKey(group.roomKey)}
-                                      className={`shrink-0 rounded-full border px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
-                                        group.assignment
-                                          ? "border-charcoal/20 text-charcoal hover:border-charcoal"
-                                          : "border-charcoal bg-charcoal text-white hover:bg-black"
-                                      }`}
-                                    >
-                                      {group.assignment ? "Edit assignment" : "Assign collection"}
-                                    </button>
+                                    {remaining > 0 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingTarget({ roomKey: group.roomKey, allocationId: null })}
+                                        className="shrink-0 rounded-full border border-charcoal bg-charcoal px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black"
+                                      >
+                                        Allocate {remaining} {remaining === 1 ? "room" : "rooms"}
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
 
-                                {groupRows.length > 0 && (
-                                  <div className="divide-y divide-charcoal/8">
-                                    {groupRows.map(({ item, product, variant, finish }) => (
-                                      <ProjectItemRow
-                                        key={`${item.scopeId}-${item.slug}-${item.finish}`}
-                                        item={item}
-                                        product={product}
-                                        variant={variant}
-                                        finish={finish}
-                                        onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
-                                        onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
-                                      />
-                                    ))}
+                                <div className="space-y-3 p-3">
+                                  {group.allocations.map((allocation) => (
+                                    <AllocationCard
+                                      key={allocation.id}
+                                      allocation={allocation}
+                                      itemRows={rows.filter((row) => row.item.scopeId === allocation.scopeId)}
+                                      onEdit={() => setEditingTarget({ roomKey: group.roomKey, allocationId: allocation.id })}
+                                      onDuplicate={() => handleDuplicateAllocation(group, allocation)}
+                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, allocation.scopeId)}
+                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, allocation.scopeId)}
+                                    />
+                                  ))}
+                                  {group.allocations.length === 0 && (
+                                    <p className="p-2 text-[11px] font-medium uppercase tracking-[0.08em] text-amber-700">Not yet assigned</p>
+                                  )}
+                                </div>
+
+                                {otherRoomRows.length > 0 && (
+                                  <div className="border-t border-charcoal/8">
+                                    <p className="bg-[#ece9e2]/50 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.15em] text-warm-gray">
+                                      Other items for this room
+                                    </p>
+                                    <div className="divide-y divide-charcoal/8">
+                                      {otherRoomRows.map(({ item, product, variant, finish }) => (
+                                        <ProjectItemRow
+                                          key={`${item.scopeId}-${item.slug}-${item.finish}`}
+                                          item={item}
+                                          product={product}
+                                          variant={variant}
+                                          finish={finish}
+                                          onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
+                                          onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
                                 )}
                               </section>
+                              </StaggerItem>
                             );
                           })}
 
                           {otherScopeGroups.map((group) => (
-                            <section key={group.id} className="border border-charcoal/10 bg-white">
+                            <StaggerItem key={group.id}>
+                            <section className="border border-charcoal/10 bg-white">
                               <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
@@ -504,8 +749,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                 ))}
                               </div>
                             </section>
+                            </StaggerItem>
                           ))}
-                        </div>
+                        </StaggerContainer>
+                        )}
 
                         <p className="mt-4 text-[9px] leading-relaxed text-warm-gray/60">
                           Prices shown are retail references. Trade pricing confirmed after submission.
@@ -636,6 +883,30 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         value={project.details.notes}
                         onChange={(e) => updateDetails({ notes: e.target.value })}
                       />
+
+                      <div className="border-t border-charcoal/8 pt-4">
+                        <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal">
+                          PDF spec sheet
+                        </p>
+                        <label className="flex cursor-pointer items-center gap-3 py-1">
+                          <input
+                            type="checkbox"
+                            checked={includePrices}
+                            onChange={(e) => setIncludePrices(e.target.checked)}
+                            className="h-4 w-4 accent-charcoal"
+                          />
+                          <span className="text-[12px] text-charcoal">Include retail reference prices</span>
+                        </label>
+                        <label className="flex cursor-pointer items-center gap-3 py-1">
+                          <input
+                            type="checkbox"
+                            checked={includeSpecs}
+                            onChange={(e) => setIncludeSpecs(e.target.checked)}
+                            className="h-4 w-4 accent-charcoal"
+                          />
+                          <span className="text-[12px] text-charcoal">Include technical specifications appendix</span>
+                        </label>
+                      </div>
                     </div>
 
                     {error && (
@@ -760,10 +1031,12 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
           {editingGroup && (
             <RoomAssignmentEditor
               roomGroup={editingGroup}
-              existingItems={rows
-                .filter((row) => row.item.scopeId === editingGroup.scopeId)
-                .map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }))}
-              onClose={() => setEditingRoomKey(null)}
+              allocation={editingAllocation}
+              capacityRoomCount={editingCapacity}
+              existingItems={editingAllocation
+                ? rows.filter((row) => row.item.scopeId === editingAllocation.scopeId).map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }))
+                : []}
+              onClose={() => setEditingTarget(null)}
             />
           )}
         </>

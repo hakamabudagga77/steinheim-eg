@@ -3,6 +3,7 @@ import productsData from "@/data/products.json";
 import { getProjectCompletion, sanitizeTradeProject } from "@/lib/trade-project";
 import { isTradeLeadStatus, type TradeLead, type TradeLeadPriority, type TradeLeadScope } from "@/lib/trade-leads";
 import { listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
+import { sendTradeLeadNotification } from "@/lib/server/trade-lead-email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -118,6 +119,11 @@ export async function POST(request: Request) {
       { error: unavailable ? "Trade lead storage is not configured." : "The lead could not be saved." },
       { status: 503 }
     );
+  }
+  try {
+    await sendTradeLeadNotification(lead);
+  } catch (error) {
+    console.error("Trade lead notification email failed:", error);
   }
   return Response.json({ ok: true, id: lead.id, reference: lead.reference, priority: lead.priority, completion: lead.completion });
 }

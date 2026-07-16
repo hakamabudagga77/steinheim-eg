@@ -22,7 +22,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const [finishOpen, setFinishOpen] = useState(false);
   const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
   const [cartAdded, setCartAdded] = useState(false);
-  const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
+  const { project, addItem, setOpen: setProposalOpen, flyToProject } = useTradeProject();
   const { addItem: addToCart, flyToCart } = useCart();
   const imageWrapRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +42,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
 
   function addToProposal() {
     if (!isInProposal) {
+      if (imageUrl) flyToProject(imageWrapRef.current, imageUrl);
       const group = activeRoomGroups.find((entry) => entry.scopeId === scopeChoice);
       addItem(product.slug, variant.finish, 1, group ? {
         scopeId: group.scopeId,

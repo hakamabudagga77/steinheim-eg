@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
+import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 
@@ -25,14 +25,10 @@ function TradePageContent() {
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         {/* Hero */}
         <section className="relative flex min-h-[75svh] items-end overflow-hidden bg-black pt-20 text-white">
-          <Image
-            src="/images/generated/gessi/steinheim-wellness-architecture.png"
-            alt="Steinheim project installation"
-            fill
-            priority
-            quality={90}
-            className="object-cover object-[center_52%] opacity-62"
-            sizes="100vw"
+          <AutoplayVideo
+            src="/videos/showroom/showroom-3.mp4"
+            poster="/images/generated/gessi/steinheim-wellness-architecture.png"
+            className="absolute inset-0 h-full w-full object-cover object-[center_52%] opacity-62"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
           <div className="relative z-10 mx-auto w-full max-w-[1780px] px-5 pb-14 sm:px-8 lg:px-16 lg:pb-20">

@@ -1,23 +1,25 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  createAllocationId,
+  createCustomRoomKey,
   createEmptyTradeProject,
   createProjectId,
   sanitizeTradeProject,
   sanitizeTradeWorkspace,
-  scopeIdForRoom,
   TRADE_PROJECT_STORAGE_KEY,
   TRADE_WORKSPACE_STORAGE_KEY,
   type RoomGroupAssignment,
-  type RoomKey,
+  type RoomProductNeed,
   type TradeProject,
   type TradeProjectDetails,
   type TradeProjectItem,
   type TradeProjectRoomPlan,
   type TradeWorkspace,
 } from "@/lib/trade-project";
-import { createEmptyRoomPlan } from "@/lib/trade-schedule";
+import { createEmptyCustomRoomGroup, createEmptyRoomPlan } from "@/lib/trade-schedule";
 
 interface TradeProjectContextValue {
   project: TradeProject;
@@ -31,17 +33,43 @@ interface TradeProjectContextValue {
   newProject: () => void;
   switchProject: (id: string) => void;
   deleteProject: (id: string) => void;
+  duplicateProject: (sourceId: string) => void;
   markSubmitted: (leadId: string) => void;
   clearProject: () => void;
   setRoomPlan: (plan: TradeProjectRoomPlan) => void;
-  assignRoomGroup: (
-    roomKey: RoomKey,
+  updateProductNeeds: (roomKey: string, productNeeds: RoomProductNeed[]) => void;
+  addCustomRoom: (label: string, count: number) => string;
+  removeCustomRoom: (roomKey: string) => void;
+  addAllocation: (
+    roomKey: string,
+    roomCount: number,
     assignment: RoomGroupAssignment,
     rows: Array<{ slug: string; finish: string; quantity: number }>,
     scopeName: string,
-    scopeSummary: string
+    scopeSummary: string,
+    label?: string
+  ) => string;
+  updateAllocation: (
+    roomKey: string,
+    allocationId: string,
+    roomCount: number,
+    assignment: RoomGroupAssignment,
+    rows: Array<{ slug: string; finish: string; quantity: number }>,
+    scopeName: string,
+    scopeSummary: string,
+    label?: string
   ) => void;
-  clearRoomGroupAssignment: (roomKey: RoomKey) => void;
+  removeAllocation: (roomKey: string, allocationId: string) => void;
+  projectIconRef: React.RefObject<HTMLButtonElement | null>;
+  flyToProject: (originEl: HTMLElement | null, image: string) => void;
+  bump: number;
+}
+
+interface Flight {
+  id: number;
+  image: string;
+  start: DOMRect;
+  end: DOMRect;
 }
 
 const TradeProjectContext = createContext<TradeProjectContextValue | null>(null);
@@ -58,6 +86,22 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   }));
   const [open, setOpen] = useState(false);
   const hydrated = useRef(false);
+  const projectIconRef = useRef<HTMLButtonElement | null>(null);
+  const flightId = useRef(0);
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [bump, setBump] = useState(0);
+
+  const flyToProject = useCallback((originEl: HTMLElement | null, image: string) => {
+    if (!originEl || !projectIconRef.current) return;
+    const start = originEl.getBoundingClientRect();
+    const end = projectIconRef.current.getBoundingClientRect();
+    const id = ++flightId.current;
+    setFlights((f) => [...f, { id, image, start, end }]);
+    window.setTimeout(() => {
+      setFlights((f) => f.filter((item) => item.id !== id));
+      setBump((b) => b + 1);
+    }, 750);
+  }, []);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -208,6 +252,33 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     });
   }, []);
 
+  const duplicateProject = useCallback((sourceId: string) => {
+    setWorkspace((current) => {
+      const source = current.projects.find((entry) => entry.id === sourceId);
+      if (!source) return current;
+      const newId = createProjectId();
+      const now = new Date().toISOString();
+      const duplicated: TradeProject = {
+        ...source,
+        id: newId,
+        details: {
+          ...source.details,
+          projectName: source.details.projectName ? `${source.details.projectName} (copy)` : "",
+        },
+        roomPlan: source.roomPlan
+          ? { ...source.roomPlan, groups: source.roomPlan.groups.map((group) => ({ ...group, allocations: group.allocations.map((a) => ({ ...a })) })) }
+          : null,
+        items: source.items.map((item) => ({ ...item })),
+        createdAt: now,
+        updatedAt: now,
+        status: "draft",
+        submittedLeadId: "",
+      };
+      return { activeProjectId: newId, projects: [duplicated, ...current.projects].slice(0, 25) };
+    });
+    setOpen(true);
+  }, []);
+
   const markSubmitted = useCallback((leadId: string) => {
     setWorkspace((current) => ({
       ...current,
@@ -225,48 +296,136 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => ({ ...current, roomPlan: plan }));
   }, [updateActive]);
 
-  const assignRoomGroup = useCallback((
-    roomKey: RoomKey,
-    assignment: RoomGroupAssignment,
-    rows: Array<{ slug: string; finish: string; quantity: number }>,
-    scopeName: string,
-    scopeSummary: string
-  ) => {
-    const scopeId = scopeIdForRoom(roomKey);
+  const updateProductNeeds = useCallback((roomKey: string, productNeeds: RoomProductNeed[]) => {
     updateActive((current) => {
       const plan = current.roomPlan ?? createEmptyRoomPlan();
-      const nextItems = [
-        ...current.items.filter((item) => item.scopeId !== scopeId),
-        ...rows.map((row) => ({
-          slug: row.slug,
-          finish: row.finish,
-          quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
-          scopeId,
-          scopeName,
-          scopeSummary,
-        })),
-      ];
       return {
         ...current,
-        items: nextItems,
         roomPlan: {
           ...plan,
-          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, assignment } : group),
+          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, productNeeds } : group),
         },
       };
     });
   }, [updateActive]);
 
-  const clearRoomGroupAssignment = useCallback((roomKey: RoomKey) => {
-    const scopeId = scopeIdForRoom(roomKey);
+  const addCustomRoom = useCallback((label: string, count: number) => {
+    const roomKey = createCustomRoomKey();
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = createEmptyCustomRoomGroup(roomKey, label.trim() || "Custom room", count);
+      return { ...current, roomPlan: { ...plan, groups: [...plan.groups, group] } };
+    });
+    return roomKey;
+  }, [updateActive]);
+
+  const removeCustomRoom = useCallback((roomKey: string) => {
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
+      const scopeIds = new Set(
+        [group?.scopeId, ...(group?.allocations.map((a) => a.scopeId) ?? [])].filter((id): id is string => Boolean(id))
+      );
+      return {
+        ...current,
+        items: current.items.filter((item) => !item.scopeId || !scopeIds.has(item.scopeId)),
+        roomPlan: { ...plan, groups: plan.groups.filter((entry) => entry.roomKey !== roomKey) },
+      };
+    });
+  }, [updateActive]);
+
+  const addAllocation = useCallback((
+    roomKey: string,
+    roomCount: number,
+    assignment: RoomGroupAssignment,
+    rows: Array<{ slug: string; finish: string; quantity: number }>,
+    scopeName: string,
+    scopeSummary: string,
+    label?: string
+  ) => {
+    const id = createAllocationId();
+    const scopeId = `${roomKey}-alloc-${id}`;
     updateActive((current) => {
       const plan = current.roomPlan ?? createEmptyRoomPlan();
       return {
         ...current,
-        items: current.items.filter((item) => item.scopeId !== scopeId),
+        items: [
+          ...current.items,
+          ...rows.map((row) => ({
+            slug: row.slug,
+            finish: row.finish,
+            quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
+            scopeId,
+            scopeName,
+            scopeSummary,
+          })),
+        ],
         roomPlan: {
           ...plan,
-          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, assignment: null } : group),
+          groups: plan.groups.map((group) => group.roomKey === roomKey
+            ? { ...group, allocations: [...group.allocations, { id, scopeId, roomCount: Math.max(1, Math.round(roomCount) || 1), assignment, label: label?.trim() || undefined }] }
+            : group),
+        },
+      };
+    });
+    return id;
+  }, [updateActive]);
+
+  const updateAllocation = useCallback((
+    roomKey: string,
+    allocationId: string,
+    roomCount: number,
+    assignment: RoomGroupAssignment,
+    rows: Array<{ slug: string; finish: string; quantity: number }>,
+    scopeName: string,
+    scopeSummary: string,
+    label?: string
+  ) => {
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
+      const scopeId = group?.allocations.find((a) => a.id === allocationId)?.scopeId ?? `${roomKey}-alloc-${allocationId}`;
+      return {
+        ...current,
+        items: [
+          ...current.items.filter((item) => item.scopeId !== scopeId),
+          ...rows.map((row) => ({
+            slug: row.slug,
+            finish: row.finish,
+            quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
+            scopeId,
+            scopeName,
+            scopeSummary,
+          })),
+        ],
+        roomPlan: {
+          ...plan,
+          groups: plan.groups.map((entry) => entry.roomKey === roomKey
+            ? {
+              ...entry,
+              allocations: entry.allocations.map((a) => a.id === allocationId
+                ? { ...a, roomCount: Math.max(1, Math.round(roomCount) || 1), assignment, label: label?.trim() || undefined }
+                : a),
+            }
+            : entry),
+        },
+      };
+    });
+  }, [updateActive]);
+
+  const removeAllocation = useCallback((roomKey: string, allocationId: string) => {
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
+      const allocation = group?.allocations.find((a) => a.id === allocationId);
+      return {
+        ...current,
+        items: allocation ? current.items.filter((item) => item.scopeId !== allocation.scopeId) : current.items,
+        roomPlan: {
+          ...plan,
+          groups: plan.groups.map((entry) => entry.roomKey === roomKey
+            ? { ...entry, allocations: entry.allocations.filter((a) => a.id !== allocationId) }
+            : entry),
         },
       };
     });
@@ -285,13 +444,48 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       newProject,
       switchProject,
       deleteProject,
+      duplicateProject,
       markSubmitted,
       clearProject,
       setRoomPlan,
-      assignRoomGroup,
-      clearRoomGroupAssignment,
+      updateProductNeeds,
+      addCustomRoom,
+      removeCustomRoom,
+      addAllocation,
+      updateAllocation,
+      removeAllocation,
+      projectIconRef,
+      flyToProject,
+      bump,
     }}>
       {children}
+      <AnimatePresence>
+        {flights.map((flight) => (
+          <motion.div
+            key={flight.id}
+            initial={{
+              left: flight.start.left,
+              top: flight.start.top,
+              width: flight.start.width,
+              height: flight.start.height,
+              opacity: 1,
+              borderRadius: 20,
+            }}
+            animate={{
+              left: flight.end.left + flight.end.width / 2 - 13,
+              top: flight.end.top + flight.end.height / 2 - 13,
+              width: 26,
+              height: 26,
+              opacity: [1, 1, 0],
+              borderRadius: 999,
+            }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            style={{ position: "fixed", zIndex: 200, overflow: "hidden", pointerEvents: "none" }}
+          >
+            <img src={flight.image} alt="" className="h-full w-full object-cover" />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </TradeProjectContext.Provider>
   );
 }

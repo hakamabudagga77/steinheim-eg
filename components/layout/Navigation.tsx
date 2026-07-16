@@ -8,6 +8,7 @@ import Image from "next/image";
 import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
+import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
 
 const LIGHT_TOP_PATTERN = /^\/products\//;
@@ -80,6 +81,13 @@ export default function Navigation({ locale }: { locale: string }) {
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
+  const {
+    project: tradeProject,
+    setOpen: setTradeOpen,
+    projectIconRef,
+    bump: tradeBump,
+  } = useTradeProject();
+  const tradeItemCount = tradeProject.items.length;
   const useWhite = !LIGHT_TOP_PATTERN.test(pathname);
 
   useEffect(() => {
@@ -161,6 +169,41 @@ export default function Navigation({ locale }: { locale: string }) {
                 <path d="M5.5 21a6.5 6.5 0 0113 0" />
               </svg>
             </Link>
+            <button
+              ref={projectIconRef}
+              onClick={() => setTradeOpen(true)}
+              className={`relative hidden transition-colors duration-300 cursor-pointer sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
+              aria-label="Trade project board"
+              title="Trade project board"
+            >
+              <motion.span
+                key={tradeBump}
+                initial={{ scale: 1 }}
+                animate={{ scale: tradeBump ? [1, 1.32, 1] : 1 }}
+                transition={{ duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
+              >
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 4h6a1 1 0 011 1v1h1.5A1.5 1.5 0 0119 7.5v11A1.5 1.5 0 0117.5 20h-11A1.5 1.5 0 015 18.5v-11A1.5 1.5 0 016.5 6H8V5a1 1 0 011-1z" />
+                  <path d="M9 4v3h6V4" />
+                  <path d="M9 12h6M9 15.5h6M9 8.5h3" />
+                </svg>
+              </motion.span>
+              {tradeItemCount > 0 && (
+                <motion.span
+                  key={`trade-count-${tradeBump}`}
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.35, ease: [0.22, 0.76, 0.2, 1] }}
+                  className={`absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full px-0.5 text-[8px] font-medium ${
+                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
+                  }`}
+                >
+                  {tradeItemCount}
+                </motion.span>
+              )}
+            </button>
             <button
               ref={cartIconRef}
               onClick={() => setCartOpen(true)}

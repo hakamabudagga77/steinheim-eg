@@ -18,7 +18,8 @@
     "next-intl": "^4.13.0",
     "pdf-lib": "^1.17.1",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "resend": "^6.17.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
