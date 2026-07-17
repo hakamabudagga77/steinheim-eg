@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 import ShowroomReel from "@/components/home/ShowroomReel";
+import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 import { projectReferences, type ProjectReference } from "@/data/project-references";
@@ -350,6 +351,38 @@ export default function GessiInspiredHome() {
           >
             View all projects
           </Link>
+        </div>
+      </section>
+
+      <section className="bg-black py-16 text-white sm:py-20">
+        <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8 }}
+            className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
+          >
+            <div>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-white/40">For the trade</p>
+              <h2 className="mt-4 max-w-lg text-[28px] font-normal leading-tight tracking-[-0.03em] sm:text-[36px]">
+                Specifying for a project?
+              </h2>
+              <p className="mt-4 max-w-md text-[14px] leading-[1.7] text-white/55">
+                Set your room composition and what each one needs once — then shop the site
+                normally, with your rooms tracked as you go.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <TradeSetupOpenButton variant="outline-light" label="Set up your project" />
+              <Link
+                href="/trade"
+                className="inline-flex h-[50px] items-center border border-white/25 px-9 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-white hover:text-black"
+              >
+                Visit Trade Studio
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 

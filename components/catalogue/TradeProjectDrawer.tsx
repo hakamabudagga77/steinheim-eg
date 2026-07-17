@@ -1,158 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ScaleIn, StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
-import { formatPrice, getAllFinishes, getProductBySlug, type Finish, type Product, type Variant } from "@/lib/utils";
-import { getProductImage } from "@/data/images";
+import { formatPrice, getAllFinishes, getProductBySlug } from "@/lib/utils";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
-import RoomAssignmentEditor from "@/components/trade/RoomAssignmentEditor";
-import type { RoomGroup, RoomGroupAllocation, TradeProjectItem } from "@/lib/trade-project";
-
-function ProjectItemRow({
-  item,
-  product,
-  variant,
-  finish,
-  onRemove,
-  onQuantityChange,
-}: {
-  item: TradeProjectItem;
-  product: Product;
-  variant: Variant;
-  finish: Finish | undefined;
-  onRemove: () => void;
-  onQuantityChange: (quantity: number) => void;
-}) {
-  const img = getProductImage(product.slug, variant.finish);
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="group bg-white"
-    >
-      <div className="flex gap-4 p-4">
-        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#ece9e2]">
-          {img && <Image src={img} alt={product.name} fill sizes="72px" className="object-contain p-1" />}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="font-heading text-[17px] leading-tight">{product.name}</p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-warm-gray">
-                {product.series[0].toUpperCase() + product.series.slice(1)} · {finish?.name ?? item.finish}
-              </p>
-              <p className="mt-0.5 text-[9px] text-warm-gray/60">{variant.model}</p>
-            </div>
-            <button
-              type="button"
-              onClick={onRemove}
-              className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-              aria-label="Remove"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex items-center border border-charcoal/12">
-              <button
-                type="button"
-                onClick={() => onQuantityChange(item.quantity - 1)}
-                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-              >
-                −
-              </button>
-              <input
-                type="number"
-                min="1"
-                max="10000"
-                value={item.quantity}
-                onChange={(e) => onQuantityChange(Number(e.target.value))}
-                className="h-7 w-12 border-x border-charcoal/12 bg-transparent text-center text-[12px] outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => onQuantityChange(item.quantity + 1)}
-                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-              >
-                +
-              </button>
-            </div>
-            <p className="text-[12px] font-medium text-charcoal">
-              {formatPrice(variant.price * item.quantity)}
-            </p>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function AllocationCard({
-  allocation,
-  itemRows,
-  titleOverride,
-  onEdit,
-  onDuplicate,
-  onRemoveItem,
-  onQuantityChange,
-}: {
-  allocation: RoomGroupAllocation;
-  itemRows: Array<{ item: TradeProjectItem; product: Product; variant: Variant; finish: Finish | undefined }>;
-  titleOverride?: string;
-  onEdit: () => void;
-  onDuplicate: () => void;
-  onRemoveItem: (slug: string, finish: string) => void;
-  onQuantityChange: (slug: string, finish: string, quantity: number) => void;
-}) {
-  const totalUnits = itemRows.reduce((sum, row) => sum + row.item.quantity, 0);
-  const totalValue = itemRows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
-  const scopeName = titleOverride || itemRows[0]?.item.scopeName || allocation.label || "Allocation";
-  const scopeSummary = itemRows[0]?.item.scopeSummary;
-
-  return (
-    <div className="border border-charcoal/8">
-      <div className="flex items-start justify-between gap-3 bg-white p-3">
-        <div className="min-w-0">
-          <p className="truncate text-[13px] font-medium text-charcoal">{scopeName}</p>
-          {scopeSummary && <p className="mt-0.5 text-[10px] text-warm-gray">{scopeSummary}</p>}
-          {itemRows.length > 0 && (
-            <p className="mt-0.5 text-[10px] text-warm-gray/70">{totalUnits} units · {formatPrice(totalValue)}</p>
-          )}
-        </div>
-        <div className="flex shrink-0 gap-1.5">
-          <button type="button" onClick={onDuplicate} className="rounded-full border border-charcoal/15 px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-charcoal transition hover:border-charcoal" title="Duplicate & edit">
-            Duplicate
-          </button>
-          <button type="button" onClick={onEdit} className="rounded-full border border-charcoal/15 px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.1em] text-charcoal transition hover:border-charcoal">
-            Edit
-          </button>
-        </div>
-      </div>
-      {itemRows.length > 0 && (
-        <div className="divide-y divide-charcoal/8 border-t border-charcoal/8">
-          {itemRows.map(({ item, product, variant, finish }) => (
-            <ProjectItemRow
-              key={`${item.scopeId}-${item.slug}-${item.finish}`}
-              item={item}
-              product={product}
-              variant={variant}
-              finish={finish}
-              onRemove={() => onRemoveItem(item.slug, item.finish)}
-              onQuantityChange={(quantity) => onQuantityChange(item.slug, item.finish, quantity)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+import { RoomBasketCard, ProjectItemRow } from "@/components/trade/RoomBasketCard";
 
 export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const isArabic = locale === "ar";
@@ -170,19 +23,15 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     switchProject,
     deleteProject,
     duplicateProject,
-    addAllocation,
-    removeAllocation,
   } = useTradeProject();
   const [step, setStep] = useState<"board" | "details" | "sent">("board");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
   const [pdfDownloading, setPdfDownloading] = useState(false);
-  const [editingTarget, setEditingTarget] = useState<{ roomKey: string; allocationId: string | null } | null>(null);
   const [showProjectsMenu, setShowProjectsMenu] = useState(false);
   const [includePrices, setIncludePrices] = useState(true);
   const [includeSpecs, setIncludeSpecs] = useState(false);
-  const [viewMode, setViewMode] = useState<"rooms" | "phases">("rooms");
   const finishes = useMemo(() => getAllFinishes(), []);
 
   const rows = project.items.flatMap((item) => {
@@ -199,18 +48,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
 
   const roomPlan = project.roomPlan;
   const activeRoomGroups = (roomPlan?.groups ?? []).filter((group) => group.count > 0);
-  const roomPlanScopeIds = new Set(
-    activeRoomGroups.flatMap((group) => [group.scopeId, ...group.allocations.map((a) => a.scopeId)])
-  );
-  const editingGroup = activeRoomGroups.find((group) => group.roomKey === editingTarget?.roomKey) ?? null;
-  const editingAllocation = editingGroup?.allocations.find((a) => a.id === editingTarget?.allocationId) ?? null;
-  const editingCapacity = editingGroup
-    ? Math.max(
-        1,
-        editingGroup.count
-          - editingGroup.allocations.filter((a) => a.id !== editingTarget?.allocationId).reduce((sum, a) => sum + a.roomCount, 0)
-      )
-    : 1;
+  const roomPlanScopeIds = new Set(activeRoomGroups.map((group) => group.scopeId));
 
   const scopeGroups = Array.from(
     rows.reduce((groups, row) => {
@@ -230,56 +68,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     totalUnits: group.rows.reduce((sum, row) => sum + row.item.quantity, 0),
     totalValue: group.rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0),
   }));
-  // Room-group allocations get their own dedicated cards below — exclude them here so they
-  // aren't rendered twice. Legacy counter-scoped items and true manual adds still render
-  // through this generic list, unchanged.
+  // Each room group's own basket gets a dedicated card below — exclude it here so it isn't
+  // rendered twice. Legacy counter-scoped items and true manual adds still render through
+  // this generic list, unchanged.
   const otherScopeGroups = scopeGroups.filter((group) => !roomPlanScopeIds.has(group.id));
-
-  type PhaseEntry = { group: RoomGroup; allocation: RoomGroupAllocation };
-  type PhaseBucket = { label: string; entries: PhaseEntry[] };
-  const phaseBucketMap = new Map<string, PhaseBucket>();
-  for (const group of activeRoomGroups) {
-    for (const allocation of group.allocations) {
-      const key = allocation.label?.trim() || "";
-      const existing = phaseBucketMap.get(key) ?? { label: key || "Unlabeled allocations", entries: [] };
-      existing.entries.push({ group, allocation });
-      phaseBucketMap.set(key, existing);
-    }
-  }
-  const phaseBuckets = Array.from(phaseBucketMap.values()).map((bucket) => {
-    const itemRowsByAllocation = bucket.entries.map(({ group, allocation }) => ({
-      group,
-      allocation,
-      itemRows: rows.filter((row) => row.item.scopeId === allocation.scopeId),
-    }));
-    const totalRooms = bucket.entries.reduce((sum, e) => sum + e.allocation.roomCount, 0);
-    const totalUnits = itemRowsByAllocation.reduce((sum, e) => sum + e.itemRows.reduce((s, r) => s + r.item.quantity, 0), 0);
-    const totalValue = itemRowsByAllocation.reduce((sum, e) => sum + e.itemRows.reduce((s, r) => s + r.variant.price * r.item.quantity, 0), 0);
-    return { ...bucket, itemRowsByAllocation, totalRooms, totalUnits, totalValue };
-  });
-  const distinctPhaseLabels = new Set(
-    activeRoomGroups.flatMap((group) => group.allocations.map((a) => a.label?.trim()).filter(Boolean))
-  );
-  const canShowPhaseView = distinctPhaseLabels.size >= 2;
-
-  function handleDuplicateAllocation(group: RoomGroup, allocation: RoomGroupAllocation) {
-    const sourceItems = rows
-      .filter((row) => row.item.scopeId === allocation.scopeId)
-      .map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }));
-    const remaining = group.count - group.allocations.reduce((sum, a) => sum + a.roomCount, 0);
-    const roomCount = Math.max(1, Math.min(allocation.roomCount, Math.max(1, remaining)));
-    const newLabel = allocation.label ? `${allocation.label} (copy)` : undefined;
-    const newId = addAllocation(
-      group.roomKey,
-      roomCount,
-      allocation.assignment,
-      sourceItems,
-      newLabel || group.roomLabel,
-      `${roomCount} ${roomCount === 1 ? "room" : "rooms"} · duplicated from a previous allocation`,
-      newLabel
-    );
-    setEditingTarget({ roomKey: group.roomKey, allocationId: newId });
-  }
 
   async function handleSubmit() {
     if (!project.items.length) {
@@ -553,7 +345,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             ))}
                           </div>
                           <p className="mt-4 text-[11px] leading-[1.7] text-white/55">
-                            This board can combine multiple room groups, allocations across collections, and custom product lines.
+                            This board can combine multiple room groups, mixed collections within one room, and custom product lines.
                           </p>
                           <p className="mt-2 text-[10px] text-white/35">
                             Retail reference total: {formatPrice(retailReferenceTotal)}
@@ -577,70 +369,12 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           </div>
                         </div>
 
-                        {canShowPhaseView && (
-                          <div className="mb-4 flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setViewMode("rooms")}
-                              className={`flex-1 border px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
-                                viewMode === "rooms" ? "border-charcoal bg-charcoal text-white" : "border-charcoal/15 text-warm-gray hover:border-charcoal hover:text-charcoal"
-                              }`}
-                            >
-                              By room type
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setViewMode("phases")}
-                              className={`flex-1 border px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] transition ${
-                                viewMode === "phases" ? "border-charcoal bg-charcoal text-white" : "border-charcoal/15 text-warm-gray hover:border-charcoal hover:text-charcoal"
-                              }`}
-                            >
-                              By phase
-                            </button>
-                          </div>
-                        )}
-
-                        {viewMode === "phases" && canShowPhaseView ? (
-                          <StaggerContainer className="space-y-5">
-                            {phaseBuckets.map((bucket) => (
-                              <StaggerItem key={bucket.label}>
-                              <section className="border border-charcoal/10 bg-white">
-                                <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
-                                  <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                                    {bucket.totalRooms} {bucket.totalRooms === 1 ? "room" : "rooms"}
-                                  </p>
-                                  <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
-                                    {bucket.label}
-                                  </h3>
-                                  <p className="mt-2 text-[11px] text-warm-gray">
-                                    {bucket.totalUnits} units · {formatPrice(bucket.totalValue)}
-                                  </p>
-                                </div>
-                                <div className="space-y-3 p-3">
-                                  {bucket.itemRowsByAllocation.map(({ group, allocation, itemRows }) => (
-                                    <AllocationCard
-                                      key={allocation.id}
-                                      allocation={allocation}
-                                      itemRows={itemRows}
-                                      titleOverride={group.roomLabel}
-                                      onEdit={() => setEditingTarget({ roomKey: group.roomKey, allocationId: allocation.id })}
-                                      onDuplicate={() => handleDuplicateAllocation(group, allocation)}
-                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, allocation.scopeId)}
-                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, allocation.scopeId)}
-                                    />
-                                  ))}
-                                </div>
-                              </section>
-                              </StaggerItem>
-                            ))}
-                          </StaggerContainer>
-                        ) : (
                         <StaggerContainer className="space-y-5">
                           {activeRoomGroups.map((group) => {
-                            const allocatedSum = group.allocations.reduce((sum, a) => sum + a.roomCount, 0);
-                            const remaining = Math.max(0, group.count - allocatedSum);
-                            const overAllocated = allocatedSum > group.count;
-                            const otherRoomRows = rows.filter((row) => row.item.scopeId === group.scopeId);
+                            const basketRows = rows.filter((row) => row.item.scopeId === group.scopeId);
+                            const neededTotal = group.productNeeds.reduce((sum, need) => sum + need.quantity, 0);
+                            const selectedTotal = basketRows.reduce((sum, row) => sum + row.item.quantity, 0);
+                            const stillNeeds = neededTotal > 0 && selectedTotal < neededTotal;
 
                             return (
                               <StaggerItem key={group.scopeId}>
@@ -654,59 +388,31 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                       <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
                                         {group.roomLabel}
                                       </h3>
-                                      <p className={`mt-2 text-[11px] font-medium uppercase tracking-[0.08em] ${overAllocated ? "text-amber-700" : "text-warm-gray"}`}>
-                                        {allocatedSum} of {group.count} rooms allocated{overAllocated ? " — check allocation counts" : ""}
-                                      </p>
                                     </div>
-                                    {remaining > 0 && (
-                                      <button
-                                        type="button"
-                                        onClick={() => setEditingTarget({ roomKey: group.roomKey, allocationId: null })}
+                                    {stillNeeds && (
+                                      <a
+                                        href={`/${locale}/trade#smart-room-calculator`}
+                                        onClick={() => setOpen(false)}
                                         className="shrink-0 rounded-full border border-charcoal bg-charcoal px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black"
                                       >
-                                        Allocate {remaining} {remaining === 1 ? "room" : "rooms"}
-                                      </button>
+                                        Shop on trade page
+                                      </a>
                                     )}
                                   </div>
                                 </div>
 
-                                <div className="space-y-3 p-3">
-                                  {group.allocations.map((allocation) => (
-                                    <AllocationCard
-                                      key={allocation.id}
-                                      allocation={allocation}
-                                      itemRows={rows.filter((row) => row.item.scopeId === allocation.scopeId)}
-                                      onEdit={() => setEditingTarget({ roomKey: group.roomKey, allocationId: allocation.id })}
-                                      onDuplicate={() => handleDuplicateAllocation(group, allocation)}
-                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, allocation.scopeId)}
-                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, allocation.scopeId)}
+                                <div className="p-3">
+                                  {basketRows.length > 0 ? (
+                                    <RoomBasketCard
+                                      title={group.roomLabel}
+                                      itemRows={basketRows}
+                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, group.scopeId)}
+                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, group.scopeId)}
                                     />
-                                  ))}
-                                  {group.allocations.length === 0 && (
+                                  ) : (
                                     <p className="p-2 text-[11px] font-medium uppercase tracking-[0.08em] text-amber-700">Not yet assigned</p>
                                   )}
                                 </div>
-
-                                {otherRoomRows.length > 0 && (
-                                  <div className="border-t border-charcoal/8">
-                                    <p className="bg-[#ece9e2]/50 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.15em] text-warm-gray">
-                                      Other items for this room
-                                    </p>
-                                    <div className="divide-y divide-charcoal/8">
-                                      {otherRoomRows.map(({ item, product, variant, finish }) => (
-                                        <ProjectItemRow
-                                          key={`${item.scopeId}-${item.slug}-${item.finish}`}
-                                          item={item}
-                                          product={product}
-                                          variant={variant}
-                                          finish={finish}
-                                          onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
-                                          onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
-                                        />
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
                               </section>
                               </StaggerItem>
                             );
@@ -752,7 +458,6 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             </StaggerItem>
                           ))}
                         </StaggerContainer>
-                        )}
 
                         <p className="mt-4 text-[9px] leading-relaxed text-warm-gray/60">
                           Prices shown are retail references. Trade pricing confirmed after submission.
@@ -1027,18 +732,6 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
               </footer>
             )}
           </motion.aside>
-
-          {editingGroup && (
-            <RoomAssignmentEditor
-              roomGroup={editingGroup}
-              allocation={editingAllocation}
-              capacityRoomCount={editingCapacity}
-              existingItems={editingAllocation
-                ? rows.filter((row) => row.item.scopeId === editingAllocation.scopeId).map((row) => ({ slug: row.item.slug, finish: row.item.finish, quantity: row.item.quantity }))
-                : []}
-              onClose={() => setEditingTarget(null)}
-            />
-          )}
         </>
       )}
     </AnimatePresence>

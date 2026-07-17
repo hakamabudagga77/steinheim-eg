@@ -2,6 +2,7 @@ import "server-only";
 
 import { Resend } from "resend";
 import type { TradeLead } from "@/lib/trade-leads";
+import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
 
 const NOTIFY_TO = process.env.TRADE_LEAD_NOTIFY_EMAIL || "inquiries@steinheim-eg.com";
 const NOTIFY_FROM = process.env.TRADE_LEAD_NOTIFY_FROM || "Steinheim Trade Studio <onboarding@resend.dev>";
@@ -28,7 +29,7 @@ function buildEmailHtml(lead: TradeLead): string {
     ["Role", d.role || "—"],
     ["Email", d.email || "—"],
     ["Phone", d.phone || "—"],
-    ["Project type", d.projectType || "—"],
+    ["Business type", lead.project.persona ? TRADE_PERSONA_LABELS[lead.project.persona] : d.projectType || "—"],
     ["Location", d.location || "—"],
     ["Timeline", d.timeline || "—"],
   ];

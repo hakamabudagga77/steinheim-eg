@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
@@ -11,6 +11,7 @@ import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { hasActiveRoomNeeds } from "@/lib/trade-project";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
@@ -20,9 +21,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const product = getProductBySlug(slug)!;
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
   const [finishOpen, setFinishOpen] = useState(false);
+  const [roomOpen, setRoomOpen] = useState(false);
   const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
   const [cartAdded, setCartAdded] = useState(false);
-  const { project, addItem, setOpen: setProposalOpen, flyToProject } = useTradeProject();
+  const [projectAdded, setProjectAdded] = useState(false);
+  const { project, addItem, setOpen: setProposalOpen, setSetupOpen, flyToProject } = useTradeProject();
   const { addItem: addToCart, flyToCart } = useCart();
   const imageWrapRef = useRef<HTMLDivElement>(null);
 
@@ -35,22 +38,41 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
   const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
-  const isInProposal = project.items.some((item) => item.slug === product.slug && item.finish === variant.finish);
   const activeFinishDisc = getFinishDiscImage(variant.finish);
+  const isTradeCustomer = hasActiveRoomNeeds(project);
   const activeRoomGroups = (project.roomPlan?.groups ?? []).filter((group) => group.count > 0);
+  const matchingRoomGroups = activeRoomGroups.filter((group) =>
+    group.productNeeds.some((need) => need.type === product.type && need.quantity > 0)
+  );
+  const roomOptions = matchingRoomGroups.length > 0 ? matchingRoomGroups : activeRoomGroups;
   const [scopeChoice, setScopeChoice] = useState("");
+  const selectedGroup = roomOptions.find((group) => group.scopeId === scopeChoice) ?? null;
+  const isInProposal = project.items.some(
+    (item) => item.slug === product.slug && item.finish === variant.finish && (item.scopeId || "") === (scopeChoice || "")
+  );
+
+  useEffect(() => {
+    if (roomOptions.length === 0) return;
+    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+      setScopeChoice(roomOptions[0].scopeId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.slug, project.roomPlan]);
 
   function addToProposal() {
-    if (!isInProposal) {
-      if (imageUrl) flyToProject(imageWrapRef.current, imageUrl);
-      const group = activeRoomGroups.find((entry) => entry.scopeId === scopeChoice);
-      addItem(product.slug, variant.finish, 1, group ? {
-        scopeId: group.scopeId,
-        scopeName: group.roomLabel,
-        scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
-      } : undefined);
+    if (isInProposal) {
+      setProposalOpen(true);
+      return;
     }
-    setProposalOpen(true);
+    if (imageUrl) flyToProject(imageWrapRef.current, imageUrl);
+    const group = roomOptions.find((entry) => entry.scopeId === scopeChoice);
+    addItem(product.slug, variant.finish, 1, group ? {
+      scopeId: group.scopeId,
+      scopeName: group.roomLabel,
+      scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
+    } : undefined);
+    setProjectAdded(true);
+    setTimeout(() => setProjectAdded(false), 2200);
   }
 
   return (
@@ -192,65 +214,144 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </div>
 
                 <div className="mt-8">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (imageUrl) flyToCart(imageWrapRef.current, imageUrl);
-                      addToCart(product.slug, variant.finish);
-                      setCartAdded(true);
-                      setTimeout(() => setCartAdded(false), 2200);
-                    }}
-                    className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
-                  >
-                    <AnimatePresence mode="wait" initial={false}>
-                      {cartAdded ? (
-                        <motion.span
-                          key="added"
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -6 }}
-                          transition={{ duration: 0.25 }}
-                          className="flex items-center gap-2"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M4 12l6 6L20 6" />
-                          </svg>
-                          Added to Cart
-                        </motion.span>
-                      ) : (
-                        <motion.span
-                          key="add"
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -6 }}
-                          transition={{ duration: 0.25 }}
-                        >
-                          Add to Cart
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </button>
-                  {!isInProposal && activeRoomGroups.length > 0 && (
-                    <select
-                      value={scopeChoice}
-                      onChange={(e) => setScopeChoice(e.target.value)}
-                      className="mt-3 h-10 w-full rounded-full border border-black/12 bg-white/60 px-4 text-[12px] text-black/70 outline-none"
-                      aria-label="Add to room group"
+                  {!isTradeCustomer && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (imageUrl) flyToCart(imageWrapRef.current, imageUrl);
+                        addToCart(product.slug, variant.finish);
+                        setCartAdded(true);
+                        setTimeout(() => setCartAdded(false), 2200);
+                      }}
+                      className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
                     >
-                      <option value="">Add to: no group (manual)</option>
-                      {activeRoomGroups.map((group) => (
-                        <option key={group.scopeId} value={group.scopeId}>
-                          Add to: {group.roomLabel} ({group.count})
-                        </option>
-                      ))}
-                    </select>
+                      <AnimatePresence mode="wait" initial={false}>
+                        {cartAdded ? (
+                          <motion.span
+                            key="added"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.25 }}
+                            className="flex items-center gap-2"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4 12l6 6L20 6" />
+                            </svg>
+                            Added to Cart
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="add"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.25 }}
+                          >
+                            Add to Cart
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  )}
+                  {roomOptions.length > 0 && (
+                    <div className={`relative ${isTradeCustomer ? "" : "mt-3"}`}>
+                      <button
+                        type="button"
+                        onClick={() => setRoomOpen((o) => !o)}
+                        className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
+                      >
+                        <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
+                          {selectedGroup ? selectedGroup.roomLabel : "No specific room"}
+                        </span>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[0px] leading-none text-black/45 after:text-[18px] after:content-['↓']">
+                          {roomOpen ? "⌃" : "⌄"}
+                        </span>
+                      </button>
+
+                      <AnimatePresence>
+                        {roomOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 8 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute left-0 right-0 z-20 mt-3 overflow-hidden rounded-[28px] border border-black/8 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+                          >
+                            {roomOptions.map((group, i) => {
+                              const active = group.scopeId === scopeChoice;
+                              const needsThis = group.productNeeds.some(
+                                (need) => need.type === product.type && need.quantity > 0
+                              );
+                              return (
+                                <button
+                                  key={group.scopeId}
+                                  type="button"
+                                  onClick={() => {
+                                    setScopeChoice(group.scopeId);
+                                    setRoomOpen(false);
+                                  }}
+                                  className={`flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                                    i > 0 ? "border-t border-black/6" : ""
+                                  }`}
+                                >
+                                  <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
+                                    {group.roomLabel}
+                                  </span>
+                                  {needsThis && (
+                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/40">Needs this</span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScopeChoice("");
+                                setRoomOpen(false);
+                              }}
+                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-left text-[14px] text-black/45 transition hover:bg-black/[0.035]"
+                            >
+                              No specific room (manual)
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )}
+                  {activeRoomGroups.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSetupOpen(true)}
+                      className="mt-3 flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-black/12 text-[11px] font-medium text-black/50 transition hover:border-black/30 hover:text-black"
+                    >
+                      Set up your project to auto-assign this to a room
+                    </button>
                   )}
                   <button
                     type="button"
                     onClick={addToProposal}
-                    className="mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/45 transition hover:bg-white/55 hover:text-black"
+                    className={
+                      isTradeCustomer
+                        ? "mt-3 flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                        : "mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/45 transition hover:bg-white/55 hover:text-black"
+                    }
                   >
-                    {isInProposal ? "Open project board" : "Add to project board"}
+                    <AnimatePresence mode="wait" initial={false}>
+                      {isInProposal ? (
+                        <motion.span key="open" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Open project board
+                        </motion.span>
+                      ) : projectAdded ? (
+                        <motion.span key="added" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Added to project board
+                        </motion.span>
+                      ) : (
+                        <motion.span key="add" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Add to project board
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </button>
                 </div>
 

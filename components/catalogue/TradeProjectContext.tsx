@@ -3,7 +3,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  createAllocationId,
   createCustomRoomKey,
   createEmptyTradeProject,
   createProjectId,
@@ -11,8 +10,8 @@ import {
   sanitizeTradeWorkspace,
   TRADE_PROJECT_STORAGE_KEY,
   TRADE_WORKSPACE_STORAGE_KEY,
-  type RoomGroupAssignment,
   type RoomProductNeed,
+  type TradePersona,
   type TradeProject,
   type TradeProjectDetails,
   type TradeProjectItem,
@@ -26,10 +25,15 @@ interface TradeProjectContextValue {
   projects: TradeProject[];
   open: boolean;
   setOpen: (open: boolean) => void;
+  setupOpen: boolean;
+  setSetupOpen: (open: boolean) => void;
+  setupJustCompleted: boolean;
+  setSetupJustCompleted: (value: boolean) => void;
   addItem: (slug: string, finish: string, quantity?: number, meta?: Pick<TradeProjectItem, "scopeId" | "scopeName" | "scopeSummary">) => void;
   updateQuantity: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   removeItem: (slug: string, finish: string, scopeId?: string) => void;
   updateDetails: (details: Partial<TradeProjectDetails>) => void;
+  setPersona: (persona: TradePersona) => void;
   newProject: () => void;
   switchProject: (id: string) => void;
   deleteProject: (id: string) => void;
@@ -40,26 +44,6 @@ interface TradeProjectContextValue {
   updateProductNeeds: (roomKey: string, productNeeds: RoomProductNeed[]) => void;
   addCustomRoom: (label: string, count: number) => string;
   removeCustomRoom: (roomKey: string) => void;
-  addAllocation: (
-    roomKey: string,
-    roomCount: number,
-    assignment: RoomGroupAssignment,
-    rows: Array<{ slug: string; finish: string; quantity: number }>,
-    scopeName: string,
-    scopeSummary: string,
-    label?: string
-  ) => string;
-  updateAllocation: (
-    roomKey: string,
-    allocationId: string,
-    roomCount: number,
-    assignment: RoomGroupAssignment,
-    rows: Array<{ slug: string; finish: string; quantity: number }>,
-    scopeName: string,
-    scopeSummary: string,
-    label?: string
-  ) => void;
-  removeAllocation: (roomKey: string, allocationId: string) => void;
   projectIconRef: React.RefObject<HTMLButtonElement | null>;
   flyToProject: (originEl: HTMLElement | null, image: string) => void;
   bump: number;
@@ -84,7 +68,17 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     activeProjectId: "",
     projects: [createEmptyTradeProject()],
   }));
-  const [open, setOpen] = useState(false);
+  const [open, setOpenRaw] = useState(false);
+  const [setupOpen, setSetupOpenRaw] = useState(false);
+  const [setupJustCompleted, setSetupJustCompleted] = useState(false);
+  const setOpen = useCallback((value: boolean) => {
+    setOpenRaw(value);
+    if (value) setSetupOpenRaw(false);
+  }, []);
+  const setSetupOpen = useCallback((value: boolean) => {
+    setSetupOpenRaw(value);
+    if (value) setOpenRaw(false);
+  }, []);
   const hydrated = useRef(false);
   const projectIconRef = useRef<HTMLButtonElement | null>(null);
   const flightId = useRef(0);
@@ -226,6 +220,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => ({ ...current, details: { ...current.details, ...details } }));
   }, [updateActive]);
 
+  const setPersona = useCallback((persona: TradePersona) => {
+    updateActive((current) => ({ ...current, persona }));
+  }, [updateActive]);
+
   const newProject = useCallback(() => {
     const id = createProjectId();
     setWorkspace((current) => ({
@@ -266,7 +264,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
           projectName: source.details.projectName ? `${source.details.projectName} (copy)` : "",
         },
         roomPlan: source.roomPlan
-          ? { ...source.roomPlan, groups: source.roomPlan.groups.map((group) => ({ ...group, allocations: group.allocations.map((a) => ({ ...a })) })) }
+          ? { ...source.roomPlan, groups: source.roomPlan.groups.map((group) => ({ ...group, productNeeds: [...group.productNeeds] })) }
           : null,
         items: source.items.map((item) => ({ ...item })),
         createdAt: now,
@@ -323,110 +321,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => {
       const plan = current.roomPlan ?? createEmptyRoomPlan();
       const group = plan.groups.find((entry) => entry.roomKey === roomKey);
-      const scopeIds = new Set(
-        [group?.scopeId, ...(group?.allocations.map((a) => a.scopeId) ?? [])].filter((id): id is string => Boolean(id))
-      );
       return {
         ...current,
-        items: current.items.filter((item) => !item.scopeId || !scopeIds.has(item.scopeId)),
+        items: group ? current.items.filter((item) => item.scopeId !== group.scopeId) : current.items,
         roomPlan: { ...plan, groups: plan.groups.filter((entry) => entry.roomKey !== roomKey) },
-      };
-    });
-  }, [updateActive]);
-
-  const addAllocation = useCallback((
-    roomKey: string,
-    roomCount: number,
-    assignment: RoomGroupAssignment,
-    rows: Array<{ slug: string; finish: string; quantity: number }>,
-    scopeName: string,
-    scopeSummary: string,
-    label?: string
-  ) => {
-    const id = createAllocationId();
-    const scopeId = `${roomKey}-alloc-${id}`;
-    updateActive((current) => {
-      const plan = current.roomPlan ?? createEmptyRoomPlan();
-      return {
-        ...current,
-        items: [
-          ...current.items,
-          ...rows.map((row) => ({
-            slug: row.slug,
-            finish: row.finish,
-            quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
-            scopeId,
-            scopeName,
-            scopeSummary,
-          })),
-        ],
-        roomPlan: {
-          ...plan,
-          groups: plan.groups.map((group) => group.roomKey === roomKey
-            ? { ...group, allocations: [...group.allocations, { id, scopeId, roomCount: Math.max(1, Math.round(roomCount) || 1), assignment, label: label?.trim() || undefined }] }
-            : group),
-        },
-      };
-    });
-    return id;
-  }, [updateActive]);
-
-  const updateAllocation = useCallback((
-    roomKey: string,
-    allocationId: string,
-    roomCount: number,
-    assignment: RoomGroupAssignment,
-    rows: Array<{ slug: string; finish: string; quantity: number }>,
-    scopeName: string,
-    scopeSummary: string,
-    label?: string
-  ) => {
-    updateActive((current) => {
-      const plan = current.roomPlan ?? createEmptyRoomPlan();
-      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
-      const scopeId = group?.allocations.find((a) => a.id === allocationId)?.scopeId ?? `${roomKey}-alloc-${allocationId}`;
-      return {
-        ...current,
-        items: [
-          ...current.items.filter((item) => item.scopeId !== scopeId),
-          ...rows.map((row) => ({
-            slug: row.slug,
-            finish: row.finish,
-            quantity: Math.max(1, Math.min(10_000, Math.round(row.quantity) || 1)),
-            scopeId,
-            scopeName,
-            scopeSummary,
-          })),
-        ],
-        roomPlan: {
-          ...plan,
-          groups: plan.groups.map((entry) => entry.roomKey === roomKey
-            ? {
-              ...entry,
-              allocations: entry.allocations.map((a) => a.id === allocationId
-                ? { ...a, roomCount: Math.max(1, Math.round(roomCount) || 1), assignment, label: label?.trim() || undefined }
-                : a),
-            }
-            : entry),
-        },
-      };
-    });
-  }, [updateActive]);
-
-  const removeAllocation = useCallback((roomKey: string, allocationId: string) => {
-    updateActive((current) => {
-      const plan = current.roomPlan ?? createEmptyRoomPlan();
-      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
-      const allocation = group?.allocations.find((a) => a.id === allocationId);
-      return {
-        ...current,
-        items: allocation ? current.items.filter((item) => item.scopeId !== allocation.scopeId) : current.items,
-        roomPlan: {
-          ...plan,
-          groups: plan.groups.map((entry) => entry.roomKey === roomKey
-            ? { ...entry, allocations: entry.allocations.filter((a) => a.id !== allocationId) }
-            : entry),
-        },
       };
     });
   }, [updateActive]);
@@ -437,10 +335,15 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       projects: workspace.projects,
       open,
       setOpen,
+      setupOpen,
+      setSetupOpen,
+      setupJustCompleted,
+      setSetupJustCompleted,
       addItem,
       updateQuantity,
       removeItem,
       updateDetails,
+      setPersona,
       newProject,
       switchProject,
       deleteProject,
@@ -451,9 +354,6 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       updateProductNeeds,
       addCustomRoom,
       removeCustomRoom,
-      addAllocation,
-      updateAllocation,
-      removeAllocation,
       projectIconRef,
       flyToProject,
       bump,

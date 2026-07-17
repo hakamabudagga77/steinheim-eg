@@ -1,9 +1,6 @@
-import { getProductsBySeries, type Product, type Series } from "@/lib/utils";
 import {
-  REQUIREMENT_TYPE_LABELS,
   ROOM_KEYS,
   scopeIdForRoom,
-  type LevelKey,
   type RequirementType,
   type RoomGroup,
   type RoomKey,
@@ -11,43 +8,7 @@ import {
   type TradeProjectRoomPlan,
 } from "@/lib/trade-project";
 
-export type { LevelKey, RequirementType, RoomKey };
-
-export interface Requirement {
-  type: RequirementType;
-  quantity: number;
-  optional?: boolean;
-}
-
-export interface GeneratedRow {
-  product: Product;
-  finish: string;
-  model: string;
-  unitPrice: number;
-  quantity: number;
-  lineTotal: number;
-}
-
-export const levelOptions: Array<{ id: LevelKey; label: string; tag: string; description: string }> = [
-  {
-    id: "practical",
-    label: "Core",
-    tag: "Essentials",
-    description: "Main mixers and repeatable items for controlled project budgets.",
-  },
-  {
-    id: "premium",
-    label: "Complete",
-    tag: "Most useful",
-    description: "A fuller bathroom scope with basin, shower, and supporting items.",
-  },
-  {
-    id: "signature",
-    label: "Signature",
-    tag: "Expanded",
-    description: "Adds statement pieces where suites, villas, or show units need more presence.",
-  },
-];
+export type { RequirementType, RoomKey };
 
 export const presets: Array<{
   id: string;
@@ -55,7 +16,6 @@ export const presets: Array<{
   icon: string;
   description: string;
   counts: Record<RoomKey, number>;
-  level: LevelKey;
 }> = [
   {
     id: "villa",
@@ -63,7 +23,6 @@ export const presets: Array<{
     icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
     description: "1 master, 2 guest, 1 powder",
     counts: { master: 1, standard: 2, powder: 1, suite: 0 },
-    level: "premium",
   },
   {
     id: "hotel",
@@ -71,7 +30,6 @@ export const presets: Array<{
     icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
     description: "40 standard rooms, 5 suites",
     counts: { master: 0, standard: 40, powder: 0, suite: 5 },
-    level: "premium",
   },
   {
     id: "development",
@@ -79,7 +37,6 @@ export const presets: Array<{
     icon: "M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z",
     description: "80 standard bathrooms",
     counts: { master: 0, standard: 80, powder: 0, suite: 0 },
-    level: "practical",
   },
   {
     id: "commercial",
@@ -87,7 +44,6 @@ export const presets: Array<{
     icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
     description: "6 powder / public washrooms",
     counts: { master: 0, standard: 0, powder: 6, suite: 0 },
-    level: "practical",
   },
 ];
 
@@ -118,10 +74,10 @@ export const roomConfig: Array<{ key: RoomKey; label: string; icon: string; help
   },
 ];
 
-/** Smart starting checklist for a room type at a given coverage level — used only to pre-fill
- * the property-setup checklist step. Not used for generation anymore; `buildSchedule()` reads
- * directly off whatever the user confirms in `RoomGroup.productNeeds`. */
-export function requirementsFor(room: RoomKey, level: LevelKey): Requirement[] {
+/** Default starting checklist for a room type — used only to seed the property-setup
+ * checklist step the first time a room is configured. `buildSchedule()` reads directly off
+ * whatever the user confirms in `RoomGroup.productNeeds`, not off this default. */
+export function defaultProductNeedsFor(room: RoomKey): RoomProductNeed[] {
   if (room === "powder") {
     return [{ type: "basin-mixer", quantity: 1 }];
   }
@@ -129,52 +85,28 @@ export function requirementsFor(room: RoomKey, level: LevelKey): Requirement[] {
     return [
       { type: "wall-mounted", quantity: 1 },
       { type: "concealed-shower", quantity: 1 },
-      { type: "free-standing", quantity: 1, optional: true },
-      { type: "bidet-spray", quantity: 1, optional: true },
-      { type: "accessories", quantity: 1, optional: true },
-    ];
-  }
-  if (level === "signature") {
-    const signatureRequirements: Requirement[] = [
-      { type: "wall-mounted", quantity: 1 },
-      { type: "concealed-shower", quantity: 1 },
-      { type: "free-standing", quantity: room === "master" ? 1 : 0, optional: true },
-      { type: "bidet-spray", quantity: 1, optional: true },
-      { type: "accessories", quantity: 1, optional: true },
-    ];
-    return signatureRequirements.filter((item) => item.quantity > 0 || item.optional);
-  }
-  if (level === "premium") {
-    return [
-      { type: room === "master" ? "tall-basin-mixer" : "basin-mixer", quantity: 1 },
-      { type: "concealed-shower", quantity: 1 },
-      { type: "bidet-spray", quantity: 1, optional: true },
-      { type: "accessories", quantity: 1, optional: true },
     ];
   }
   return [
-    { type: "basin-mixer", quantity: 1 },
+    { type: room === "master" ? "tall-basin-mixer" : "basin-mixer", quantity: 1 },
     { type: "concealed-shower", quantity: 1 },
-    { type: "accessories", quantity: 1, optional: true },
   ];
 }
 
-/** The checklist rows to show in the property-setup step for a room type: required items
- * pre-checked with their default quantity, optional items shown unchecked (quantity 0). */
-export function productNeedDefaultsFor(room: RoomKey, level: LevelKey): RoomProductNeed[] {
-  return requirementsFor(room, level)
-    .filter((req) => !req.optional)
-    .map((req) => ({ type: req.type, quantity: req.quantity }));
-}
+const ALL_REQUIREMENT_TYPES: RequirementType[] = [
+  "basin-mixer",
+  "tall-basin-mixer",
+  "wall-mounted",
+  "concealed-shower",
+  "free-standing",
+  "accessories",
+  "bidet-spray",
+];
 
-/** Every product type that could plausibly apply to a room type, for building the full
- * checklist UI (required + optional), independent of which are checked by default. */
-export function allRequirementTypesFor(room: RoomKey): RequirementType[] {
-  const seen = new Set<RequirementType>();
-  (["practical", "premium", "signature"] as LevelKey[]).forEach((level) => {
-    requirementsFor(room, level).forEach((req) => seen.add(req.type));
-  });
-  return Array.from(seen);
+/** The full product-type gallery, shown for every room regardless of kind — nobody should be
+ * forced into a curated subset. Room kind only affects which needs are pre-checked by default. */
+export function allRequirementTypesFor(_room: RoomKey): RequirementType[] {
+  return ALL_REQUIREMENT_TYPES;
 }
 
 export function createEmptyRoomPlan(): TradeProjectRoomPlan {
@@ -185,8 +117,7 @@ export function createEmptyRoomPlan(): TradeProjectRoomPlan {
       roomKey,
       roomLabel: roomConfig.find((entry) => entry.key === roomKey)?.label ?? roomKey,
       count: 0,
-      productNeeds: productNeedDefaultsFor(roomKey, "premium"),
-      allocations: [],
+      productNeeds: defaultProductNeedsFor(roomKey),
     })),
   };
 }
@@ -198,14 +129,13 @@ export function createEmptyCustomRoomGroup(roomKey: string, label: string, count
     roomLabel: label,
     count: clampCount(count),
     isCustom: true,
-    productNeeds: productNeedDefaultsFor("master", "premium"),
-    allocations: [],
+    productNeeds: defaultProductNeedsFor("master"),
   };
 }
 
 /** Builds/updates a room plan from the property-setup step, preserving any existing
- * allocations for rooms that already existed (matched by roomKey) — re-visiting property
- * setup should never silently discard collection assignments already made. */
+ * product needs for rooms that already existed (matched by roomKey) — re-visiting property
+ * setup should never silently discard needs already confirmed. */
 export function buildRoomPlan(
   existingPlan: TradeProjectRoomPlan | null,
   presetId: string | null,
@@ -214,7 +144,6 @@ export function buildRoomPlan(
   customRooms: Array<{ roomKey: string; label: string; count: number }>
 ): TradeProjectRoomPlan {
   const existingByKey = new Map((existingPlan?.groups ?? []).map((group) => [group.roomKey, group]));
-  const level = presets.find((preset) => preset.id === presetId)?.level ?? "premium";
 
   const fixedGroups: RoomGroup[] = ROOM_KEYS.map((roomKey) => {
     const existing = existingByKey.get(roomKey);
@@ -223,8 +152,7 @@ export function buildRoomPlan(
       roomKey,
       roomLabel: roomConfig.find((entry) => entry.key === roomKey)?.label ?? roomKey,
       count: clampCount(counts[roomKey] ?? 0),
-      productNeeds: productNeedsByRoom[roomKey] ?? existing?.productNeeds ?? productNeedDefaultsFor(roomKey, level),
-      allocations: existing?.allocations ?? [],
+      productNeeds: productNeedsByRoom[roomKey] ?? existing?.productNeeds ?? defaultProductNeedsFor(roomKey),
     };
   });
 
@@ -236,62 +164,13 @@ export function buildRoomPlan(
       roomLabel: room.label,
       count: clampCount(room.count),
       isCustom: true,
-      productNeeds: productNeedsByRoom[room.roomKey] ?? existing?.productNeeds ?? productNeedDefaultsFor("master", "premium"),
-      allocations: existing?.allocations ?? [],
+      productNeeds: productNeedsByRoom[room.roomKey] ?? existing?.productNeeds ?? defaultProductNeedsFor("master"),
     };
   });
 
   return { presetId, groups: [...fixedGroups, ...customGroups] };
 }
 
-export const collectionIntelligence: Record<string, { bestUse: string; note: string }> = {
-  joy: {
-    bestUse: "Villas, hotel suites, premium apartments",
-    note: "Warm, round lines with the broadest product coverage in the Egypt range.",
-  },
-  up: {
-    bestUse: "Hotels, compounds, repeatable schedules",
-    note: "Streamlined and complete — the strongest trade recommendation.",
-  },
-  art: {
-    bestUse: "Architect-led villas, boutique hospitality",
-    note: "Stainless steel bodies create a stronger design statement.",
-  },
-  quatro: {
-    bestUse: "Modern apartments, geometric interiors",
-    note: "Linear forms for sharper, contemporary spaces.",
-  },
-};
-
 export function clampCount(value: number) {
   return Math.max(0, Math.min(500, Math.round(value) || 0));
-}
-
-/** Generates product rows for ONE allocation: a single collection+finish, a single room count,
- * against an explicit list of needed product types (already decided at the room-group level). */
-export function buildSchedule(series: Series, finish: string, productNeeds: RoomProductNeed[], roomCount: number) {
-  const products = getProductsBySeries(series.id);
-  const rows: GeneratedRow[] = [];
-  const omitted: string[] = [];
-
-  for (const need of productNeeds) {
-    if (need.quantity <= 0 || roomCount <= 0) continue;
-    const product = products.find((entry) => entry.type === need.type);
-    const variant = product?.variants.find((entry) => entry.finish === finish);
-    const totalQuantity = need.quantity * roomCount;
-    if (!product || !variant) {
-      omitted.push(`${REQUIREMENT_TYPE_LABELS[need.type]} (not available in ${series.name} in this finish)`);
-      continue;
-    }
-    rows.push({
-      product,
-      finish,
-      model: variant.model,
-      unitPrice: variant.price,
-      quantity: totalQuantity,
-      lineTotal: totalQuantity * variant.price,
-    });
-  }
-
-  return { rows, omitted };
 }

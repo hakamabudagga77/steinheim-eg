@@ -15,14 +15,17 @@ export default function ProductCard({
   liveVariants,
   hidePrice = false,
   finish: groupFinish,
+  onAdd,
 }: {
   product: Product;
   liveVariants?: LiveVariants;
   hidePrice?: boolean;
   finish?: string | null;
+  onAdd?: (slug: string, finish: string, quantity: number) => void;
 }) {
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
   const [added, setAdded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
 
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
@@ -39,7 +42,11 @@ export default function ProductCard({
 
   return (
     <article>
-      <Link href={`/products/${product.slug}`} className="group block">
+      <Link
+        href={`/products/${product.slug}`}
+        className="group block"
+        {...(onAdd ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
         <div className="relative aspect-square overflow-hidden bg-[#ece9e2]">
           <AnimatePresence mode="wait">
             <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
@@ -68,44 +75,110 @@ export default function ProductCard({
         </div>
       </Link>
 
-      <div className="mt-3 flex items-center justify-between gap-1.5 sm:gap-2">
-        <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
-          {product.variants.map((entry) => {
-            const finish = getFinishById(entry.finish);
-            const disc = getFinishDiscImage(entry.finish);
-            if (!finish) return null;
-            return (
-              <button
-                key={entry.finish}
-                type="button"
-                onClick={() => setSelectedFinish(entry.finish)}
-                title={finish.name}
-                aria-label={`Show ${finish.name}`}
-                aria-pressed={selectedFinish === entry.finish}
-                className={`relative h-5 w-5 shrink-0 overflow-hidden rounded-full border transition cursor-pointer sm:h-6 sm:w-6 ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1 sm:ring-offset-2" : "border-black/10 hover:border-black/40"}`}
-              >
-                {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
-              </button>
-            );
-          })}
-        </div>
+      {onAdd ? (
+        <div className="mt-3 space-y-2.5">
+          <div className="flex flex-wrap items-center gap-1.5" aria-label="Available finishes">
+            {product.variants.map((entry) => {
+              const finish = getFinishById(entry.finish);
+              const disc = getFinishDiscImage(entry.finish);
+              if (!finish) return null;
+              return (
+                <button
+                  key={entry.finish}
+                  type="button"
+                  onClick={() => setSelectedFinish(entry.finish)}
+                  title={finish.name}
+                  aria-label={`Show ${finish.name}`}
+                  aria-pressed={selectedFinish === entry.finish}
+                  className={`relative h-6 w-6 shrink-0 overflow-hidden rounded-full border transition cursor-pointer ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1" : "border-black/10 hover:border-black/40"}`}
+                >
+                  {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
+                </button>
+              );
+            })}
+          </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            addItem(product.slug, variant.finish);
-            setAdded(true);
-            setTimeout(() => setAdded(false), 1600);
-          }}
-          aria-label={added ? "Added to cart" : "Quick add to cart"}
-          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
-            added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
-          }`}
-        >
-          <span className="sm:hidden">{added ? "✓" : "+"}</span>
-          <span className="hidden sm:inline">{added ? "Added" : "Quick add"}</span>
-        </button>
-      </div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 flex-1 items-center border border-black/12">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="flex h-full w-8 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+              >
+                −
+              </button>
+              <input
+                type="number"
+                min={1}
+                max={9999}
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, Math.round(Number(e.target.value)) || 1))}
+                className="h-full w-full min-w-0 border-x border-black/12 bg-transparent text-center text-[12px] outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                className="flex h-full w-8 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+              >
+                +
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onAdd(product.slug, variant.finish, quantity);
+                setAdded(true);
+                setTimeout(() => setAdded(false), 1600);
+              }}
+              aria-label={added ? "Added" : "Add"}
+              className={`flex h-8 shrink-0 items-center justify-center rounded-full border px-4 text-[11px] font-medium uppercase tracking-[0.08em] transition cursor-pointer ${
+                added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
+              }`}
+            >
+              {added ? "Added" : "Add"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3 flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
+            {product.variants.map((entry) => {
+              const finish = getFinishById(entry.finish);
+              const disc = getFinishDiscImage(entry.finish);
+              if (!finish) return null;
+              return (
+                <button
+                  key={entry.finish}
+                  type="button"
+                  onClick={() => setSelectedFinish(entry.finish)}
+                  title={finish.name}
+                  aria-label={`Show ${finish.name}`}
+                  aria-pressed={selectedFinish === entry.finish}
+                  className={`relative h-5 w-5 shrink-0 overflow-hidden rounded-full border transition cursor-pointer sm:h-6 sm:w-6 ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1 sm:ring-offset-2" : "border-black/10 hover:border-black/40"}`}
+                >
+                  {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              addItem(product.slug, variant.finish);
+              setAdded(true);
+              setTimeout(() => setAdded(false), 1600);
+            }}
+            aria-label={added ? "Added to cart" : "Quick add to cart"}
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
+              added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
+            }`}
+          >
+            <span className="sm:hidden">{added ? "✓" : "+"}</span>
+            <span className="hidden sm:inline">{added ? "Added" : "Quick add"}</span>
+          </button>
+        </div>
+      )}
     </article>
   );
 }

@@ -43,6 +43,21 @@ export function getProductTypes(): string[] {
   return Array.from(types);
 }
 
+export function getProductsByType(type: string): Product[] {
+  return productsData.products.filter((p) => p.type === type);
+}
+
+const REPRESENTATIVE_SERIES_PRIORITY = ["joy", "up", "art", "quatro"];
+
+export function getRepresentativeProductForType(type: string): Product | undefined {
+  const candidates = getProductsByType(type);
+  for (const seriesId of REPRESENTATIVE_SERIES_PRIORITY) {
+    const match = candidates.find((p) => p.series === seriesId);
+    if (match) return match;
+  }
+  return candidates[0];
+}
+
 export function getRelatedProducts(product: Product, limit = 4): Product[] {
   return productsData.products
     .filter((p) => p.series === product.series && p.slug !== product.slug)

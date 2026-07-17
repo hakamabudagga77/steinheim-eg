@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { tradeLeadStatuses, type TradeLead, type TradeLeadStatus } from "@/lib/trade-leads";
+import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
 
 const STORAGE_KEY = "steinheim-trade-admin-key";
 
@@ -47,7 +48,9 @@ function LeadDetail({ lead, onSave }: { lead: TradeLead; onSave: (id: string, up
         </div>
         <div>
           <p className="mb-2 text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">Project</p>
-          <p className="text-[13px] text-charcoal">{d.projectType || "—"}</p>
+          <p className="text-[13px] text-charcoal">
+            {lead.project.persona ? TRADE_PERSONA_LABELS[lead.project.persona] : d.projectType || "—"}
+          </p>
           <p className="text-[13px] text-charcoal">{d.location || "—"}</p>
           <p className="text-[12px] text-warm-gray">Timeline: {d.timeline || "—"}</p>
         </div>
@@ -243,6 +246,11 @@ export default function TradeAdminBoard() {
                     <span className={`shrink-0 border px-2 py-1 text-[8px] font-medium uppercase tracking-[0.1em] ${priorityStyles(lead.priority)}`}>
                       {lead.priority}
                     </span>
+                    {lead.project.persona && (
+                      <span className="shrink-0 border border-charcoal/15 bg-[#f4f2ec] px-2 py-1 text-[8px] font-medium uppercase tracking-[0.1em] text-charcoal">
+                        {TRADE_PERSONA_LABELS[lead.project.persona]}
+                      </span>
+                    )}
                     <p className="truncate text-[14px] font-medium text-charcoal">
                       {lead.project.details.projectName || "Untitled project"}
                     </p>
