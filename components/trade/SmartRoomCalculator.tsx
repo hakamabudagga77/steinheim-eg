@@ -270,7 +270,7 @@ export default function SmartRoomCalculator() {
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40 sm:col-span-2"
-                      placeholder="Project name *"
+                      placeholder="Business or project name *"
                       value={details.projectName}
                       onChange={(e) => updateDetails({ projectName: e.target.value })}
                     />

@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
+import type { RoomGroup } from "@/lib/trade-project";
 
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
 
@@ -16,16 +17,20 @@ export default function ProductCard({
   hidePrice = false,
   finish: groupFinish,
   onAdd,
+  roomOptions,
 }: {
   product: Product;
   liveVariants?: LiveVariants;
   hidePrice?: boolean;
   finish?: string | null;
-  onAdd?: (slug: string, finish: string, quantity: number) => void;
+  onAdd?: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
+  roomOptions?: RoomGroup[];
 }) {
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [roomOpen, setRoomOpen] = useState(false);
+  const [scopeChoice, setScopeChoice] = useState(roomOptions?.[0]?.scopeId ?? "");
   const { addItem } = useCart();
 
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
@@ -34,11 +39,20 @@ export default function ProductCard({
     if (groupFinish) setSelectedFinish(groupFinish);
   }, [groupFinish]);
 
+  useEffect(() => {
+    if (!roomOptions || roomOptions.length === 0) return;
+    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+      setScopeChoice(roomOptions[0].scopeId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomOptions]);
+
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const liveVariant = liveVariants?.find((v) => v.finish === variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
+  const selectedRoom = roomOptions?.find((group) => group.scopeId === scopeChoice) ?? null;
 
   return (
     <article>
@@ -98,12 +112,53 @@ export default function ProductCard({
             })}
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 flex-1 items-center border border-black/12">
+          {roomOptions && roomOptions.length > 0 && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setRoomOpen((o) => !o)}
+                className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-black/10 pb-1.5 text-left text-[11px] text-black/55 transition hover:border-black/30 hover:text-black"
+              >
+                <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : "No specific room"}</span>
+                <span className="shrink-0 text-[9px] text-black/35">{roomOpen ? "▲" : "▼"}</span>
+              </button>
+              <AnimatePresence>
+                {roomOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 right-0 z-20 mt-1 overflow-hidden border border-black/8 bg-white shadow-[0_16px_50px_rgba(0,0,0,0.12)]"
+                  >
+                    {roomOptions.map((group, i) => (
+                      <button
+                        key={group.scopeId}
+                        type="button"
+                        onClick={() => {
+                          setScopeChoice(group.scopeId);
+                          setRoomOpen(false);
+                        }}
+                        className={`flex w-full cursor-pointer items-center px-3 py-2 text-left text-[11px] transition hover:bg-black/[0.035] ${
+                          i > 0 ? "border-t border-black/6" : ""
+                        } ${group.scopeId === scopeChoice ? "font-semibold text-black" : "text-black/65"}`}
+                      >
+                        {group.roomLabel}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex h-full w-8 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+                className="flex h-7 w-6 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+                aria-label="Decrease quantity"
               >
                 −
               </button>
@@ -113,12 +168,14 @@ export default function ProductCard({
                 max={9999}
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Math.round(Number(e.target.value)) || 1))}
-                className="h-full w-full min-w-0 border-x border-black/12 bg-transparent text-center text-[12px] outline-none"
+                className="h-7 w-8 shrink-0 bg-transparent text-center text-[12px] outline-none"
+                aria-label="Quantity"
               />
               <button
                 type="button"
                 onClick={() => setQuantity((q) => q + 1)}
-                className="flex h-full w-8 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+                className="flex h-7 w-6 shrink-0 items-center justify-center text-[14px] text-black/55 transition hover:text-black"
+                aria-label="Increase quantity"
               >
                 +
               </button>
@@ -126,7 +183,7 @@ export default function ProductCard({
             <button
               type="button"
               onClick={() => {
-                onAdd(product.slug, variant.finish, quantity);
+                onAdd(product.slug, variant.finish, quantity, scopeChoice || undefined);
                 setAdded(true);
                 setTimeout(() => setAdded(false), 1600);
               }}

@@ -250,7 +250,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                         />
                         <input
                           className="h-10 border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Project name *"
+                          placeholder="Business or project name *"
                           value={details.projectName}
                           onChange={(e) => updateDetails({ projectName: e.target.value })}
                         />
@@ -420,6 +420,13 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                         </div>
                       );
                     })}
+                  </div>
+
+                  <div className="mt-6 border border-charcoal/10 bg-[#ece9e2]/60 p-4">
+                    <p className="text-[12px] leading-[1.6] text-charcoal">
+                      <span className="font-medium">You&apos;re set.</span> Once you&apos;re done, browse the site exactly as normal —
+                      or open <span className="font-medium">Shop by need</span> in the menu to see only what {details.projectName || "your project"} still needs, grouped by type.
+                    </p>
                   </div>
                 </div>
               )}

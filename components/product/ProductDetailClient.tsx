@@ -25,6 +25,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
   const [cartAdded, setCartAdded] = useState(false);
   const [projectAdded, setProjectAdded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { project, addItem, setOpen: setProposalOpen, setSetupOpen, flyToProject } = useTradeProject();
   const { addItem: addToCart, flyToCart } = useCart();
   const imageWrapRef = useRef<HTMLDivElement>(null);
@@ -66,7 +67,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
     }
     if (imageUrl) flyToProject(imageWrapRef.current, imageUrl);
     const group = roomOptions.find((entry) => entry.scopeId === scopeChoice);
-    addItem(product.slug, variant.finish, 1, group ? {
+    addItem(product.slug, variant.finish, quantity, group ? {
       scopeId: group.scopeId,
       scopeName: group.roomLabel,
       scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
@@ -74,6 +75,36 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
     setProjectAdded(true);
     setTimeout(() => setProjectAdded(false), 2200);
   }
+
+  const quantityStepper = (
+    <div className="flex shrink-0 items-center gap-1">
+      <button
+        type="button"
+        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+        className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
+        aria-label="Decrease quantity"
+      >
+        −
+      </button>
+      <input
+        type="number"
+        min={1}
+        max={9999}
+        value={quantity}
+        onChange={(e) => setQuantity(Math.max(1, Math.round(Number(e.target.value)) || 1))}
+        className="h-9 w-9 bg-transparent text-center text-[14px] outline-none"
+        aria-label="Quantity"
+      />
+      <button
+        type="button"
+        onClick={() => setQuantity((q) => q + 1)}
+        className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
+        aria-label="Increase quantity"
+      >
+        +
+      </button>
+    </div>
+  );
 
   return (
     <PageTransition>
@@ -122,7 +153,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
               </AnimatePresence>
             </div>
 
-            <div className="flex items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:items-center sm:px-8 sm:py-12 lg:px-16 lg:py-20 xl:px-20">
+            <div className="flex items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:px-8 sm:pt-4 sm:pb-12 lg:px-16 lg:pt-8 lg:pb-20 xl:px-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -130,7 +161,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 className="w-full max-w-[620px]"
               >
                 <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
-                <h1 className="mt-2 text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[clamp(1.8rem,5.8vw,5.8rem)] sm:font-light sm:leading-[0.95]">
+                <h1 className="mt-2 whitespace-nowrap text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[1.8rem] lg:text-[clamp(1.3rem,2.1vw,2.6rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
 
@@ -144,7 +175,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   )}
                 </div>
 
-                <div className="relative mt-7 sm:mt-12">
+                <div className="relative mt-7 sm:mt-20 lg:mt-28">
                   <button
                     type="button"
                     onClick={() => setFinishOpen((open) => !open)}
@@ -213,13 +244,13 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </AnimatePresence>
                 </div>
 
-                <div className="mt-8">
+                <div className={isTradeCustomer ? "mt-3" : "mt-8 sm:mt-20 lg:mt-28"}>
                   {!isTradeCustomer && (
                     <button
                       type="button"
                       onClick={() => {
                         if (imageUrl) flyToCart(imageWrapRef.current, imageUrl);
-                        addToCart(product.slug, variant.finish);
+                        addToCart(product.slug, variant.finish, quantity);
                         setCartAdded(true);
                         setTimeout(() => setCartAdded(false), 2200);
                       }}
@@ -255,7 +286,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     </button>
                   )}
                   {roomOptions.length > 0 && (
-                    <div className={`relative ${isTradeCustomer ? "" : "mt-3"}`}>
+                    <div className={`flex items-center gap-3 ${isTradeCustomer ? "" : "mt-3"}`}>
+                      <div className="relative flex-1">
                       <button
                         type="button"
                         onClick={() => setRoomOpen((o) => !o)}
@@ -317,6 +349,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                           </motion.div>
                         )}
                       </AnimatePresence>
+                      </div>
+                      {quantityStepper}
                     </div>
                   )}
                   {activeRoomGroups.length === 0 && (

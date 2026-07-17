@@ -9,6 +9,7 @@ import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
+import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
 
 const LIGHT_TOP_PATTERN = /^\/products\//;
@@ -88,6 +89,8 @@ export default function Navigation({ locale }: { locale: string }) {
     bump: tradeBump,
   } = useTradeProject();
   const tradeItemCount = tradeProject.items.length;
+  const showShopByNeed = hasActiveRoomNeeds(tradeProject);
+  const projectDisplayName = tradeProject.details.projectName || "your project";
   const useWhite = !LIGHT_TOP_PATTERN.test(pathname);
 
   useEffect(() => {
@@ -138,10 +141,20 @@ export default function Navigation({ locale }: { locale: string }) {
 
           <Link
             href="/"
-            className="absolute left-1/2 top-1/2 shrink-0 -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-1/2 flex shrink-0 -translate-x-1/2 -translate-y-1/2 items-center gap-2.5"
             aria-label="Steinheim home"
           >
             <Logo color={useWhite ? "light" : "dark"} size="md" showWave={false} />
+            {showShopByNeed && (
+              <span
+                className={`hidden whitespace-nowrap font-heading text-[39px] tracking-[-0.06em] lg:inline ${
+                  useWhite ? "text-white" : "text-charcoal"
+                }`}
+                style={{ fontStyle: "italic" }}
+              >
+                × {projectDisplayName}
+              </span>
+            )}
           </Link>
 
           <div className="flex items-center gap-4 lg:gap-6">
@@ -279,6 +292,28 @@ export default function Navigation({ locale }: { locale: string }) {
               <div className="flex w-full flex-col overflow-y-auto px-6 pb-6 pt-20 lg:w-[36%] lg:px-10 lg:pb-8 lg:pt-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="mb-8 lg:mb-12">
                   <div className="space-y-1">
+                    {showShopByNeed && (
+                      <motion.div
+                        className="mb-3"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
+                      >
+                        <div className="mb-1.5 inline-flex items-center gap-1.5 bg-black px-2.5 py-1">
+                          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white">For your project</span>
+                        </div>
+                        <Link
+                          href="/shop-by-need"
+                          onClick={handleNavigate}
+                          style={{ fontStyle: "italic" }}
+                          className={`block py-1 text-[clamp(2.1rem,10vw,2.8rem)] font-medium leading-[1.05] text-black transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
+                            pathname === "/shop-by-need" ? "" : "hover:translate-x-2"
+                          }`}
+                        >
+                          Shop for {projectDisplayName}
+                        </Link>
+                      </motion.div>
+                    )}
                     <motion.div
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
