@@ -13,6 +13,7 @@ import {
   Users,
   Package,
   BarChart3,
+  Megaphone,
   FileText,
   ShieldCheck,
   LogOut,
@@ -26,7 +27,8 @@ const NAV_ITEMS = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart, external: false },
   { href: "/admin/customers", label: "Customers", icon: Users, external: false },
   { href: "/admin/products", label: "Products", icon: Package, external: false },
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, external: false },
+  { href: "/admin/analytics", label: "Website Analytics", icon: BarChart3, external: false },
+  { href: "/admin/analytics/marketing", label: "Marketing Analytics", icon: Megaphone, external: false },
   { href: "/admin/policies", label: "Policies", icon: ShieldCheck, external: false },
   { href: "/admin/content", label: "Content", icon: FileText, external: false },
 ];

@@ -11,6 +11,7 @@ import {
   Users,
   Package,
   BarChart3,
+  Megaphone,
   FileText,
   ShieldCheck,
   LogOut,
@@ -43,7 +44,8 @@ export default function CommandPalette() {
       { id: "orders", label: "Orders", icon: ShoppingCart, group: "Go to", run: () => router.push("/admin/orders") },
       { id: "customers", label: "Customers", icon: Users, group: "Go to", run: () => router.push("/admin/customers") },
       { id: "products", label: "Products", icon: Package, group: "Go to", run: () => router.push("/admin/products") },
-      { id: "analytics", label: "Analytics", icon: BarChart3, group: "Go to", run: () => router.push("/admin/analytics") },
+      { id: "analytics", label: "Website Analytics", icon: BarChart3, group: "Go to", run: () => router.push("/admin/analytics") },
+      { id: "marketing-analytics", label: "Marketing Analytics", icon: Megaphone, group: "Go to", run: () => router.push("/admin/analytics/marketing") },
       { id: "policies", label: "Policies", icon: ShieldCheck, group: "Go to", run: () => router.push("/admin/policies") },
       { id: "content", label: "Content", icon: FileText, group: "Go to", run: () => router.push("/admin/content") },
       {
