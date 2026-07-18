@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { Users, Activity, Eye, Clock } from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { PageHeader, Panel, StatCard, StatCardSkeleton, ErrorState, SegmentedControl } from "@/components/admin/ui";
 
 type Timeframe = "7d" | "30d" | "90d";
 
-const TIMEFRAME_LABELS: Record<Timeframe, string> = {
-  "7d": "7 days",
-  "30d": "30 days",
-  "90d": "90 days",
-};
+const TIMEFRAME_OPTIONS: Array<{ value: Timeframe; label: string }> = [
+  { value: "7d", label: "7 days" },
+  { value: "30d", label: "30 days" },
+  { value: "90d", label: "90 days" },
+];
 
 const TIMEFRAME_DAYS: Record<Timeframe, string> = {
   "7d": "7daysAgo",
@@ -58,112 +61,114 @@ export default function AdminAnalyticsPage() {
       .catch((err) => setError(err.message));
   }, [timeframe]);
 
-  const maxDailyUsers = useMemo(
-    () => Math.max(1, ...(summary?.dailyUsers.map((d) => d.users) ?? [1])),
-    [summary]
-  );
-
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-[0.3em] text-black/40">Analytics</p>
-      <h1 className="mt-2 font-heading text-[32px] tracking-[-0.02em]">Site traffic</h1>
-      <p className="mt-2 text-[13px] text-black/40">Live from Google Analytics 4</p>
+      <PageHeader eyebrow="Analytics" title="Site traffic" subtitle="Live from Google Analytics 4" />
 
       {error && (
-        <div className="mt-6 rounded-xl border border-black/8 bg-white p-6">
-          <p className="text-[14px] text-black/60">{error}</p>
+        <ErrorState>
+          {error}
           {error.includes("not configured") && (
-            <p className="mt-2 text-[13px] text-black/40">
-              Needs <code className="rounded bg-black/5 px-1.5 py-0.5">GA4_PROPERTY_ID</code> set in the environment.
-            </p>
+            <span className="mt-2 block text-white/40">
+              Needs <code className="rounded bg-white/[0.08] px-1.5 py-0.5">GA4_PROPERTY_ID</code> set in the environment.
+            </span>
           )}
-        </div>
+        </ErrorState>
       )}
 
       {!error && (
         <>
-          <div className="mt-8 flex flex-wrap items-center gap-2">
-            {(["7d", "30d", "90d"] as Timeframe[]).map((tf) => (
-              <button
-                key={tf}
-                type="button"
-                onClick={() => setTimeframe(tf)}
-                className={`rounded-full border px-4 py-1.5 text-[12px] transition ${
-                  timeframe === tf ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black/30"
-                }`}
-              >
-                {TIMEFRAME_LABELS[tf]}
-              </button>
-            ))}
+          <div className="mt-8">
+            <SegmentedControl options={TIMEFRAME_OPTIONS} value={timeframe} onChange={setTimeframe} />
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Visitors</p>
-              <p className="mt-2 text-[26px] font-medium">{summary ? summary.activeUsers.toLocaleString() : "—"}</p>
-            </div>
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Sessions</p>
-              <p className="mt-2 text-[26px] font-medium">{summary ? summary.sessions.toLocaleString() : "—"}</p>
-            </div>
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Page views</p>
-              <p className="mt-2 text-[26px] font-medium">{summary ? summary.pageViews.toLocaleString() : "—"}</p>
-            </div>
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Avg. session</p>
-              <p className="mt-2 text-[26px] font-medium">{summary ? fmtDuration(summary.avgSessionDuration) : "—"}</p>
-            </div>
+            {summary ? (
+              <>
+                <StatCard icon={Users} label="Visitors" value={summary.activeUsers.toLocaleString()} accent />
+                <StatCard icon={Activity} label="Sessions" value={summary.sessions.toLocaleString()} />
+                <StatCard icon={Eye} label="Page views" value={summary.pageViews.toLocaleString()} />
+                <StatCard icon={Clock} label="Avg. session" value={fmtDuration(summary.avgSessionDuration)} />
+              </>
+            ) : (
+              <>
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+              </>
+            )}
           </div>
 
-          {summary && summary.dailyUsers.length > 0 && (
-            <div className="mt-4 rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Visitors per day</p>
-              <div className="mt-4 flex h-32 items-end gap-1">
-                {summary.dailyUsers.map((d) => (
-                  <div key={d.date} className="group relative flex-1">
-                    <div
-                      className="w-full rounded-t bg-black/80 transition group-hover:bg-black"
-                      style={{ height: `${Math.max(4, (d.users / maxDailyUsers) * 100)}%` }}
+          <Panel className="mt-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors per day</p>
+            <div className="mt-4 h-[200px]">
+              {summary ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={summary.dailyUsers} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="visitorsFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.35} />
+                        <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={fmtDate}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
+                      interval={Math.max(0, Math.floor(summary.dailyUsers.length / 8))}
                     />
-                    <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-black px-2 py-1 text-[10px] text-white opacity-0 transition group-hover:opacity-100">
-                      {fmtDate(d.date)}: {d.users}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    <Tooltip
+                      contentStyle={{
+                        background: "#18181b",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 10,
+                        fontSize: 12,
+                        color: "#fff",
+                      }}
+                      labelFormatter={(v) => fmtDate(String(v))}
+                      labelStyle={{ color: "rgba(255,255,255,0.5)" }}
+                    />
+                    <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
+              )}
             </div>
-          )}
+          </Panel>
 
           <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Top pages</p>
+            <Panel>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Top pages</p>
               <div className="mt-4 space-y-2">
                 {summary?.topPages.map((p) => (
                   <div key={p.path} className="flex items-center justify-between text-[13px]">
-                    <span className="truncate text-black/70">{p.path}</span>
-                    <span className="shrink-0 pl-3 font-medium">{p.views.toLocaleString()}</span>
+                    <span className="truncate text-white/70">{p.path}</span>
+                    <span className="shrink-0 pl-3 font-medium text-white/90">{p.views.toLocaleString()}</span>
                   </div>
                 ))}
                 {summary && summary.topPages.length === 0 && (
-                  <p className="text-[13px] text-black/40">No data yet for this period.</p>
+                  <p className="text-[13px] text-white/30">No data yet for this period.</p>
                 )}
               </div>
-            </div>
-            <div className="rounded-xl border border-black/8 bg-white p-6">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Traffic sources</p>
+            </Panel>
+            <Panel>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Traffic sources</p>
               <div className="mt-4 space-y-2">
                 {summary?.topSources.map((s) => (
                   <div key={s.source} className="flex items-center justify-between text-[13px]">
-                    <span className="truncate text-black/70">{s.source}</span>
-                    <span className="shrink-0 pl-3 font-medium">{s.sessions.toLocaleString()}</span>
+                    <span className="truncate text-white/70">{s.source}</span>
+                    <span className="shrink-0 pl-3 font-medium text-white/90">{s.sessions.toLocaleString()}</span>
                   </div>
                 ))}
                 {summary && summary.topSources.length === 0 && (
-                  <p className="text-[13px] text-black/40">No data yet for this period.</p>
+                  <p className="text-[13px] text-white/30">No data yet for this period.</p>
                 )}
               </div>
-            </div>
+            </Panel>
           </div>
         </>
       )}

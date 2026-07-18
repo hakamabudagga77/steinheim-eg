@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Users, Repeat, Wallet } from "lucide-react";
 import type { ShopifyCustomer } from "@/lib/shopify-client";
+import { PageHeader, Panel, StatCard, StatCardSkeleton, EmptyState, ErrorState } from "@/components/admin/ui";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", { dateStyle: "medium" });
@@ -24,25 +26,50 @@ export default function AdminCustomersPage() {
       .catch((err) => setError(err.message));
   }, []);
 
+  const stats = useMemo(() => {
+    if (!customers) return null;
+    const returning = customers.filter((c) => c.orders_count > 1).length;
+    const totalSpent = customers.reduce((sum, c) => sum + Number(c.total_spent || 0), 0);
+    return { returning, totalSpent };
+  }, [customers]);
+
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-[0.3em] text-black/40">Customers</p>
-      <h1 className="mt-2 font-heading text-[32px] tracking-[-0.02em]">
-        {customers ? `${customers.length} customer${customers.length === 1 ? "" : "s"}` : "Loading…"}
-      </h1>
-      <p className="mt-2 text-[13px] text-black/40">Live from Shopify · read-only</p>
+      <PageHeader
+        eyebrow="Customers"
+        title={customers ? `${customers.length} customer${customers.length === 1 ? "" : "s"}` : "Loading…"}
+        subtitle="Live from Shopify · read-only"
+      />
 
-      {error && <p className="mt-6 text-[14px] text-red-600">{error}</p>}
+      {error && <ErrorState>{error}</ErrorState>}
 
-      {customers && customers.length === 0 && (
-        <p className="mt-6 text-[14px] text-black/45">No customers yet.</p>
-      )}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {customers && stats ? (
+          <>
+            <StatCard icon={Users} label="Total customers" value={customers.length} accent />
+            <StatCard icon={Repeat} label="Returning" value={stats.returning} hint="More than 1 order" />
+            <StatCard
+              icon={Wallet}
+              label="Lifetime spend"
+              value={`EGP ${stats.totalSpent.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+            />
+          </>
+        ) : (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        )}
+      </div>
 
-      <div className="mt-8 overflow-x-auto rounded-xl border border-black/8 bg-white">
-        {customers && customers.length > 0 && (
+      {customers && customers.length === 0 && <EmptyState>No customers yet.</EmptyState>}
+
+      {customers && customers.length > 0 && (
+        <Panel className="mt-6 overflow-x-auto" padded={false}>
           <table className="w-full min-w-[640px] text-[13px]">
             <thead>
-              <tr className="border-b border-black/8 text-left text-black/40">
+              <tr className="border-b border-white/[0.06] text-left text-white/35">
                 <th className="px-5 py-3 font-normal">Name</th>
                 <th className="px-5 py-3 font-normal">Email</th>
                 <th className="px-5 py-3 font-normal">Phone</th>
@@ -53,25 +80,29 @@ export default function AdminCustomersPage() {
             </thead>
             <tbody>
               {customers.map((customer) => (
-                <tr key={customer.id} className="border-b border-black/6 last:border-b-0">
-                  <td className="px-5 py-3 font-medium">
+                <tr key={customer.id} className="border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02]">
+                  <td className="px-5 py-3 font-medium text-white/90">
                     {`${customer.first_name ?? ""} ${customer.last_name ?? ""}`.trim() || "—"}
                   </td>
                   <td className="px-5 py-3">
                     {customer.email ? (
-                      <a href={`mailto:${customer.email}`} className="underline">{customer.email}</a>
-                    ) : "—"}
+                      <a href={`mailto:${customer.email}`} className="text-[#c9a961] underline decoration-white/20">
+                        {customer.email}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
                   </td>
-                  <td className="px-5 py-3 text-black/60">{customer.phone || "—"}</td>
-                  <td className="px-5 py-3 text-black/60">{customer.orders_count}</td>
-                  <td className="px-5 py-3 font-medium">{customer.total_spent}</td>
-                  <td className="px-5 py-3 text-black/60">{fmtDate(customer.created_at)}</td>
+                  <td className="px-5 py-3 text-white/45">{customer.phone || "—"}</td>
+                  <td className="px-5 py-3 text-white/45">{customer.orders_count}</td>
+                  <td className="px-5 py-3 font-medium text-white/90">{customer.total_spent}</td>
+                  <td className="px-5 py-3 text-white/45">{fmtDate(customer.created_at)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </Panel>
+      )}
     </div>
   );
 }
