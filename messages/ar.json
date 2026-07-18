@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "title": "Steinheim | Premium German Bathroom Fixtures in Egypt",
-    "description": "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG."
+    "title": "شتاينهايم | تجهيزات حمّامات ألمانية فاخرة في مصر",
+    "description": "اكتشف خلاطات وأنظمة دُش وإكسسوارات شتاينهايم الفاخرة. هندسة ألمانية بخراطيش Sedal ومهويات Neoperl. متاحة بستة تشطيبات. حصريًا في مصر عبر مجموعة الشربتلي الدولية."
   },
   "nav": {
-    "collections": "Collections",
+    "collections": "المجموعات",
     "catalogue": "الكتالوج التفاعلي",
-    "assistant": "Concierge",
-    "finishes": "Finishes",
-    "projects": "مشاريع",
-    "trade": "Trade",
-    "configurator": "Build",
-    "compare": "Compare",
-    "specSheet": "Specs",
-    "about": "About",
-    "journal": "Journal",
-    "contact": "Contact",
-    "search": "Search",
-    "cart": "Cart",
-    "menu": "Menu",
-    "close": "Close"
+    "assistant": "الكونسيرج",
+    "finishes": "التشطيبات",
+    "projects": "المشروعات",
+    "trade": "المشروعات التجارية",
+    "configurator": "التكوين",
+    "compare": "المقارنة",
+    "specSheet": "المواصفات",
+    "about": "عن شتاينهايم",
+    "journal": "المدوّنة",
+    "contact": "تواصل معنا",
+    "search": "البحث",
+    "cart": "السلة",
+    "menu": "القائمة",
+    "close": "إغلاق"
   },
   "hero": {
     "headline": "Defined by what endures",
@@ -293,9 +293,20 @@
     }
   },
   "footer": {
-    "tagline": "Premium German bathroom systems",
-    "distributor": "Exclusive distributor: El Sharbatly International Group",
-    "rights": "All rights reserved"
+    "tagline": "أنظمة حمّامات ألمانية فاخرة",
+    "distributor": "الموزّع الحصري: مجموعة الشربتلي الدولية",
+    "rights": "جميع الحقوق محفوظة",
+    "assistance": { "label": "المساعدة", "desc": "هل تحتاج إلى مساعدة أو ترغب في طلب معلومات؟" },
+    "news": { "label": "الأخبار والفعاليات", "desc": "أخبار ورؤى ولحظات لا تُفوَّت." },
+    "catalogues": { "label": "الكتالوجات", "desc": "تصفَّح الكتالوجات لاكتشاف أحدث المجموعات." },
+    "discoverMore": "اكتشف المزيد",
+    "links": {
+      "collections": "المجموعات",
+      "ourWorld": "عالمنا",
+      "help": "هل تحتاج إلى مساعدة؟",
+      "newsletter": "النشرة البريدية"
+    },
+    "localeLabel": "مصر / AR"
   },
   "cart": {
     "title": "Cart",
@@ -306,8 +317,121 @@
     "continueShopping": "Continue shopping"
   },
   "common": {
-    "learnMore": "Learn more",
-    "viewAll": "View all",
-    "currency": "LE"
+    "learnMore": "اعرف المزيد",
+    "viewAll": "استعرض الكل",
+    "currency": "ج.م"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "شتاينهايم مصر",
+      "headline": "الماء، حين يُصمَّم.",
+      "body": "أنظمة حمّامات فاخرة للمنازل والضيافة والمشروعات المعمارية في مصر.",
+      "discover": "اكتشف المزيد",
+      "viewProducts": "استعرض المنتجات",
+      "pause": "إيقاف فيديو الخلفية",
+      "play": "تشغيل فيديو الخلفية",
+      "playShort": "تشغيل",
+      "scroll": "مرِّر"
+    },
+    "collections": {
+      "title": "اكتشف مجموعاتنا",
+      "joy": "توازن هادئ للفلل الخاصة والأجنحة وغرف الضيافة الدافئة.",
+      "up": "لغة عصرية قابلة للتكرار للمشروعات العقارية وجداول التوريد.",
+      "art": "دقة معمارية لحمّامات استثنائية ومساحات يقودها التصميم.",
+      "quatro": "هندسة نقية الخطوط لتصميمات داخلية معاصرة."
+    },
+    "ritual": {
+      "headline": "طقس الدقة الهادئ.",
+      "body": "تُختار شتاينهايم حيث يجب أن يبدو الحمّام مكتملًا: التناسب والتشطيب والآلية والاعتمادية طويلة الأمد، تعمل جميعها كلغة واحدة متكاملة."
+    },
+    "projects": {
+      "eyebrow": "مراجع المشروعات",
+      "headline": "حيث يتجسّد التصميم",
+      "viewAll": "استعرض كل المشروعات"
+    },
+    "trade": {
+      "eyebrow": "لمحترفي المشروعات",
+      "headline": "تُعِدّ مواصفات مشروع؟",
+      "body": "حدِّد تكوين غرفك واحتياجات كلٍّ منها مرة واحدة — ثم تسوَّق كالمعتاد بينما تتابع غرفك أولًا بأول.",
+      "setup": "جهِّز مشروعك",
+      "visit": "زيارة استوديو المشروعات"
+    }
+  },
+  "showroom": {
+    "eyebrow": "داخل شتاينهايم",
+    "headline": "صالة العرض، كما هي.",
+    "body": "لقطات حقيقية من صالة عرضنا في القاهرة — التشطيبات والآليات والمساحة التي يختار فيها العملاء حمّامًا متكاملًا وجهًا لوجه.",
+    "soundOn": "تشغيل صوت الفيديو",
+    "soundOff": "كتم صوت الفيديو"
+  },
+  "productPage": {
+    "collectionLabel": "مجموعة {series}",
+    "outOfStock": "غير متوفر حاليًا",
+    "addToCart": "أضِف إلى السلة",
+    "addedToCart": "أُضيف إلى السلة",
+    "noSpecificRoom": "بدون غرفة محددة",
+    "needsThis": "تحتاج إليه",
+    "noRoomManual": "بدون غرفة محددة (يدوي)",
+    "setupRoomCta": "جهِّز مشروعك ليُخصَّص هذا المنتج لغرفة تلقائيًا",
+    "openBoard": "افتح لوحة المشروع",
+    "addedBoard": "أُضيف إلى لوحة المشروع",
+    "addBoard": "أضِف إلى لوحة المشروع",
+    "infoNote": "المعلومات الفنية وتفاصيل المنتج وملفات الكتالوج متاحة بالأسفل.",
+    "tabs": {
+      "description": "وصف المنتج",
+      "detail": "تفاصيل المنتج",
+      "downloads": "الملفات"
+    },
+    "detailRows": {
+      "number": "رقم المنتج",
+      "collection": "المجموعة",
+      "finish": "التشطيب",
+      "application": "الاستخدام"
+    },
+    "descriptionBody": "{product} من مجموعة {series} يترجم لغة شتاينهايم المعمارية إلى منتج دقيق جاهز للمشروعات. الاختيار الحالي معروض بتشطيب {finish}.",
+    "downloadsIntro": "حمِّل كتالوج شتاينهايم الحالي أو اطلب النشرة الفنية الدقيقة لمنتج {product} من مجموعة {series} بتشطيب {finish}.",
+    "downloadsNote": "يُرجى تأكيد المخزون النهائي وأسعار المشروعات ومدد التوريد والكميات مع شتاينهايم مصر.",
+    "openCatalogue": "افتح كتالوج شتاينهايم 2026",
+    "requestSheet": "اطلب النشرة الفنية للموديل {model}",
+    "context": {
+      "eyebrow": "في سياقه",
+      "headline": "جزء من لغة حمّام متكاملة.",
+      "body": "شاهد كيف يعمل شكل مجموعة {series} وتشطيبها وتناسبها داخل بيئة حمّام مكتملة.",
+      "cta": "استعرض مجموعة {series}"
+    },
+    "related": {
+      "eyebrow": "منتجات ذات صلة",
+      "headline": "أكمِل لغة {series}.",
+      "viewCollection": "استعرض المجموعة"
+    },
+    "qty": {
+      "decrease": "تقليل الكمية",
+      "increase": "زيادة الكمية",
+      "label": "الكمية"
+    }
+  },
+  "cards": {
+    "quickAdd": "إضافة سريعة",
+    "add": "أضِف",
+    "added": "أُضيفت",
+    "inStock": "متوفر",
+    "outOfStock": "غير متوفر",
+    "noSpecificRoom": "بدون غرفة محددة",
+    "availableFinishes": "التشطيبات المتاحة",
+    "showFinish": "عرض تشطيب {name}"
+  },
+  "menu": {
+    "forYourProject": "لمشروعك",
+    "shopFor": "تسوّق لـ {name}",
+    "yourProject": "مشروعك",
+    "ourWorld": "عالمنا",
+    "world": {
+      "company": "الشركة",
+      "companyEyebrow": "الهوية",
+      "finishes": "تشطيباتنا",
+      "finishesEyebrow": "لغة الأسطح",
+      "tradeStudio": "استوديو المشروعات",
+      "tradeStudioEyebrow": "المشروعات"
+    }
   }
 }

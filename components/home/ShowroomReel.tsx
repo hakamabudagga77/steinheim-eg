@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const clips: Array<{
@@ -25,6 +26,7 @@ function ReelVideo({
   poster: string;
   active: boolean;
 }) {
+  const t = useTranslations("showroom");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   useAutoplayVideo(videoRef, src);
@@ -59,7 +61,7 @@ function ReelVideo({
           event.stopPropagation();
           setMuted((value) => !value);
         }}
-        aria-label={muted ? "Turn video sound on" : "Mute video"}
+        aria-label={muted ? t("soundOn") : t("soundOff")}
         className={`absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-md transition duration-500 hover:bg-white hover:text-black ${
           active ? "opacity-100" : "opacity-70"
         }`}
@@ -83,6 +85,7 @@ function ReelVideo({
 }
 
 export default function ShowroomReel() {
+  const t = useTranslations("showroom");
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
   const hoverPausedRef = useRef(false);
@@ -209,13 +212,12 @@ export default function ShowroomReel() {
           transition={{ duration: 0.8 }}
           className="mb-12"
         >
-          <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
+          <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">{t("eyebrow")}</p>
           <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-            The showroom, as it is.
+            {t("headline")}
           </h2>
           <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
-            Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms,
-            and the space where clients specify a complete bathroom in person.
+            {t("body")}
           </p>
         </motion.div>
       </div>

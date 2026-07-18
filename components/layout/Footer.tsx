@@ -16,20 +16,20 @@ export default function Footer({ dark = true }: { dark?: boolean }) {
     <footer className={dark ? "bg-[#0a0a0a] text-white" : "bg-[#ece9e2] text-black"}>
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
         <div className={`grid border-b sm:grid-cols-3 ${borderClass}`}>
-          {[
-            { label: "Assistance", desc: "Do you need assistance or would you like to request information?", href: "/contact" },
-            { label: "News & Events", desc: "News, insights and must-see moments.", href: "/about" },
-            { label: "Catalogues", desc: "Flip through the catalogs to find the newest collections.", href: "/collections" },
-          ].map((item) => (
+          {([
+            { key: "assistance", href: "/contact" },
+            { key: "news", href: "/about" },
+            { key: "catalogues", href: "/collections" },
+          ] as const).map((item) => (
             <Link
-              key={item.label}
+              key={item.key}
               href={item.href}
               className={`group flex flex-col border-b py-8 transition sm:border-b-0 sm:border-r sm:px-6 sm:last:border-r-0 lg:px-10 lg:py-12 ${borderClass} ${itemHoverClass}`}
             >
-              <p className={`text-[14px] font-medium transition ${primaryTextClass}`}>{item.label}</p>
-              <p className={`mt-2 text-[12px] leading-[1.65] ${mutedTextClass}`}>{item.desc}</p>
-              <span className={`mt-4 inline-flex text-[11px] font-medium uppercase tracking-[0.12em] transition ${linkClass}`}>
-                Discover more →
+              <p className={`text-[14px] font-medium transition ${primaryTextClass}`}>{t(`${item.key}.label`)}</p>
+              <p className={`mt-2 text-[12px] leading-[1.65] ${mutedTextClass}`}>{t(`${item.key}.desc`)}</p>
+              <span className={`mt-4 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.12em] transition ${linkClass}`}>
+                {t("discoverMore")} <span className="inline-block rtl:rotate-180">→</span>
               </span>
             </Link>
           ))}
@@ -51,13 +51,13 @@ export default function Footer({ dark = true }: { dark?: boolean }) {
               <circle cx="12" cy="12" r="10" />
               <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
             </svg>
-            <p className={`text-[10px] uppercase tracking-[0.12em] ${dark ? "text-white/25" : "text-black/45"}`}>Egypt / EN</p>
+            <p className={`text-[10px] uppercase tracking-[0.12em] ${dark ? "text-white/25" : "text-black/45"}`}>{t("localeLabel")}</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-5">
-            <Link href="/collections" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>Collections</Link>
-            <Link href="/about" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>Our World</Link>
-            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>Do You Need Help?</Link>
-            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>Newsletter</Link>
+            <Link href="/collections" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.collections")}</Link>
+            <Link href="/about" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.ourWorld")}</Link>
+            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.help")}</Link>
+            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.newsletter")}</Link>
           </div>
           <p className={`text-[10px] tracking-[0.08em] ${dark ? "text-white/15" : "text-black/35"}`}>
             &copy; {new Date().getFullYear()} Steinheim. {t("rights")}.

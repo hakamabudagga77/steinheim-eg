@@ -28,20 +28,20 @@ const menuLinks = [
 
 const worldLinks = [
   {
-    label: "The Company",
-    eyebrow: "Identity",
+    labelKey: "world.company" as const,
+    eyebrowKey: "world.companyEyebrow" as const,
     href: "/about",
     image: "/images/generated/gessi/steinheim-specification-story.png",
   },
   {
-    label: "Our Finishes",
-    eyebrow: "Surface language",
+    labelKey: "world.finishes" as const,
+    eyebrowKey: "world.finishesEyebrow" as const,
     href: "/about#finishes",
     image: "/images/generated/gessi/steinheim-finish-stack.png",
   },
   {
-    label: "Trade Studio",
-    eyebrow: "Projects",
+    labelKey: "world.tradeStudio" as const,
+    eyebrowKey: "world.tradeStudioEyebrow" as const,
     href: "/trade",
     image: "/images/generated/gessi/steinheim-wellness-architecture.png",
   },
@@ -77,6 +77,7 @@ const navMenuSlugs: Record<string, string[]> = {
 export default function Navigation({ locale }: { locale: string }) {
   const t = useTranslations("nav");
   const tc = useTranslations("collections");
+  const tm = useTranslations("menu");
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
@@ -91,7 +92,7 @@ export default function Navigation({ locale }: { locale: string }) {
   } = useTradeProject();
   const tradeItemCount = tradeProject.items.length;
   const showShopByNeed = hasActiveRoomNeeds(tradeProject);
-  const projectDisplayName = tradeProject.details.projectName || "your project";
+  const projectDisplayName = tradeProject.details.projectName || tm("yourProject");
   const useWhite = !LIGHT_TOP_PATTERN.test(pathname);
 
   useEffect(() => {
@@ -137,7 +138,7 @@ export default function Navigation({ locale }: { locale: string }) {
               <span className="block h-[1.5px] w-[52px] bg-current" />
               <span className="block h-[1.5px] w-[52px] bg-current" />
             </span>
-            <span className="hidden sm:block">Menu</span>
+            <span className="hidden sm:block">{t("menu")}</span>
           </button>
 
           <Link
@@ -296,7 +297,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   <line x1="4" y1="4" x2="16" y2="16" />
                   <line x1="16" y1="4" x2="4" y2="16" />
                 </svg>
-                <span className="hidden sm:inline">Close</span>
+                <span className="hidden sm:inline">{t("close")}</span>
               </button>
 
               <div className="flex h-full">
@@ -311,7 +312,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
                       >
                         <div className="mb-1.5 inline-flex items-center gap-1.5 bg-black px-2.5 py-1">
-                          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white">For your project</span>
+                          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white">{tm("forYourProject")}</span>
                         </div>
                         <Link
                           href="/shop-by-need"
@@ -321,7 +322,7 @@ export default function Navigation({ locale }: { locale: string }) {
                             pathname === "/shop-by-need" ? "" : "hover:translate-x-2"
                           }`}
                         >
-                          Shop for {projectDisplayName}
+                          {tm("shopFor", { name: projectDisplayName })}
                         </Link>
                       </motion.div>
                     )}
@@ -338,7 +339,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           pathname === "/collections" ? "text-black" : "text-black/35 hover:translate-x-2 hover:text-black"
                         }`}
                       >
-                        Collections
+                        {t("collections")}
                       </Link>
                     </motion.div>
                     {collections.map((collection, index) => (
@@ -415,12 +416,12 @@ export default function Navigation({ locale }: { locale: string }) {
 
                 <div className="mb-8 lg:mb-10">
                   <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35">
-                    Our World
+                    {tm("ourWorld")}
                   </p>
                   <div className="space-y-1">
                     {worldLinks.map((link, index) => (
                       <motion.div
-                        key={link.label}
+                        key={link.labelKey}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.42 + index * 0.05, duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
@@ -435,7 +436,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               : "text-black/50 hover:translate-x-2 hover:text-black"
                           }`}
                         >
-                          {link.label}
+                          {tm(link.labelKey)}
                         </Link>
                       </motion.div>
                     ))}
@@ -492,7 +493,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
                           {worldLinks.map((item, index) => (
                             <motion.div
-                              key={item.label}
+                              key={item.labelKey}
                               initial={{ opacity: 0, y: 14 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
@@ -505,7 +506,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               >
                                 <Image
                                   src={item.image}
-                                  alt={item.label}
+                                  alt={tm(item.labelKey)}
                                   fill
                                   sizes="32vw"
                                   className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
@@ -514,10 +515,10 @@ export default function Navigation({ locale }: { locale: string }) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
                                 <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
-                                    {item.eyebrow}
+                                    {tm(item.eyebrowKey)}
                                   </p>
                                   <p className="mt-2 text-[24px] leading-none tracking-[-0.04em]">
-                                    {item.label}
+                                    {tm(item.labelKey)}
                                   </p>
                                 </div>
                               </Link>

@@ -3,6 +3,7 @@
 import { memo, useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
@@ -30,6 +31,7 @@ function ProductCard({
   onAdd?: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   roomOptions?: RoomGroup[];
 }) {
+  const t = useTranslations("cards");
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -85,7 +87,7 @@ function ProductCard({
               {liveVariant && (
                 <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
                   <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
-                  {liveVariant.inStock ? "In stock" : "Out of stock"}
+                  {liveVariant.inStock ? t("inStock") : t("outOfStock")}
                 </span>
               )}
             </div>
@@ -123,7 +125,7 @@ function ProductCard({
                 onClick={() => setRoomOpen((o) => !o)}
                 className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-black/10 pb-1.5 text-left text-[11px] text-black/55 transition hover:border-black/30 hover:text-black"
               >
-                <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : "No specific room"}</span>
+                <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : t("noSpecificRoom")}</span>
                 <span className="shrink-0 text-[9px] text-black/35">{roomOpen ? "▲" : "▼"}</span>
               </button>
               <AnimatePresence>
@@ -192,12 +194,12 @@ function ProductCard({
                 setAdded(true);
                 setTimeout(() => setAdded(false), 1600);
               }}
-              aria-label={added ? "Added" : "Add"}
+              aria-label={added ? t("added") : t("add")}
               className={`flex h-8 shrink-0 items-center justify-center rounded-full border px-4 text-[11px] font-medium uppercase tracking-[0.08em] transition cursor-pointer ${
                 added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
               }`}
             >
-              {added ? "Added" : "Add"}
+              {added ? t("added") : t("add")}
             </button>
           </div>
         </div>
@@ -231,13 +233,13 @@ function ProductCard({
               setAdded(true);
               setTimeout(() => setAdded(false), 1600);
             }}
-            aria-label={added ? "Added to cart" : "Quick add to cart"}
+            aria-label={added ? t("added") : t("quickAdd")}
             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
               added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
             }`}
           >
             <span className="sm:hidden">{added ? "✓" : "+"}</span>
-            <span className="hidden sm:inline">{added ? "Added" : "Quick add"}</span>
+            <span className="hidden sm:inline">{added ? t("added") : t("quickAdd")}</span>
           </button>
         </div>
       )}
