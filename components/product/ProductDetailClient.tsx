@@ -165,7 +165,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   {product.name}
                 </h1>
 
-                <div className="mt-4 hidden items-center gap-3 sm:mt-6 sm:flex">
+                <div className="mt-4 flex items-center gap-3 sm:mt-6">
                   <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
@@ -212,6 +212,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                           const entryFinish = getFinishById(entry.finish);
                           const disc = getFinishDiscImage(entry.finish);
                           const active = variant.finish === entry.finish;
+                          const entryLive = liveData?.variants.find((v) => v.finish === entry.finish);
 
                           return (
                             <button
@@ -236,6 +237,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 {entryFinish?.name}
                                 {entryFinish?.type === "pvd" ? " Pvd" : ""}
                               </span>
+                              {entryLive && entryLive.inStock === false && (
+                                <span className="ml-auto shrink-0 text-[9px] font-medium uppercase tracking-[0.08em] text-red-400">
+                                  Out of stock
+                                </span>
+                              )}
                             </button>
                           );
                         })}

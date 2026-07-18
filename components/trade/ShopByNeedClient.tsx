@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
@@ -14,10 +14,20 @@ import {
 } from "@/lib/trade-project";
 import { getProductsByType } from "@/lib/utils";
 
+type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
+
 export default function ShopByNeedClient() {
   const { project, addItem } = useTradeProject();
   const hasProject = hasActiveRoomNeeds(project);
   const displayName = project.details.projectName || "your project";
+  const [liveData, setLiveData] = useState<Record<string, { variants: LiveVariants }>>({});
+
+  useEffect(() => {
+    fetch("/api/shopify/prices")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then(setLiveData)
+      .catch(() => {});
+  }, []);
 
   const activeRooms = useMemo(
     () =>
@@ -115,6 +125,7 @@ export default function ShopByNeedClient() {
                         key={product.slug}
                         product={product}
                         roomOptions={candidates}
+                        liveVariants={liveData[product.slug]?.variants}
                         onAdd={(slug, finish, quantity, scopeId) => handleAdd(type, slug, finish, quantity, scopeId)}
                       />
                     ))}

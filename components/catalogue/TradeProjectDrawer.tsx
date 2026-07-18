@@ -76,9 +76,24 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const [deliverySaving, setDeliverySaving] = useState(false);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
   const [deliveryHydrated, setDeliveryHydrated] = useState(false);
+  const [liveStock, setLiveStock] = useState<Record<string, boolean>>({});
   const finishes = useMemo(() => getAllFinishes(), []);
 
   const submittedLeadId = project.status === "submitted" ? project.submittedLeadId : undefined;
+
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/shopify/prices")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data: Record<string, { variants: Array<{ finish: string; inStock: boolean }> }>) => {
+        const map: Record<string, boolean> = {};
+        for (const [slug, entry] of Object.entries(data)) {
+          for (const v of entry.variants) map[`${slug}::${v.finish}`] = v.inStock;
+        }
+        setLiveStock(map);
+      })
+      .catch(() => {});
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -668,6 +683,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                     <RoomBasketCard
                                       title={group.roomLabel}
                                       itemRows={basketRows}
+                                      liveStock={liveStock}
                                       onRemoveItem={(slug, finish) => removeItem(slug, finish, group.scopeId)}
                                       onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, group.scopeId)}
                                     />
@@ -711,6 +727,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                     product={product}
                                     variant={variant}
                                     finish={finish}
+                                    inStock={liveStock[`${item.slug}::${item.finish}`]}
                                     onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
                                     onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
                                   />

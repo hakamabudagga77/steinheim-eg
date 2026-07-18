@@ -11,6 +11,7 @@ export function ProjectItemRow({
   product,
   variant,
   finish,
+  inStock,
   onRemove,
   onQuantityChange,
 }: {
@@ -18,6 +19,7 @@ export function ProjectItemRow({
   product: Product;
   variant: Variant;
   finish: Finish | undefined;
+  inStock?: boolean;
   onRemove: () => void;
   onQuantityChange: (quantity: number) => void;
 }) {
@@ -42,6 +44,12 @@ export function ProjectItemRow({
                 {product.series[0].toUpperCase() + product.series.slice(1)} · {finish?.name ?? item.finish}
               </p>
               <p className="mt-0.5 text-[9px] text-warm-gray/60">{variant.model}</p>
+              {inStock !== undefined && (
+                <span className={`mt-1 inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${inStock ? "text-emerald-600" : "text-red-400"}`}>
+                  <span className={`h-1 w-1 rounded-full ${inStock ? "bg-emerald-500" : "bg-red-400"}`} />
+                  {inStock ? "In stock" : "Out of stock"}
+                </span>
+              )}
             </div>
             <button
               type="button"
@@ -94,12 +102,14 @@ export function RoomBasketCard({
   title,
   summary,
   itemRows,
+  liveStock,
   onRemoveItem,
   onQuantityChange,
 }: {
   title: string;
   summary?: string;
   itemRows: Array<{ item: TradeProjectItem; product: Product; variant: Variant; finish: Finish | undefined }>;
+  liveStock?: Record<string, boolean>;
   onRemoveItem: (slug: string, finish: string) => void;
   onQuantityChange: (slug: string, finish: string, quantity: number) => void;
 }) {
@@ -124,6 +134,7 @@ export function RoomBasketCard({
               product={product}
               variant={variant}
               finish={finish}
+              inStock={liveStock?.[`${item.slug}::${item.finish}`]}
               onRemove={() => onRemoveItem(item.slug, item.finish)}
               onQuantityChange={(quantity) => onQuantityChange(item.slug, item.finish, quantity)}
             />
