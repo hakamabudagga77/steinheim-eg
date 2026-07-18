@@ -16,6 +16,7 @@ import {
   Megaphone,
   FileText,
   ShieldCheck,
+  Settings,
   LogOut,
 } from "lucide-react";
 import CommandPalette from "@/components/admin/CommandPalette";
@@ -31,6 +32,7 @@ const NAV_ITEMS = [
   { href: "/admin/analytics/marketing", label: "Marketing Analytics", icon: Megaphone, external: false },
   { href: "/admin/policies", label: "Policies", icon: ShieldCheck, external: false },
   { href: "/admin/content", label: "Content", icon: FileText, external: false },
+  { href: "/admin/settings", label: "Settings", icon: Settings, external: false },
 ];
 
 export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
