@@ -13,6 +13,7 @@ const enquiryTypes = [
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [enquiryType, setEnquiryType] = useState<string>("homeowner");
+  const [honeypot, setHoneypot] = useState("");
 
   const inputBase =
     "w-full border-b border-black/15 bg-transparent px-1 py-4 text-[15px] text-[#0a0a0a] placeholder:text-black/25 focus:border-black/40 focus:outline-none transition-colors duration-300";
@@ -78,8 +79,23 @@ export default function ContactPage() {
                 ) : (
                   <form
                     className="rounded-[14px] bg-white p-8 sm:p-10 lg:p-12"
-                    onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (honeypot) return;
+                      setSubmitted(true);
+                    }}
                   >
+                    <div className="hidden" aria-hidden="true">
+                      <input
+                        type="text"
+                        name="website"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
+
                     {/* Enquiry type */}
                     <div className="mb-10">
                       <p className="text-[11px] uppercase tracking-[0.3em] text-black/35">I am a</p>
@@ -107,35 +123,41 @@ export default function ContactPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Name</label>
-                        <input type="text" placeholder="Your full name" className={inputBase} required />
+                        <input type="text" name="name" autoComplete="name" placeholder="Your full name" className={inputBase} required />
                       </div>
                       <div>
                         <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Email</label>
-                        <input type="email" placeholder="you@example.com" className={inputBase} required />
+                        <input type="email" name="email" autoComplete="email" placeholder="you@example.com" className={inputBase} required />
                       </div>
                     </div>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Phone</label>
-                        <input type="tel" placeholder="+20 xxx xxx xxxx" className={inputBase} />
+                        <input type="tel" name="phone" autoComplete="tel" placeholder="+20 xxx xxx xxxx" className={inputBase} />
                       </div>
                       <div>
                         <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">
                           {enquiryType === "homeowner" ? "City" : "Company"}
                         </label>
-                        <input type="text" placeholder={enquiryType === "homeowner" ? "Cairo, Alexandria..." : "Company name"} className={inputBase} />
+                        <input
+                          type="text"
+                          name={enquiryType === "homeowner" ? "city" : "company"}
+                          autoComplete={enquiryType === "homeowner" ? "address-level2" : "organization"}
+                          placeholder={enquiryType === "homeowner" ? "Cairo, Alexandria..." : "Company name"}
+                          className={inputBase}
+                        />
                       </div>
                     </div>
 
                     <div className="mt-4">
                       <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Subject</label>
-                      <input type="text" placeholder="What can we help with?" className={inputBase} />
+                      <input type="text" name="subject" placeholder="What can we help with?" className={inputBase} />
                     </div>
 
                     <div className="mt-4">
                       <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Message</label>
-                      <textarea rows={4} placeholder="Tell us about your project or question..." className={`${inputBase} resize-none`} required />
+                      <textarea rows={4} name="message" placeholder="Tell us about your project or question..." className={`${inputBase} resize-none`} required />
                     </div>
 
                     <button

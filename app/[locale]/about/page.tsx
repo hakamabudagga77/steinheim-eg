@@ -216,6 +216,7 @@ function AboutPageContent() {
           <Image
             src="/images/generated/gessi/steinheim-specification-story.png"
             alt=""
+            aria-hidden="true"
             fill
             sizes="100vw"
             className="object-cover opacity-18 blur-[2px]"

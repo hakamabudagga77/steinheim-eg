@@ -8,6 +8,25 @@ export const metadata = {
     "How Steinheim Egypt collects, uses, and protects your personal information when you use our website and services.",
 };
 
+type ContentBlock = { type: "p"; text: string } | { type: "ul"; items: string[] };
+
+function groupContentBlocks(content: string[]): ContentBlock[] {
+  const blocks: ContentBlock[] = [];
+  for (const item of content) {
+    if (item.startsWith("• ")) {
+      const last = blocks[blocks.length - 1];
+      if (last?.type === "ul") {
+        last.items.push(item.slice(2));
+      } else {
+        blocks.push({ type: "ul", items: [item.slice(2)] });
+      }
+    } else {
+      blocks.push({ type: "p", text: item });
+    }
+  }
+  return blocks;
+}
+
 export default async function PrivacyPage({
   params,
 }: {
@@ -111,14 +130,25 @@ export default async function PrivacyPage({
                   {section.title}
                 </h2>
                 <div className="mt-5 space-y-4">
-                  {section.content.map((paragraph, j) => (
-                    <p
-                      key={j}
-                      className="text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
+                  {groupContentBlocks(section.content).map((block, j) =>
+                    block.type === "p" ? (
+                      <p
+                        key={`${section.title}-p-${j}`}
+                        className="text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
+                      >
+                        {block.text}
+                      </p>
+                    ) : (
+                      <ul
+                        key={`${section.title}-ul-${j}`}
+                        className="list-disc space-y-1.5 pl-5 text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
+                      >
+                        {block.items.map((item, k) => (
+                          <li key={`${section.title}-li-${j}-${k}`}>{item}</li>
+                        ))}
+                      </ul>
+                    )
+                  )}
                 </div>
               </div>
             </ScrollReveal>

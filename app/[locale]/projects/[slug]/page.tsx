@@ -10,6 +10,24 @@ export function generateStaticParams() {
   return projectReferences.map((project) => ({ slug: project.slug }));
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const project = getProjectReference(slug);
+
+  if (!project) {
+    return { title: "Project Not Found | Steinheim Egypt" };
+  }
+
+  return {
+    title: `${project.name} | Projects | Steinheim Egypt`,
+    description: project.intro || `Discover our luxury project reference: ${project.name}`,
+  };
+}
+
 export default async function ProjectReferencePage({
   params,
 }: {
@@ -20,6 +38,14 @@ export default async function ProjectReferencePage({
 
   const project = getProjectReference(slug);
   if (!project) notFound();
+
+  const remainingGallery = project.gallery.slice(2);
+  const galleryGridCols =
+    remainingGallery.length >= 3
+      ? "md:grid-cols-3"
+      : remainingGallery.length === 2
+        ? "md:grid-cols-2 max-w-3xl"
+        : "max-w-sm mx-auto";
 
   return (
     <PageTransition>
@@ -143,18 +169,19 @@ export default async function ProjectReferencePage({
           </div>
         </section>
 
+        {remainingGallery.length > 0 && (
         <section className="px-6 pb-24 sm:px-10 lg:px-16 lg:pb-32">
           <div className="mx-auto max-w-[1780px]">
             <div className="mb-12 flex items-end justify-between">
               <h2 className="text-[clamp(2.4rem,5vw,5.5rem)] font-light tracking-[-0.06em]">Gallery</h2>
               <div className="h-px w-28 bg-white/42" />
             </div>
-            <div className="grid gap-8 md:grid-cols-3">
-              {project.gallery.map((image, index) => (
-                <div key={`${image}-${index}`} className={`relative overflow-hidden bg-white/5 ${index === 0 ? "aspect-[4/3]" : "aspect-[3/4]"}`}>
+            <div className={`grid gap-8 ${galleryGridCols}`}>
+              {remainingGallery.map((image, index) => (
+                <div key={`gallery-item-${index}`} className="relative aspect-[3/4] overflow-hidden bg-white/5">
                   <Image
                     src={image}
-                    alt={`${project.name} gallery ${index + 1}`}
+                    alt={`${project.name} gallery detail ${index + 3}`}
                     fill
                     quality={90}
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -165,6 +192,7 @@ export default async function ProjectReferencePage({
             </div>
           </div>
         </section>
+        )}
 
         <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-16">
           <div className="mx-auto flex max-w-[1780px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">

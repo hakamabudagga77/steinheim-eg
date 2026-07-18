@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
@@ -94,8 +94,11 @@ export default function CollectionPage() {
   const params = useParams();
   const seriesId = String(params.series || "");
   const series = getSeriesById(seriesId);
-  const products = getProductsBySeries(seriesId);
-  const finishes = getAllFinishes().filter((finish) => series?.finishes.includes(finish.id));
+  const products = useMemo(() => getProductsBySeries(seriesId), [seriesId]);
+  const finishes = useMemo(
+    () => getAllFinishes().filter((finish) => series?.finishes.includes(finish.id)),
+    [series]
+  );
   const [globalFinish, setGlobalFinish] = useState<string | null>(finishes[0]?.id ?? null);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>>({});
@@ -111,10 +114,14 @@ export default function CollectionPage() {
   const heroTitleOpacity = useTransform(heroProgressSmooth, [0, 0.7], [1, 0]);
 
   useEffect(() => {
-    fetch("/api/shopify/prices")
+    const controller = new AbortController();
+    fetch("/api/shopify/prices", { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : {}))
       .then(setLiveData)
-      .catch(() => {});
+      .catch((err) => {
+        if (err.name !== "AbortError") console.error("Shopify pricing fetch failed:", err);
+      });
+    return () => controller.abort();
   }, []);
 
   if (!series) {
