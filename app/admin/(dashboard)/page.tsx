@@ -3,7 +3,8 @@ import Link from "next/link";
 const SECTIONS = [
   { href: "/admin/contact", label: "Contact Leads", desc: "General enquiries submitted through the site's contact page." },
   { href: "/trade-admin", label: "Trade Leads", desc: "B2B project quotes and specification requests." },
-  { href: "/admin/orders", label: "Orders", desc: "Real Shopify orders (coming soon)." },
+  { href: "/admin/orders", label: "Orders", desc: "Live Shopify orders, read-only." },
+  { href: "/admin/customers", label: "Customers", desc: "Live Shopify customer list, read-only." },
   { href: "/admin/analytics", label: "Analytics", desc: "Site traffic from GA4 (coming soon)." },
   { href: "/admin/content", label: "Content", desc: "Edit site copy without touching code (coming soon)." },
 ];

@@ -28,11 +28,11 @@ async function getAccessToken(): Promise<string> {
   return cachedToken.token;
 }
 
-async function adminFetch<T>(endpoint: string): Promise<T> {
+async function adminFetch<T>(endpoint: string, revalidate = 300): Promise<T> {
   const token = await getAccessToken();
   const res = await fetch(
     `https://${STORE_DOMAIN}/admin/api/${API_VERSION}/${endpoint}`,
-    { headers: { "X-Shopify-Access-Token": token }, next: { revalidate: 300 } }
+    { headers: { "X-Shopify-Access-Token": token }, next: { revalidate } }
   );
   if (!res.ok) throw new Error(`Shopify API ${endpoint}: ${res.status}`);
   return res.json();
@@ -67,6 +67,47 @@ export async function fetchAllProducts(): Promise<ShopifyProduct[]> {
 export function buildCheckoutUrl(items: Array<{ variantId: number; quantity: number }>): string {
   const lines = items.map((i) => `${i.variantId}:${i.quantity}`).join(",");
   return `https://${STORE_DOMAIN}/cart/${lines}`;
+}
+
+export interface ShopifyOrder {
+  id: number;
+  order_number: number;
+  name: string;
+  email: string | null;
+  created_at: string;
+  currency: string;
+  total_price: string;
+  financial_status: string | null;
+  fulfillment_status: string | null;
+  customer: { id: number; first_name: string | null; last_name: string | null; email: string | null } | null;
+  line_items: Array<{ title: string; quantity: number }>;
+}
+
+export interface ShopifyCustomer {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  orders_count: number;
+  total_spent: string;
+  created_at: string;
+}
+
+export async function fetchOrders(limit = 50): Promise<ShopifyOrder[]> {
+  const data = await adminFetch<{ orders: ShopifyOrder[] }>(
+    `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items`,
+    60
+  );
+  return data.orders;
+}
+
+export async function fetchCustomers(limit = 50): Promise<ShopifyCustomer[]> {
+  const data = await adminFetch<{ customers: ShopifyCustomer[] }>(
+    `customers.json?limit=${limit}&fields=id,first_name,last_name,email,phone,orders_count,total_spent,created_at`,
+    60
+  );
+  return data.customers;
 }
 
 export { STORE_DOMAIN };
