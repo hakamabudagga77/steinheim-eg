@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
@@ -11,7 +11,11 @@ import type { RoomGroup } from "@/lib/trade-project";
 
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
 
-export default function ProductCard({
+// Memoized: rendered in grids of 20+ cards, so unrelated page-state changes
+// (modals, finish selectors) must not re-render every card.
+export default memo(ProductCard);
+
+function ProductCard({
   product,
   liveVariants,
   hidePrice = false,
@@ -164,6 +168,7 @@ export default function ProductCard({
               </button>
               <input
                 type="number"
+                inputMode="numeric"
                 min={1}
                 max={9999}
                 value={quantity}

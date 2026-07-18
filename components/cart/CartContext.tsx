@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   createEmptyCart,
@@ -142,22 +142,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = cart.items.reduce((sum, i) => sum + i.quantity, 0);
 
+  // Stable value identity: flight animations update provider-local state and
+  // must not re-render every context consumer mid-animation.
+  const value = useMemo(
+    () => ({
+      cart,
+      open,
+      setOpen,
+      addItem,
+      updateQuantity,
+      removeItem,
+      clearCart,
+      itemCount,
+      cartIconRef,
+      flyToCart,
+      bump,
+    }),
+    [cart, open, addItem, updateQuantity, removeItem, clearCart, itemCount, flyToCart, bump]
+  );
+
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        open,
-        setOpen,
-        addItem,
-        updateQuantity,
-        removeItem,
-        clearCart,
-        itemCount,
-        cartIconRef,
-        flyToCart,
-        bump,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
       <AnimatePresence>
         {flights.map((flight) => (

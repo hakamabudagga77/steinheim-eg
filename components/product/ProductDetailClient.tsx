@@ -88,6 +88,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
       </button>
       <input
         type="number"
+        inputMode="numeric"
         min={1}
         max={9999}
         value={quantity}

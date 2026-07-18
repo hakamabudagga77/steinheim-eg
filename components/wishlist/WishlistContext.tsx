@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   createEmptyWishlist,
   sanitizeWishlist,
@@ -97,10 +97,14 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const itemCount = wishlist.items.length;
 
+  // Stable value identity so consumers only re-render on real wishlist changes.
+  const value = useMemo(
+    () => ({ wishlist, open, setOpen, addItem, removeItem, toggleItem, isInWishlist, clearWishlist, itemCount }),
+    [wishlist, open, addItem, removeItem, toggleItem, isInWishlist, clearWishlist, itemCount]
+  );
+
   return (
-    <WishlistContext.Provider
-      value={{ wishlist, open, setOpen, addItem, removeItem, toggleItem, isInWishlist, clearWishlist, itemCount }}
-    >
+    <WishlistContext.Provider value={value}>
       {children}
     </WishlistContext.Provider>
   );

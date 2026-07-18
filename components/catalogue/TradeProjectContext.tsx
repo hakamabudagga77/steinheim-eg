@@ -178,7 +178,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       }
     }
     void poll();
-    const interval = window.setInterval(poll, 20000);
+    // Skip polling while the tab is hidden — the first visible poll catches up.
+    const interval = window.setInterval(() => {
+      if (!document.hidden) void poll();
+    }, 20000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
@@ -369,8 +372,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     });
   }, [updateActive]);
 
-  return (
-    <TradeProjectContext.Provider value={{
+  // Stable value identity: flight animations update provider-local state and
+  // must not re-render every context consumer mid-animation.
+  const value = useMemo(
+    () => ({
       project,
       projects: workspace.projects,
       open,
@@ -399,7 +404,39 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       bump,
       unreadMessageCount,
       markMessagesSeen,
-    }}>
+    }),
+    [
+      project,
+      workspace.projects,
+      open,
+      setOpen,
+      setupOpen,
+      setSetupOpen,
+      setupJustCompleted,
+      addItem,
+      updateQuantity,
+      removeItem,
+      updateDetails,
+      setPersona,
+      newProject,
+      switchProject,
+      deleteProject,
+      duplicateProject,
+      markSubmitted,
+      clearProject,
+      setRoomPlan,
+      updateProductNeeds,
+      addCustomRoom,
+      removeCustomRoom,
+      flyToProject,
+      bump,
+      unreadMessageCount,
+      markMessagesSeen,
+    ]
+  );
+
+  return (
+    <TradeProjectContext.Provider value={value}>
       {children}
       <AnimatePresence>
         {flights.map((flight) => (
