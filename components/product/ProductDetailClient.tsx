@@ -395,7 +395,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </button>
                 </div>
 
-                <div className="mt-10 hidden border-t border-black/10 pt-6 sm:block">
+                <div className="mt-10 hidden border-t border-black/10 pt-6 sm:block" dir="ltr">
                   <p className="text-[13px] leading-[1.8] text-black/45">
                     Technical information, product details, and catalogue downloads are available below.
                   </p>
@@ -405,7 +405,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           </div>
         </section>
 
-        <section className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
+        <section dir="ltr" className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 sm:px-8 lg:px-16 lg:py-16">
           <div className="mx-auto max-w-[1560px]">
             <div className="border-b border-black/18">
               <div className="grid grid-cols-3 gap-0">
@@ -442,9 +442,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   <>
                     <div className="space-y-6">
                       <p className="max-w-xl text-[17px] leading-[1.85] text-black/72">
-                        {product.name} from the {seriesName} collection brings Steinheim&apos;s
-                        architectural bathroom language into a precise, project-ready product.
-                        The current selection is shown in {finish?.name ?? "the selected finish"}.
+                        {`${product.name} from the ${seriesName} collection brings Steinheim's architectural bathroom language into a precise, project-ready product. The current selection is shown in ${finish?.name ?? "the selected finish"}.`}
                       </p>
                     </div>
                   </>
@@ -515,7 +513,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </section>
 
         {contextImage && (
-          <section className="px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
+          <section dir="ltr" className="px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-black">
@@ -534,7 +532,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     Part of a complete bathroom language.
                   </h2>
                   <p className="mt-6 text-[16px] leading-[1.85] text-black/55">
-                    See how the {seriesName} collection&apos;s form, finish, and proportions work within a resolved bathroom environment.
+                    {`See how the ${seriesName} collection's form, finish, and proportions work within a resolved bathroom environment.`}
                   </p>
                   <Link
                     href={`/collections/${product.series}`}
@@ -549,7 +547,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         )}
 
         {related.length > 0 && (
-          <section className="border-t border-black/6 px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
+          <section dir="ltr" className="border-t border-black/6 px-5 py-20 sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="mb-14 flex items-end justify-between">
                 <div>
