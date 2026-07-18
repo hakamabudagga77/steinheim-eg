@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
 import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
@@ -21,43 +22,44 @@ const ritualVideo =
 const collections = [
   {
     name: "Joy",
+    lineKey: "joy" as const,
     href: "/collections/joy",
     image: "/images/nav-menu/products/joy-basin-mixer.png",
     hoverImage: "/images/nav-menu/products/joy-wall-mounted-basin-mixer.png",
-    line: "Soft balance for private villas, suites, and warm hospitality rooms.",
   },
   {
     name: "Up",
+    lineKey: "up" as const,
     href: "/collections/up",
     image: "/images/nav-menu/products/up-wall-mounted-basin-mixer-v2.png",
     hoverImage: "/images/nav-menu/products/up-basin-mixer-v2.png",
-    line: "A repeatable modern language for developments and project schedules.",
   },
   {
     name: "Art",
+    lineKey: "art" as const,
     href: "/collections/art",
     image: "/images/nav-menu/products/art-basin-mixer-v2.png",
     hoverImage: "/images/nav-menu/products/art-free-standing-bath-mixer.png",
-    line: "Architectural precision for statement bathrooms and design-led spaces.",
   },
   {
     name: "Quatro",
+    lineKey: "quatro" as const,
     href: "/collections/quatro",
     image: "/images/nav-menu/products/quatro-concealed-shower-v2.png",
     hoverImage: "/images/nav-menu/products/quatro-tall-basin-mixer-v2.png",
-    line: "Crisp geometry for sharp, contemporary interiors.",
   },
 ];
 
-function ScrollCue() {
+function ScrollCue({ label }: { label: string }) {
   return (
     <span className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 text-[10px] uppercase tracking-[0.34em] text-white/55 sm:block">
-      Scroll
+      {label}
     </span>
   );
 }
 
 function CollectionCard({ item, index }: { item: (typeof collections)[number]; index: number }) {
+  const t = useTranslations("landing.collections");
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -100,7 +102,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
         </h3>
         <span className="mx-auto mt-3 block h-px w-8 bg-black/20 transition-all duration-700 group-hover:w-16 group-hover:bg-black/60" />
         <p className="mx-auto mt-2 max-w-[320px] text-center text-[13px] leading-[1.5] text-black/55 sm:text-[14px] sm:leading-[1.55]">
-          {item.line}
+          {t(item.lineKey)}
         </p>
       </Link>
     </motion.article>
@@ -156,6 +158,7 @@ function ProjectCard({ project, index }: { project: ProjectReference; index: num
 }
 
 export default function GessiInspiredHome() {
+  const t = useTranslations("landing");
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
   const [heroPaused, setHeroPaused] = useState(false);
@@ -193,7 +196,7 @@ export default function GessiInspiredHome() {
   };
 
   return (
-    <div className="bg-[#ece9e2] text-[#0a0a0a] text-left" dir="ltr">
+    <div className="bg-[#ece9e2] text-[#0a0a0a] text-start">
       <AnimatePresence>
         {showIntro && (
           <motion.div
@@ -239,7 +242,7 @@ export default function GessiInspiredHome() {
             transition={{ duration: 0.9, delay: 0.2 }}
             className="text-[11px] uppercase tracking-[0.55em] text-white/70"
           >
-            Steinheim Egypt
+            {t("hero.eyebrow")}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
@@ -247,7 +250,7 @@ export default function GessiInspiredHome() {
             transition={{ duration: 1, delay: 0.38 }}
             className="mt-5 font-heading text-[clamp(3.4rem,9vw,8.8rem)] leading-[0.9] tracking-[-0.045em]"
           >
-            Water, designed.
+            {t("hero.headline")}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -255,7 +258,7 @@ export default function GessiInspiredHome() {
             transition={{ duration: 0.9, delay: 0.62 }}
             className="mt-5 max-w-xl text-[15px] leading-[1.9] text-white/72"
           >
-            Premium bathroom systems for homes, hospitality, and design-led projects in Egypt.
+            {t("hero.body")}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -267,32 +270,32 @@ export default function GessiInspiredHome() {
               href="/collections"
               className="rounded-full border border-white/50 px-9 py-3.5 text-[13px] font-medium text-white backdrop-blur-sm transition duration-500 hover:bg-white hover:text-black"
             >
-              Discover more
+              {t("hero.discover")}
             </Link>
             <Link
               href="/collections"
               className="rounded-full border border-white/30 px-9 py-3.5 text-[13px] font-medium text-white transition duration-500 hover:border-white/60"
             >
-              View products
+              {t("hero.viewProducts")}
             </Link>
           </motion.div>
         </motion.div>
         <button
           type="button"
           onClick={toggleHeroVideo}
-          aria-label="Pause background video"
+          aria-label={heroPaused ? t("hero.play") : t("hero.pause")}
           className="absolute bottom-8 right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/45 text-[11px] uppercase tracking-[0.18em] text-white/80 transition duration-500 hover:bg-white hover:text-black"
         >
-          {heroPaused ? "Play" : "II"}
+          {heroPaused ? t("hero.playShort") : "II"}
         </button>
-        <ScrollCue />
+        <ScrollCue label={t("hero.scroll")} />
       </section>
 
       <section className="overflow-hidden bg-[#ece9e2] px-6 py-20 sm:px-10 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-[1160px]">
           <div className="mb-10 text-center sm:mb-12">
             <h2 className="text-[32px] font-normal leading-tight tracking-[-0.055em] text-black sm:text-[42px] lg:text-[48px]">
-              Explore our collections
+              {t("collections.title")}
             </h2>
           </div>
 
@@ -312,11 +315,10 @@ export default function GessiInspiredHome() {
             className="max-w-3xl text-[clamp(2.7rem,6vw,7rem)] leading-[0.92] tracking-[-0.052em]"
             style={{ fontStyle: "italic" }}
           >
-            The quiet ritual of precision.
+            {t("ritual.headline")}
           </h2>
           <p className="max-w-2xl text-[18px] leading-[1.85] text-white/78">
-            Steinheim is specified where the bathroom must feel resolved: proportion, finish, mechanism,
-            and long-term reliability working as one complete language.
+            {t("ritual.body")}
           </p>
         </div>
       </section>
@@ -330,9 +332,9 @@ export default function GessiInspiredHome() {
             transition={{ duration: 0.8 }}
             className="mb-12 text-center"
           >
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Project references</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("projects.eyebrow")}</p>
             <h2 className="mx-auto mt-4 max-w-xl text-[28px] font-normal leading-tight tracking-[-0.03em] text-black sm:text-[36px]">
-              Where design takes shape
+              {t("projects.headline")}
             </h2>
           </motion.div>
         </div>
@@ -348,7 +350,7 @@ export default function GessiInspiredHome() {
             href="/projects"
             className="inline-flex h-11 items-center rounded-full border border-black/25 px-7 text-[13px] uppercase tracking-[0.2em] text-black transition hover:bg-black hover:text-white"
           >
-            View all projects
+            {t("projects.viewAll")}
           </Link>
         </div>
       </section>
@@ -363,22 +365,21 @@ export default function GessiInspiredHome() {
             className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"
           >
             <div>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-white/40">For the trade</p>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-white/40">{t("trade.eyebrow")}</p>
               <h2 className="mt-4 max-w-lg text-[28px] font-normal leading-tight tracking-[-0.03em] sm:text-[36px]">
-                Specifying for a project?
+                {t("trade.headline")}
               </h2>
               <p className="mt-4 max-w-md text-[14px] leading-[1.7] text-white/55">
-                Set your room composition and what each one needs once — then shop the site
-                normally, with your rooms tracked as you go.
+                {t("trade.body")}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <TradeSetupOpenButton variant="outline-light" label="Set up your project" />
+              <TradeSetupOpenButton variant="outline-light" label={t("trade.setup")} />
               <Link
                 href="/trade"
                 className="inline-flex h-[50px] items-center border border-white/25 px-9 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-white hover:text-black"
               >
-                Visit Trade Studio
+                {t("trade.visit")}
               </Link>
             </div>
           </motion.div>
