@@ -69,7 +69,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 function AboutPageContent() {
   return (
     <PageTransition>
-      <main className="bg-[#ece9e2] text-[#0a0a0a]" dir="ltr">
+      <main className="bg-[#ece9e2] text-[#0a0a0a] text-left" dir="ltr">
         <section id="intro" className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-black text-white">
           <AutoplayVideo
             src={heroVideo}

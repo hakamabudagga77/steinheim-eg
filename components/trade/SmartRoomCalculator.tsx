@@ -127,19 +127,21 @@ export default function SmartRoomCalculator() {
       <div className="mx-auto max-w-[960px] px-5 sm:px-8">
         {/* Header */}
         <ScrollReveal className="mb-10 text-center">
-          <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-            Steinheim Trade Studio
-          </p>
-          <h2
-            className="mt-3 font-heading text-[clamp(1.8rem,4vw,3rem)] leading-[1] text-charcoal"
-            style={{ fontStyle: "italic" }}
-          >
-            Tell us your property, once
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-warm-gray">
-            Set your room composition, then assign real products to each room — right here on this
-            page. Everything you pick is saved to your project board as you go.
-          </p>
+          <div dir="ltr">
+            <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
+              Steinheim Trade Studio
+            </p>
+            <h2
+              className="mt-3 font-heading text-[clamp(1.8rem,4vw,3rem)] leading-[1] text-charcoal"
+              style={{ fontStyle: "italic" }}
+            >
+              Tell us your property, once
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-warm-gray">
+              Set your room composition, then assign real products to each room — right here on this
+              page. Everything you pick is saved to your project board as you go.
+            </p>
+          </div>
         </ScrollReveal>
 
         {/* Progress stepper */}
@@ -194,10 +196,12 @@ export default function SmartRoomCalculator() {
           {/* Step 0: Who you are + your project */}
           {step === 0 && (
             <div>
-              <h3 className="mb-2 font-heading text-[22px] text-charcoal">What kind of project is this?</h3>
-              <p className="mb-8 text-[13px] text-warm-gray">
-                Pick the closest match — it shapes what we ask next. You can always adjust details later.
-              </p>
+              <div dir="ltr" className="text-left">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">What kind of project is this?</h3>
+                <p className="mb-8 text-[13px] text-warm-gray">
+                  Pick the closest match — it shapes what we ask next. You can always adjust details later.
+                </p>
+              </div>
 
               <StaggerContainer className="grid gap-3 sm:grid-cols-2">
                 {TRADE_PERSONAS.map((id) => (
@@ -219,7 +223,7 @@ export default function SmartRoomCalculator() {
                           <path d={PERSONA_META[id].icon} />
                         </svg>
                       </div>
-                      <div>
+                      <div dir="ltr" className="text-left">
                         <span className="block font-heading text-[20px] leading-tight">
                           {TRADE_PERSONA_LABELS[id]}
                         </span>
@@ -236,12 +240,14 @@ export default function SmartRoomCalculator() {
 
               {persona && (
                 <ScrollReveal className="mt-8 border-t border-charcoal/8 pt-8">
-                  <p className="mb-1 font-heading text-[20px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
-                    Tell us who to reach
-                  </p>
-                  <p className="mb-5 text-[12px] leading-[1.6] text-warm-gray">
-                    So our team has everything they need before the first call — no back-and-forth just to get the basics.
-                  </p>
+                  <div dir="ltr" className="text-left">
+                    <p className="mb-1 font-heading text-[20px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
+                      Tell us who to reach
+                    </p>
+                    <p className="mb-5 text-[12px] leading-[1.6] text-warm-gray">
+                      So our team has everything they need before the first call — no back-and-forth just to get the basics.
+                    </p>
+                  </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
@@ -295,10 +301,12 @@ export default function SmartRoomCalculator() {
           {/* Step 1: Room counts */}
           {step === 1 && (
             <div>
-              <h3 className="mb-2 font-heading text-[22px] text-charcoal">{personaConfig?.roomsTitle ?? "How many rooms in total?"}</h3>
-              <p className="mb-8 text-[13px] text-warm-gray">
-                {personaConfig?.roomsBody ?? "This is the full property. You'll assign a collection to each group next, right here on this page."}
-              </p>
+              <div dir="ltr" className="text-left">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{personaConfig?.roomsTitle ?? "How many rooms in total?"}</h3>
+                <p className="mb-8 text-[13px] text-warm-gray">
+                  {personaConfig?.roomsBody ?? "This is the full property. You'll assign a collection to each group next, right here on this page."}
+                </p>
+              </div>
 
               {!personaConfig?.skipFixedRooms && (
                 <>
@@ -441,10 +449,12 @@ export default function SmartRoomCalculator() {
           {/* Step 2: What each room needs */}
           {step === 2 && (
             <div>
-              <h3 className="mb-2 font-heading text-[22px] text-charcoal">What does each room need?</h3>
-              <p className="mb-8 text-[13px] text-warm-gray">
-                Pick what each room needs and how many. You&apos;ll shop for the exact products next.
-              </p>
+              <div dir="ltr" className="text-left">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">What does each room need?</h3>
+                <p className="mb-8 text-[13px] text-warm-gray">
+                  Pick what each room needs and how many. You&apos;ll shop for the exact products next.
+                </p>
+              </div>
 
               <div className="relative left-1/2 w-screen -translate-x-1/2">
                 <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
@@ -558,11 +568,13 @@ export default function SmartRoomCalculator() {
           {/* Step 3: Shop real products, by type, across all collections */}
           {step === 3 && (
             <div>
-              <h3 className="mb-2 font-heading text-[22px] text-charcoal">Shop your products</h3>
-              <p className="mb-8 text-[13px] text-warm-gray">
-                Every collection, side by side. Mix products and finishes freely to fill what each room needs —
-                everything you add is saved to your project board immediately.
-              </p>
+              <div dir="ltr" className="text-left">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">Shop your products</h3>
+                <p className="mb-8 text-[13px] text-warm-gray">
+                  Every collection, side by side. Mix products and finishes freely to fill what each room needs —
+                  everything you add is saved to your project board immediately.
+                </p>
+              </div>
 
               <ShopProductsStep />
 
@@ -575,7 +587,7 @@ export default function SmartRoomCalculator() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 4a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" /></svg>
                   Continue to project board
                 </button>
-                <p className="mt-4 text-[10px] leading-relaxed text-warm-gray/60">
+                <p dir="ltr" className="mt-4 text-left text-[10px] leading-relaxed text-warm-gray/60">
                   Retail references only. Trade pricing, stock, lead times, and final package structure are
                   confirmed by the Steinheim Egypt team after submission.
                 </p>

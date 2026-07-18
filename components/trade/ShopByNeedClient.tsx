@@ -64,7 +64,7 @@ export default function ShopByNeedClient() {
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div dir="ltr" className="px-5 pb-4 pt-[124px] sm:px-8 lg:px-16">
+        <div dir="ltr" className="px-5 pb-4 pt-[124px] sm:px-8 lg:px-16 text-left">
           <div className="mx-auto max-w-[1780px]">
             <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">For {displayName}</p>
             <h1

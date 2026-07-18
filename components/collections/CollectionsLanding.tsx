@@ -58,7 +58,7 @@ export default function CollectionsLanding() {
   };
 
   return (
-    <main className="bg-[#ece9e2] text-[#0a0a0a]">
+    <main className="bg-[#ece9e2] text-[#0a0a0a] text-left" dir="ltr">
       <section ref={heroSectionRef} className="relative bg-black text-white">
         <div className="sticky top-0 h-svh min-h-[760px] overflow-hidden">
           <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
@@ -103,10 +103,10 @@ export default function CollectionsLanding() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 0.76, 0.2, 1] }}
             >
-              <p className="text-[clamp(1rem,1.6vw,1.45rem)] uppercase tracking-[0.22em] text-white/82" dir="ltr">
+              <p className="text-[clamp(1rem,1.6vw,1.45rem)] uppercase tracking-[0.22em] text-white/82">
                 Collections
               </p>
-              <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white" dir="ltr">
+              <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white">
                 Four systems.
               </h1>
             </motion.div>
