@@ -94,6 +94,51 @@ function Metric({ label, value, hint, delay = 0 }: { label: string; value: strin
   );
 }
 
+function SectionList({
+  title,
+  seeAllHref,
+  items,
+  delay = 0,
+}: {
+  title: string;
+  seeAllHref: string;
+  items: Array<{ id: string; label: string; detail: string; at: string; href: string; dot: string }>;
+  delay?: number;
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}>
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-white/35">{title}</p>
+        <Link href={seeAllHref} className="text-[11px] text-white/30 transition hover:text-[#0a84ff]">
+          See all
+        </Link>
+      </div>
+      <div className="mt-4">
+        {items.length === 0 && <p className="py-6 text-[13px] text-white/30">Nothing yet.</p>}
+        {items.map((item) => (
+          <Link
+            key={item.id}
+            href={item.href}
+            className="group flex items-center justify-between gap-3 border-t border-white/[0.06] py-3.5 first:border-t-0"
+          >
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${item.dot}`} />
+              <div className="min-w-0">
+                <p className="truncate text-[13.5px] text-white/85">{item.label}</p>
+                <p className="truncate text-[11.5px] text-white/35">{item.detail}</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="text-[11px] text-white/25">{fmtRelative(item.at)}</span>
+              <ArrowUpRight className="h-3.5 w-3.5 text-white/0 transition group-hover:text-white/40" />
+            </div>
+          </Link>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function AttentionItem({
   icon: Icon,
   tone,
@@ -211,26 +256,37 @@ export default function AdminDashboardPage() {
     [orders]
   );
 
-  const activity = useMemo(() => {
-    const items: Array<{ id: string; kind: "lead" | "trade" | "order"; label: string; detail: string; at: string; href: string }> = [];
-    leads?.slice(0, 6).forEach((l) =>
-      items.push({ id: `lead-${l.id}`, kind: "lead", label: l.name, detail: l.subject || l.enquiryType, at: l.submittedAt, href: "/admin/contact" })
+  const recentLeads = useMemo(() => {
+    const items: Array<{ id: string; label: string; detail: string; at: string; href: string; dot: string }> = [];
+    leads?.forEach((l) =>
+      items.push({ id: `lead-${l.id}`, label: l.name, detail: l.subject || l.enquiryType, at: l.submittedAt, href: "/admin/contact", dot: "bg-[#0a84ff]" })
     );
-    tradeLeads?.slice(0, 6).forEach((l) =>
+    tradeLeads?.forEach((l) =>
       items.push({
         id: `trade-${l.id}`,
-        kind: "trade",
         label: l.project.details.projectName || l.reference,
         detail: l.project.details.company || "Trade enquiry",
         at: l.submittedAt,
         href: "/admin/trade",
+        dot: "bg-[#ff453a]",
       })
     );
-    orders?.slice(0, 6).forEach((o) =>
-      items.push({ id: `order-${o.id}`, kind: "order", label: o.name, detail: `${o.currency} ${o.total_price}`, at: o.created_at, href: "/admin/orders" })
-    );
-    return items.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 6);
-  }, [leads, tradeLeads, orders]);
+    return items.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 5);
+  }, [leads, tradeLeads]);
+
+  const recentOrders = useMemo(() => {
+    return [...(orders ?? [])]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5)
+      .map((o) => ({
+        id: `order-${o.id}`,
+        label: o.name,
+        detail: `${o.currency} ${Number(o.total_price).toLocaleString("en-US", { maximumFractionDigits: 0 })} · ${o.financial_status ?? "pending"}`,
+        at: o.created_at,
+        href: "/admin/orders",
+        dot: "bg-[#30d158]",
+      }));
+  }, [orders]);
 
   const attentionReady = tradeLeads !== null && orders !== null && products !== null;
   const hasAttentionItems = tradeLeadsAwaitingReview.length > 0 || lowStockCount !== null && lowStockCount > 0 || unfulfilledOrders.length > 0;
@@ -359,39 +415,12 @@ export default function AdminDashboardPage() {
         </motion.div>
       </div>
 
-      {/* Activity + visitors */}
-      <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_320px]">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-white/35">Recent activity</p>
-          <div className="mt-4">
-            {activity.length === 0 && <p className="py-6 text-[13px] text-white/30">Nothing yet.</p>}
-            {activity.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="group flex items-center justify-between gap-4 border-t border-white/[0.06] py-3.5 first:border-t-0"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                      item.kind === "trade" ? "bg-[#ff453a]" : item.kind === "lead" ? "bg-[#0a84ff]" : "bg-[#30d158]"
-                    }`}
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate text-[14px] text-white/85">{item.label}</p>
-                    <p className="truncate text-[12px] text-white/35">{item.detail}</p>
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-[12px] text-white/25">{fmtRelative(item.at)}</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-white/0 transition group-hover:text-white/40" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </motion.div>
+      {/* Grouped by section, not a merged timeline — each world stays its own list */}
+      <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-3">
+        <SectionList title="Leads" seeAllHref="/admin/contact" items={recentLeads} delay={0.15} />
+        <SectionList title="Orders" seeAllHref="/admin/orders" items={recentOrders} delay={0.2} />
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}>
           <p className="text-[11px] uppercase tracking-[0.25em] text-white/35">Visitors, 30 days</p>
           <div className="mt-4 h-[160px]">
             {ga4 ? (
