@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Package, AlertTriangle, XCircle } from "lucide-react";
 import type { ShopifyProduct, ShopifyLocation } from "@/lib/shopify-client";
@@ -125,13 +126,25 @@ function ProductDrawer({
   );
 }
 
-export default function AdminProductsPage() {
+function ProductsInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [products, setProducts] = useState<ShopifyProduct[] | null>(null);
   const [locations, setLocations] = useState<ShopifyLocation[] | null>(null);
   const [locationId, setLocationId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<number | null>(null);
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  const deepLinkConsumed = useRef(false);
+
+  useEffect(() => {
+    if (!products || deepLinkConsumed.current) return;
+    const targetId = deepLinkId ? Number(deepLinkId) : null;
+    if (targetId && products.some((p) => p.id === targetId)) {
+      deepLinkConsumed.current = true;
+      setOpenId(targetId);
+    }
+  }, [products, deepLinkId]);
 
   useEffect(() => {
     fetch("/api/admin/products")
@@ -358,5 +371,13 @@ export default function AdminProductsPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminProductsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductsInner />
+    </Suspense>
   );
 }

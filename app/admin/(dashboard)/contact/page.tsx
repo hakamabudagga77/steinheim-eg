@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Mail, ArrowUpRight } from "lucide-react";
 import { CONTACT_LEAD_STATUS_LABELS, type ContactLead, type ContactLeadStatus } from "@/lib/contact-leads";
 import { PageHeader, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
@@ -36,11 +37,14 @@ function statusTone(status: ContactLeadStatus): "accent" | "muted" | "neutral" |
   return "neutral";
 }
 
-export default function AdminContactLeadsPage() {
+function ContactLeadsInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [leads, setLeads] = useState<ContactLead[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<ContactLeadStatus | "all">("all");
+  const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
     fetch("/api/contact")
@@ -79,8 +83,17 @@ export default function AdminContactLeadsPage() {
   }, [leads, filter]);
 
   // Inbox convention: opening an item auto-selects the first one, and mirrors
-  // a mail client by marking a "new" lead read the moment it's opened.
+  // a mail client by marking a "new" lead read the moment it's opened. A
+  // search-result deep link (?id=) wins once, forcing the filter to "all" so
+  // the linked lead is guaranteed visible even if it's archived, for example.
   useEffect(() => {
+    if (!leads) return;
+    if (deepLinkId && !deepLinkConsumed.current && leads.some((l) => l.id === deepLinkId)) {
+      deepLinkConsumed.current = true;
+      setFilter("all");
+      setSelectedId(deepLinkId);
+      return;
+    }
     if (filteredLeads.length === 0) {
       setSelectedId(null);
       return;
@@ -89,7 +102,7 @@ export default function AdminContactLeadsPage() {
       setSelectedId(filteredLeads[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredLeads]);
+  }, [filteredLeads, leads, deepLinkId]);
 
   const selected = filteredLeads.find((l) => l.id === selectedId) ?? null;
 
@@ -228,5 +241,13 @@ export default function AdminContactLeadsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminContactLeadsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactLeadsInner />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Users, Repeat, Wallet, Search, ArrowUpRight } from "lucide-react";
 import type { ShopifyCustomer, ShopifyOrder } from "@/lib/shopify-client";
@@ -23,12 +24,15 @@ function tierFor(customer: ShopifyCustomer): { label: string; tone: "accent" | "
   return { label: "New", tone: "neutral" };
 }
 
-export default function AdminCustomersPage() {
+function CustomersInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [customers, setCustomers] = useState<ShopifyCustomer[] | null>(null);
   const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [query, setQuery] = useState("");
+  const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
     fetch("/api/admin/customers?limit=250")
@@ -69,6 +73,14 @@ export default function AdminCustomersPage() {
   }, [sorted, query]);
 
   useEffect(() => {
+    if (!customers) return;
+    const targetId = deepLinkId ? Number(deepLinkId) : null;
+    if (targetId && !deepLinkConsumed.current && customers.some((c) => c.id === targetId)) {
+      deepLinkConsumed.current = true;
+      setQuery("");
+      setSelectedId(targetId);
+      return;
+    }
     if (filtered.length === 0) {
       setSelectedId(null);
       return;
@@ -77,7 +89,7 @@ export default function AdminCustomersPage() {
       setSelectedId(filtered[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtered]);
+  }, [filtered, customers, deepLinkId]);
 
   const selected = filtered.find((c) => c.id === selectedId) ?? null;
 
@@ -272,5 +284,13 @@ export default function AdminCustomersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminCustomersPage() {
+  return (
+    <Suspense fallback={null}>
+      <CustomersInner />
+    </Suspense>
   );
 }

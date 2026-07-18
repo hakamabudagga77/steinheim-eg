@@ -1,6 +1,7 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Wallet, ShoppingBag, TrendingUp, Truck, X, ChevronDown } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { ShopifyOrder } from "@/lib/shopify-client";
@@ -139,7 +140,9 @@ function startOfDay(d: Date) {
   return copy;
 }
 
-export default function AdminOrdersPage() {
+function OrdersInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
@@ -147,6 +150,19 @@ export default function AdminOrdersPage() {
   const [customEnd, setCustomEnd] = useState("");
   const [fulfillingOrder, setFulfillingOrder] = useState<ShopifyOrder | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const deepLinkConsumed = useRef(false);
+
+  // A search-result deep link (?id=) must be visible regardless of the
+  // default 30-day filter, so force "all time" once when it resolves.
+  useEffect(() => {
+    if (!orders || deepLinkConsumed.current) return;
+    const targetId = deepLinkId ? Number(deepLinkId) : null;
+    if (targetId && orders.some((o) => o.id === targetId)) {
+      deepLinkConsumed.current = true;
+      setTimeframe("all");
+      setExpandedId(targetId);
+    }
+  }, [orders, deepLinkId]);
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -431,5 +447,13 @@ export default function AdminOrdersPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={null}>
+      <OrdersInner />
+    </Suspense>
   );
 }
