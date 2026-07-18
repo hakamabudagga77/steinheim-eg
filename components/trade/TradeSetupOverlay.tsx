@@ -199,7 +199,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
               </div>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-7 py-6">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto px-7 py-6">
               {step === 0 && (
                 <div>
                   <h3 className="mb-2 font-heading text-[18px] text-charcoal">What kind of project is this?</h3>

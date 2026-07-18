@@ -49,9 +49,11 @@ export default function CollectionsLanding() {
     if (!video) return;
 
     if (video.paused) {
+      delete video.dataset.userPaused;
       video.play();
       setPaused(false);
     } else {
+      video.dataset.userPaused = "1";
       video.pause();
       setPaused(true);
     }

@@ -16,7 +16,7 @@
   --color-accent: #555555;
 
   --font-heading: "Georgia", serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: var(--font-inter, "Inter"), sans-serif;
 
   --spacing-section-y: 120px;
   --spacing-section-y-mobile: 64px;
@@ -35,6 +35,34 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Lenis smooth-scroll integration: native CSS smooth scrolling must be off
+   while Lenis drives the scroll, or every programmatic scroll animates twice. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -139,7 +139,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       }
     }
     void load();
-    const interval = window.setInterval(load, 20000);
+    // Skip polling while the tab is hidden — the first visible poll catches up.
+    const interval = window.setInterval(() => {
+      if (!document.hidden) load();
+    }, 20000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
@@ -548,7 +551,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             </header>
 
             {/* Content */}
-            <div className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
+            <div data-lenis-prevent className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {step === "board" ? (
                   <motion.div

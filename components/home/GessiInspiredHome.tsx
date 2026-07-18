@@ -79,7 +79,6 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             alt={`${item.name} collection`}
             fill
             sizes="(max-width: 768px) 100vw, 25vw"
-            priority
             className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
               hovered ? "opacity-0 scale-[1.045]" : "opacity-100 scale-100 group-hover:scale-[1.025]"
             }`}
@@ -90,7 +89,6 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             fill
             sizes="(max-width: 768px) 100vw, 25vw"
             quality={82}
-            priority
             className={`object-cover transition-[opacity,transform] duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
               hovered ? "opacity-100 scale-100" : "opacity-0 scale-[1.045]"
             }`}
@@ -131,7 +129,6 @@ function ProjectCard({ project, index }: { project: ProjectReference; index: num
             src={project.cardImage}
             alt={project.name}
             fill
-            priority={index === 0}
             quality={90}
             sizes="(max-width: 768px) 82vw, 480px"
             className={`object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,0.76,0.2,1)] ${
@@ -185,9 +182,11 @@ export default function GessiInspiredHome() {
     if (!video) return;
 
     if (video.paused) {
+      delete video.dataset.userPaused;
       video.play();
       setHeroPaused(false);
     } else {
+      video.dataset.userPaused = "1";
       video.pause();
       setHeroPaused(true);
     }

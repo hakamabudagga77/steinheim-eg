@@ -28,7 +28,6 @@ export default function WorldCard({ card }: { card: WorldCardData }) {
           alt={card.title}
           fill
           sizes="(min-width: 1280px) 24vw, (min-width: 768px) 48vw, 100vw"
-          priority
           className={`object-cover transition-[opacity,transform] duration-[1600ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
             card.hoverImage && hovered ? "opacity-0 scale-[1.03]" : "opacity-100 scale-100"
           }`}
@@ -40,7 +39,6 @@ export default function WorldCard({ card }: { card: WorldCardData }) {
             fill
             sizes="(min-width: 1280px) 24vw, (min-width: 768px) 48vw, 100vw"
             quality={82}
-            priority
             className={`object-cover transition-[opacity,transform] duration-[1600ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
               hovered ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
             }`}

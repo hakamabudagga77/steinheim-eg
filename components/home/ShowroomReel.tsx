@@ -46,7 +46,7 @@ function ReelVideo({
         muted={muted}
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster={poster}
         className="h-full w-full object-cover"
       >
@@ -109,12 +109,14 @@ export default function ShowroomReel() {
     const track = trackRef.current;
     if (!track) return;
 
-    let frame: number;
+    let frame = 0;
+    let running = false;
     let lastCenterCheck = 0;
     let lastTimestamp: number | null = null;
     const pixelsPerSecond = 34;
 
     const step = (timestamp: number) => {
+      if (!running) return;
       const delta = lastTimestamp === null ? 16.67 : Math.min(timestamp - lastTimestamp, 80);
       lastTimestamp = timestamp;
 
@@ -150,6 +152,18 @@ export default function ShowroomReel() {
       frame = requestAnimationFrame(step);
     };
 
+    const startLoop = () => {
+      if (running) return;
+      running = true;
+      lastTimestamp = null;
+      frame = requestAnimationFrame(step);
+    };
+    const stopLoop = () => {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+
     const releaseTouchPause = () => setTouchPaused(false);
     window.addEventListener("pointerup", releaseTouchPause);
     window.addEventListener("pointercancel", releaseTouchPause);
@@ -157,9 +171,25 @@ export default function ShowroomReel() {
     document.addEventListener("visibilitychange", releaseTouchPause);
 
     track.scrollLeft = track.scrollWidth / 3;
-    frame = requestAnimationFrame(step);
+
+    // The marquee only needs to animate while it is actually on screen.
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) startLoop();
+          else stopLoop();
+        },
+        { rootMargin: "100px" }
+      );
+      observer.observe(track);
+    } else {
+      startLoop();
+    }
+
     return () => {
-      cancelAnimationFrame(frame);
+      stopLoop();
+      observer?.disconnect();
       window.removeEventListener("pointerup", releaseTouchPause);
       window.removeEventListener("pointercancel", releaseTouchPause);
       window.removeEventListener("blur", releaseTouchPause);

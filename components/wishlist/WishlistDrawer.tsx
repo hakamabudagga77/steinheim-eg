@@ -70,7 +70,7 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
               </div>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto">
               {rows.length === 0 ? (
                 <div className="flex flex-col items-center justify-center px-5 sm:px-7 py-20 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full border border-charcoal/10">
