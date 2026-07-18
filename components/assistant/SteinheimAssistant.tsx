@@ -110,7 +110,10 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
   const messageIdRef = useRef(0);
   const streamTextRef = useRef("");
   const streamActionRef = useRef<AssistantAction>(null);
+  const streamFlushRef = useRef(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => () => cancelAnimationFrame(streamFlushRef.current), []);
 
   useEffect(() => {
     const el = chatContainerRef.current;
@@ -190,13 +193,20 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
           }
           if (payload.type === "delta") {
             streamTextRef.current = `${streamTextRef.current}${payload.text ?? ""}`;
-            setMessages((current) =>
-              current.map((message) =>
-                message.id === assistantId
-                  ? { ...message, content: streamTextRef.current, action: streamActionRef.current }
-                  : message
-              )
-            );
+            // Coalesce token updates to one state flush per animation frame —
+            // per-token setState re-renders the whole thread dozens of times a second.
+            if (!streamFlushRef.current) {
+              streamFlushRef.current = requestAnimationFrame(() => {
+                streamFlushRef.current = 0;
+                setMessages((current) =>
+                  current.map((message) =>
+                    message.id === assistantId
+                      ? { ...message, content: streamTextRef.current, action: streamActionRef.current }
+                      : message
+                  )
+                );
+              });
+            }
           }
         }
       }
@@ -302,7 +312,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
             </div>
           </div>
 
-          <div ref={chatContainerRef} className="max-h-[62vh] min-h-[520px] overflow-y-auto scroll-smooth p-4 sm:p-6">
+          <div ref={chatContainerRef} data-lenis-prevent className="max-h-[62vh] min-h-[520px] overflow-y-auto scroll-smooth p-4 sm:p-6">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
