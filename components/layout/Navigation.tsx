@@ -283,6 +283,7 @@ export default function Navigation({ locale }: { locale: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
+            data-lenis-prevent
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
             <div className="relative mx-0 my-0 h-[100svh] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:my-3 sm:h-[calc(100svh-24px)] lg:mx-6 lg:my-6 lg:h-[calc(100vh-48px)]">

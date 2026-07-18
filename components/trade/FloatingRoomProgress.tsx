@@ -92,7 +92,7 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
               )}
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto bg-[#f4f3f1] px-5 py-4">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto bg-[#f4f3f1] px-5 py-4">
               <RoomProgressPanel onSelectNeed={handleSelectNeed} />
             </div>
 

@@ -38,7 +38,10 @@ export default function TradeMessagesPanel({ leadId }: { leadId: string }) {
 
   useEffect(() => {
     void load();
-    const interval = window.setInterval(() => void load(), 15000);
+    // Skip polling while the tab is hidden — the first visible poll catches up.
+    const interval = window.setInterval(() => {
+      if (!document.hidden) void load();
+    }, 15000);
     return () => window.clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leadId]);
@@ -85,7 +88,7 @@ export default function TradeMessagesPanel({ leadId }: { leadId: string }) {
           </span>
         </div>
       )}
-      <div ref={listRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-7 py-5">
+      <div ref={listRef} data-lenis-prevent className="min-h-0 flex-1 space-y-3 overflow-y-auto px-7 py-5">
         {messages === null ? (
           <p className="text-[12px] text-warm-gray">Loading messages…</p>
         ) : messages.length === 0 ? (
