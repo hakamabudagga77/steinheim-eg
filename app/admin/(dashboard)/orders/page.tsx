@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Wallet, ShoppingBag, TrendingUp, Truck, X } from "lucide-react";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { Wallet, ShoppingBag, TrendingUp, Truck, X, ChevronDown } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { ShopifyOrder } from "@/lib/shopify-client";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
@@ -146,6 +146,7 @@ export default function AdminOrdersPage() {
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [fulfillingOrder, setFulfillingOrder] = useState<ShopifyOrder | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -337,44 +338,80 @@ export default function AdminOrdersPage() {
                 <th className="px-5 py-3 font-normal">Payment</th>
                 <th className="px-5 py-3 font-normal">Fulfillment</th>
                 <th className="px-5 py-3 font-normal" />
+                <th className="w-9 px-3 py-3 font-normal" />
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} className="border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02]">
-                  <td className="px-5 py-3 font-medium text-white/90">{order.name}</td>
-                  <td className="px-5 py-3 text-white/70">
-                    {order.customer
-                      ? `${order.customer.first_name ?? ""} ${order.customer.last_name ?? ""}`.trim() || order.customer.email || "—"
-                      : order.email || "—"}
-                  </td>
-                  <td className="px-5 py-3 text-white/45">{fmtDate(order.created_at)}</td>
-                  <td className="px-5 py-3 text-white/45">
-                    {order.line_items.reduce((sum, item) => sum + item.quantity, 0)} units
-                  </td>
-                  <td className="px-5 py-3 font-medium text-white/90">
-                    {order.currency} {order.total_price}
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge tone={statusTone(order.financial_status)}>{order.financial_status ?? "—"}</Badge>
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge tone={statusTone(order.fulfillment_status)}>{order.fulfillment_status ?? "unfulfilled"}</Badge>
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    {order.fulfillment_status !== "fulfilled" && (
-                      <button
-                        type="button"
-                        onClick={() => setFulfillingOrder(order)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff]"
-                      >
-                        <Truck className="h-3 w-3" />
-                        Fulfill
-                      </button>
+              {filteredOrders.map((order) => {
+                const expanded = expandedId === order.id;
+                return (
+                  <Fragment key={order.id}>
+                    <tr
+                      onClick={() => setExpandedId(expanded ? null : order.id)}
+                      className={`cursor-pointer border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] ${expanded ? "bg-white/[0.02]" : ""}`}
+                    >
+                      <td className="px-5 py-3 font-medium text-white/90">{order.name}</td>
+                      <td className="px-5 py-3 text-white/70">
+                        {order.customer
+                          ? `${order.customer.first_name ?? ""} ${order.customer.last_name ?? ""}`.trim() || order.customer.email || "—"
+                          : order.email || "—"}
+                      </td>
+                      <td className="px-5 py-3 text-white/45">{fmtDate(order.created_at)}</td>
+                      <td className="px-5 py-3 text-white/45">
+                        {order.line_items.reduce((sum, item) => sum + item.quantity, 0)} units
+                      </td>
+                      <td className="px-5 py-3 font-medium text-white/90">
+                        {order.currency} {order.total_price}
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge tone={statusTone(order.financial_status)}>{order.financial_status ?? "—"}</Badge>
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge tone={statusTone(order.fulfillment_status)}>{order.fulfillment_status ?? "unfulfilled"}</Badge>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        {order.fulfillment_status !== "fulfilled" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFulfillingOrder(order);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff]"
+                          >
+                            <Truck className="h-3 w-3" />
+                            Fulfill
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <ChevronDown className={`ml-auto h-3.5 w-3.5 text-white/25 transition ${expanded ? "rotate-180" : ""}`} />
+                      </td>
+                    </tr>
+                    {expanded && (
+                      <tr className="border-b border-white/[0.04] bg-black/20 last:border-b-0">
+                        <td colSpan={9} className="px-5 py-4">
+                          <p className="text-[11px] uppercase tracking-[0.15em] text-white/30">Line items</p>
+                          <div className="mt-2 space-y-1.5">
+                            {order.line_items.map((item, i) => (
+                              <div key={i} className="flex items-center justify-between text-[13px]">
+                                <span className="text-white/70">{item.title}</span>
+                                <span className="text-white/40">× {item.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {order.referring_site || order.landing_site ? (
+                            <p className="mt-3 truncate text-[11px] text-white/25">
+                              Source: {order.source_name ?? "web"}
+                              {order.referring_site ? ` · from ${order.referring_site}` : ""}
+                            </p>
+                          ) : null}
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                </tr>
-              ))}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </Panel>
