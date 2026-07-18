@@ -14,6 +14,8 @@ export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [enquiryType, setEnquiryType] = useState<string>("homeowner");
   const [honeypot, setHoneypot] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const inputBase =
     "w-full border-b border-black/15 bg-transparent px-1 py-4 text-[15px] text-[#0a0a0a] placeholder:text-black/25 focus:border-black/40 focus:outline-none transition-colors duration-300";
@@ -79,10 +81,37 @@ export default function ContactPage() {
                 ) : (
                   <form
                     className="rounded-[14px] bg-white p-8 sm:p-10 lg:p-12"
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
                       if (honeypot) return;
-                      setSubmitted(true);
+                      setSubmitError(null);
+                      setSubmitting(true);
+                      const formData = new FormData(e.currentTarget);
+                      try {
+                        const res = await fetch("/api/contact", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            enquiryType,
+                            name: formData.get("name"),
+                            email: formData.get("email"),
+                            phone: formData.get("phone"),
+                            cityOrCompany: formData.get(enquiryType === "homeowner" ? "city" : "company"),
+                            subject: formData.get("subject"),
+                            message: formData.get("message"),
+                          }),
+                        });
+                        if (!res.ok) {
+                          const data = await res.json().catch(() => ({}));
+                          setSubmitError(data.error || "Something went wrong. Please try again.");
+                          return;
+                        }
+                        setSubmitted(true);
+                      } catch {
+                        setSubmitError("Could not reach the server. Please try again.");
+                      } finally {
+                        setSubmitting(false);
+                      }
                     }}
                   >
                     <div className="hidden" aria-hidden="true">
@@ -160,11 +189,14 @@ export default function ContactPage() {
                       <textarea rows={4} name="message" placeholder="Tell us about your project or question..." className={`${inputBase} resize-none`} required />
                     </div>
 
+                    {submitError && <p className="mt-4 text-[13px] text-red-600">{submitError}</p>}
+
                     <button
                       type="submit"
-                      className="mt-8 flex h-[50px] items-center justify-center rounded-full border border-black/30 px-14 text-[13px] font-medium text-black transition hover:bg-black hover:text-white cursor-pointer"
+                      disabled={submitting}
+                      className="mt-8 flex h-[50px] items-center justify-center rounded-full border border-black/30 px-14 text-[13px] font-medium text-black transition hover:bg-black hover:text-white cursor-pointer disabled:opacity-50"
                     >
-                      Send message
+                      {submitting ? "Sending…" : "Send message"}
                     </button>
                   </form>
                 )}

@@ -41,3 +41,18 @@ export function verifySessionToken(token: string | undefined | null): boolean {
     return false;
   }
 }
+
+function readCookie(request: Request, name: string): string | undefined {
+  const header = request.headers.get("cookie");
+  if (!header) return undefined;
+  for (const part of header.split(";")) {
+    const [key, ...rest] = part.trim().split("=");
+    if (key === name) return decodeURIComponent(rest.join("="));
+  }
+  return undefined;
+}
+
+export function isAdminRequest(request: Request): boolean {
+  if (process.env.NODE_ENV !== "production") return true;
+  return verifySessionToken(readCookie(request, ADMIN_SESSION_COOKIE));
+}
