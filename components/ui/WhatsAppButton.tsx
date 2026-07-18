@@ -12,15 +12,6 @@ function getContactHref(message: string) {
   return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Steinheim enquiry")}&body=${encodeURIComponent(message)}`;
 }
 
-function ContactIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 6h16v12H4z" />
-      <path d="m4 7 8 6 8-6" />
-    </svg>
-  );
-}
-
 export function WhatsAppFloat() {
   const message = "Hi, I'm interested in Steinheim products. Can you help me?";
 
@@ -31,14 +22,14 @@ export function WhatsAppFloat() {
       rel="noopener noreferrer"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 2, duration: 0.4, type: "spring" }}
-      className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-charcoal rounded-full flex items-center justify-center text-off-white shadow-lg shadow-black/10 hover:bg-stone hover:scale-110 transition-all duration-300 group"
+      transition={{ delay: 2.5, duration: 0.4, type: "spring" }}
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full border border-white/15 bg-black/80 px-5 py-3 text-white shadow-[0_8px_30px_rgba(0,0,0,0.2)] backdrop-blur-md transition-all duration-300 hover:bg-black hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] group"
       aria-label="Contact Steinheim"
     >
-      <ContactIcon size={22} />
-      <span className="absolute right-full mr-3 px-3 py-1.5 bg-charcoal text-off-white text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-        Contact us
-      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+      <span className="text-[12px] font-medium tracking-[0.05em]">Concierge</span>
     </motion.a>
   );
 }
@@ -63,9 +54,11 @@ export function WhatsAppProductButton({
       href={getContactHref(message)}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-charcoal text-off-white text-[13px] font-medium uppercase tracking-[0.1em] hover:bg-stone transition-colors duration-300"
+      className="flex h-[54px] w-full items-center justify-center gap-3 rounded-full border border-black/15 text-[13px] font-medium transition hover:border-black"
     >
-      <ContactIcon />
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
       Enquire via WhatsApp
     </a>
   );
@@ -92,9 +85,11 @@ export function WhatsAppConfigButton({
       href={getContactHref(message)}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center gap-3 w-full px-8 py-4 bg-charcoal text-off-white text-[13px] font-medium uppercase tracking-[0.1em] hover:bg-stone transition-colors duration-300"
+      className="flex h-[54px] w-full items-center justify-center gap-3 rounded-full bg-black text-[13px] font-medium text-white transition hover:bg-black/85"
     >
-      <ContactIcon />
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
       Discuss availability
     </a>
   );

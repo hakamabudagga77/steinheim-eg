@@ -23,9 +23,9 @@ export default function FinishPlanetsSection() {
   const isInView = useInView(ref, { once: true, margin: "-8%" });
 
   return (
-    <section className="relative overflow-hidden bg-[#070707] text-white">
+    <section className="relative overflow-hidden bg-black text-white">
       {/* Heading */}
-      <div className="relative z-20 mx-auto max-w-[1440px] px-8 pt-32 lg:px-12 lg:pt-48">
+      <div className="relative z-20 mx-auto max-w-[1440px] px-8 pt-16 lg:px-12 lg:pt-20">
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -62,8 +62,8 @@ export default function FinishPlanetsSection() {
           {/* Cinematic vignette */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,transparent_0%,rgba(7,7,7,0.65)_100%)]" />
           {/* Top/bottom fade to section bg */}
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#070707] to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#070707] to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent" />
 
           {/* Discs in an arc */}
           {discs.map((disc, index) => (
@@ -144,16 +144,37 @@ export default function FinishPlanetsSection() {
           ))}
         </div>
 
-        {/* Mobile: static fallback */}
-        <div className="relative aspect-[16/9] w-full md:hidden">
-          <Image
-            src={`${BASE}/finish-planets-static.webp`}
-            alt="Steinheim PVD finish discs — Chrome, Brushed Nickel, Matte Black, Brushed Gold, Coffee Gold, Metal Gun"
-            fill
-            quality={85}
-            sizes="100vw"
-            className="object-cover object-center"
-          />
+        {/* Mobile: animated grid */}
+        <div className="grid grid-cols-3 gap-x-4 gap-y-12 px-6 py-8 md:hidden">
+          {discs.map((disc, index) => (
+            <motion.div
+              key={disc.id}
+              className="relative flex flex-col items-center"
+              initial={{ opacity: 0, y: 36, scale: 0.85 }}
+              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+              transition={{
+                duration: 0.9,
+                delay: index * 0.12,
+                ease: [0.16, 0.9, 0.3, 1.08],
+              }}
+            >
+              <Image
+                src={`${BASE}/disc-${disc.id}.webp`}
+                alt={disc.label}
+                width={200}
+                height={200}
+                quality={82}
+                sizes="30vw"
+                className="h-auto w-full drop-shadow-[0_14px_30px_rgba(0,0,0,0.5)]"
+              />
+              <p className="mt-3 text-center text-[9px] font-semibold uppercase tracking-[0.2em] text-white/65">
+                {disc.label}
+              </p>
+              <p className="mt-1 text-center text-[7px] uppercase tracking-[0.15em] text-white/20">
+                {disc.tag}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
 

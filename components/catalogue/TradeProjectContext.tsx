@@ -1,33 +1,61 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  createCustomRoomKey,
   createEmptyTradeProject,
   createProjectId,
   sanitizeTradeProject,
   sanitizeTradeWorkspace,
   TRADE_PROJECT_STORAGE_KEY,
   TRADE_WORKSPACE_STORAGE_KEY,
+  type RoomProductNeed,
+  type TradePersona,
   type TradeProject,
   type TradeProjectDetails,
   type TradeProjectItem,
+  type TradeProjectRoomPlan,
   type TradeWorkspace,
 } from "@/lib/trade-project";
+import { createEmptyCustomRoomGroup, createEmptyRoomPlan } from "@/lib/trade-schedule";
 
 interface TradeProjectContextValue {
   project: TradeProject;
   projects: TradeProject[];
   open: boolean;
   setOpen: (open: boolean) => void;
+  setupOpen: boolean;
+  setSetupOpen: (open: boolean) => void;
+  setupJustCompleted: boolean;
+  setSetupJustCompleted: (value: boolean) => void;
   addItem: (slug: string, finish: string, quantity?: number, meta?: Pick<TradeProjectItem, "scopeId" | "scopeName" | "scopeSummary">) => void;
   updateQuantity: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   removeItem: (slug: string, finish: string, scopeId?: string) => void;
   updateDetails: (details: Partial<TradeProjectDetails>) => void;
+  setPersona: (persona: TradePersona) => void;
   newProject: () => void;
   switchProject: (id: string) => void;
   deleteProject: (id: string) => void;
+  duplicateProject: (sourceId: string) => void;
   markSubmitted: (leadId: string) => void;
   clearProject: () => void;
+  setRoomPlan: (plan: TradeProjectRoomPlan) => void;
+  updateProductNeeds: (roomKey: string, productNeeds: RoomProductNeed[]) => void;
+  addCustomRoom: (label: string, count: number) => string;
+  removeCustomRoom: (roomKey: string) => void;
+  projectIconRef: React.RefObject<HTMLButtonElement | null>;
+  flyToProject: (originEl: HTMLElement | null, image: string) => void;
+  bump: number;
+  unreadMessageCount: number;
+  markMessagesSeen: () => void;
+}
+
+interface Flight {
+  id: number;
+  image: string;
+  start: DOMRect;
+  end: DOMRect;
 }
 
 const TradeProjectContext = createContext<TradeProjectContextValue | null>(null);
@@ -42,8 +70,36 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     activeProjectId: "",
     projects: [createEmptyTradeProject()],
   }));
-  const [open, setOpen] = useState(false);
+  const [open, setOpenRaw] = useState(false);
+  const [setupOpen, setSetupOpenRaw] = useState(false);
+  const [setupJustCompleted, setSetupJustCompleted] = useState(false);
+  const setOpen = useCallback((value: boolean) => {
+    setOpenRaw(value);
+    if (value) setSetupOpenRaw(false);
+  }, []);
+  const setSetupOpen = useCallback((value: boolean) => {
+    setSetupOpenRaw(value);
+    if (value) setOpenRaw(false);
+  }, []);
   const hydrated = useRef(false);
+  const projectIconRef = useRef<HTMLButtonElement | null>(null);
+  const flightId = useRef(0);
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [bump, setBump] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const steinheimMessageCountRef = useRef(0);
+
+  const flyToProject = useCallback((originEl: HTMLElement | null, image: string) => {
+    if (!originEl || !projectIconRef.current) return;
+    const start = originEl.getBoundingClientRect();
+    const end = projectIconRef.current.getBoundingClientRect();
+    const id = ++flightId.current;
+    setFlights((f) => [...f, { id, image, start, end }]);
+    window.setTimeout(() => {
+      setFlights((f) => f.filter((item) => item.id !== id));
+      setBump((b) => b + 1);
+    }, 750);
+  }, []);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -98,6 +154,42 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     () => workspace.projects.find((entry) => entry.id === workspace.activeProjectId) ?? workspace.projects[0] ?? createEmptyTradeProject(),
     [workspace]
   );
+
+  const submittedLeadId = project.submittedLeadId;
+
+  useEffect(() => {
+    if (!submittedLeadId) {
+      setUnreadMessageCount(0);
+      return;
+    }
+    let cancelled = false;
+    async function poll() {
+      try {
+        const res = await fetch(`/api/trade/leads/${submittedLeadId}/messages`, { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = await res.json() as { messages?: Array<{ from: string }> };
+        const steinheimCount = (data.messages ?? []).filter((m) => m.from === "steinheim").length;
+        steinheimMessageCountRef.current = steinheimCount;
+        const lastSeenRaw = window.localStorage.getItem(`steinheim-lastseen-${submittedLeadId}`);
+        const lastSeen = lastSeenRaw ? Number(lastSeenRaw) || 0 : 0;
+        setUnreadMessageCount(Math.max(0, steinheimCount - lastSeen));
+      } catch {
+        // Keep whatever we last had; a poll will retry shortly.
+      }
+    }
+    void poll();
+    const interval = window.setInterval(poll, 20000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [submittedLeadId]);
+
+  const markMessagesSeen = useCallback(() => {
+    if (!submittedLeadId) return;
+    window.localStorage.setItem(`steinheim-lastseen-${submittedLeadId}`, String(steinheimMessageCountRef.current));
+    setUnreadMessageCount(0);
+  }, [submittedLeadId]);
 
   const updateActive = useCallback((update: (current: TradeProject) => TradeProject) => {
     setWorkspace((currentWorkspace) => {
@@ -168,6 +260,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => ({ ...current, details: { ...current.details, ...details } }));
   }, [updateActive]);
 
+  const setPersona = useCallback((persona: TradePersona) => {
+    updateActive((current) => ({ ...current, persona }));
+  }, [updateActive]);
+
   const newProject = useCallback(() => {
     const id = createProjectId();
     setWorkspace((current) => ({
@@ -194,6 +290,33 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     });
   }, []);
 
+  const duplicateProject = useCallback((sourceId: string) => {
+    setWorkspace((current) => {
+      const source = current.projects.find((entry) => entry.id === sourceId);
+      if (!source) return current;
+      const newId = createProjectId();
+      const now = new Date().toISOString();
+      const duplicated: TradeProject = {
+        ...source,
+        id: newId,
+        details: {
+          ...source.details,
+          projectName: source.details.projectName ? `${source.details.projectName} (copy)` : "",
+        },
+        roomPlan: source.roomPlan
+          ? { ...source.roomPlan, groups: source.roomPlan.groups.map((group) => ({ ...group, productNeeds: [...group.productNeeds] })) }
+          : null,
+        items: source.items.map((item) => ({ ...item })),
+        createdAt: now,
+        updatedAt: now,
+        status: "draft",
+        submittedLeadId: "",
+      };
+      return { activeProjectId: newId, projects: [duplicated, ...current.projects].slice(0, 25) };
+    });
+    setOpen(true);
+  }, []);
+
   const markSubmitted = useCallback((leadId: string) => {
     setWorkspace((current) => ({
       ...current,
@@ -207,23 +330,104 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     updateActive((current) => createEmptyTradeProject(current.id));
   }, [updateActive]);
 
+  const setRoomPlan = useCallback((plan: TradeProjectRoomPlan) => {
+    updateActive((current) => ({ ...current, roomPlan: plan }));
+  }, [updateActive]);
+
+  const updateProductNeeds = useCallback((roomKey: string, productNeeds: RoomProductNeed[]) => {
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      return {
+        ...current,
+        roomPlan: {
+          ...plan,
+          groups: plan.groups.map((group) => group.roomKey === roomKey ? { ...group, productNeeds } : group),
+        },
+      };
+    });
+  }, [updateActive]);
+
+  const addCustomRoom = useCallback((label: string, count: number) => {
+    const roomKey = createCustomRoomKey();
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = createEmptyCustomRoomGroup(roomKey, label.trim() || "Custom room", count);
+      return { ...current, roomPlan: { ...plan, groups: [...plan.groups, group] } };
+    });
+    return roomKey;
+  }, [updateActive]);
+
+  const removeCustomRoom = useCallback((roomKey: string) => {
+    updateActive((current) => {
+      const plan = current.roomPlan ?? createEmptyRoomPlan();
+      const group = plan.groups.find((entry) => entry.roomKey === roomKey);
+      return {
+        ...current,
+        items: group ? current.items.filter((item) => item.scopeId !== group.scopeId) : current.items,
+        roomPlan: { ...plan, groups: plan.groups.filter((entry) => entry.roomKey !== roomKey) },
+      };
+    });
+  }, [updateActive]);
+
   return (
     <TradeProjectContext.Provider value={{
       project,
       projects: workspace.projects,
       open,
       setOpen,
+      setupOpen,
+      setSetupOpen,
+      setupJustCompleted,
+      setSetupJustCompleted,
       addItem,
       updateQuantity,
       removeItem,
       updateDetails,
+      setPersona,
       newProject,
       switchProject,
       deleteProject,
+      duplicateProject,
       markSubmitted,
       clearProject,
+      setRoomPlan,
+      updateProductNeeds,
+      addCustomRoom,
+      removeCustomRoom,
+      projectIconRef,
+      flyToProject,
+      bump,
+      unreadMessageCount,
+      markMessagesSeen,
     }}>
       {children}
+      <AnimatePresence>
+        {flights.map((flight) => (
+          <motion.div
+            key={flight.id}
+            initial={{
+              left: flight.start.left,
+              top: flight.start.top,
+              width: flight.start.width,
+              height: flight.start.height,
+              opacity: 1,
+              borderRadius: 20,
+            }}
+            animate={{
+              left: flight.end.left + flight.end.width / 2 - 13,
+              top: flight.end.top + flight.end.height / 2 - 13,
+              width: 26,
+              height: 26,
+              opacity: [1, 1, 0],
+              borderRadius: 999,
+            }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            style={{ position: "fixed", zIndex: 200, overflow: "hidden", pointerEvents: "none" }}
+          >
+            <img src={flight.image} alt="" className="h-full w-full object-cover" />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </TradeProjectContext.Provider>
   );
 }

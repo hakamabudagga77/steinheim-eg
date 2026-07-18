@@ -34,6 +34,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,6 +80,12 @@ h1, h2, h3, h4, h5, h6 {
 
 [dir="rtl"] {
   text-align: right;
+}
+
+/* Showroom reel marquee */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 /* Image loading shimmer */

@@ -79,7 +79,7 @@ export default async function ReturnsPage({
 
   return (
     <PageTransition>
-      <section className="bg-charcoal pt-[72px] lg:pt-[80px]">
+      <section className="bg-charcoal pt-[124px]">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
           <div className="py-16 sm:py-20 lg:py-28">
             <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/30">

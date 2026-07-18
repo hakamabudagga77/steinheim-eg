@@ -121,7 +121,7 @@ export default function ProductModelLab() {
   const concept = concepts.find((entry) => entry.id === activeConcept) ?? concepts[0];
 
   return (
-    <main className="min-h-screen bg-[#080808] px-5 py-28 text-white sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-[#0a0a0a] px-5 py-28 text-white sm:px-8 lg:px-12">
       <Script
         src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
         type="module"
@@ -205,7 +205,7 @@ export default function ProductModelLab() {
             })}
           </div>
 
-          <section className="overflow-hidden border border-white/10 bg-[#111]">
+          <section className="overflow-hidden border border-white/10 bg-[#0a0a0a]">
             <div className="grid min-h-[680px] lg:grid-cols-[minmax(0,1fr)_360px]">
               <div className="relative min-h-[520px] bg-[radial-gradient(circle_at_50%_45%,rgba(255,255,255,0.13),transparent_34%),linear-gradient(180deg,#181818,#050505)]">
                 <ModelViewer ready={viewerReady} file={active.file} />
@@ -246,7 +246,7 @@ export default function ProductModelLab() {
         ) : null}
 
         {activeConcept === "hero" ? (
-          <section className="mt-12 overflow-hidden border border-white/10 bg-[#101010]">
+          <section className="mt-12 overflow-hidden border border-white/10 bg-[#0a0a0a]">
             <div className="grid min-h-[720px] lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
               <div className="relative min-h-[560px] bg-[radial-gradient(circle_at_50%_44%,rgba(255,255,255,0.16),transparent_34%),linear-gradient(180deg,#171717,#050505)]">
                 <ModelViewer ready={viewerReady} file={heroModel.file} cameraOrbit="-26deg 64deg auto" fieldOfView="25deg" />
@@ -270,7 +270,7 @@ export default function ProductModelLab() {
                 </p>
                 <div className="mt-9 grid gap-3">
                   {["Use on homepage", "Use on Joy product page", "Connect to project board later"].map((item) => (
-                    <div key={item} className="border border-charcoal/10 bg-[#f7f5f0] px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-charcoal/58">
+                    <div key={item} className="border border-charcoal/10 bg-[#ece9e2] px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.18em] text-charcoal/58">
                       {item}
                     </div>
                   ))}
@@ -281,7 +281,7 @@ export default function ProductModelLab() {
         ) : null}
 
         {activeConcept === "studio" ? (
-          <section className="mt-12 overflow-hidden border border-white/10 bg-[#101010]">
+          <section className="mt-12 overflow-hidden border border-white/10 bg-[#0a0a0a]">
             <div className="grid min-h-[720px] lg:grid-cols-[minmax(0,1fr)_380px]">
               <div className="relative min-h-[560px] bg-[radial-gradient(circle_at_50%_44%,rgba(255,255,255,0.16),transparent_34%),linear-gradient(180deg,#171717,#050505)]">
                 <ModelViewer ready={viewerReady} file="/models/steinheim-spec-studio.glb" cameraOrbit="-34deg 66deg 5.1m" fieldOfView="30deg" />
@@ -306,7 +306,7 @@ export default function ProductModelLab() {
         ) : null}
 
         {activeConcept === "finish" ? (
-          <section className="mt-12 overflow-hidden border border-white/10 bg-[#080808] p-6 sm:p-10">
+          <section className="mt-12 overflow-hidden border border-white/10 bg-[#0a0a0a] p-6 sm:p-10">
             <div className="grid gap-4 lg:grid-cols-3">
               {[
                 ["Chrome", "Mirror-clean, universal, safest for high-volume bathrooms"],

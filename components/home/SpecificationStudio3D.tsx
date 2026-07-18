@@ -16,7 +16,7 @@ export default function SpecificationStudio3D() {
   const [viewerReady, setViewerReady] = useState(false);
 
   return (
-    <section className="relative overflow-hidden bg-[#f4f1ec] px-4 py-8 text-charcoal sm:px-6 lg:px-10">
+    <section className="relative overflow-hidden bg-[#ece9e2] px-4 py-8 text-charcoal sm:px-6 lg:px-10">
       <Script
         src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"
         type="module"
@@ -25,7 +25,7 @@ export default function SpecificationStudio3D() {
         onReady={() => setViewerReady(true)}
       />
 
-      <div className="mx-auto max-w-[1440px] overflow-hidden border border-charcoal/10 bg-[#111] shadow-[0_30px_90px_rgba(0,0,0,0.14)]">
+      <div className="mx-auto max-w-[1440px] overflow-hidden border border-charcoal/10 bg-[#0a0a0a] shadow-[0_30px_90px_rgba(0,0,0,0.14)]">
         <div className="grid min-h-[760px] lg:grid-cols-[minmax(420px,0.82fr)_minmax(0,1.18fr)]">
           <div className="relative z-10 flex flex-col justify-between bg-white px-7 py-10 sm:px-10 lg:px-14 lg:py-16">
             <div>
@@ -67,7 +67,7 @@ export default function SpecificationStudio3D() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.45, delay: 0.18 + index * 0.05 }}
-                    className="border border-charcoal/10 bg-[#faf9f6] px-4 py-4"
+                    className="border border-charcoal/10 bg-[#ece9e2] px-4 py-4"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/48">
                       {mode}
@@ -100,7 +100,7 @@ export default function SpecificationStudio3D() {
             </div>
           </div>
 
-          <div className="relative min-h-[560px] overflow-hidden bg-[#090909]">
+          <div className="relative min-h-[560px] overflow-hidden bg-[#0a0a0a]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_42%,rgba(255,255,255,0.16),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.68))]" />
             <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-7 py-7 text-white/42 sm:px-10">
               <span className="text-[10px] font-semibold uppercase tracking-[0.28em]">

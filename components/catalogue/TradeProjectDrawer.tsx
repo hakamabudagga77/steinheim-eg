@@ -1,32 +1,211 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ScaleIn, StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { formatPrice, getAllFinishes, getProductBySlug } from "@/lib/utils";
-import { getProductImage } from "@/data/images";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
-import TradeProjectReviewPanel from "@/components/catalogue/TradeProjectReviewPanel";
+import { RoomBasketCard, ProjectItemRow } from "@/components/trade/RoomBasketCard";
+import TradeMessagesPanel from "@/components/trade/TradeMessagesPanel";
+import TradeStageTimeline from "@/components/trade/TradeStageTimeline";
+import ScheduleCallModal from "@/components/trade/ScheduleCallModal";
+import { TRADE_LEAD_STATUS_LABELS, type TradeLeadDeliveryDetails, type TradeLeadDocument, type TradeLeadQuoteRevision, type TradeLeadSampleRequest, type TradeLeadScopeStatus, type TradeLeadStatus } from "@/lib/trade-leads";
+
+interface RelatedProject {
+  id: string;
+  reference: string;
+  projectName: string;
+  status: TradeLeadStatus;
+  submittedAt: string;
+}
+
+interface LeadOverview {
+  status: TradeLeadStatus;
+  quoteUrl?: string;
+  quoteAmount?: string;
+  quoteAcceptedAt?: string;
+  quoteHistory: TradeLeadQuoteRevision[];
+  sampleRequests: TradeLeadSampleRequest[];
+  deliveryDetails?: TradeLeadDeliveryDetails;
+  documents: TradeLeadDocument[];
+  scopeStatuses: TradeLeadScopeStatus[];
+  warrantyReference?: string;
+  relatedProjects: RelatedProject[];
+}
+
+function formatSampleDate(value: string) {
+  return new Date(value).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
 
 export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const isArabic = locale === "ar";
   const {
     project,
+    projects,
     open,
     setOpen,
-    addItem,
     updateQuantity,
     removeItem,
     updateDetails,
     markSubmitted,
     clearProject,
+    newProject,
+    switchProject,
+    deleteProject,
+    duplicateProject,
   } = useTradeProject();
-  const [step, setStep] = useState<"board" | "details" | "sent">("board");
+  const [step, setStep] = useState<"board" | "details" | "sent" | "messages" | "status" | "quote" | "samples" | "documents">("board");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
   const [pdfDownloading, setPdfDownloading] = useState(false);
+  const [showProjectsMenu, setShowProjectsMenu] = useState(false);
+  const [includePrices, setIncludePrices] = useState(true);
+  const [includeSpecs, setIncludeSpecs] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<"idle" | "busy" | "success" | "error">("idle");
+  const [leadOverview, setLeadOverview] = useState<LeadOverview | null>(null);
+  const [acceptStatus, setAcceptStatus] = useState<"idle" | "busy" | "error">("idle");
+  const [sampleNote, setSampleNote] = useState("");
+  const [sampleAddress, setSampleAddress] = useState("");
+  const [sampleSending, setSampleSending] = useState(false);
+  const [sampleError, setSampleError] = useState<string | null>(null);
+  const [showroomOpen, setShowroomOpen] = useState(false);
+  const [deliveryContactName, setDeliveryContactName] = useState("");
+  const [deliveryContactPhone, setDeliveryContactPhone] = useState("");
+  const [deliveryAccessNotes, setDeliveryAccessNotes] = useState("");
+  const [deliverySaving, setDeliverySaving] = useState(false);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [deliveryHydrated, setDeliveryHydrated] = useState(false);
+  const [liveStock, setLiveStock] = useState<Record<string, boolean>>({});
   const finishes = useMemo(() => getAllFinishes(), []);
+
+  const submittedLeadId = project.status === "submitted" ? project.submittedLeadId : undefined;
+
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/shopify/prices")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data: Record<string, { variants: Array<{ finish: string; inStock: boolean }> }>) => {
+        const map: Record<string, boolean> = {};
+        for (const [slug, entry] of Object.entries(data)) {
+          for (const v of entry.variants) map[`${slug}::${v.finish}`] = v.inStock;
+        }
+        setLiveStock(map);
+      })
+      .catch(() => {});
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !submittedLeadId) return;
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch(`/api/trade/leads/${submittedLeadId}`, { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        setLeadOverview({
+          status: data.status,
+          quoteUrl: data.quoteUrl,
+          quoteAmount: data.quoteAmount,
+          quoteAcceptedAt: data.quoteAcceptedAt,
+          quoteHistory: Array.isArray(data.quoteHistory) ? data.quoteHistory : [],
+          sampleRequests: Array.isArray(data.sampleRequests) ? data.sampleRequests : [],
+          deliveryDetails: data.deliveryDetails,
+          documents: Array.isArray(data.documents) ? data.documents : [],
+          scopeStatuses: Array.isArray(data.scopeStatuses) ? data.scopeStatuses : [],
+          warrantyReference: data.warrantyReference,
+          relatedProjects: Array.isArray(data.relatedProjects) ? data.relatedProjects : [],
+        });
+        setDeliveryHydrated((hydrated) => {
+          if (hydrated) return hydrated;
+          if (data.deliveryDetails) {
+            setDeliveryContactName(data.deliveryDetails.contactName);
+            setDeliveryContactPhone(data.deliveryDetails.contactPhone);
+            setDeliveryAccessNotes(data.deliveryDetails.accessNotes);
+          }
+          return true;
+        });
+      } catch {
+        // Keep whatever we last had; the next poll will retry.
+      }
+    }
+    void load();
+    const interval = window.setInterval(load, 20000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [open, submittedLeadId]);
+
+  async function handleAcceptQuote() {
+    if (!submittedLeadId) return;
+    setAcceptStatus("busy");
+    try {
+      const res = await fetch(`/api/trade/leads/${submittedLeadId}/accept-quote`, { method: "POST" });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setLeadOverview((current) => current ? { ...current, quoteAcceptedAt: data.quoteAcceptedAt, status: data.status ?? current.status } : current);
+      setAcceptStatus("idle");
+    } catch {
+      setAcceptStatus("error");
+      setTimeout(() => setAcceptStatus("idle"), 2500);
+    }
+  }
+
+  async function handleRequestSamples() {
+    const note = sampleNote.trim();
+    const address = sampleAddress.trim();
+    if (!note || !address || !submittedLeadId || sampleSending) return;
+    setSampleSending(true);
+    setSampleError(null);
+    try {
+      const res = await fetch(`/api/trade/leads/${submittedLeadId}/sample-requests`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note, address }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setLeadOverview((current) => current ? { ...current, sampleRequests: [...current.sampleRequests, data.request] } : current);
+      setSampleNote("");
+      setSampleAddress("");
+    } catch {
+      setSampleError("Could not send the request. Please try again.");
+    } finally {
+      setSampleSending(false);
+    }
+  }
+
+  async function handleSaveDeliveryDetails() {
+    const contactName = deliveryContactName.trim();
+    const contactPhone = deliveryContactPhone.trim();
+    if (!contactName || !contactPhone || !submittedLeadId || deliverySaving) return;
+    setDeliverySaving(true);
+    setDeliveryError(null);
+    try {
+      const res = await fetch(`/api/trade/leads/${submittedLeadId}/delivery-details`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contactName, contactPhone, accessNotes: deliveryAccessNotes.trim() }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setLeadOverview((current) => current ? { ...current, deliveryDetails: data.deliveryDetails } : current);
+    } catch {
+      setDeliveryError("Could not save. Please try again.");
+    } finally {
+      setDeliverySaving(false);
+    }
+  }
 
   const rows = project.items.flatMap((item) => {
     const product = getProductBySlug(item.slug);
@@ -36,9 +215,12 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   });
 
   const totalItems = rows.reduce((sum, r) => sum + r.item.quantity, 0);
-  const selectedSeries = Array.from(new Set(rows.map((row) => row.product.series)));
-  const selectedFinishes = Array.from(new Set(rows.map((row) => row.finish?.name ?? row.item.finish)));
   const retailReferenceTotal = rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
+
+  const roomPlan = project.roomPlan;
+  const activeRoomGroups = (roomPlan?.groups ?? []).filter((group) => group.count > 0);
+  const roomPlanScopeIds = new Set(activeRoomGroups.map((group) => group.scopeId));
+
   const scopeGroups = Array.from(
     rows.reduce((groups, row) => {
       const key = row.item.scopeId || "manual";
@@ -57,6 +239,15 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     totalUnits: group.rows.reduce((sum, row) => sum + row.item.quantity, 0),
     totalValue: group.rows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0),
   }));
+  // Each room group's own basket gets a dedicated card below — exclude it here so it isn't
+  // rendered twice. Legacy counter-scoped items and true manual adds still render through
+  // this generic list, unchanged.
+  const otherScopeGroups = scopeGroups.filter((group) => !roomPlanScopeIds.has(group.id));
+
+  const allScopeEntries = [
+    ...activeRoomGroups.map((group) => ({ id: group.scopeId, name: group.roomLabel })),
+    ...otherScopeGroups.map((group) => ({ id: group.id, name: group.name })),
+  ];
 
   async function handleSubmit() {
     if (!project.items.length) {
@@ -108,7 +299,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       const res = await fetch("/api/trade/rfq", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(project),
+        body: JSON.stringify({ project, includePrices, includeSpecs }),
       });
       if (!res.ok) throw new Error();
       const blob = await res.blob();
@@ -126,6 +317,24 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       setError("Could not generate the PDF. Try again.");
     } finally {
       setPdfDownloading(false);
+    }
+  }
+
+  async function handleUpdateSteinheim() {
+    if (!project.submittedLeadId) return;
+    setUpdateStatus("busy");
+    try {
+      const res = await fetch(`/api/trade/leads/${project.submittedLeadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project }),
+      });
+      if (!res.ok) throw new Error();
+      setUpdateStatus("success");
+      setTimeout(() => setUpdateStatus("idle"), 2500);
+    } catch {
+      setUpdateStatus("error");
+      setTimeout(() => setUpdateStatus("idle"), 2500);
     }
   }
 
@@ -172,11 +381,32 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             <header className="shrink-0 border-b border-charcoal/8 px-7 py-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
+                  <button
+                    type="button"
+                    onClick={() => setShowProjectsMenu((v) => !v)}
+                    className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray transition hover:text-charcoal"
+                  >
                     Steinheim
-                  </p>
+                    {projects.length > 1 && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
+                    )}
+                  </button>
                   <h2 className="mt-1 font-heading text-[28px] leading-tight">
-                    {step === "board" ? "Project board" : step === "details" ? "Your details" : "Sent"}
+                    {step === "board"
+                      ? "Project board"
+                      : step === "details"
+                        ? "Your details"
+                        : step === "messages"
+                          ? "Messages"
+                          : step === "status"
+                            ? "Project status"
+                            : step === "quote"
+                              ? "Trade quote"
+                              : step === "samples"
+                                ? "Samples"
+                                : step === "documents"
+                                  ? "Documents"
+                                  : "Sent"}
                   </h2>
                 </div>
                 <button
@@ -191,38 +421,134 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                 </button>
               </div>
 
+              {showProjectsMenu && (
+                <div className="mt-4 border border-charcoal/10 bg-[#ece9e2]">
+                  {projects.map((entry) => (
+                    <div key={entry.id} className={`flex items-center justify-between gap-2 border-b border-charcoal/8 p-3 last:border-b-0 ${entry.id === project.id ? "bg-white" : ""}`}>
+                      <button
+                        type="button"
+                        onClick={() => { switchProject(entry.id); setShowProjectsMenu(false); }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <p className="truncate text-[12px] font-medium text-charcoal">{entry.details.projectName || "Untitled project"}</p>
+                        <p className="text-[10px] text-warm-gray">{entry.items.length} products</p>
+                      </button>
+                      <div className="flex shrink-0 gap-1">
+                        <button type="button" onClick={() => duplicateProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
+                          Duplicate
+                        </button>
+                        {projects.length > 1 && (
+                          <button type="button" onClick={() => deleteProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { newProject(); setShowProjectsMenu(false); }}
+                    className="flex w-full items-center justify-center gap-2 p-3 text-[10px] font-medium uppercase tracking-[0.12em] text-charcoal transition hover:bg-white"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 4v16m-8-8h16" /></svg>
+                    New project
+                  </button>
+                </div>
+              )}
+
               {step !== "sent" && (
-                <div className="mt-5 flex gap-2">
+                <div className="mt-5 flex gap-4 overflow-x-auto">
                   <button
                     type="button"
                     onClick={() => { setStep("board"); setError(null); }}
-                    className={`flex-1 border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                    className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                       step === "board"
                         ? "border-charcoal text-charcoal"
                         : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                     }`}
                   >
-                    1 — Products
+                    {project.status === "submitted" ? "Overview" : "1 — Products"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => { if (rows.length) setStep("details"); }}
-                    className={`flex-1 border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
-                      step === "details"
-                        ? "border-charcoal text-charcoal"
-                        : rows.length
-                          ? "border-charcoal/15 text-warm-gray hover:text-charcoal"
-                          : "border-charcoal/8 text-warm-gray/40 cursor-default"
-                    }`}
-                  >
-                    2 — Details & send
-                  </button>
+                  {project.status !== "submitted" && (
+                    <button
+                      type="button"
+                      onClick={() => { if (rows.length) setStep("details"); }}
+                      className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                        step === "details"
+                          ? "border-charcoal text-charcoal"
+                          : rows.length
+                            ? "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                            : "border-charcoal/8 text-warm-gray/40 cursor-default"
+                      }`}
+                    >
+                      2 — Details & send
+                    </button>
+                  )}
+                  {project.status === "submitted" && project.submittedLeadId && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setStep("status")}
+                        className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                          step === "status"
+                            ? "border-charcoal text-charcoal"
+                            : "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                        }`}
+                      >
+                        Status
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep("quote")}
+                        className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                          step === "quote"
+                            ? "border-charcoal text-charcoal"
+                            : "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                        }`}
+                      >
+                        Quote
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep("documents")}
+                        className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                          step === "documents"
+                            ? "border-charcoal text-charcoal"
+                            : "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                        }`}
+                      >
+                        Documents
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep("samples")}
+                        className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                          step === "samples"
+                            ? "border-charcoal text-charcoal"
+                            : "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                        }`}
+                      >
+                        Samples
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep("messages")}
+                        className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                          step === "messages"
+                            ? "border-charcoal text-charcoal"
+                            : "border-charcoal/15 text-warm-gray hover:text-charcoal"
+                        }`}
+                      >
+                        Messages
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </header>
 
             {/* Content */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {step === "board" ? (
                   <motion.div
@@ -232,28 +558,28 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {rows.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center px-7 py-20 text-center">
+                    {rows.length === 0 && activeRoomGroups.length === 0 ? (
+                      <ScaleIn className="flex flex-col items-center justify-center px-7 py-20 text-center">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-charcoal/10">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-warm-gray">
                             <rect x="3" y="3" width="18" height="18" rx="2" />
                             <path d="M12 8v8M8 12h8" />
                           </svg>
                         </div>
-                        <h3 className="mt-6 font-heading text-2xl">
+                        <h3 className="mt-6 font-heading text-2xl" style={{ fontStyle: "italic" }}>
                           Start your project
                         </h3>
                         <p className="mt-3 max-w-[260px] text-[13px] leading-relaxed text-warm-gray">
-                          Start with a scope from the trade page, or browse products and tap &ldquo;Add to project&rdquo; to build a mixed specification list.
+                          Set up your property&apos;s room composition from the trade page, or browse products and tap &ldquo;Add to project&rdquo; to build a mixed specification list.
                         </p>
                         <a
                           href={`/${locale}/trade#smart-room-calculator`}
                           onClick={() => setOpen(false)}
                           className="mt-8 flex h-[46px] items-center justify-center bg-charcoal px-6 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
                         >
-                          Start first scope
+                          Set up your property
                         </a>
-                      </div>
+                      </ScaleIn>
                     ) : (
                       <div className="px-7 py-5">
                         <div className="flex items-center justify-between pb-4">
@@ -271,51 +597,109 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           )}
                         </div>
 
-                        <div className="mb-5 border border-charcoal/10 bg-charcoal p-4 text-white">
-                          <p className="text-[9px] font-medium uppercase tracking-[0.22em] text-white/45">
-                            Board overview
-                          </p>
-                          <div className="mt-4 grid grid-cols-3 gap-2">
-                            {[
-                              [String(selectedSeries.length), selectedSeries.length === 1 ? "Collection" : "Collections"],
-                              [String(selectedFinishes.length), selectedFinishes.length === 1 ? "Finish" : "Finishes"],
-                              [String(totalItems), totalItems === 1 ? "Unit" : "Units"],
-                            ].map(([value, label]) => (
-                              <div key={label} className="border border-white/10 bg-white/[0.04] p-3">
-                                <p className="font-heading text-[24px] leading-none">{value}</p>
-                                <p className="mt-2 text-[8px] uppercase tracking-[0.14em] text-white/45">{label}</p>
-                              </div>
-                            ))}
-                          </div>
-                          <p className="mt-4 text-[11px] leading-[1.7] text-white/55">
-                            This board can combine multiple scopes: standard rooms, suites, public washrooms, and custom product lines.
-                          </p>
-                          <p className="mt-2 text-[10px] text-white/35">
-                            Retail reference total: {formatPrice(retailReferenceTotal)}
-                          </p>
+                        <p className="mb-4 text-[11px] text-warm-gray">
+                          Retail reference total: <span className="text-charcoal">{formatPrice(retailReferenceTotal)}</span>
+                        </p>
+
+                        <div className="mb-5 grid grid-cols-2 gap-2">
                           <a
                             href={`/${locale}/trade#smart-room-calculator`}
                             onClick={() => setOpen(false)}
-                            className="mt-4 flex h-[42px] items-center justify-center border border-white/20 bg-white/5 text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:border-white hover:bg-white/10"
+                            className="flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                           >
-                            Add another scope
+                            {roomPlan ? "Edit property composition" : "Set up your property"}
                           </a>
+                          <button
+                            type="button"
+                            disabled={pdfDownloading}
+                            onClick={handleDownloadPdf}
+                            className="flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal disabled:opacity-50"
+                          >
+                            {pdfDownloading ? "Generating…" : "Download PDF"}
+                          </button>
+
+                          {project.status === "submitted" && project.submittedLeadId && (
+                            <button
+                              type="button"
+                              disabled={updateStatus === "busy"}
+                              onClick={handleUpdateSteinheim}
+                              className="col-span-2 flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal disabled:opacity-50"
+                            >
+                              {updateStatus === "busy"
+                                ? "Sending…"
+                                : updateStatus === "success"
+                                  ? "Sent — Steinheim notified"
+                                  : updateStatus === "error"
+                                    ? "Could not send, try again"
+                                    : "Send updated selection to Steinheim"}
+                            </button>
+                          )}
+
+                          {project.status === "submitted" && (
+                            <button
+                              type="button"
+                              onClick={() => duplicateProject(project.id)}
+                              className="col-span-2 flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
+                            >
+                              Reorder — start a new project from this one
+                            </button>
+                          )}
                         </div>
 
-                        <TradeProjectReviewPanel
-                          project={project}
-                          rows={rows}
-                          totalItems={totalItems}
-                          onAddItem={addItem}
-                          onGoDetails={() => setStep("details")}
-                          onDownloadPdf={handleDownloadPdf}
-                          pdfDownloading={pdfDownloading}
-                        />
+                        <StaggerContainer className="space-y-5">
+                          {activeRoomGroups.map((group) => {
+                            const basketRows = rows.filter((row) => row.item.scopeId === group.scopeId);
+                            const neededTotal = group.productNeeds.reduce((sum, need) => sum + need.quantity, 0);
+                            const selectedTotal = basketRows.reduce((sum, row) => sum + row.item.quantity, 0);
+                            const stillNeeds = neededTotal > 0 && selectedTotal < neededTotal;
 
-                        <div className="space-y-5">
-                          {scopeGroups.map((group) => (
-                            <section key={group.id} className="border border-charcoal/10 bg-white">
-                              <div className="border-b border-charcoal/8 bg-[#FAFAF8] p-4">
+                            return (
+                              <StaggerItem key={group.scopeId}>
+                              <section className="border border-charcoal/10 bg-white">
+                                <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                      <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                                        {group.count} {group.count === 1 ? "room" : "rooms"}
+                                      </p>
+                                      <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
+                                        {group.roomLabel}
+                                      </h3>
+                                    </div>
+                                    {stillNeeds && (
+                                      <a
+                                        href={`/${locale}/trade#smart-room-calculator`}
+                                        onClick={() => setOpen(false)}
+                                        className="shrink-0 rounded-full border border-charcoal bg-charcoal px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black"
+                                      >
+                                        Shop on trade page
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="p-3">
+                                  {basketRows.length > 0 ? (
+                                    <RoomBasketCard
+                                      title={group.roomLabel}
+                                      itemRows={basketRows}
+                                      liveStock={liveStock}
+                                      onRemoveItem={(slug, finish) => removeItem(slug, finish, group.scopeId)}
+                                      onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, group.scopeId)}
+                                    />
+                                  ) : (
+                                    <p className="p-2 text-[11px] font-medium uppercase tracking-[0.08em] text-amber-700">Not yet assigned</p>
+                                  )}
+                                </div>
+                              </section>
+                              </StaggerItem>
+                            );
+                          })}
+
+                          {otherScopeGroups.map((group) => (
+                            <StaggerItem key={group.id}>
+                            <section className="border border-charcoal/10 bg-white">
+                              <div className="border-b border-charcoal/8 bg-[#ece9e2] p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
@@ -336,99 +720,52 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               </div>
 
                               <div className="divide-y divide-charcoal/8">
-                                {group.rows.map(({ item, product, variant, finish }) => {
-                                  const img = getProductImage(product.slug, variant.finish);
-                                  return (
-                                    <motion.div
-                                      key={`${item.scopeId || "manual"}-${item.slug}-${item.finish}`}
-                                      layout
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: -10 }}
-                                      className="group bg-white"
-                                    >
-                                      <div className="flex gap-4 p-4">
-                                        <div className="relative h-[72px] w-[72px] shrink-0 bg-[#FAFAF8]">
-                                          {img && (
-                                            <Image
-                                              src={img}
-                                              alt={product.name}
-                                              fill
-                                              sizes="72px"
-                                              className="object-contain p-1"
-                                            />
-                                          )}
-                                        </div>
-
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex items-start justify-between">
-                                            <div>
-                                              <p className="font-heading text-[17px] leading-tight">
-                                                {product.name}
-                                              </p>
-                                              <p className="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-warm-gray">
-                                                {product.series[0].toUpperCase() + product.series.slice(1)} · {finish?.name ?? item.finish}
-                                              </p>
-                                              <p className="mt-0.5 text-[9px] text-warm-gray/60">
-                                                {variant.model}
-                                              </p>
-                                            </div>
-                                            <button
-                                              type="button"
-                                              onClick={() => removeItem(item.slug, item.finish, item.scopeId)}
-                                              className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-                                              aria-label="Remove"
-                                            >
-                                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                <path d="M18 6L6 18M6 6l12 12" />
-                                              </svg>
-                                            </button>
-                                          </div>
-
-                                          <div className="mt-3 flex items-center gap-3">
-                                            <div className="flex items-center border border-charcoal/12">
-                                              <button
-                                                type="button"
-                                                onClick={() => updateQuantity(item.slug, item.finish, item.quantity - 1, item.scopeId)}
-                                                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-                                              >
-                                                −
-                                              </button>
-                                              <input
-                                                type="number"
-                                                min="1"
-                                                max="10000"
-                                                value={item.quantity}
-                                                onChange={(e) =>
-                                                  updateQuantity(item.slug, item.finish, Number(e.target.value), item.scopeId)
-                                                }
-                                                className="h-7 w-12 border-x border-charcoal/12 bg-transparent text-center text-[12px] outline-none"
-                                              />
-                                              <button
-                                                type="button"
-                                                onClick={() => updateQuantity(item.slug, item.finish, item.quantity + 1, item.scopeId)}
-                                                className="flex h-7 w-7 items-center justify-center text-[14px] text-warm-gray transition hover:text-charcoal"
-                                              >
-                                                +
-                                              </button>
-                                            </div>
-                                            <p className="text-[12px] font-medium text-charcoal">
-                                              {formatPrice(variant.price * item.quantity)}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </motion.div>
-                                  );
-                                })}
+                                {group.rows.map(({ item, product, variant, finish }) => (
+                                  <ProjectItemRow
+                                    key={`${item.scopeId || "manual"}-${item.slug}-${item.finish}`}
+                                    item={item}
+                                    product={product}
+                                    variant={variant}
+                                    finish={finish}
+                                    inStock={liveStock[`${item.slug}::${item.finish}`]}
+                                    onRemove={() => removeItem(item.slug, item.finish, item.scopeId)}
+                                    onQuantityChange={(quantity) => updateQuantity(item.slug, item.finish, quantity, item.scopeId)}
+                                  />
+                                ))}
                               </div>
                             </section>
+                            </StaggerItem>
                           ))}
-                        </div>
+                        </StaggerContainer>
 
                         <p className="mt-4 text-[9px] leading-relaxed text-warm-gray/60">
                           Prices shown are retail references. Trade pricing confirmed after submission.
                         </p>
+
+                        {leadOverview && leadOverview.relatedProjects.length > 0 && (
+                          <div className="mt-5 border border-charcoal/10 bg-white p-4">
+                            <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                              Your other projects
+                            </p>
+                            <div className="mt-3 space-y-2">
+                              {leadOverview.relatedProjects.map((rp) => (
+                                <a
+                                  key={rp.id}
+                                  href={`/${locale}/trade/restore/${rp.id}`}
+                                  className="flex items-center justify-between gap-3 border border-charcoal/8 bg-[#ece9e2] p-3 transition hover:border-charcoal"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="truncate text-[12px] text-charcoal">{rp.projectName}</p>
+                                    <p className="text-[10px] text-warm-gray">{rp.reference}</p>
+                                  </div>
+                                  <span className="shrink-0 border border-charcoal/15 bg-white px-2 py-0.5 text-[8px] font-medium uppercase tracking-[0.08em] text-charcoal">
+                                    {TRADE_LEAD_STATUS_LABELS[rp.status]}
+                                  </span>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </motion.div>
@@ -442,7 +779,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     className="px-7 py-5"
                   >
                     {/* Summary strip */}
-                    <div className="mb-6 border border-charcoal/8 bg-[#FAFAF8] p-4">
+                    <div className="mb-6 border border-charcoal/8 bg-[#ece9e2] p-4">
                       <p className="text-[9px] font-medium uppercase tracking-[0.15em] text-warm-gray">
                         Your selection
                       </p>
@@ -461,7 +798,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         onClick={() => setOpen(false)}
                         className="mt-3 inline-flex text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray underline underline-offset-2 transition hover:text-charcoal"
                       >
-                        Add another scope before sending
+                        {roomPlan ? "Edit property composition before sending" : "Set up your property before sending"}
                       </a>
                     </div>
 
@@ -555,6 +892,30 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         value={project.details.notes}
                         onChange={(e) => updateDetails({ notes: e.target.value })}
                       />
+
+                      <div className="border-t border-charcoal/8 pt-4">
+                        <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal">
+                          PDF spec sheet
+                        </p>
+                        <label className="flex cursor-pointer items-center gap-3 py-1">
+                          <input
+                            type="checkbox"
+                            checked={includePrices}
+                            onChange={(e) => setIncludePrices(e.target.checked)}
+                            className="h-4 w-4 accent-charcoal"
+                          />
+                          <span className="text-[12px] text-charcoal">Include retail reference prices</span>
+                        </label>
+                        <label className="flex cursor-pointer items-center gap-3 py-1">
+                          <input
+                            type="checkbox"
+                            checked={includeSpecs}
+                            onChange={(e) => setIncludeSpecs(e.target.checked)}
+                            className="h-4 w-4 accent-charcoal"
+                          />
+                          <span className="text-[12px] text-charcoal">Include technical specifications appendix</span>
+                        </label>
+                      </div>
                     </div>
 
                     {error && (
@@ -562,6 +923,316 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         {error}
                       </p>
                     )}
+                  </motion.div>
+                ) : step === "status" && project.submittedLeadId ? (
+                  <motion.div
+                    key="status"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-7 py-5"
+                  >
+                    {leadOverview ? (
+                      <TradeStageTimeline status={leadOverview.status} />
+                    ) : (
+                      <p className="text-[12px] text-warm-gray">Loading status…</p>
+                    )}
+
+                    {leadOverview && allScopeEntries.length > 1 && (
+                      <div className="mt-5 border border-charcoal/10 bg-white p-4">
+                        <p className="mb-3 text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                          Progress by room
+                        </p>
+                        <div className="space-y-2">
+                          {allScopeEntries.map((entry) => {
+                            const override = leadOverview.scopeStatuses.find((s) => s.scopeId === entry.id);
+                            const roomStatus = override?.status ?? leadOverview.status;
+                            return (
+                              <div key={entry.id} className="flex items-center justify-between gap-3 border-b border-charcoal/8 pb-2 last:border-b-0 last:pb-0">
+                                <p className="min-w-0 truncate text-[12px] text-charcoal">{entry.name}</p>
+                                <span className="shrink-0 border border-charcoal/15 px-2 py-0.5 text-[8px] font-medium uppercase tracking-[0.08em] text-charcoal">
+                                  {TRADE_LEAD_STATUS_LABELS[roomStatus]}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {leadOverview && (
+                      <div className="mt-5 border border-charcoal/10 bg-white p-4">
+                        <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                          Delivery details
+                        </p>
+                        <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
+                          Tell us who to hand this to on-site and when the gate is open, so delivery goes smoothly.
+                        </p>
+                        <input
+                          value={deliveryContactName}
+                          onChange={(e) => setDeliveryContactName(e.target.value)}
+                          placeholder="Site contact name"
+                          className="mt-3 h-11 w-full border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
+                        />
+                        <input
+                          value={deliveryContactPhone}
+                          onChange={(e) => setDeliveryContactPhone(e.target.value)}
+                          placeholder="Site contact phone"
+                          className="mt-2 h-11 w-full border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
+                        />
+                        <textarea
+                          value={deliveryAccessNotes}
+                          onChange={(e) => setDeliveryAccessNotes(e.target.value)}
+                          placeholder="Access hours, security instructions, anything the driver should know"
+                          rows={2}
+                          className="mt-2 min-h-[54px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
+                        />
+                        {deliveryError && <p className="mt-2 text-[11px] text-red-700">{deliveryError}</p>}
+                        <button
+                          type="button"
+                          disabled={!deliveryContactName.trim() || !deliveryContactPhone.trim() || deliverySaving}
+                          onClick={handleSaveDeliveryDetails}
+                          className="mt-3 flex h-[42px] w-full items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-40"
+                        >
+                          {deliverySaving ? "Saving…" : "Save delivery details"}
+                        </button>
+                        {leadOverview.deliveryDetails && (
+                          <p className="mt-2 text-[10px] text-warm-gray">
+                            Last saved {formatSampleDate(leadOverview.deliveryDetails.updatedAt)}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                ) : step === "quote" && project.submittedLeadId ? (
+                  <motion.div
+                    key="quote"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-7 py-5"
+                  >
+                    {leadOverview?.quoteUrl ? (
+                      <div className="border border-charcoal/10 bg-white p-4">
+                        <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                          Trade quote
+                        </p>
+                        {leadOverview.quoteAmount && (
+                          <p className="mt-2 font-heading text-[22px] text-charcoal">{leadOverview.quoteAmount}</p>
+                        )}
+                        <div className="mt-3 flex gap-2">
+                          <a
+                            href={leadOverview.quoteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-[42px] flex-1 items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
+                          >
+                            View quote
+                          </a>
+                          {leadOverview.quoteAcceptedAt ? (
+                            <span className="flex h-[42px] flex-1 items-center justify-center bg-[#ece9e2] text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal">
+                              Accepted
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={acceptStatus === "busy"}
+                              onClick={handleAcceptQuote}
+                              className="flex h-[42px] flex-1 items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-50"
+                            >
+                              {acceptStatus === "busy" ? "Accepting…" : acceptStatus === "error" ? "Could not accept, try again" : "Accept quote"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <p className="font-heading text-[18px] text-charcoal" style={{ fontStyle: "italic" }}>
+                          Quote pending
+                        </p>
+                        <p className="mt-2 max-w-[260px] text-[12px] leading-relaxed text-warm-gray">
+                          Steinheim will share trade pricing for this project here as soon as it&apos;s ready.
+                        </p>
+                      </div>
+                    )}
+
+                    {leadOverview && leadOverview.quoteHistory.length > 0 && (
+                      <div className="mt-5">
+                        <p className="mb-2 text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">
+                          Previous quotes
+                        </p>
+                        <div className="space-y-2">
+                          {leadOverview.quoteHistory.slice().reverse().map((revision, index) => (
+                            <div key={index} className="border border-charcoal/8 bg-[#ece9e2] p-3">
+                              <div className="flex items-center justify-between">
+                                {revision.url ? (
+                                  <a
+                                    href={revision.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[12px] text-charcoal underline underline-offset-2"
+                                  >
+                                    {revision.amount || "View quote"}
+                                  </a>
+                                ) : (
+                                  <p className="text-[12px] text-warm-gray">No quote set yet</p>
+                                )}
+                                <p className="text-[9px] uppercase tracking-[0.08em] text-warm-gray">
+                                  {formatSampleDate(revision.changedAt)}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                ) : step === "documents" && project.submittedLeadId ? (
+                  <motion.div
+                    key="documents"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-7 py-5"
+                  >
+                    {leadOverview && leadOverview.documents.length > 0 ? (
+                      <div className="space-y-2">
+                        {leadOverview.documents.map((doc) => (
+                          <a
+                            key={doc.id}
+                            href={doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between gap-3 border border-charcoal/10 bg-white p-4 transition hover:border-charcoal"
+                          >
+                            <p className="min-w-0 truncate text-[13px] text-charcoal">{doc.label}</p>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="shrink-0 text-warm-gray">
+                              <path d="M7 17L17 7M7 7h10v10" />
+                            </svg>
+                          </a>
+                        ))}
+                      </div>
+                    ) : !leadOverview?.warrantyReference && (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <p className="font-heading text-[18px] text-charcoal" style={{ fontStyle: "italic" }}>
+                          Nothing here yet
+                        </p>
+                        <p className="mt-2 max-w-[260px] text-[12px] leading-relaxed text-warm-gray">
+                          Invoices, certificates, and spec sheets will show up here as Steinheim adds them.
+                        </p>
+                      </div>
+                    )}
+
+                    {leadOverview?.warrantyReference && (
+                      <div className={leadOverview.documents.length > 0 ? "mt-5 border border-charcoal/10 bg-white p-4" : "border border-charcoal/10 bg-white p-4"}>
+                        <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                          Warranty reference
+                        </p>
+                        <p className="mt-2 whitespace-pre-wrap text-[13px] text-charcoal">{leadOverview.warrantyReference}</p>
+                        <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
+                          Keep this reference for any warranty claim. Request a technician anytime from the Messages tab.
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                ) : step === "samples" && project.submittedLeadId ? (
+                  <motion.div
+                    key="samples"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="px-7 py-5"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setShowroomOpen(true)}
+                      className="mb-5 flex h-[46px] w-full items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
+                    >
+                      Book a showroom visit
+                    </button>
+
+                    <div className="border border-charcoal/10 bg-white p-4">
+                      <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                        Request samples
+                      </p>
+                      <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
+                        Tell us which finishes or products you&apos;d like to see in person before committing.
+                      </p>
+                      <textarea
+                        value={sampleNote}
+                        onChange={(e) => setSampleNote(e.target.value)}
+                        placeholder="e.g. Chrome and Brushed Nickel finish for the Up Shower Column"
+                        rows={3}
+                        className="mt-3 min-h-[70px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
+                      />
+                      <p className="mt-4 text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
+                        Delivery address
+                      </p>
+                      <textarea
+                        value={sampleAddress}
+                        onChange={(e) => setSampleAddress(e.target.value)}
+                        placeholder="Full address, including area and city — e.g. 12 Shagaret El Dor St, Zamalek, Cairo"
+                        rows={2}
+                        className="mt-3 min-h-[54px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
+                      />
+                      {sampleError && <p className="mt-2 text-[11px] text-red-700">{sampleError}</p>}
+                      <button
+                        type="button"
+                        disabled={!sampleNote.trim() || !sampleAddress.trim() || sampleSending}
+                        onClick={handleRequestSamples}
+                        className="mt-3 flex h-[42px] w-full items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-40"
+                      >
+                        {sampleSending ? "Sending…" : "Request samples"}
+                      </button>
+                    </div>
+
+                    {leadOverview && leadOverview.sampleRequests.length > 0 && (
+                      <div className="mt-5 space-y-2">
+                        <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">
+                          Your requests
+                        </p>
+                        {leadOverview.sampleRequests.slice().reverse().map((entry) => (
+                          <div key={entry.id} className="border border-charcoal/8 bg-[#ece9e2] p-3">
+                            <p className="whitespace-pre-wrap text-[12px] text-charcoal">{entry.note}</p>
+                            <p className="mt-1 whitespace-pre-wrap text-[11px] text-warm-gray">{entry.address}</p>
+                            <div className="mt-2 flex items-center justify-between">
+                              <p className="text-[9px] uppercase tracking-[0.08em] text-warm-gray">
+                                {formatSampleDate(entry.requestedAt)}
+                              </p>
+                              <span className={`px-2 py-0.5 text-[8px] font-medium uppercase tracking-[0.1em] ${
+                                entry.fulfilledAt ? "bg-charcoal text-white" : "border border-charcoal/15 text-charcoal"
+                              }`}>
+                                {entry.fulfilledAt ? "Fulfilled" : "Requested"}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <ScheduleCallModal
+                      open={showroomOpen}
+                      onClose={() => setShowroomOpen(false)}
+                      onRequestByMessage={() => setStep("messages")}
+                      title="Book a showroom visit"
+                      fallbackCopy="Live booking isn't set up yet — send Steinheim a message with a few times that work for you to visit the showroom, and the team will confirm one directly in the Messages tab."
+                      ctaLabel="Request a visit by message"
+                    />
+                  </motion.div>
+                ) : step === "messages" && project.submittedLeadId ? (
+                  <motion.div
+                    key="messages"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex h-full flex-col"
+                  >
+                    <TradeMessagesPanel leadId={project.submittedLeadId} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -605,6 +1276,17 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         {pdfDownloading ? "Generating…" : "Download your spec sheet"}
                       </button>
 
+                      {project.submittedLeadId && (
+                        <button
+                          type="button"
+                          onClick={() => setStep("messages")}
+                          className="flex h-[46px] w-full items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.13em] text-white transition hover:bg-black"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg>
+                          Message Steinheim
+                        </button>
+                      )}
+
                       <button
                         type="button"
                         onClick={handleNewProject}
@@ -619,7 +1301,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             </div>
 
             {/* Footer actions */}
-            {step === "board" && (
+            {step === "board" && project.status !== "submitted" && (
               <footer className="shrink-0 border-t border-charcoal/8 bg-white p-5">
                 <div className="grid grid-cols-2 gap-3">
                   <a
@@ -627,7 +1309,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     onClick={() => setOpen(false)}
                     className="flex h-[50px] items-center justify-center border border-charcoal/15 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                   >
-                    Add another scope
+                    {roomPlan ? "Edit property" : "Set up property"}
                   </a>
                   <button
                     type="button"

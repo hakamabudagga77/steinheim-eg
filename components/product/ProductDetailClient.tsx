@@ -1,144 +1,140 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
-import ScrollReveal from "@/components/ui/ScrollReveal";
 import ProductCard from "@/components/product/ProductCard";
-import ProductAssistantPanel, { type ProductPackageItem } from "@/components/product/ProductAssistantPanel";
 import SpecTable from "@/components/product/SpecTable";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
-
-const tabs = ["Description", "Product detail", "Customisation options", "Downloads"] as const;
-
-const supportPackageTypes = ["accessories", "bidet-spray", "click-clack", "angle-valve"];
-
-function packageTypesForProduct(type: string) {
-  if (type === "free-standing") {
-    return ["wall-mounted", "concealed-shower", "free-standing", ...supportPackageTypes];
-  }
-  if (type === "shower-column") {
-    return ["basin-mixer", "shower-column", ...supportPackageTypes];
-  }
-  if (type === "wall-mounted") {
-    return ["wall-mounted", "concealed-shower", ...supportPackageTypes];
-  }
-  if (type === "tall-basin-mixer") {
-    return ["tall-basin-mixer", "concealed-shower", ...supportPackageTypes];
-  }
-  if (type === "concealed-shower") {
-    return ["basin-mixer", "concealed-shower", ...supportPackageTypes];
-  }
-  if (supportPackageTypes.includes(type)) {
-    return ["basin-mixer", "concealed-shower", type, ...supportPackageTypes];
-  }
-  return ["basin-mixer", "concealed-shower", ...supportPackageTypes];
-}
+import { hasActiveRoomNeeds } from "@/lib/trade-project";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
+const productInfoTabs = ["Product Description", "Product Detail", "Downloads"] as const;
 
 export default function ProductDetailClient({ slug, liveData = null }: { slug: string; liveData?: LiveProductData }) {
   const product = getProductBySlug(slug)!;
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>("Description");
+  const [finishOpen, setFinishOpen] = useState(false);
+  const [roomOpen, setRoomOpen] = useState(false);
+  const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
   const [cartAdded, setCartAdded] = useState(false);
-  const { project, addItem, setOpen: setProposalOpen } = useTradeProject();
-  const { addItem: addToCart } = useCart();
+  const [projectAdded, setProjectAdded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const { project, addItem, setOpen: setProposalOpen, setSetupOpen, flyToProject } = useTradeProject();
+  const { addItem: addToCart, flyToCart } = useCart();
+  const imageWrapRef = useRef<HTMLDivElement>(null);
 
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series;
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
+  const liveVariant = liveData?.variants.find((entry) => entry.finish === variant.finish);
   const finish = getFinishById(variant.finish);
-  const liveVariant = liveData?.variants.find((v) => v.finish === variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
-  const contextImage = getCollectionContextImage(product.series);
+  const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
+  const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
-  const isInProposal = project.items.some((item) => item.slug === product.slug && item.finish === variant.finish);
-  const packageTypes = Array.from(new Set(packageTypesForProduct(product.type)));
-  const packageBuild = (() => {
-    const rows: ProductPackageItem[] = [];
-    const omitted: string[] = [];
-    const seriesProducts = getProductsBySeries(product.series);
+  const activeFinishDisc = getFinishDiscImage(variant.finish);
+  const isTradeCustomer = hasActiveRoomNeeds(project);
+  const activeRoomGroups = (project.roomPlan?.groups ?? []).filter((group) => group.count > 0);
+  const matchingRoomGroups = activeRoomGroups.filter((group) =>
+    group.productNeeds.some((need) => need.type === product.type && need.quantity > 0)
+  );
+  const roomOptions = matchingRoomGroups.length > 0 ? matchingRoomGroups : activeRoomGroups;
+  const [scopeChoice, setScopeChoice] = useState("");
+  const selectedGroup = roomOptions.find((group) => group.scopeId === scopeChoice) ?? null;
+  const isInProposal = project.items.some(
+    (item) => item.slug === product.slug && item.finish === variant.finish && (item.scopeId || "") === (scopeChoice || "")
+  );
 
-    for (const type of packageTypes) {
-      const packageProduct = type === product.type
-        ? product
-        : seriesProducts.find((entry) => entry.type === type);
-      const packageVariant = packageProduct?.variants.find((entry) => entry.finish === variant.finish);
-
-      if (!packageProduct || !packageVariant) {
-        omitted.push(type.replace(/-/g, " "));
-        continue;
-      }
-
-      rows.push({
-        slug: packageProduct.slug,
-        name: `${seriesName} ${packageProduct.name}`,
-        finish: packageVariant.finish,
-        model: packageVariant.model,
-        quantity: type === "angle-valve" ? 2 : 1,
-      });
+  useEffect(() => {
+    if (roomOptions.length === 0) return;
+    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+      setScopeChoice(roomOptions[0].scopeId);
     }
-
-    return { rows, omitted };
-  })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.slug, project.roomPlan]);
 
   function addToProposal() {
-    if (!isInProposal) addItem(product.slug, variant.finish);
-    setProposalOpen(true);
+    if (isInProposal) {
+      setProposalOpen(true);
+      return;
+    }
+    if (imageUrl) flyToProject(imageWrapRef.current, imageUrl);
+    const group = roomOptions.find((entry) => entry.scopeId === scopeChoice);
+    addItem(product.slug, variant.finish, quantity, group ? {
+      scopeId: group.scopeId,
+      scopeName: group.roomLabel,
+      scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
+    } : undefined);
+    setProjectAdded(true);
+    setTimeout(() => setProjectAdded(false), 2200);
   }
 
-  function addPackageToProposal() {
-    for (const item of packageBuild.rows) {
-      addItem(item.slug, item.finish, item.quantity);
-    }
-    setProposalOpen(true);
-  }
+  const quantityStepper = (
+    <div className="flex shrink-0 items-center gap-1">
+      <button
+        type="button"
+        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+        className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
+        aria-label="Decrease quantity"
+      >
+        −
+      </button>
+      <input
+        type="number"
+        min={1}
+        max={9999}
+        value={quantity}
+        onChange={(e) => setQuantity(Math.max(1, Math.round(Number(e.target.value)) || 1))}
+        className="h-9 w-9 bg-transparent text-center text-[14px] outline-none"
+        aria-label="Quantity"
+      />
+      <button
+        type="button"
+        onClick={() => setQuantity((q) => q + 1)}
+        className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
+        aria-label="Increase quantity"
+      >
+        +
+      </button>
+    </div>
+  );
 
   return (
     <PageTransition>
-      {/* Top: Image + Info */}
-      <section className="bg-white pt-20">
-        <div className="grid lg:grid-cols-[58%_42%]">
-          {/* Left - product image with thumbnail strip */}
-          <div className="relative flex h-[60svh] overflow-hidden bg-white lg:h-[75svh]">
-            {/* Vertical thumbnails */}
-            <div className="z-10 flex flex-col gap-2 py-4 pl-4 pr-1 sm:py-6 sm:pl-6 lg:py-8 lg:pl-8">
-              {product.variants.slice(0, 5).map((entry) => {
-                const thumbUrl = getProductImage(product.slug, entry.finish);
-                return thumbUrl ? (
-                  <button
-                    key={entry.finish}
-                    type="button"
-                    onClick={() => setSelectedFinish(entry.finish)}
-                    className={`relative h-[48px] w-[48px] shrink-0 overflow-hidden border transition sm:h-[56px] sm:w-[56px] ${
-                      variant.finish === entry.finish
-                        ? "border-charcoal"
-                        : "border-border-light opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    <Image src={thumbUrl} alt="" fill sizes="56px" className="object-contain p-1" />
-                  </button>
-                ) : null;
-              })}
-            </div>
+      <div className="bg-[#ece9e2] text-[#0a0a0a]">
+        <div className="hidden bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:block sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[1780px]">
+            <p className="text-[12px] text-black/40">
+              <Link href={`/collections/${product.series}`} className="transition hover:text-black">
+                {seriesName}
+              </Link>
+              {" · "}
+              <span className="text-black/60">{variant.model}</span>
+            </p>
+          </div>
+        </div>
 
-            {/* Main image */}
-            <div className="relative flex-1">
+        <section className="bg-[#ece9e2]">
+          <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(80svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
+            <div
+              ref={imageWrapRef}
+              className="relative flex min-h-[80svh] items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={variant.finish}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
-                  className="absolute inset-0 flex items-center justify-center"
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-x-0 bottom-0 top-[100px] flex items-center justify-center sm:top-4 lg:top-10"
                 >
                   {imageUrl ? (
                     <Image
@@ -146,270 +142,436 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`}
                       fill
                       priority
-                      quality={90}
-                      sizes="(max-width: 1024px) 100vw, 55vw"
-                      className="object-contain p-[3%] lg:p-[5%]"
+                      quality={92}
+                      sizes="(max-width: 1024px) 100vw, 56vw"
+                      className="origin-top scale-[1.45] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (
-                    <div className="font-heading text-3xl text-warm-gray/40">
-                      {product.name}
-                    </div>
+                    <div className="font-heading text-3xl text-black/15">{product.name}</div>
                   )}
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
 
-          {/* Right - product info (compact, no tabs here) */}
-          <div className="bg-white px-6 py-8 sm:px-10 lg:px-[7%] lg:py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-warm-gray">
-                Product detail
-              </p>
+            <div className="flex items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:px-8 sm:pt-4 sm:pb-12 lg:px-16 lg:pt-8 lg:pb-20 xl:px-20">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="w-full max-w-[620px]"
+              >
+                <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
+                <h1 className="mt-2 whitespace-nowrap text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[1.8rem] lg:text-[clamp(1.3rem,2.1vw,2.6rem)] sm:font-light sm:leading-[0.95]">
+                  {product.name}
+                </h1>
 
-              <h1 className="mt-3 font-heading text-[clamp(1.6rem,2.8vw,2.6rem)] leading-[1.1] text-charcoal">
-                {product.name}
-              </h1>
-
-              <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-warm-gray">
-                Model {variant.model}
-              </p>
-
-              {/* Finishes */}
-              <div className="mt-6">
-                <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-charcoal">
-                  Finishes
-                </p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {product.variants.map((entry) => {
-                    const entryFinish = getFinishById(entry.finish);
-                    const disc = getFinishDiscImage(entry.finish);
-                    return (
-                      <button
-                        key={entry.finish}
-                        type="button"
-                        onClick={() => setSelectedFinish(entry.finish)}
-                        title={entryFinish?.name}
-                        aria-label={`Select ${entryFinish?.name}`}
-                        aria-pressed={variant.finish === entry.finish}
-                        className={`relative h-9 w-9 overflow-hidden rounded-full border-2 transition ${
-                          variant.finish === entry.finish
-                            ? "border-charcoal scale-110"
-                            : "border-transparent hover:border-warm-gray/40"
-                        }`}
-                      >
-                        {disc ? (
-                          <Image src={disc} alt="" fill sizes="36px" className="object-cover" />
-                        ) : (
-                          <span
-                            className="absolute inset-0 rounded-full"
-                            style={{ backgroundColor: entryFinish?.hex }}
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="mt-1.5 text-[12px] text-warm-gray">{finish?.name}</p>
-              </div>
-
-              {/* Price + Stock */}
-              <div className="mt-6 border-t border-border-light pt-5">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-warm-gray">
-                    Price
-                  </p>
-                  {liveVariant && (
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.1em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-500"}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
-                      {liveVariant.inStock ? "In stock" : "Out of stock"}
+                <div className="mt-4 flex items-center gap-3 sm:mt-6">
+                  <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+                  {liveVariant && liveVariant.inStock === false && (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                      Out of stock
                     </span>
                   )}
                 </div>
-                <p className="mt-1.5 font-heading text-[24px] text-charcoal">
-                  {formatPrice(liveVariant?.price ?? variant.price)}
-                </p>
-              </div>
 
-              {/* CTAs - Add to cart (B2C) + Add to project (B2B) */}
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    addToCart(product.slug, variant.finish);
-                    setCartAdded(true);
-                    setTimeout(() => setCartAdded(false), 2200);
-                  }}
-                  className="flex h-[46px] items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.14em] text-white transition hover:bg-black"
-                >
-                  {cartAdded ? "Added ✓" : "Add to cart"}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  onClick={addToProposal}
-                  className="flex h-[46px] items-center justify-center gap-2 border border-charcoal/20 bg-white text-[10px] font-medium uppercase tracking-[0.14em] text-charcoal transition hover:border-charcoal"
-                >
-                  {isInProposal ? "View project ✓" : "Add to project"}
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-
-              <ProductAssistantPanel
-                product={product}
-                series={series}
-                variant={variant}
-                finish={finish}
-                isInProject={isInProposal}
-                onAddToProject={addToProposal}
-                packageItems={packageBuild.rows}
-                omittedPackageItems={packageBuild.omitted}
-                onAddPackage={addPackageToProposal}
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      {/* Tabs section - full width, spans from image edge to button edge */}
-      <section className="border-t border-border-light bg-white">
-        <div className="px-6 sm:px-10 lg:px-[4%]">
-          {/* Tab bar */}
-          <div className="flex flex-wrap gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`shrink-0 border-b-2 px-3 sm:px-5 py-4 text-[11px] sm:text-[13px] font-medium tracking-[0.04em] transition ${
-                  activeTab === tab
-                    ? "border-charcoal text-charcoal"
-                    : "border-transparent text-warm-gray hover:text-charcoal"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab content - wider, with subtle bg */}
-        <div className="border-t border-border-light bg-[#FAFAF8] px-6 py-10 sm:px-10 lg:px-[4%] lg:py-12">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="max-w-5xl"
-            >
-              {activeTab === "Description" && (
-                <p className="text-[15px] leading-[1.9] text-stone">
-                  {product.name} with hand shower. Sculptural form with precise engineering.
-                  Part of the {seriesName} collection - {series?.description?.toLowerCase() || "designed for enduring performance"}.
-                </p>
-              )}
-              {activeTab === "Product detail" && (
-                <div className="border-t border-charcoal/10">
-                  <SpecTable product={product} />
-                </div>
-              )}
-              {activeTab === "Customisation options" && (
-                <p className="text-[15px] leading-[1.9] text-stone">
-                  Available in {product.variants.length} finish{product.variants.length > 1 ? "es" : ""}. Contact the trade team for project-specific configurations, custom finishes, and bulk pricing.
-                </p>
-              )}
-              {activeTab === "Downloads" && (
-                <div className="space-y-5">
-                  <Link
-                    href="/contact"
-                    className="flex items-center gap-3 text-[14px] text-charcoal transition hover:text-warm-gray"
+                <div className="relative mt-7 sm:mt-20 lg:mt-28">
+                  <button
+                    type="button"
+                    onClick={() => setFinishOpen((open) => !open)}
+                    className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
                   >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    Request specification sheet
-                  </Link>
-                  <p className="text-[13px] text-warm-gray">
-                    CAD files and technical drawings available on request.
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
+                        {activeFinishDisc ? (
+                          <Image src={activeFinishDisc} alt="" fill sizes="36px" className="object-cover" />
+                        ) : (
+                          <span className="absolute inset-0 rounded-full" style={{ backgroundColor: finish?.hex }} />
+                        )}
+                      </span>
+                      <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
+                        {finish?.name}
+                        {finish?.type === "pvd" ? " Pvd" : ""}
+                      </span>
+                    </span>
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[0px] leading-none text-black/45 after:text-[18px] after:content-['↓']">
+                      {finishOpen ? "⌃" : "⌄"}
+                    </span>
+                  </button>
+
+                  <AnimatePresence>
+                    {finishOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute left-0 right-0 z-20 mt-3 overflow-hidden rounded-[28px] border border-black/8 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+                      >
+                        {product.variants.map((entry, i) => {
+                          const entryFinish = getFinishById(entry.finish);
+                          const disc = getFinishDiscImage(entry.finish);
+                          const active = variant.finish === entry.finish;
+                          const entryLive = liveData?.variants.find((v) => v.finish === entry.finish);
+
+                          return (
+                            <button
+                              key={entry.finish}
+                              type="button"
+                              onClick={() => {
+                                setSelectedFinish(entry.finish);
+                                setFinishOpen(false);
+                              }}
+                              className={`flex w-full cursor-pointer items-center gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                                i > 0 ? "border-t border-black/6" : ""
+                              }`}
+                            >
+                              <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full">
+                                {disc ? (
+                                  <Image src={disc} alt="" fill sizes="28px" className="object-cover" />
+                                ) : (
+                                  <span className="absolute inset-0 rounded-full" style={{ backgroundColor: entryFinish?.hex }} />
+                                )}
+                              </span>
+                              <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
+                                {entryFinish?.name}
+                                {entryFinish?.type === "pvd" ? " Pvd" : ""}
+                              </span>
+                              {entryLive && entryLive.inStock === false && (
+                                <span className="ml-auto shrink-0 text-[9px] font-medium uppercase tracking-[0.08em] text-red-400">
+                                  Out of stock
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className={isTradeCustomer ? "mt-3" : "mt-8 sm:mt-20 lg:mt-28"}>
+                  {!isTradeCustomer && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (imageUrl) flyToCart(imageWrapRef.current, imageUrl);
+                        addToCart(product.slug, variant.finish, quantity);
+                        setCartAdded(true);
+                        setTimeout(() => setCartAdded(false), 2200);
+                      }}
+                      className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                    >
+                      <AnimatePresence mode="wait" initial={false}>
+                        {cartAdded ? (
+                          <motion.span
+                            key="added"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.25 }}
+                            className="flex items-center gap-2"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4 12l6 6L20 6" />
+                            </svg>
+                            Added to Cart
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="add"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.25 }}
+                          >
+                            Add to Cart
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  )}
+                  {roomOptions.length > 0 && (
+                    <div className={`flex items-center gap-3 ${isTradeCustomer ? "" : "mt-3"}`}>
+                      <div className="relative flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setRoomOpen((o) => !o)}
+                        className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
+                      >
+                        <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
+                          {selectedGroup ? selectedGroup.roomLabel : "No specific room"}
+                        </span>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[0px] leading-none text-black/45 after:text-[18px] after:content-['↓']">
+                          {roomOpen ? "⌃" : "⌄"}
+                        </span>
+                      </button>
+
+                      <AnimatePresence>
+                        {roomOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 8 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute left-0 right-0 z-20 mt-3 overflow-hidden rounded-[28px] border border-black/8 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.12)]"
+                          >
+                            {roomOptions.map((group, i) => {
+                              const active = group.scopeId === scopeChoice;
+                              const needsThis = group.productNeeds.some(
+                                (need) => need.type === product.type && need.quantity > 0
+                              );
+                              return (
+                                <button
+                                  key={group.scopeId}
+                                  type="button"
+                                  onClick={() => {
+                                    setScopeChoice(group.scopeId);
+                                    setRoomOpen(false);
+                                  }}
+                                  className={`flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                                    i > 0 ? "border-t border-black/6" : ""
+                                  }`}
+                                >
+                                  <span className={`text-[14px] ${active ? "font-semibold text-black" : "text-black/65"}`}>
+                                    {group.roomLabel}
+                                  </span>
+                                  {needsThis && (
+                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/40">Needs this</span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setScopeChoice("");
+                                setRoomOpen(false);
+                              }}
+                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-left text-[14px] text-black/45 transition hover:bg-black/[0.035]"
+                            >
+                              No specific room (manual)
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      </div>
+                      {quantityStepper}
+                    </div>
+                  )}
+                  {activeRoomGroups.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSetupOpen(true)}
+                      className="mt-3 flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-black/12 text-[11px] font-medium text-black/50 transition hover:border-black/30 hover:text-black"
+                    >
+                      Set up your project to auto-assign this to a room
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={addToProposal}
+                    className={
+                      isTradeCustomer
+                        ? "mt-3 flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                        : "mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/45 transition hover:bg-white/55 hover:text-black"
+                    }
+                  >
+                    <AnimatePresence mode="wait" initial={false}>
+                      {isInProposal ? (
+                        <motion.span key="open" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Open project board
+                        </motion.span>
+                      ) : projectAdded ? (
+                        <motion.span key="added" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Added to project board
+                        </motion.span>
+                      ) : (
+                        <motion.span key="add" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+                          Add to project board
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </button>
+                </div>
+
+                <div className="mt-10 hidden border-t border-black/10 pt-6 text-left sm:block" dir="ltr">
+                  <p className="text-[13px] leading-[1.8] text-black/45">
+                    Technical information, product details, and catalogue downloads are available below.
                   </p>
                 </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </section>
-      {contextImage && (
-        <section className="border-t border-border-light bg-[#FAFAF8] px-5 py-10 sm:px-8 sm:py-14 lg:px-10">
-          <div className="mx-auto grid max-w-[1440px] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <ScrollReveal>
-              <div className="relative aspect-[16/10] overflow-hidden bg-charcoal">
-                <Image
-                  src={contextImage}
-                  alt={`${seriesName} collection shown in a bathroom setting`}
-                  fill
-                  quality={90}
-                  sizes="(max-width: 1024px) 100vw, 48vw"
-                  className="object-cover"
-                />
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.08} className="max-w-xl">
-              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-warm-gray">
-                In context
-              </p>
-              <h2 className="mt-4 font-heading text-[clamp(2rem,4vw,3.6rem)] leading-[0.98] text-charcoal">
-                The product belongs to a complete bathroom language.
-              </h2>
-              <p className="mt-5 text-[14px] leading-[1.9] text-warm-gray">
-                See how the {seriesName} collection&apos;s form, finish, and proportions sit within a
-                complete bathroom environment before choosing the exact specification.
-              </p>
-            </ScrollReveal>
-          </div>
-        </section>
-      )}
-
-
-
-      {/* Related products */}
-      {related.length > 0 && (
-        <section className="border-t border-border-light bg-white py-20 sm:py-28">
-          <div className="mx-auto max-w-[1440px] px-[24px] lg:px-[40px]">
-            <ScrollReveal className="mb-12 flex items-end justify-between">
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                  Related products
-                </p>
-                <h2 className="mt-3 font-heading text-[clamp(1.8rem,3.5vw,2.8rem)]">
-                  Continue the {seriesName} language.
-                </h2>
-              </div>
-              <Link
-                href={`/collections/${product.series}`}
-                className="hidden text-[11px] font-medium uppercase tracking-[0.14em] text-charcoal transition hover:text-warm-gray sm:block"
-              >
-                View collection →
-              </Link>
-            </ScrollReveal>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-              {related.map((entry) => (
-                <ProductCard key={entry.slug} product={entry} liveVariants={liveData?.slug === entry.slug ? liveData.variants : undefined} />
-              ))}
+              </motion.div>
             </div>
           </div>
         </section>
-      )}
+
+        <section dir="ltr" className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 text-left sm:px-8 lg:px-16 lg:py-16">
+          <div className="mx-auto max-w-[1560px]">
+            <div className="border-b border-black/18">
+              <div className="grid grid-cols-3 gap-0">
+                {productInfoTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveInfoTab(tab)}
+                    className={`relative px-1 py-3 text-center text-[12px] font-semibold leading-tight tracking-[-0.02em] transition sm:px-2 sm:py-5 sm:text-[20px] sm:tracking-[-0.04em] lg:text-[27px] ${
+                      activeInfoTab === tab ? "text-black" : "text-black/42 hover:text-black/70"
+                    }`}
+                  >
+                    {tab}
+                    <span
+                      className={`absolute bottom-[-1px] left-1/2 h-[2px] -translate-x-1/2 bg-black transition-all duration-300 ${
+                        activeInfoTab === tab ? "w-full" : "w-0"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeInfoTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28 }}
+                className="grid gap-10 py-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-14"
+              >
+                {activeInfoTab === "Product Description" && (
+                  <>
+                    <div className="space-y-6">
+                      <p className="max-w-xl text-[17px] leading-[1.85] text-black/72">
+                        {`${product.name} from the ${seriesName} collection brings Steinheim's architectural bathroom language into a precise, project-ready product. The current selection is shown in ${finish?.name ?? "the selected finish"}.`}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {activeInfoTab === "Product Detail" && (
+                  <>
+                    <div className="border border-black/10 p-8 lg:p-10">
+                      <div className="grid gap-5 text-[16px]">
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Product Number</span>
+                          <span className="text-right font-medium">{variant.model}</span>
+                        </div>
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Collection</span>
+                          <span className="text-right font-medium">{seriesName}</span>
+                        </div>
+                        <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
+                          <span className="text-black/52">Finish</span>
+                          <span className="text-right font-medium">{finish?.name ?? variant.finish}</span>
+                        </div>
+                        <div className="flex justify-between gap-8">
+                          <span className="text-black/52">Application</span>
+                          <span className="text-right font-medium">{product.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border border-black/10 p-8 lg:p-10">
+                      <SpecTable product={product} />
+                    </div>
+                  </>
+                )}
+
+                {activeInfoTab === "Downloads" && (
+                  <>
+                    <div>
+                      <p className="max-w-xl text-[17px] leading-[1.85] text-black/70">
+                        Download the current Steinheim catalogue or request the exact technical sheet for
+                        {` ${seriesName} ${product.name}`} in {finish?.name ?? "the selected finish"}.
+                      </p>
+                      <p className="mt-5 max-w-xl text-[14px] leading-[1.85] text-black/45">
+                        Final stock, trade pricing, lead times, and project quantities should still be confirmed with Steinheim Egypt.
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <a
+                        href="/catalogues/steinheim-catalogue-2026.pdf"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                      >
+                        <span>Open Steinheim Catalogue 2026</span>
+                        <span aria-hidden="true" className="hidden sm:inline">↗</span>
+                      </a>
+                      <Link
+                        href="/contact"
+                        className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
+                      >
+                        <span>Request technical sheet for {variant.model}</span>
+                        <span aria-hidden="true" className="hidden sm:inline">→</span>
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </section>
+
+        {contextImage && (
+          <section dir="ltr" className="px-5 py-20 text-left sm:px-8 lg:px-16 lg:py-28">
+            <div className="mx-auto max-w-[1780px]">
+              <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-black">
+                  <Image
+                    src={contextImage}
+                    alt={`${seriesName} collection in a bathroom setting`}
+                    fill
+                    quality={90}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="max-w-lg">
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">In context</p>
+                  <h2 className="mt-4 font-heading text-[clamp(2.4rem,4.6vw,4.4rem)] font-light leading-[0.92] tracking-[-0.055em]">
+                    Part of a complete bathroom language.
+                  </h2>
+                  <p className="mt-6 text-[16px] leading-[1.85] text-black/55">
+                    {`See how the ${seriesName} collection's form, finish, and proportions work within a resolved bathroom environment.`}
+                  </p>
+                  <Link
+                    href={`/collections/${product.series}`}
+                    className="mt-8 inline-flex rounded-full border border-black/25 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white"
+                  >
+                    View {seriesName} collection
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section dir="ltr" className="border-t border-black/6 px-5 py-20 text-left sm:px-8 lg:px-16 lg:py-28">
+            <div className="mx-auto max-w-[1780px]">
+              <div className="mb-14 flex items-end justify-between">
+                <div>
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Related</p>
+                  <h2 className="mt-3 font-heading text-[clamp(2.4rem,4.5vw,4.6rem)] font-light leading-[0.92] tracking-[-0.055em]">
+                    Continue the {seriesName} language.
+                  </h2>
+                </div>
+                <Link
+                  href={`/collections/${product.series}`}
+                  className="hidden rounded-full border border-black/25 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white sm:inline-flex"
+                >
+                  View collection
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-7">
+                {related.map((entry) => (
+                  <ProductCard key={entry.slug} product={entry} liveVariants={liveData?.slug === entry.slug ? liveData.variants : undefined} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+      </div>
     </PageTransition>
   );
 }

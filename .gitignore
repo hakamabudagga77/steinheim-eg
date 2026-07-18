@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# local runtime data (trade leads fallback store)
+data/runtime/

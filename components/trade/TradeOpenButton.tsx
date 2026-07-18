@@ -5,7 +5,7 @@ import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 export default function TradeOpenButton({
   variant = "primary",
 }: {
-  variant?: "primary" | "outline" | "white";
+  variant?: "primary" | "outline" | "outline-light" | "white";
 }) {
   const { project, setOpen } = useTradeProject();
   const count = project.items.length;
@@ -18,6 +18,8 @@ export default function TradeOpenButton({
       "bg-white text-charcoal hover:bg-white/90",
     outline:
       "border border-charcoal text-charcoal hover:bg-charcoal hover:text-white",
+    "outline-light":
+      "border border-white/40 text-white hover:bg-white hover:text-black",
     white:
       "bg-white text-charcoal hover:bg-white/90",
   };

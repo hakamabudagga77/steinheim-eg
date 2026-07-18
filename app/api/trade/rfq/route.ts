@@ -26,6 +26,33 @@ interface ResolvedItem {
   finish: (typeof finishesData)[number] | undefined;
   quantity: number;
   lineTotal: number;
+  scopeId: string;
+  scopeName: string;
+  scopeSummary: string;
+}
+
+interface ScopeGroup {
+  id: string;
+  name: string;
+  summary: string;
+  rows: ResolvedItem[];
+  totalUnits: number;
+  totalValue: number;
+}
+
+function groupByScope(rows: ResolvedItem[]): ScopeGroup[] {
+  const map = new Map<string, { name: string; summary: string; rows: ResolvedItem[] }>();
+  for (const row of rows) {
+    const existing = map.get(row.scopeId) ?? { name: row.scopeName, summary: row.scopeSummary, rows: [] };
+    existing.rows.push(row);
+    map.set(row.scopeId, existing);
+  }
+  return Array.from(map.entries()).map(([id, group]) => ({
+    id,
+    ...group,
+    totalUnits: group.rows.reduce((sum, row) => sum + row.quantity, 0),
+    totalValue: group.rows.reduce((sum, row) => sum + row.lineTotal, 0),
+  }));
 }
 
 function hexToRgb(hex: string) {
@@ -74,20 +101,43 @@ async function loadProductImage(slug: string, finish: string): Promise<Buffer | 
   }
 }
 
+const SPEC_FIELDS: Array<[key: string, label: string]> = [
+  ["material", "Material"],
+  ["cartridge", "Cartridge"],
+  ["aerator", "Aerator"],
+  ["inletPipe", "Inlet pipe"],
+  ["connectionSize", "Connection size"],
+  ["pressureRange", "Pressure range"],
+  ["maxPressure", "Max pressure"],
+  ["maxTemperature", "Max temperature"],
+  ["operatingTemperature", "Operating temperature"],
+  ["mountingAperture", "Mounting aperture"],
+];
+
 function resolveItems(project: TradeProject): ResolvedItem[] {
   return project.items.flatMap((item) => {
     const product = productsData.products.find((p) => p.slug === item.slug);
     const variant = product?.variants.find((v) => v.finish === item.finish);
     if (!product || !variant) return [];
     const finish = finishesData.find((f) => f.id === item.finish);
-    return [{ product, variant, finish, quantity: item.quantity, lineTotal: variant.price * item.quantity }];
+    return [{
+      product,
+      variant,
+      finish,
+      quantity: item.quantity,
+      lineTotal: variant.price * item.quantity,
+      scopeId: item.scopeId || "manual",
+      scopeName: item.scopeName || "Manually added products",
+      scopeSummary: item.scopeSummary || "Products added directly from collection and product pages.",
+    }];
   });
 }
 
-async function buildPremiumPdf(project: TradeProject) {
+async function buildPremiumPdf(project: TradeProject, includePrices: boolean, includeSpecs: boolean) {
   const now = new Date();
   const reference = `STM-RFQ-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getTime()).slice(-6)}`;
   const rows = resolveItems(project);
+  const groups = groupByScope(rows);
   const total = rows.reduce((sum, r) => sum + r.lineTotal, 0);
   const detail = project.details;
 
@@ -188,6 +238,7 @@ async function buildPremiumPdf(project: TradeProject) {
   cover.drawRectangle({ x: MARGIN, y: y - 70, width: CONTENT_W, height: 70, color: WARM_BG });
   const summaryY = y - 25;
   const summaryItems = [
+    [`${groups.length}`, groups.length === 1 ? "Room group" : "Room groups"],
     [`${rows.length}`, "Products"],
     [`${rows.reduce((s, r) => s + r.quantity, 0)}`, "Total units"],
     [`${new Set(rows.map((r) => r.product.series)).size}`, "Collections"],
@@ -279,7 +330,7 @@ async function buildPremiumPdf(project: TradeProject) {
       { text: "MODEL", x: MARGIN + 230, w: 90 },
       { text: "FINISH", x: MARGIN + 320, w: 80 },
       { text: "QTY", x: MARGIN + 400, w: 35 },
-      { text: "LINE TOTAL", x: MARGIN + 435, w: 65 },
+      ...(includePrices ? [{ text: "LINE TOTAL", x: MARGIN + 435, w: 65 }] : []),
     ];
     for (const h of headers) {
       page.drawText(h.text, { x: h.x, y: yPos, size: 6.5, font: helveticaBold, color: MID_GRAY });
@@ -289,12 +340,13 @@ async function buildPremiumPdf(project: TradeProject) {
 
   y = drawTableHeader(currentPage, y);
 
-  // Product rows with images
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const ROW_HEIGHT = 72;
+  // Product rows with images, grouped by room/scope
+  let rowNumber = 0;
+  for (const group of groups) {
+    const GROUP_BAND_HEIGHT = 34;
+    const GROUP_HEADER_HEIGHT = GROUP_BAND_HEIGHT + 10;
 
-    if (y - ROW_HEIGHT < 60) {
+    if (y - GROUP_HEADER_HEIGHT < 90) {
       pageNum++;
       currentPage = doc.addPage([PAGE_W, PAGE_H]);
       drawPageHeader(currentPage, pageNum);
@@ -304,115 +356,154 @@ async function buildPremiumPdf(project: TradeProject) {
       y = drawTableHeader(currentPage, y);
     }
 
-    // Alternating row background
-    if (i % 2 === 0) {
-      currentPage.drawRectangle({
-        x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: ROW_HEIGHT, color: rgb(0.985, 0.985, 0.98),
-      });
-    }
-
-    // Row separator
-    currentPage.drawRectangle({
-      x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: 0.5, color: rgb(0.9, 0.9, 0.88),
+    // Group subsection header
+    currentPage.drawRectangle({ x: MARGIN, y: y - GROUP_BAND_HEIGHT, width: CONTENT_W, height: GROUP_BAND_HEIGHT, color: WARM_BG });
+    currentPage.drawText(group.name, { x: MARGIN + 8, y: y - 13, size: 10.5, font: helveticaBold, color: CHARCOAL });
+    const groupSummaryLine = wrapText(group.summary, helvetica, 7.5, CONTENT_W - 220)[0] ?? "";
+    currentPage.drawText(groupSummaryLine, { x: MARGIN + 8, y: y - 26, size: 7.5, font: helvetica, color: MID_GRAY });
+    const groupTotalsStr = includePrices
+      ? `${group.totalUnits} ${group.totalUnits === 1 ? "unit" : "units"} · LE ${group.totalValue.toLocaleString("en-US")}`
+      : `${group.totalUnits} ${group.totalUnits === 1 ? "unit" : "units"}`;
+    const groupTotalsWidth = helveticaBold.widthOfTextAtSize(groupTotalsStr, 8.5);
+    currentPage.drawText(groupTotalsStr, {
+      x: PAGE_W - MARGIN - groupTotalsWidth - 8, y: y - 19, size: 8.5, font: helveticaBold, color: CHARCOAL,
     });
+    y -= GROUP_HEADER_HEIGHT;
 
-    const series = productsData.series.find((s) => s.id === row.product.series);
-    const seriesName = series?.name ?? row.product.series;
+    for (const row of group.rows) {
+      const ROW_HEIGHT = 72;
 
-    // Product image
-    try {
-      const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
-      if (imgBytes) {
-        const img = await doc.embedPng(imgBytes);
-        const imgSize = 48;
-        const imgDims = img.scaleToFit(imgSize, imgSize);
+      if (y - ROW_HEIGHT < 60) {
+        pageNum++;
+        currentPage = doc.addPage([PAGE_W, PAGE_H]);
+        drawPageHeader(currentPage, pageNum);
+        y = PAGE_H - 100;
+        currentPage.drawText("Product Schedule (continued)", { x: MARGIN, y, size: 16, font: timesRoman, color: CHARCOAL });
+        y -= 30;
+        y = drawTableHeader(currentPage, y);
+      }
+
+      // Alternating row background
+      if (rowNumber % 2 === 0) {
         currentPage.drawRectangle({
-          x: MARGIN + 30, y: y - 40, width: 52, height: 52, color: rgb(0.96, 0.96, 0.95),
-        });
-        currentPage.drawImage(img, {
-          x: MARGIN + 30 + (52 - imgDims.width) / 2,
-          y: y - 40 + (52 - imgDims.height) / 2,
-          width: imgDims.width,
-          height: imgDims.height,
+          x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: ROW_HEIGHT, color: rgb(0.985, 0.985, 0.98),
         });
       }
-    } catch {
-      // Skip image if it can't be loaded
-    }
 
-    // Row number
-    currentPage.drawText(`${i + 1}`, {
-      x: MARGIN + 10, y: y - 10, size: 9, font: helvetica, color: MID_GRAY,
-    });
-
-    // Product name and series
-    currentPage.drawText(`${seriesName} ${row.product.name}`, {
-      x: MARGIN + 88, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-    currentPage.drawText(row.product.type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), {
-      x: MARGIN + 88, y: y - 20, size: 7.5, font: helvetica, color: MID_GRAY,
-    });
-
-    // Model number
-    currentPage.drawText(row.variant.model, {
-      x: MARGIN + 230, y: y - 6, size: 9, font: helvetica, color: DARK_GRAY,
-    });
-
-    // Finish name with color swatch
-    const finishName = row.finish?.name ?? row.variant.finish;
-    if (row.finish?.hex) {
-      currentPage.drawCircle({
-        x: MARGIN + 324, y: y - 7, size: 5, color: hexToRgb(row.finish.hex),
-      });
-      currentPage.drawCircle({
-        x: MARGIN + 324, y: y - 7, size: 5, borderColor: rgb(0.8, 0.8, 0.78), borderWidth: 0.5,
-      });
-    }
-    currentPage.drawText(finishName, {
-      x: MARGIN + 334, y: y - 10, size: 8, font: helvetica, color: DARK_GRAY,
-    });
-
-    // PVD badge
-    if (row.finish?.type === "pvd") {
-      const pvdX = MARGIN + 334 + helvetica.widthOfTextAtSize(finishName, 8) + 5;
+      // Row separator
       currentPage.drawRectangle({
-        x: pvdX, y: y - 14, width: 20, height: 11, color: rgb(0.94, 0.94, 0.92),
+        x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: 0.5, color: rgb(0.9, 0.9, 0.88),
       });
-      currentPage.drawText("PVD", { x: pvdX + 3, y: y - 11, size: 6, font: helveticaBold, color: MID_GRAY });
+
+      const series = productsData.series.find((s) => s.id === row.product.series);
+      const seriesName = series?.name ?? row.product.series;
+
+      // Product image
+      try {
+        const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
+        if (imgBytes) {
+          const img = await doc.embedPng(imgBytes);
+          const imgSize = 48;
+          const imgDims = img.scaleToFit(imgSize, imgSize);
+          currentPage.drawRectangle({
+            x: MARGIN + 30, y: y - 40, width: 52, height: 52, color: rgb(0.96, 0.96, 0.95),
+          });
+          currentPage.drawImage(img, {
+            x: MARGIN + 30 + (52 - imgDims.width) / 2,
+            y: y - 40 + (52 - imgDims.height) / 2,
+            width: imgDims.width,
+            height: imgDims.height,
+          });
+        }
+      } catch {
+        // Skip image if it can't be loaded
+      }
+
+      // Row number
+      rowNumber++;
+      currentPage.drawText(`${rowNumber}`, {
+        x: MARGIN + 10, y: y - 10, size: 9, font: helvetica, color: MID_GRAY,
+      });
+
+      // Product name and series
+      currentPage.drawText(`${seriesName} ${row.product.name}`, {
+        x: MARGIN + 88, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+      });
+      currentPage.drawText(row.product.type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), {
+        x: MARGIN + 88, y: y - 20, size: 7.5, font: helvetica, color: MID_GRAY,
+      });
+
+      // Model number
+      currentPage.drawText(row.variant.model, {
+        x: MARGIN + 230, y: y - 6, size: 9, font: helvetica, color: DARK_GRAY,
+      });
+
+      // Finish name with color swatch
+      const finishName = row.finish?.name ?? row.variant.finish;
+      if (row.finish?.hex) {
+        currentPage.drawCircle({
+          x: MARGIN + 324, y: y - 7, size: 5, color: hexToRgb(row.finish.hex),
+        });
+        currentPage.drawCircle({
+          x: MARGIN + 324, y: y - 7, size: 5, borderColor: rgb(0.8, 0.8, 0.78), borderWidth: 0.5,
+        });
+      }
+      currentPage.drawText(finishName, {
+        x: MARGIN + 334, y: y - 10, size: 8, font: helvetica, color: DARK_GRAY,
+      });
+
+      // PVD badge
+      if (row.finish?.type === "pvd") {
+        const pvdX = MARGIN + 334 + helvetica.widthOfTextAtSize(finishName, 8) + 5;
+        currentPage.drawRectangle({
+          x: pvdX, y: y - 14, width: 20, height: 11, color: rgb(0.94, 0.94, 0.92),
+        });
+        currentPage.drawText("PVD", { x: pvdX + 3, y: y - 11, size: 6, font: helveticaBold, color: MID_GRAY });
+      }
+
+      // Quantity
+      currentPage.drawText(`${row.quantity}`, {
+        x: MARGIN + 410, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+      });
+
+      // Line total
+      if (includePrices) {
+        const totalStr = `LE ${row.lineTotal.toLocaleString("en-US")}`;
+        currentPage.drawText(totalStr, {
+          x: MARGIN + 435, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
+        });
+
+        // Unit price
+        currentPage.drawText(`@ LE ${row.variant.price.toLocaleString("en-US")} each`, {
+          x: MARGIN + 435, y: y - 20, size: 7, font: helvetica, color: MID_GRAY,
+        });
+      }
+
+      y -= ROW_HEIGHT;
     }
-
-    // Quantity
-    currentPage.drawText(`${row.quantity}`, {
-      x: MARGIN + 410, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-
-    // Line total
-    const totalStr = `LE ${row.lineTotal.toLocaleString("en-US")}`;
-    currentPage.drawText(totalStr, {
-      x: MARGIN + 435, y: y - 6, size: 10, font: helveticaBold, color: CHARCOAL,
-    });
-
-    // Unit price
-    currentPage.drawText(`@ LE ${row.variant.price.toLocaleString("en-US")} each`, {
-      x: MARGIN + 435, y: y - 20, size: 7, font: helvetica, color: MID_GRAY,
-    });
-
-    y -= ROW_HEIGHT;
   }
 
   // Totals row
   y -= 8;
-  currentPage.drawRectangle({ x: MARGIN, y: y - 32, width: CONTENT_W, height: 36, color: CHARCOAL });
-  currentPage.drawText("RETAIL REFERENCE TOTAL", {
-    x: MARGIN + 12, y: y - 18, size: 9, font: helveticaBold, color: LIGHT_GRAY,
-  });
-  const totalStr = `LE ${total.toLocaleString("en-US")}`;
-  const totalWidth = helveticaBold.widthOfTextAtSize(totalStr, 16);
-  currentPage.drawText(totalStr, {
-    x: PAGE_W - MARGIN - totalWidth - 12, y: y - 22, size: 16, font: helveticaBold, color: WHITE,
-  });
-
-  y -= 54;
+  if (includePrices) {
+    currentPage.drawRectangle({ x: MARGIN, y: y - 32, width: CONTENT_W, height: 36, color: CHARCOAL });
+    currentPage.drawText("RETAIL REFERENCE TOTAL", {
+      x: MARGIN + 12, y: y - 18, size: 9, font: helveticaBold, color: LIGHT_GRAY,
+    });
+    const totalStr = `LE ${total.toLocaleString("en-US")}`;
+    const totalWidth = helveticaBold.widthOfTextAtSize(totalStr, 16);
+    currentPage.drawText(totalStr, {
+      x: PAGE_W - MARGIN - totalWidth - 12, y: y - 22, size: 16, font: helveticaBold, color: WHITE,
+    });
+    y -= 54;
+  } else {
+    currentPage.drawRectangle({ x: MARGIN, y: y - 32, width: CONTENT_W, height: 36, color: CHARCOAL });
+    const unitsStr = `${rows.reduce((s, r) => s + r.quantity, 0)} TOTAL UNITS`;
+    currentPage.drawText(unitsStr, {
+      x: MARGIN + 12, y: y - 22, size: 14, font: helveticaBold, color: WHITE,
+    });
+    y -= 54;
+  }
 
   // Disclaimer
   if (y > 120) {
@@ -420,14 +511,82 @@ async function buildPremiumPdf(project: TradeProject) {
       x: MARGIN, y, size: 8, font: helveticaBold, color: MID_GRAY,
     });
     y -= 18;
-    const disclaimers = [
-      "Trade pricing is confirmed after Steinheim review. Retail prices shown are references only.",
-      "Stock availability, lead times, delivery, payment terms, and final discounts: to be confirmed.",
-      "This document does not constitute a binding quotation or purchase agreement.",
-    ];
+    const disclaimers = includePrices
+      ? [
+          "Trade pricing is confirmed after Steinheim review. Retail prices shown are references only.",
+          "Stock availability, lead times, delivery, payment terms, and final discounts: to be confirmed.",
+          "This document does not constitute a binding quotation or purchase agreement.",
+        ]
+      : [
+          "Trade pricing is confirmed after Steinheim review and shared separately from this document.",
+          "Stock availability, lead times, delivery, payment terms, and final discounts: to be confirmed.",
+          "This document does not constitute a binding quotation or purchase agreement.",
+        ];
     for (const text of disclaimers) {
       currentPage.drawText(`•  ${text}`, { x: MARGIN, y, size: 8, font: helvetica, color: MID_GRAY });
       y -= 14;
+    }
+  }
+
+  // ──────────────────── TECHNICAL SPECIFICATIONS APPENDIX ────────────────────
+  if (includeSpecs) {
+    const uniqueProducts = Array.from(
+      new Map(rows.map((r) => [r.product.slug, r.product])).values()
+    );
+
+    let specPage = doc.addPage([PAGE_W, PAGE_H]);
+    pageNum++;
+    drawPageHeader(specPage, pageNum);
+    y = PAGE_H - 100;
+    specPage.drawText("Technical Specifications", { x: MARGIN, y, size: 22, font: timesRoman, color: CHARCOAL });
+    y -= 10;
+    specPage.drawRectangle({ x: MARGIN, y: y - 4, width: 40, height: 1.5, color: ACCENT });
+    y -= 12;
+    specPage.drawText("One entry per unique product used in this specification, independent of finish.", {
+      x: MARGIN, y, size: 8.5, font: helvetica, color: MID_GRAY,
+    });
+    y -= 26;
+
+    for (const product of uniqueProducts) {
+      const specEntries = SPEC_FIELDS.filter(([key]) => Boolean((product as unknown as Record<string, string>)[key]));
+      const rowsNeeded = Math.ceil(specEntries.length / 2);
+      const BLOCK_HEIGHT = 30 + rowsNeeded * 16 + 10;
+
+      if (y - BLOCK_HEIGHT < 90) {
+        pageNum++;
+        specPage = doc.addPage([PAGE_W, PAGE_H]);
+        drawPageHeader(specPage, pageNum);
+        y = PAGE_H - 100;
+        specPage.drawText("Technical Specifications (continued)", { x: MARGIN, y, size: 16, font: timesRoman, color: CHARCOAL });
+        y -= 30;
+      }
+
+      const series = productsData.series.find((s) => s.id === product.series);
+      const seriesName = series?.name ?? product.series;
+
+      specPage.drawRectangle({ x: MARGIN, y: y - 4, width: CONTENT_W, height: 22, color: WARM_BG });
+      specPage.drawText(`${seriesName} ${product.name}`, {
+        x: MARGIN + 8, y: y + 3, size: 10.5, font: helveticaBold, color: CHARCOAL,
+      });
+      const typeLabel = product.type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      const typeWidth = helvetica.widthOfTextAtSize(typeLabel, 8);
+      specPage.drawText(typeLabel, {
+        x: PAGE_W - MARGIN - typeWidth - 8, y: y + 4, size: 8, font: helvetica, color: MID_GRAY,
+      });
+      y -= 30;
+
+      const specColW = CONTENT_W / 2;
+      specEntries.forEach(([key, label], i) => {
+        const col = i % 2;
+        const rowIdx = Math.floor(i / 2);
+        const xPos = MARGIN + col * specColW + 8;
+        const yPos = y - rowIdx * 16;
+        const value = (product as unknown as Record<string, string>)[key];
+        specPage.drawText(`${label}:`, { x: xPos, y: yPos, size: 8, font: helveticaBold, color: MID_GRAY });
+        specPage.drawText(value, { x: xPos + 100, y: yPos, size: 8, font: helvetica, color: DARK_GRAY });
+      });
+
+      y -= rowsNeeded * 16 + 10;
     }
   }
 
@@ -500,7 +659,11 @@ export async function POST(request: Request) {
   }
 
   const value = await request.json().catch(() => null);
-  const project = sanitizeTradeProject(value);
+  const hasWrapper = Boolean(value && typeof value === "object" && "project" in value);
+  const projectInput = hasWrapper ? (value as { project: unknown }).project : value;
+  const includePrices = hasWrapper ? (value as { includePrices?: unknown }).includePrices !== false : true;
+  const includeSpecs = hasWrapper ? Boolean((value as { includeSpecs?: unknown }).includeSpecs) : false;
+  const project = sanitizeTradeProject(projectInput);
 
   if (
     !project ||
@@ -515,7 +678,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { pdf, reference } = await buildPremiumPdf(project);
+  const { pdf, reference } = await buildPremiumPdf(project, includePrices, includeSpecs);
   const safeName = project.details.projectName
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-|-$/g, "")
