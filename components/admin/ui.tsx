@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Check, Pencil, X, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function PageHeader({
@@ -52,39 +57,41 @@ export function StatCard({
   accent?: boolean;
 }) {
   return (
-    <Panel className="relative overflow-hidden">
-      <div className="flex items-start justify-between">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">{label}</p>
-        {Icon && (
-          <div
-            className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-              accent ? "bg-[#c9a961]/12 text-[#c9a961]" : "bg-white/[0.06] text-white/40"
-            }`}
-          >
-            <Icon className="h-4 w-4" />
-          </div>
-        )}
-      </div>
-      <p className="mt-3 font-heading text-[28px] tabular-nums tracking-[-0.02em] text-white">{value}</p>
-      {(hint || trend) && (
-        <div className="mt-2 flex items-center gap-2 text-[12px]">
-          {trend && (
-            <span
-              className={`inline-flex items-center gap-0.5 font-medium ${
-                trend.direction === "up"
-                  ? "text-emerald-400"
-                  : trend.direction === "down"
-                    ? "text-red-400"
-                    : "text-white/40"
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: "easeOut" }}>
+      <Panel className="relative overflow-hidden">
+        <div className="flex items-start justify-between">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">{label}</p>
+          {Icon && (
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                accent ? "bg-[#c9a961]/12 text-[#c9a961]" : "bg-white/[0.06] text-white/40"
               }`}
             >
-              {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"} {trend.label}
-            </span>
+              <Icon className="h-4 w-4" />
+            </div>
           )}
-          {hint && <span className="text-white/30">{hint}</span>}
         </div>
-      )}
-    </Panel>
+        <p className="mt-3 font-heading text-[28px] tabular-nums tracking-[-0.02em] text-white">{value}</p>
+        {(hint || trend) && (
+          <div className="mt-2 flex items-center gap-2 text-[12px]">
+            {trend && (
+              <span
+                className={`inline-flex items-center gap-0.5 font-medium ${
+                  trend.direction === "up"
+                    ? "text-emerald-400"
+                    : trend.direction === "down"
+                      ? "text-red-400"
+                      : "text-white/40"
+                }`}
+              >
+                {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"} {trend.label}
+              </span>
+            )}
+            {hint && <span className="text-white/30">{hint}</span>}
+          </div>
+        )}
+      </Panel>
+    </motion.div>
   );
 }
 
@@ -97,7 +104,9 @@ const BADGE_TONES = {
   muted: "bg-white/[0.04] text-white/30",
 } as const;
 
-export function Badge({ tone = "neutral", children }: { tone?: keyof typeof BADGE_TONES; children: ReactNode }) {
+export type BadgeTone = keyof typeof BADGE_TONES;
+
+export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; children: ReactNode }) {
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${BADGE_TONES[tone]}`}>
       {children}
@@ -159,5 +168,106 @@ export function StatCardSkeleton() {
       <Skeleton className="mt-4 h-7 w-24" />
       <Skeleton className="mt-3 h-3 w-16" />
     </Panel>
+  );
+}
+
+export function InlineEdit({
+  value,
+  onSave,
+  type = "text",
+  prefix,
+  className = "",
+  align = "left",
+  confirmMessage,
+}: {
+  value: string;
+  onSave: (value: string) => Promise<void>;
+  type?: "text" | "number";
+  prefix?: string;
+  className?: string;
+  align?: "left" | "right";
+  /** If provided, shows a native confirm() with this message before saving. Receives the new value. */
+  confirmMessage?: (newValue: string) => string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
+
+  async function commit() {
+    if (draft === value) {
+      setEditing(false);
+      return;
+    }
+    if (confirmMessage && !window.confirm(confirmMessage(draft))) {
+      return;
+    }
+    setSaving(true);
+    setError(false);
+    try {
+      await onSave(draft);
+      setEditing(false);
+    } catch {
+      setError(true);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function cancel() {
+    setDraft(value);
+    setEditing(false);
+    setError(false);
+  }
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setDraft(value);
+          setEditing(true);
+        }}
+        className={`group inline-flex items-center gap-1.5 rounded px-1 py-0.5 transition hover:bg-white/[0.06] ${
+          align === "right" ? "flex-row-reverse" : ""
+        } ${className}`}
+      >
+        <span className={value ? "" : "text-white/25"}>
+          {value ? prefix : ""}
+          {value || "—"}
+        </span>
+        <Pencil className="h-3 w-3 text-white/0 transition group-hover:text-white/35" />
+      </button>
+    );
+  }
+
+  return (
+    <span className={`inline-flex items-center gap-1 ${align === "right" ? "flex-row-reverse" : ""}`}>
+      <input
+        autoFocus
+        type={type}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") cancel();
+        }}
+        disabled={saving}
+        className={`w-20 rounded border border-[#c9a961]/50 bg-black/40 px-1.5 py-0.5 text-white outline-none focus:border-[#c9a961] ${className}`}
+      />
+      {saving ? (
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-white/40" />
+      ) : (
+        <>
+          <button type="button" onClick={commit} className="text-emerald-400 hover:text-emerald-300">
+            <Check className="h-3.5 w-3.5" />
+          </button>
+          <button type="button" onClick={cancel} className="text-white/30 hover:text-white/60">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </>
+      )}
+      {error && <span className="text-[10px] text-red-400">Failed</span>}
+    </span>
   );
 }

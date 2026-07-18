@@ -1,7 +1,8 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { TradeLeadMessage, TradeLeadMessageSender } from "@/lib/trade-leads";
 import { getTradeLead, saveTradeLead } from "@/lib/server/trade-lead-store";
 import { sendTradeMessageNotification } from "@/lib/server/trade-lead-email";
+import { isAdminRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,14 +24,6 @@ function canSend(request: Request) {
   if (bucket.count >= 20) return false;
   bucket.count += 1;
   return true;
-}
-
-function isAdmin(request: Request) {
-  if (process.env.NODE_ENV !== "production") return true;
-  const configured = process.env.TRADE_ADMIN_KEY;
-  const supplied = request.headers.get("x-steinheim-admin-key") || "";
-  if (!configured || !supplied || configured.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -63,7 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!from || !text) {
     return Response.json({ error: "A sender and message body are required." }, { status: 400 });
   }
-  if (from === "steinheim" && !isAdmin(request)) {
+  if (from === "steinheim" && !isAdminRequest(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (from === "customer" && !canSend(request)) {

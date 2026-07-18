@@ -1,7 +1,8 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { TradeLeadSampleRequest } from "@/lib/trade-leads";
 import { getTradeLead, saveTradeLead } from "@/lib/server/trade-lead-store";
 import { sendSampleRequestNotification } from "@/lib/server/trade-lead-email";
+import { isAdminRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,14 +24,6 @@ function canRequest(request: Request) {
   if (bucket.count >= 10) return false;
   bucket.count += 1;
   return true;
-}
-
-function isAdmin(request: Request) {
-  if (process.env.NODE_ENV !== "production") return true;
-  const configured = process.env.TRADE_ADMIN_KEY;
-  const supplied = request.headers.get("x-steinheim-admin-key") || "";
-  if (!configured || !supplied || configured.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
 }
 
 // Customer creates a sample or showroom-visit request against their own lead —
@@ -74,7 +67,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 // Admin marks a sample request fulfilled.
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!id) return Response.json({ error: "A lead id is required." }, { status: 400 });
 

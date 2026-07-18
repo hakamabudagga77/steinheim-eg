@@ -1,0 +1,16 @@
+import { fetchLocations } from "@/lib/shopify-client";
+import { isAdminRequest } from "@/lib/server/admin-session";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const locations = await fetchLocations();
+    return Response.json({ locations }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    console.error("Failed to fetch Shopify locations:", error);
+    return Response.json({ error: "Could not load locations." }, { status: 502 });
+  }
+}

@@ -1,9 +1,10 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { sanitizeTradeProject } from "@/lib/trade-project";
 import { isTradeLeadStatus, type TradeLead } from "@/lib/trade-leads";
 import { getTradeLead, listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
 import { sendTradeLeadConfirmationEmail, sendTradeLeadNotification, sendQuoteReadyNotification, sendStatusUpdateNotification } from "@/lib/server/trade-lead-email";
 import { analyzeProject } from "@/lib/server/trade-lead-intelligence";
+import { isAdminRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,14 +26,6 @@ function canSubmit(request: Request) {
   if (bucket.count >= 5) return false;
   bucket.count += 1;
   return true;
-}
-
-function isAdmin(request: Request) {
-  if (process.env.NODE_ENV !== "production") return true;
-  const configured = process.env.TRADE_ADMIN_KEY;
-  const supplied = request.headers.get("x-steinheim-admin-key") || "";
-  if (!configured || !supplied || configured.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
 }
 
 export async function POST(request: Request) {
@@ -94,7 +87,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   try {
     return Response.json({ leads: await listTradeLeads() }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
@@ -104,7 +97,7 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const body = await request.json().catch(() => null) as {
     id?: unknown;
     status?: unknown;

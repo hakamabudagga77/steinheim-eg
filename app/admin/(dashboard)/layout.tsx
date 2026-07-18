@@ -2,6 +2,8 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 import {
   LayoutDashboard,
@@ -12,17 +14,20 @@ import {
   Package,
   BarChart3,
   FileText,
+  ShieldCheck,
   LogOut,
 } from "lucide-react";
+import CommandPalette from "@/components/admin/CommandPalette";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, external: false },
   { href: "/admin/contact", label: "Contact Leads", icon: Inbox, external: false },
-  { href: "/trade-admin", label: "Trade Leads", icon: Briefcase, external: true },
+  { href: "/admin/trade", label: "Trade Leads", icon: Briefcase, external: false },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart, external: false },
   { href: "/admin/customers", label: "Customers", icon: Users, external: false },
   { href: "/admin/products", label: "Products", icon: Package, external: false },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3, external: false },
+  { href: "/admin/policies", label: "Policies", icon: ShieldCheck, external: false },
   { href: "/admin/content", label: "Content", icon: FileText, external: false },
 ];
 
@@ -38,13 +43,21 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
 
   return (
     <div className="flex min-h-screen bg-[#0a0a0b] text-white">
-      <aside className="flex w-[248px] shrink-0 flex-col border-r border-white/[0.06] bg-[#0d0d0f] px-5 py-7">
-        <div className="px-2">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-white/30">Steinheim Egypt</p>
-          <p className="mt-1 font-heading text-[19px] tracking-[-0.02em] text-white">Admin</p>
+      <aside className="relative flex w-[248px] shrink-0 flex-col overflow-hidden border-r border-white/[0.06] bg-[#0d0d0f] px-5 py-7">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#c9a961]/[0.08] blur-[80px]"
+        />
+        <div className="relative px-2">
+          <Image src="/images/brand/steinheim-logo-white.png" alt="Steinheim" width={140} height={28} className="h-6 w-auto" priority />
+          <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-white/30">Admin</p>
         </div>
 
-        <nav className="mt-9 flex flex-1 flex-col gap-0.5">
+        <div className="relative mt-6 px-0.5">
+          <CommandPalette />
+        </div>
+
+        <nav className="relative mt-6 flex flex-1 flex-col gap-0.5">
           {NAV_ITEMS.map((item) => {
             const active = !item.external && pathname === item.href;
             const Icon = item.icon;
@@ -86,7 +99,18 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
       </aside>
 
       <main className="flex-1 overflow-y-auto px-10 py-10">
-        <div className="mx-auto max-w-[1400px]">{children}</div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="mx-auto max-w-[1400px]"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

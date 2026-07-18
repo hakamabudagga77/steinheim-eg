@@ -1,10 +1,117 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Wallet, ShoppingBag, TrendingUp } from "lucide-react";
+import { Wallet, ShoppingBag, TrendingUp, Truck, X } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { ShopifyOrder } from "@/lib/shopify-client";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
+
+function FulfillModal({
+  order,
+  onClose,
+  onFulfilled,
+}: {
+  order: ShopifyOrder;
+  onClose: () => void;
+  onFulfilled: () => void;
+}) {
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingCompany, setTrackingCompany] = useState("");
+  const [notifyCustomer, setNotifyCustomer] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    const summary = [
+      trackingNumber && `tracking number ${trackingNumber}`,
+      trackingCompany && `via ${trackingCompany}`,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const confirmed = window.confirm(
+      `Mark ${order.name} as fulfilled${summary ? ` (${summary})` : ""}?${
+        notifyCustomer ? " The customer will be emailed." : " The customer will NOT be notified."
+      } This updates the live Shopify store immediately and cannot be undone from here.`
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/fulfill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackingNumber, trackingCompany, notifyCustomer }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Could not fulfill this order.");
+      }
+      onFulfilled();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={onClose}>
+      <div
+        className="w-full max-w-sm rounded-2xl border border-white/[0.08] bg-[#131316] p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-[15px] font-medium text-white">Mark {order.name} fulfilled</p>
+          <button type="button" onClick={onClose} className="text-white/40 hover:text-white/80">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <div>
+            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-white/35">Tracking number</label>
+            <input
+              value={trackingNumber}
+              onChange={(e) => setTrackingNumber(e.target.value)}
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              placeholder="Optional"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-white/35">Carrier</label>
+            <input
+              value={trackingCompany}
+              onChange={(e) => setTrackingCompany(e.target.value)}
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              placeholder="Optional, e.g. Bosta, Aramex"
+            />
+          </div>
+          <label className="flex items-center gap-2 text-[13px] text-white/60">
+            <input
+              type="checkbox"
+              checked={notifyCustomer}
+              onChange={(e) => setNotifyCustomer(e.target.checked)}
+              className="h-4 w-4 rounded border-white/20 bg-black/30 accent-[#c9a961]"
+            />
+            Email the customer
+          </label>
+        </div>
+
+        {error && <p className="mt-4 text-[13px] text-red-400">{error}</p>}
+
+        <button
+          type="button"
+          onClick={submit}
+          disabled={saving}
+          className="mt-6 flex h-11 w-full items-center justify-center rounded-full bg-[#c9a961] text-[13px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Confirm fulfillment"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
@@ -38,6 +145,7 @@ export default function AdminOrdersPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
+  const [fulfillingOrder, setFulfillingOrder] = useState<ShopifyOrder | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -130,7 +238,7 @@ export default function AdminOrdersPage() {
       <PageHeader
         eyebrow="Orders"
         title={orders ? `${orders.length} order${orders.length === 1 ? "" : "s"}` : "Loading…"}
-        subtitle="Live from Shopify · read-only"
+        subtitle="Live from Shopify · fulfill orders directly from here"
       />
 
       {error && <ErrorState>{error}</ErrorState>}
@@ -228,6 +336,7 @@ export default function AdminOrdersPage() {
                 <th className="px-5 py-3 font-normal">Total</th>
                 <th className="px-5 py-3 font-normal">Payment</th>
                 <th className="px-5 py-3 font-normal">Fulfillment</th>
+                <th className="px-5 py-3 font-normal" />
               </tr>
             </thead>
             <tbody>
@@ -252,11 +361,37 @@ export default function AdminOrdersPage() {
                   <td className="px-5 py-3">
                     <Badge tone={statusTone(order.fulfillment_status)}>{order.fulfillment_status ?? "unfulfilled"}</Badge>
                   </td>
+                  <td className="px-5 py-3 text-right">
+                    {order.fulfillment_status !== "fulfilled" && (
+                      <button
+                        type="button"
+                        onClick={() => setFulfillingOrder(order)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961]"
+                      >
+                        <Truck className="h-3 w-3" />
+                        Fulfill
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </Panel>
+      )}
+
+      {fulfillingOrder && (
+        <FulfillModal
+          order={fulfillingOrder}
+          onClose={() => setFulfillingOrder(null)}
+          onFulfilled={() => {
+            setOrders(
+              (prev) =>
+                prev?.map((o) => (o.id === fulfillingOrder.id ? { ...o, fulfillment_status: "fulfilled" } : o)) ?? null
+            );
+            setFulfillingOrder(null);
+          }}
+        />
       )}
     </div>
   );

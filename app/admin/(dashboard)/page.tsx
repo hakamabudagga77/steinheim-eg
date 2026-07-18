@@ -13,6 +13,8 @@ import {
   Wallet,
   Eye,
   AlertTriangle,
+  Mail,
+  Check,
 } from "lucide-react";
 import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { PageHeader, StatCard, StatCardSkeleton, Panel, Badge } from "@/components/admin/ui";
@@ -33,7 +35,7 @@ interface GA4Summary {
 
 const SECTIONS = [
   { href: "/admin/contact", label: "Contact Leads", desc: "General enquiries from the site.", icon: Inbox },
-  { href: "/trade-admin", label: "Trade Leads", desc: "B2B project quotes and specs.", icon: Briefcase },
+  { href: "/admin/trade", label: "Trade Leads", desc: "B2B project quotes and specs.", icon: Briefcase },
   { href: "/admin/orders", label: "Orders", desc: "Live Shopify orders.", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", desc: "Live Shopify customer list.", icon: Users },
   { href: "/admin/products", label: "Products", desc: "Inventory and stock levels.", icon: Package },
@@ -56,6 +58,45 @@ function fmtDate(yyyymmdd: string) {
   if (yyyymmdd.length !== 8) return yyyymmdd;
   const d = new Date(`${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`);
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function DigestTestButton() {
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function send() {
+    setStatus("sending");
+    setMessage(null);
+    try {
+      const res = await fetch("/api/cron/daily-digest");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.sent) {
+        setStatus("error");
+        setMessage(data.reason || data.error || "Could not send.");
+        return;
+      }
+      setStatus("sent");
+      setTimeout(() => setStatus("idle"), 3000);
+    } catch {
+      setStatus("error");
+      setMessage("Could not reach the server.");
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={send}
+        disabled={status === "sending"}
+        className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-[12px] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
+      >
+        {status === "sent" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Mail className="h-3.5 w-3.5" />}
+        {status === "sending" ? "Sending…" : status === "sent" ? "Sent" : "Send test digest"}
+      </button>
+      {message && <span className="text-[11px] text-amber-300">{message}</span>}
+    </div>
+  );
 }
 
 export default function AdminDashboardPage() {
@@ -142,7 +183,10 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Overview" title="Welcome back." subtitle="Everything moving through Steinheim Egypt, at a glance." />
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <PageHeader eyebrow="Overview" title="Welcome back." subtitle="Everything moving through Steinheim Egypt, at a glance." />
+        <DigestTestButton />
+      </div>
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {last30 ? (

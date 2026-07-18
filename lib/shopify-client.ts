@@ -38,9 +38,37 @@ async function adminFetch<T>(endpoint: string, revalidate = 300): Promise<T> {
   return res.json();
 }
 
+async function adminWrite<T>(endpoint: string, method: "POST" | "PUT", body: unknown): Promise<T> {
+  const token = await getAccessToken();
+  const res = await fetch(`https://${STORE_DOMAIN}/admin/api/${API_VERSION}/${endpoint}`, {
+    method,
+    headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Shopify API ${method} ${endpoint}: ${res.status} ${text}`);
+  }
+  return res.json();
+}
+
+async function adminGraphQL<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+  const token = await getAccessToken();
+  const res = await fetch(`https://${STORE_DOMAIN}/admin/api/${API_VERSION}/graphql.json`, {
+    method: "POST",
+    headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
+    body: JSON.stringify({ query, variables }),
+  });
+  if (!res.ok) throw new Error(`Shopify GraphQL: ${res.status}`);
+  const data = await res.json();
+  if (data.errors) throw new Error(`Shopify GraphQL: ${JSON.stringify(data.errors)}`);
+  return data.data as T;
+}
+
 export interface ShopifyVariant {
   id: number;
   product_id: number;
+  inventory_item_id: number;
   title: string;
   price: string;
   sku: string;
@@ -64,6 +92,42 @@ export async function fetchAllProducts(): Promise<ShopifyProduct[]> {
     "products.json?limit=250&fields=id,title,handle,tags,product_type,status,image,variants"
   );
   return data.products;
+}
+
+export async function updateProductStatus(productId: number, status: "active" | "draft"): Promise<ShopifyProduct> {
+  const data = await adminWrite<{ product: ShopifyProduct }>(`products/${productId}.json`, "PUT", {
+    product: { id: productId, status },
+  });
+  return data.product;
+}
+
+export async function updateVariantPrice(variantId: number, price: string): Promise<ShopifyVariant> {
+  const data = await adminWrite<{ variant: ShopifyVariant }>(`variants/${variantId}.json`, "PUT", {
+    variant: { id: variantId, price },
+  });
+  return data.variant;
+}
+
+export interface ShopifyLocation {
+  id: number;
+  name: string;
+}
+
+export async function fetchLocations(): Promise<ShopifyLocation[]> {
+  const data = await adminFetch<{ locations: ShopifyLocation[] }>("locations.json", 3600);
+  return data.locations;
+}
+
+export async function setInventoryLevel(
+  inventoryItemId: number,
+  locationId: number,
+  available: number
+): Promise<void> {
+  await adminWrite("inventory_levels/set.json", "POST", {
+    location_id: locationId,
+    inventory_item_id: inventoryItemId,
+    available,
+  });
 }
 
 export function buildCheckoutUrl(items: Array<{ variantId: number; quantity: number }>): string {
@@ -94,6 +158,7 @@ export interface ShopifyCustomer {
   orders_count: number;
   total_spent: string;
   created_at: string;
+  note: string | null;
 }
 
 export async function fetchOrders(limit = 250): Promise<ShopifyOrder[]> {
@@ -106,10 +171,98 @@ export async function fetchOrders(limit = 250): Promise<ShopifyOrder[]> {
 
 export async function fetchCustomers(limit = 50): Promise<ShopifyCustomer[]> {
   const data = await adminFetch<{ customers: ShopifyCustomer[] }>(
-    `customers.json?limit=${limit}&fields=id,first_name,last_name,email,phone,orders_count,total_spent,created_at`,
+    `customers.json?limit=${limit}&fields=id,first_name,last_name,email,phone,orders_count,total_spent,created_at,note`,
     60
   );
   return data.customers;
+}
+
+export async function updateCustomer(
+  customerId: number,
+  updates: { phone?: string; email?: string; note?: string }
+): Promise<ShopifyCustomer> {
+  const data = await adminWrite<{ customer: ShopifyCustomer }>(`customers/${customerId}.json`, "PUT", {
+    customer: { id: customerId, ...updates },
+  });
+  return data.customer;
+}
+
+export interface ShopifyFulfillmentOrder {
+  id: number;
+  status: string;
+  request_status: string;
+  line_items: Array<{ id: number; quantity: number; fulfillment_order_id: number }>;
+}
+
+export async function fetchFulfillmentOrders(orderId: number): Promise<ShopifyFulfillmentOrder[]> {
+  const data = await adminFetch<{ fulfillment_orders: ShopifyFulfillmentOrder[] }>(
+    `orders/${orderId}/fulfillment_orders.json`,
+    0
+  );
+  return data.fulfillment_orders;
+}
+
+export async function createFulfillment(
+  fulfillmentOrderId: number,
+  options: { trackingNumber?: string; trackingCompany?: string; trackingUrl?: string; notifyCustomer: boolean }
+): Promise<void> {
+  await adminWrite("fulfillments.json", "POST", {
+    fulfillment: {
+      line_items_by_fulfillment_order: [{ fulfillment_order_id: fulfillmentOrderId }],
+      notify_customer: options.notifyCustomer,
+      tracking_info:
+        options.trackingNumber || options.trackingCompany || options.trackingUrl
+          ? {
+              number: options.trackingNumber || undefined,
+              company: options.trackingCompany || undefined,
+              url: options.trackingUrl || undefined,
+            }
+          : undefined,
+    },
+  });
+}
+
+export interface ShopPolicy {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+}
+
+export async function fetchShopPolicies(): Promise<ShopPolicy[]> {
+  const data = await adminGraphQL<{ shop: { shopPolicies: ShopPolicy[] } }>(`
+    query {
+      shop {
+        shopPolicies {
+          id
+          type
+          title
+          body
+        }
+      }
+    }
+  `);
+  return data.shop.shopPolicies;
+}
+
+export async function updateShopPolicy(type: string, body: string): Promise<ShopPolicy> {
+  const data = await adminGraphQL<{
+    shopPolicyUpdate: { shopPolicy: ShopPolicy; userErrors: Array<{ field: string; message: string }> };
+  }>(
+    `
+    mutation UpdatePolicy($policy: ShopPolicyInput!) {
+      shopPolicyUpdate(shopPolicy: $policy) {
+        shopPolicy { id type title body }
+        userErrors { field message }
+      }
+    }
+  `,
+    { policy: { type, body } }
+  );
+  if (data.shopPolicyUpdate.userErrors.length > 0) {
+    throw new Error(data.shopPolicyUpdate.userErrors.map((e) => e.message).join("; "));
+  }
+  return data.shopPolicyUpdate.shopPolicy;
 }
 
 export { STORE_DOMAIN };

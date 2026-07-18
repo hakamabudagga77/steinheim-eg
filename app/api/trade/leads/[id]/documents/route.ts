@@ -1,21 +1,14 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import type { TradeLeadDocument } from "@/lib/trade-leads";
 import { getTradeLead, saveTradeLead } from "@/lib/server/trade-lead-store";
+import { isAdminRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function isAdmin(request: Request) {
-  if (process.env.NODE_ENV !== "production") return true;
-  const configured = process.env.TRADE_ADMIN_KEY;
-  const supplied = request.headers.get("x-steinheim-admin-key") || "";
-  if (!configured || !supplied || configured.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
-}
-
 // Admin attaches a document (invoice, certificate, spec sheet...) to a lead.
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!id) return Response.json({ error: "A lead id is required." }, { status: 400 });
 
@@ -44,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 // Admin removes a document.
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!id) return Response.json({ error: "A lead id is required." }, { status: 400 });
 

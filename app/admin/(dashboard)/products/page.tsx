@@ -2,15 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Package, AlertTriangle, XCircle } from "lucide-react";
-import type { ShopifyProduct } from "@/lib/shopify-client";
-import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, ErrorState } from "@/components/admin/ui";
+import type { ShopifyProduct, ShopifyLocation } from "@/lib/shopify-client";
+import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, ErrorState, InlineEdit } from "@/components/admin/ui";
 
 const LOW_STOCK_THRESHOLD = 10;
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<ShopifyProduct[] | null>(null);
+  const [locations, setLocations] = useState<ShopifyLocation[] | null>(null);
+  const [locationId, setLocationId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/products")
@@ -23,6 +26,16 @@ export default function AdminProductsPage() {
       })
       .then((data) => setProducts(data.products))
       .catch((err) => setError(err.message));
+
+    fetch("/api/admin/locations")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.locations?.length) {
+          setLocations(data.locations);
+          setLocationId(data.locations[0].id);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const lowStockVariants = useMemo(() => {
@@ -43,12 +56,65 @@ export default function AdminProductsPage() {
     return { outOfStock, totalUnits };
   }, [products, lowStockVariants]);
 
+  function patchVariant(productId: number, variantId: number, updates: Partial<ShopifyProduct["variants"][number]>) {
+    setProducts(
+      (prev) =>
+        prev?.map((p) =>
+          p.id !== productId
+            ? p
+            : { ...p, variants: p.variants.map((v) => (v.id === variantId ? { ...v, ...updates } : v)) }
+        ) ?? null
+    );
+  }
+
+  async function savePrice(productId: number, variantId: number, price: string) {
+    const res = await fetch("/api/admin/products", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variantId, price }),
+    });
+    if (!res.ok) throw new Error("Failed");
+    patchVariant(productId, variantId, { price });
+  }
+
+  async function saveStock(productId: number, variant: ShopifyProduct["variants"][number], quantity: string) {
+    if (!locationId) throw new Error("No location");
+    const qty = Number(quantity);
+    if (!Number.isFinite(qty) || qty < 0) throw new Error("Invalid quantity");
+    const res = await fetch("/api/admin/inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inventoryItemId: variant.inventory_item_id, locationId, quantity: qty }),
+    });
+    if (!res.ok) throw new Error("Failed");
+    patchVariant(productId, variant.id, { inventory_quantity: qty });
+  }
+
+  async function toggleStatus(product: ShopifyProduct) {
+    const nextStatus = product.status === "active" ? "draft" : "active";
+    if (!confirm(`${nextStatus === "active" ? "Publish" : "Unpublish"} "${product.title}"?`)) return;
+    setTogglingId(product.id);
+    try {
+      const res = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, status: nextStatus }),
+      });
+      if (!res.ok) throw new Error();
+      setProducts((prev) => prev?.map((p) => (p.id === product.id ? { ...p, status: nextStatus } : p)) ?? null);
+    } catch {
+      alert("Could not update product status.");
+    } finally {
+      setTogglingId(null);
+    }
+  }
+
   return (
     <div>
       <PageHeader
         eyebrow="Products"
         title={products ? `${products.length} product${products.length === 1 ? "" : "s"}` : "Loading…"}
-        subtitle="Live from Shopify · read-only"
+        subtitle="Live from Shopify · click any price, stock, or status to edit"
       />
 
       {error && <ErrorState>{error}</ErrorState>}
@@ -68,6 +134,23 @@ export default function AdminProductsPage() {
           </>
         )}
       </div>
+
+      {locations && locations.length > 1 && locationId && (
+        <div className="mt-4 flex items-center gap-2 text-[12px] text-white/40">
+          <span>Editing stock at:</span>
+          <select
+            value={locationId}
+            onChange={(e) => setLocationId(Number(e.target.value))}
+            className="rounded-lg border border-white/15 bg-[#131316] px-2 py-1 text-white/80"
+          >
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.id}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {lowStockVariants.length > 0 && (
         <Panel className="mt-4 border-amber-400/20 bg-amber-400/[0.05]">
@@ -98,29 +181,42 @@ export default function AdminProductsPage() {
           const expanded = expandedId === product.id;
           return (
             <Panel key={product.id} padded={false} className="overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setExpandedId(expanded ? null : product.id)}
-                className="flex w-full items-center gap-4 px-5 py-4 text-left"
-              >
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
-                  {product.image && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.image.src} alt="" className="h-full w-full object-cover" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] font-medium text-white/90">{product.title}</p>
-                  <p className="mt-0.5 text-[12px] text-white/40">
-                    {product.product_type || "—"} · {product.variants.length} variant{product.variants.length === 1 ? "" : "s"}
-                  </p>
-                </div>
+              <div className="flex w-full items-center gap-4 px-5 py-4 text-left">
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(expanded ? null : product.id)}
+                  className="flex min-w-0 flex-1 items-center gap-4"
+                >
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
+                    {product.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.image.src} alt="" className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-medium text-white/90">{product.title}</p>
+                    <p className="mt-0.5 text-[12px] text-white/40">
+                      {product.product_type || "—"} · {product.variants.length} variant{product.variants.length === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                </button>
                 <div className="shrink-0 text-right">
                   <p className="text-[13px] font-medium text-white/85">{totalStock} units</p>
-                  <Badge tone={product.status === "active" ? "positive" : "muted"}>{product.status}</Badge>
+                  <button
+                    type="button"
+                    onClick={() => toggleStatus(product)}
+                    disabled={togglingId === product.id}
+                    className="mt-1 disabled:opacity-40"
+                  >
+                    <Badge tone={product.status === "active" ? "positive" : "muted"}>
+                      {togglingId === product.id ? "Saving…" : product.status}
+                    </Badge>
+                  </button>
                 </div>
-                <ChevronDown className={`h-4 w-4 shrink-0 text-white/30 transition ${expanded ? "rotate-180" : ""}`} />
-              </button>
+                <button type="button" onClick={() => setExpandedId(expanded ? null : product.id)}>
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-white/30 transition ${expanded ? "rotate-180" : ""}`} />
+                </button>
+              </div>
 
               {expanded && (
                 <div className="border-t border-white/[0.06] px-5 py-4">
@@ -138,13 +234,31 @@ export default function AdminProductsPage() {
                         <tr key={variant.id} className="border-t border-white/[0.05]">
                           <td className="py-2 text-white/80">{variant.title}</td>
                           <td className="py-2 text-white/40">{variant.sku || "—"}</td>
-                          <td className="py-2 text-white/40">EGP {variant.price}</td>
+                          <td className="py-2 text-white/80">
+                            <InlineEdit
+                              value={variant.price}
+                              prefix="EGP "
+                              type="number"
+                              onSave={(v) => savePrice(product.id, variant.id, v)}
+                              confirmMessage={(v) =>
+                                `Change the price of "${product.title} — ${variant.title}" from EGP ${variant.price} to EGP ${v}? This updates the live Shopify store immediately.`
+                              }
+                            />
+                          </td>
                           <td
                             className={`py-2 text-right font-medium ${
                               variant.inventory_quantity <= LOW_STOCK_THRESHOLD ? "text-amber-300" : "text-white/80"
                             }`}
                           >
-                            {variant.inventory_quantity}
+                            <InlineEdit
+                              value={String(variant.inventory_quantity)}
+                              type="number"
+                              align="right"
+                              onSave={(v) => saveStock(product.id, variant, v)}
+                              confirmMessage={(v) =>
+                                `Set stock for "${product.title} — ${variant.title}" from ${variant.inventory_quantity} to ${v} units? This updates the live Shopify store immediately.`
+                              }
+                            />
                           </td>
                         </tr>
                       ))}

@@ -1,9 +1,9 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { timingSafeEqual } from "node:crypto";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import productsData from "@/data/products.json";
 import { getTradeLead } from "@/lib/server/trade-lead-store";
+import { isAdminRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,14 +23,6 @@ const PAGE_H = 841.89;
 const MARGIN = 48;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 const VAT_RATE = 0.14;
-
-function isAdmin(request: Request) {
-  if (process.env.NODE_ENV !== "production") return true;
-  const configured = process.env.TRADE_ADMIN_KEY;
-  const supplied = request.headers.get("x-steinheim-admin-key") || "";
-  if (!configured || !supplied || configured.length !== supplied.length) return false;
-  return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
-}
 
 function parseAmount(value: string | undefined): number | null {
   if (!value) return null;
@@ -66,7 +58,7 @@ async function loadLogo(): Promise<Buffer | null> {
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   if (!id) return Response.json({ error: "A lead id is required." }, { status: 400 });
 
