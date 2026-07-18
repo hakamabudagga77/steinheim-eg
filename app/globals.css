@@ -15,8 +15,8 @@
   --color-stone: #666666;
   --color-accent: #555555;
 
-  --font-heading: "Georgia", serif;
-  --font-body: var(--font-inter, "Inter"), sans-serif;
+  --font-heading: "Georgia", var(--font-arabic-heading, "Amiri"), serif;
+  --font-body: var(--font-inter, "Inter"), var(--font-arabic-body, "IBM Plex Sans Arabic"), sans-serif;
 
   --spacing-section-y: 120px;
   --spacing-section-y-mobile: 64px;

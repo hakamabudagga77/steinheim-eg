@@ -295,7 +295,18 @@
   "footer": {
     "tagline": "Premium German bathroom systems",
     "distributor": "Exclusive distributor: El Sharbatly International Group",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "assistance": { "label": "Assistance", "desc": "Do you need assistance or would you like to request information?" },
+    "news": { "label": "News & Events", "desc": "News, insights and must-see moments." },
+    "catalogues": { "label": "Catalogues", "desc": "Flip through the catalogs to find the newest collections." },
+    "discoverMore": "Discover more",
+    "links": {
+      "collections": "Collections",
+      "ourWorld": "Our World",
+      "help": "Do You Need Help?",
+      "newsletter": "Newsletter"
+    },
+    "localeLabel": "Egypt / EN"
   },
   "cart": {
     "title": "Cart",
@@ -309,5 +320,118 @@
     "learnMore": "Learn more",
     "viewAll": "View all",
     "currency": "LE"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Steinheim Egypt",
+      "headline": "Water, designed.",
+      "body": "Premium bathroom systems for homes, hospitality, and design-led projects in Egypt.",
+      "discover": "Discover more",
+      "viewProducts": "View products",
+      "pause": "Pause background video",
+      "play": "Play background video",
+      "playShort": "Play",
+      "scroll": "Scroll"
+    },
+    "collections": {
+      "title": "Explore our collections",
+      "joy": "Soft balance for private villas, suites, and warm hospitality rooms.",
+      "up": "A repeatable modern language for developments and project schedules.",
+      "art": "Architectural precision for statement bathrooms and design-led spaces.",
+      "quatro": "Crisp geometry for sharp, contemporary interiors."
+    },
+    "ritual": {
+      "headline": "The quiet ritual of precision.",
+      "body": "Steinheim is specified where the bathroom must feel resolved: proportion, finish, mechanism, and long-term reliability working as one complete language."
+    },
+    "projects": {
+      "eyebrow": "Project references",
+      "headline": "Where design takes shape",
+      "viewAll": "View all projects"
+    },
+    "trade": {
+      "eyebrow": "For the trade",
+      "headline": "Specifying for a project?",
+      "body": "Set your room composition and what each one needs once — then shop the site normally, with your rooms tracked as you go.",
+      "setup": "Set up your project",
+      "visit": "Visit Trade Studio"
+    }
+  },
+  "showroom": {
+    "eyebrow": "Inside Steinheim",
+    "headline": "The showroom, as it is.",
+    "body": "Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms, and the space where clients specify a complete bathroom in person.",
+    "soundOn": "Turn video sound on",
+    "soundOff": "Mute video"
+  },
+  "productPage": {
+    "collectionLabel": "{series} Collection",
+    "outOfStock": "Out of stock",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to Cart",
+    "noSpecificRoom": "No specific room",
+    "needsThis": "Needs this",
+    "noRoomManual": "No specific room (manual)",
+    "setupRoomCta": "Set up your project to auto-assign this to a room",
+    "openBoard": "Open project board",
+    "addedBoard": "Added to project board",
+    "addBoard": "Add to project board",
+    "infoNote": "Technical information, product details, and catalogue downloads are available below.",
+    "tabs": {
+      "description": "Product Description",
+      "detail": "Product Detail",
+      "downloads": "Downloads"
+    },
+    "detailRows": {
+      "number": "Product Number",
+      "collection": "Collection",
+      "finish": "Finish",
+      "application": "Application"
+    },
+    "descriptionBody": "{product} from the {series} collection brings Steinheim's architectural bathroom language into a precise, project-ready product. The current selection is shown in {finish}.",
+    "downloadsIntro": "Download the current Steinheim catalogue or request the exact technical sheet for {series} {product} in {finish}.",
+    "downloadsNote": "Final stock, trade pricing, lead times, and project quantities should still be confirmed with Steinheim Egypt.",
+    "openCatalogue": "Open Steinheim Catalogue 2026",
+    "requestSheet": "Request technical sheet for {model}",
+    "context": {
+      "eyebrow": "In context",
+      "headline": "Part of a complete bathroom language.",
+      "body": "See how the {series} collection's form, finish, and proportions work within a resolved bathroom environment.",
+      "cta": "View {series} collection"
+    },
+    "related": {
+      "eyebrow": "Related",
+      "headline": "Continue the {series} language.",
+      "viewCollection": "View collection"
+    },
+    "qty": {
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "label": "Quantity"
+    }
+  },
+  "cards": {
+    "quickAdd": "Quick add",
+    "add": "Add",
+    "added": "Added",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "noSpecificRoom": "No specific room",
+    "availableFinishes": "Available finishes",
+    "showFinish": "Show {name}"
+  },
+  "menu": {
+    "forYourProject": "For your project",
+    "shopFor": "Shop for {name}",
+    "yourProject": "your project",
+    "ourWorld": "Our World",
+    "world": {
+      "company": "The Company",
+      "companyEyebrow": "Identity",
+      "finishes": "Our Finishes",
+      "finishesEyebrow": "Surface language",
+      "tradeStudio": "Trade Studio",
+      "tradeStudioEyebrow": "Projects"
+    }
   }
 }
