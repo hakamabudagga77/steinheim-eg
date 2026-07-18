@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Users, Repeat, Wallet, Search, ArrowUpRight } from "lucide-react";
+import { Users, Repeat, Wallet, Search, ArrowUpRight, ChevronLeft } from "lucide-react";
 import type { ShopifyCustomer, ShopifyOrder } from "@/lib/shopify-client";
 import { PageHeader, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, InlineEdit } from "@/components/admin/ui";
 
@@ -32,6 +32,7 @@ function CustomersInner() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [query, setQuery] = useState("");
+  const [showDetailMobile, setShowDetailMobile] = useState(false);
   const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
@@ -79,6 +80,7 @@ function CustomersInner() {
       deepLinkConsumed.current = true;
       setQuery("");
       setSelectedId(targetId);
+      setShowDetailMobile(true);
       return;
     }
     if (filtered.length === 0) {
@@ -143,9 +145,9 @@ function CustomersInner() {
       {customers && customers.length === 0 && <EmptyState>No customers yet.</EmptyState>}
 
       {customers && customers.length > 0 && (
-        <div className="mt-6 flex gap-5 rounded-2xl border border-white/[0.08] bg-[#131316]">
+        <div className="mt-6 flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#131316] lg:flex-row">
           {/* Directory list pane */}
-          <div className="w-[300px] shrink-0 border-r border-white/[0.08]">
+          <div className={`w-full shrink-0 border-white/[0.08] lg:w-[300px] lg:border-r ${showDetailMobile ? "hidden lg:block" : "block"}`}>
             <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
               <Search className="h-3.5 w-3.5 shrink-0 text-white/30" />
               <input
@@ -164,7 +166,10 @@ function CustomersInner() {
                   <button
                     key={customer.id}
                     type="button"
-                    onClick={() => setSelectedId(customer.id)}
+                    onClick={() => {
+                      setSelectedId(customer.id);
+                      setShowDetailMobile(true);
+                    }}
                     className={`flex w-full items-center gap-3 px-4 py-3 text-left transition ${
                       active ? "bg-[#0a84ff]/[0.09]" : "hover:bg-white/[0.025]"
                     }`}
@@ -193,7 +198,15 @@ function CustomersInner() {
 
           {/* Profile pane */}
           {selected && (
-            <div className="min-w-0 flex-1 px-7 py-6">
+            <div className={`min-w-0 flex-1 px-5 py-6 lg:px-7 ${showDetailMobile ? "block" : "hidden lg:block"}`}>
+              <button
+                type="button"
+                onClick={() => setShowDetailMobile(false)}
+                className="mb-4 flex items-center gap-1 text-[13px] text-white/40 lg:hidden"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back to list
+              </button>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0a84ff]/12 text-[15px] font-medium text-[#0a84ff]">

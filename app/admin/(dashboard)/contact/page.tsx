@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Mail, ArrowUpRight } from "lucide-react";
+import { Mail, ArrowUpRight, ChevronLeft } from "lucide-react";
 import { CONTACT_LEAD_STATUS_LABELS, type ContactLead, type ContactLeadStatus } from "@/lib/contact-leads";
 import { PageHeader, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
 
@@ -44,6 +44,7 @@ function ContactLeadsInner() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<ContactLeadStatus | "all">("all");
+  const [showDetailMobile, setShowDetailMobile] = useState(false);
   const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ function ContactLeadsInner() {
       deepLinkConsumed.current = true;
       setFilter("all");
       setSelectedId(deepLinkId);
+      setShowDetailMobile(true);
       return;
     }
     if (filteredLeads.length === 0) {
@@ -151,16 +153,23 @@ function ContactLeadsInner() {
       {leads && leads.length > 0 && filteredLeads.length === 0 && <EmptyState>No leads in this filter.</EmptyState>}
 
       {leads && filteredLeads.length > 0 && (
-        <div className="mt-6 flex gap-5 rounded-2xl border border-white/[0.08] bg-[#131316]">
+        <div className="mt-6 flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#131316] lg:flex-row">
           {/* Inbox list pane */}
-          <div className="w-[300px] shrink-0 divide-y divide-white/[0.05] overflow-y-auto border-r border-white/[0.08] py-1">
+          <div
+            className={`w-full shrink-0 divide-y divide-white/[0.05] overflow-y-auto border-white/[0.08] py-1 lg:w-[300px] lg:border-r ${
+              showDetailMobile ? "hidden lg:block" : "block"
+            }`}
+          >
             {filteredLeads.map((lead) => {
               const active = lead.id === selectedId;
               return (
                 <button
                   key={lead.id}
                   type="button"
-                  onClick={() => setSelectedId(lead.id)}
+                  onClick={() => {
+                    setSelectedId(lead.id);
+                    setShowDetailMobile(true);
+                  }}
                   className={`flex w-full flex-col gap-1 px-4 py-3 text-left transition ${
                     active ? "bg-[#0a84ff]/[0.09]" : "hover:bg-white/[0.025]"
                   }`}
@@ -182,7 +191,15 @@ function ContactLeadsInner() {
 
           {/* Reading pane */}
           {selected && (
-            <div className="min-w-0 flex-1 px-7 py-6">
+            <div className={`min-w-0 flex-1 px-5 py-6 lg:px-7 ${showDetailMobile ? "block" : "hidden lg:block"}`}>
+              <button
+                type="button"
+                onClick={() => setShowDetailMobile(false)}
+                className="mb-4 flex items-center gap-1 text-[13px] text-white/40 lg:hidden"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back to list
+              </button>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2.5">
