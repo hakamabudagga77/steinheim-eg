@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/trade-admin", label: "Trade Leads", external: true },
   { href: "/admin/orders", label: "Orders", external: false },
   { href: "/admin/customers", label: "Customers", external: false },
+  { href: "/admin/products", label: "Products", external: false },
   { href: "/admin/analytics", label: "Analytics", external: false },
   { href: "/admin/content", label: "Content", external: false },
 ];

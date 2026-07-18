@@ -54,12 +54,14 @@ export interface ShopifyProduct {
   handle: string;
   tags: string;
   product_type: string;
+  status: string;
+  image: { src: string } | null;
   variants: ShopifyVariant[];
 }
 
 export async function fetchAllProducts(): Promise<ShopifyProduct[]> {
   const data = await adminFetch<{ products: ShopifyProduct[] }>(
-    "products.json?limit=250&fields=id,title,handle,tags,product_type,variants"
+    "products.json?limit=250&fields=id,title,handle,tags,product_type,status,image,variants"
   );
   return data.products;
 }
@@ -94,7 +96,7 @@ export interface ShopifyCustomer {
   created_at: string;
 }
 
-export async function fetchOrders(limit = 50): Promise<ShopifyOrder[]> {
+export async function fetchOrders(limit = 250): Promise<ShopifyOrder[]> {
   const data = await adminFetch<{ orders: ShopifyOrder[] }>(
     `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items`,
     60
