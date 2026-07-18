@@ -8,10 +8,14 @@ export function useAutoplayVideo(ref: RefObject<HTMLVideoElement | null>, src: s
     video.muted = true;
     video.playsInline = true;
 
+    let inView = true;
+
     const tryPlay = () => {
+      // Respect an explicit user pause (set via video.dataset.userPaused).
+      if (!inView || video.dataset.userPaused === "1") return;
       video.play().catch(() => {
         const resume = () => {
-          video.play().catch(() => {});
+          if (inView && video.dataset.userPaused !== "1") video.play().catch(() => {});
           window.removeEventListener("touchstart", resume);
           window.removeEventListener("click", resume);
         };
@@ -31,9 +35,28 @@ export function useAutoplayVideo(ref: RefObject<HTMLVideoElement | null>, src: s
     };
     document.addEventListener("visibilitychange", onVisibility);
 
+    // Offscreen videos burn CPU/battery decoding frames nobody sees; pause
+    // them and resume seamlessly when they scroll back into view.
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          inView = entry.isIntersecting;
+          if (inView) {
+            tryPlay();
+          } else if (!video.paused) {
+            video.pause();
+          }
+        },
+        { rootMargin: "160px" }
+      );
+      observer.observe(video);
+    }
+
     return () => {
       video.removeEventListener("loadeddata", tryPlay);
       document.removeEventListener("visibilitychange", onVisibility);
+      observer?.disconnect();
     };
   }, [ref, src]);
 }
