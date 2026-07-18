@@ -87,6 +87,7 @@ export default function Navigation({ locale }: { locale: string }) {
     setOpen: setTradeOpen,
     projectIconRef,
     bump: tradeBump,
+    unreadMessageCount,
   } = useTradeProject();
   const tradeItemCount = tradeProject.items.length;
   const showShopByNeed = hasActiveRoomNeeds(tradeProject);
@@ -215,6 +216,15 @@ export default function Navigation({ locale }: { locale: string }) {
                 >
                   {tradeItemCount}
                 </motion.span>
+              )}
+              {unreadMessageCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: [1, 1.25, 1] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                  className={`absolute -top-1 -left-1 h-2.5 w-2.5 rounded-full ${useWhite ? "bg-white" : "bg-charcoal"}`}
+                  aria-label={`${unreadMessageCount} new message${unreadMessageCount === 1 ? "" : "s"} from Steinheim`}
+                />
               )}
             </button>
             <button

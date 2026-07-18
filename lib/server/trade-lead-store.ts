@@ -51,6 +51,17 @@ function requireConfiguredProductionStore() {
   }
 }
 
+function normalizeLead(lead: TradeLead): TradeLead {
+  return {
+    ...lead,
+    messages: Array.isArray(lead.messages) ? lead.messages : [],
+    sampleRequests: Array.isArray(lead.sampleRequests) ? lead.sampleRequests : [],
+    documents: Array.isArray(lead.documents) ? lead.documents : [],
+    scopeStatuses: Array.isArray(lead.scopeStatuses) ? lead.scopeStatuses : [],
+    quoteHistory: Array.isArray(lead.quoteHistory) ? lead.quoteHistory : [],
+  };
+}
+
 export async function listTradeLeads() {
   requireConfiguredProductionStore();
   const redisResult = await redisCommand(["HGETALL", REDIS_KEY]);
@@ -68,7 +79,24 @@ export async function listTradeLeads() {
   } else {
     leads = await readLocalLeads();
   }
-  return leads.sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  return leads.map(normalizeLead).sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+}
+
+export async function getTradeLead(id: string): Promise<TradeLead | null> {
+  requireConfiguredProductionStore();
+  const config = redisConfig();
+  if (config) {
+    const redisResult = await redisCommand(["HGET", REDIS_KEY, id]);
+    if (typeof redisResult !== "string") return null;
+    try {
+      return normalizeLead(JSON.parse(redisResult) as TradeLead);
+    } catch {
+      return null;
+    }
+  }
+  const leads = await readLocalLeads();
+  const found = leads.find((entry) => entry.id === id);
+  return found ? normalizeLead(found) : null;
 }
 
 export async function saveTradeLead(lead: TradeLead) {

@@ -47,6 +47,8 @@ interface TradeProjectContextValue {
   projectIconRef: React.RefObject<HTMLButtonElement | null>;
   flyToProject: (originEl: HTMLElement | null, image: string) => void;
   bump: number;
+  unreadMessageCount: number;
+  markMessagesSeen: () => void;
 }
 
 interface Flight {
@@ -84,6 +86,8 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   const flightId = useRef(0);
   const [flights, setFlights] = useState<Flight[]>([]);
   const [bump, setBump] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const steinheimMessageCountRef = useRef(0);
 
   const flyToProject = useCallback((originEl: HTMLElement | null, image: string) => {
     if (!originEl || !projectIconRef.current) return;
@@ -150,6 +154,42 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     () => workspace.projects.find((entry) => entry.id === workspace.activeProjectId) ?? workspace.projects[0] ?? createEmptyTradeProject(),
     [workspace]
   );
+
+  const submittedLeadId = project.submittedLeadId;
+
+  useEffect(() => {
+    if (!submittedLeadId) {
+      setUnreadMessageCount(0);
+      return;
+    }
+    let cancelled = false;
+    async function poll() {
+      try {
+        const res = await fetch(`/api/trade/leads/${submittedLeadId}/messages`, { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = await res.json() as { messages?: Array<{ from: string }> };
+        const steinheimCount = (data.messages ?? []).filter((m) => m.from === "steinheim").length;
+        steinheimMessageCountRef.current = steinheimCount;
+        const lastSeenRaw = window.localStorage.getItem(`steinheim-lastseen-${submittedLeadId}`);
+        const lastSeen = lastSeenRaw ? Number(lastSeenRaw) || 0 : 0;
+        setUnreadMessageCount(Math.max(0, steinheimCount - lastSeen));
+      } catch {
+        // Keep whatever we last had; a poll will retry shortly.
+      }
+    }
+    void poll();
+    const interval = window.setInterval(poll, 20000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [submittedLeadId]);
+
+  const markMessagesSeen = useCallback(() => {
+    if (!submittedLeadId) return;
+    window.localStorage.setItem(`steinheim-lastseen-${submittedLeadId}`, String(steinheimMessageCountRef.current));
+    setUnreadMessageCount(0);
+  }, [submittedLeadId]);
 
   const updateActive = useCallback((update: (current: TradeProject) => TradeProject) => {
     setWorkspace((currentWorkspace) => {
@@ -357,6 +397,8 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       projectIconRef,
       flyToProject,
       bump,
+      unreadMessageCount,
+      markMessagesSeen,
     }}>
       {children}
       <AnimatePresence>

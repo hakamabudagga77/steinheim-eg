@@ -1,9 +1,9 @@
 import { randomUUID, timingSafeEqual } from "node:crypto";
-import productsData from "@/data/products.json";
-import { getProjectCompletion, sanitizeTradeProject } from "@/lib/trade-project";
-import { isTradeLeadStatus, type TradeLead, type TradeLeadPriority, type TradeLeadScope } from "@/lib/trade-leads";
-import { listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
-import { sendTradeLeadNotification } from "@/lib/server/trade-lead-email";
+import { sanitizeTradeProject } from "@/lib/trade-project";
+import { isTradeLeadStatus, type TradeLead } from "@/lib/trade-leads";
+import { getTradeLead, listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
+import { sendTradeLeadConfirmationEmail, sendTradeLeadNotification, sendQuoteReadyNotification, sendStatusUpdateNotification } from "@/lib/server/trade-lead-email";
+import { analyzeProject } from "@/lib/server/trade-lead-intelligence";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,51 +33,6 @@ function isAdmin(request: Request) {
   const supplied = request.headers.get("x-steinheim-admin-key") || "";
   if (!configured || !supplied || configured.length !== supplied.length) return false;
   return timingSafeEqual(Buffer.from(configured), Buffer.from(supplied));
-}
-
-function buildScopeBreakdown(
-  rows: Array<{ item: NonNullable<ReturnType<typeof sanitizeTradeProject>>["items"][number]; variant: { price: number } }>
-): TradeLeadScope[] {
-  const map = new Map<string, TradeLeadScope>();
-  for (const { item, variant } of rows) {
-    const scopeId = item.scopeId || "manual";
-    const existing = map.get(scopeId) ?? {
-      scopeId,
-      scopeName: item.scopeName || "Manually added products",
-      scopeSummary: item.scopeSummary || "Products added directly from collection and product pages.",
-      totalUnits: 0,
-      retailReferenceTotal: 0,
-      lineCount: 0,
-    };
-    existing.totalUnits += item.quantity;
-    existing.retailReferenceTotal += item.quantity * variant.price;
-    existing.lineCount += 1;
-    map.set(scopeId, existing);
-  }
-  return Array.from(map.values());
-}
-
-function analyzeProject(project: NonNullable<ReturnType<typeof sanitizeTradeProject>>) {
-  const rows = project.items.flatMap((item) => {
-    const product = productsData.products.find((entry) => entry.slug === item.slug);
-    const variant = product?.variants.find((entry) => entry.finish === item.finish);
-    return product && variant ? [{ item, variant }] : [];
-  });
-  const totalUnits = rows.reduce((sum, row) => sum + row.item.quantity, 0);
-  const retailReferenceTotal = rows.reduce((sum, row) => sum + row.item.quantity * row.variant.price, 0);
-  const completion = getProjectCompletion(project);
-  const riskFlags = [
-    !project.details.location && "Location missing",
-    !project.details.timeline && "Required date missing",
-    !project.details.phone && "Phone missing",
-    !project.details.projectType && "Project type missing",
-    totalUnits >= 50 && !project.details.notes && "Room mix / scope notes missing",
-  ].filter((flag): flag is string => Boolean(flag));
-  const scalePoints = totalUnits >= 250 ? 30 : totalUnits >= 100 ? 24 : totalUnits >= 25 ? 16 : totalUnits >= 5 ? 8 : 3;
-  const score = Math.min(100, Math.round(20 + completion * 0.45 + scalePoints + (project.details.company ? 5 : 0)));
-  const priority: TradeLeadPriority = score >= 78 || totalUnits >= 100 ? "hot" : score >= 55 ? "warm" : "exploratory";
-  const scopeBreakdown = buildScopeBreakdown(rows);
-  return { totalUnits, retailReferenceTotal, completion, riskFlags, score, priority, lineCount: rows.length, scopeBreakdown };
 }
 
 export async function POST(request: Request) {
@@ -110,6 +65,11 @@ export async function POST(request: Request) {
     internalNotes: "",
     project: { ...project, status: "submitted", submittedLeadId: id, updatedAt: now.toISOString() },
     ...intelligence,
+    messages: [],
+    sampleRequests: [],
+    documents: [],
+    scopeStatuses: [],
+    quoteHistory: [],
   };
   try {
     await saveTradeLead(lead);
@@ -124,6 +84,11 @@ export async function POST(request: Request) {
     await sendTradeLeadNotification(lead);
   } catch (error) {
     console.error("Trade lead notification email failed:", error);
+  }
+  try {
+    await sendTradeLeadConfirmationEmail(lead);
+  } catch (error) {
+    console.error("Trade lead confirmation email failed:", error);
   }
   return Response.json({ ok: true, id: lead.id, reference: lead.reference, priority: lead.priority, completion: lead.completion });
 }
@@ -140,13 +105,56 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   if (!isAdmin(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await request.json().catch(() => null) as { id?: unknown; status?: unknown; internalNotes?: unknown } | null;
-  if (!body || typeof body.id !== "string" || (!isTradeLeadStatus(body.status) && typeof body.internalNotes !== "string")) {
+  const body = await request.json().catch(() => null) as {
+    id?: unknown;
+    status?: unknown;
+    internalNotes?: unknown;
+    quoteUrl?: unknown;
+    quoteAmount?: unknown;
+    warrantyReference?: unknown;
+  } | null;
+  const hasQuoteField = typeof body?.quoteUrl === "string" || typeof body?.quoteAmount === "string";
+  const hasWarrantyField = typeof body?.warrantyReference === "string";
+  if (!body || typeof body.id !== "string" || (!isTradeLeadStatus(body.status) && typeof body.internalNotes !== "string" && !hasQuoteField && !hasWarrantyField)) {
     return Response.json({ error: "A valid lead update is required." }, { status: 400 });
   }
   const update: Partial<TradeLead> = {};
   if (isTradeLeadStatus(body.status)) update.status = body.status;
   if (typeof body.internalNotes === "string") update.internalNotes = body.internalNotes.trim().slice(0, 3000);
+  if (typeof body.quoteUrl === "string") update.quoteUrl = body.quoteUrl.trim().slice(0, 500);
+  if (typeof body.quoteAmount === "string") update.quoteAmount = body.quoteAmount.trim().slice(0, 100);
+  if (typeof body.warrantyReference === "string") update.warrantyReference = body.warrantyReference.trim().slice(0, 500);
+
+  const needsBefore = hasQuoteField || isTradeLeadStatus(body.status);
+  const before = needsBefore ? await getTradeLead(body.id) : null;
+
+  if (hasQuoteField && before && (before.quoteUrl || before.quoteAmount)) {
+    const urlChanged = update.quoteUrl !== undefined && update.quoteUrl !== (before.quoteUrl ?? "");
+    const amountChanged = update.quoteAmount !== undefined && update.quoteAmount !== (before.quoteAmount ?? "");
+    if (urlChanged || amountChanged) {
+      const revision = { url: before.quoteUrl, amount: before.quoteAmount, changedAt: new Date().toISOString() };
+      update.quoteHistory = [...before.quoteHistory, revision].slice(-20);
+    }
+  }
+
   const lead = await updateTradeLead(body.id, update);
-  return lead ? Response.json({ lead }) : Response.json({ error: "Lead not found." }, { status: 404 });
+  if (!lead) return Response.json({ error: "Lead not found." }, { status: 404 });
+
+  if (hasQuoteField && lead.quoteUrl && lead.quoteUrl !== before?.quoteUrl) {
+    try {
+      await sendQuoteReadyNotification(lead);
+    } catch (error) {
+      console.error("Quote ready notification email failed:", error);
+    }
+  }
+
+  if (isTradeLeadStatus(body.status) && lead.status !== before?.status) {
+    try {
+      await sendStatusUpdateNotification(lead, lead.status);
+    } catch (error) {
+      console.error("Status update notification email failed:", error);
+    }
+  }
+
+  return Response.json({ lead });
 }
