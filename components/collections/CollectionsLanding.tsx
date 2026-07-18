@@ -103,10 +103,10 @@ export default function CollectionsLanding() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 0.76, 0.2, 1] }}
             >
-              <p className="text-[clamp(1rem,1.6vw,1.45rem)] uppercase tracking-[0.22em] text-white/82">
+              <p className="text-[clamp(1rem,1.6vw,1.45rem)] uppercase tracking-[0.22em] text-white/82" dir="ltr">
                 Collections
               </p>
-              <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white">
+              <h1 className="mt-7 text-[clamp(4.2rem,9vw,8.8rem)] font-normal leading-[0.88] tracking-[-0.055em] text-white" dir="ltr">
                 Four systems.
               </h1>
             </motion.div>
