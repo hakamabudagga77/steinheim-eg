@@ -74,7 +74,7 @@ function FulfillModal({
             <input
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#0a84ff]"
               placeholder="Optional"
             />
           </div>
@@ -83,7 +83,7 @@ function FulfillModal({
             <input
               value={trackingCompany}
               onChange={(e) => setTrackingCompany(e.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#0a84ff]"
               placeholder="Optional, e.g. Bosta, Aramex"
             />
           </div>
@@ -92,7 +92,7 @@ function FulfillModal({
               type="checkbox"
               checked={notifyCustomer}
               onChange={(e) => setNotifyCustomer(e.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-black/30 accent-[#c9a961]"
+              className="h-4 w-4 rounded border-white/20 bg-black/30 accent-[#0a84ff]"
             />
             Email the customer
           </label>
@@ -104,7 +104,7 @@ function FulfillModal({
           type="button"
           onClick={submit}
           disabled={saving}
-          className="mt-6 flex h-11 w-full items-center justify-center rounded-full bg-[#c9a961] text-[13px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-50"
+          className="mt-6 flex h-11 w-full items-center justify-center rounded-full bg-[#0a84ff] text-[13px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-50"
         >
           {saving ? "Saving…" : "Confirm fulfillment"}
         </button>
@@ -289,8 +289,8 @@ export default function AdminOrdersPage() {
                 <AreaChart data={trend} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
                   <defs>
                     <linearGradient id="ordersRevenueFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#c9a961" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="#c9a961" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#0a84ff" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#0a84ff" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis
@@ -314,7 +314,7 @@ export default function AdminOrdersPage() {
                       "Revenue",
                     ]}
                   />
-                  <Area type="monotone" dataKey="revenue" stroke="#c9a961" strokeWidth={2} fill="url(#ordersRevenueFill)" />
+                  <Area type="monotone" dataKey="revenue" stroke="#0a84ff" strokeWidth={2} fill="url(#ordersRevenueFill)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -366,7 +366,7 @@ export default function AdminOrdersPage() {
                       <button
                         type="button"
                         onClick={() => setFulfillingOrder(order)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961]"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff]"
                       >
                         <Truck className="h-3 w-3" />
                         Fulfill

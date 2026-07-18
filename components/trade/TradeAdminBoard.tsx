@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ChevronDown } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getFinishById, getProductBySlug, getSeriesById } from "@/lib/utils";
+import { getProductDefaultImage, getProductImage } from "@/data/images";
 import { tradeLeadStatuses, TRADE_LEAD_STATUS_LABELS, type TradeLead, type TradeLeadMessage, type TradeLeadStatus } from "@/lib/trade-leads";
 import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
 import { PageHeader, Panel, Badge, SegmentedControl, EmptyState, ErrorState, type BadgeTone } from "@/components/admin/ui";
@@ -56,11 +58,11 @@ function MessagesThread({ leadId, initialMessages }: { leadId: string; initialMe
               <div key={message.id} className={`flex ${message.from === "steinheim" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-lg px-3 py-2 text-[12px] leading-[1.5] ${
-                    message.from === "steinheim" ? "bg-[#c9a961] text-black" : "border border-white/10 bg-white/[0.04] text-white/80"
+                    message.from === "steinheim" ? "bg-[#0a84ff] text-white" : "border border-white/10 bg-white/[0.04] text-white/80"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.body}</p>
-                  <p className={`mt-1 text-[9px] uppercase tracking-[0.08em] ${message.from === "steinheim" ? "text-black/50" : "text-white/35"}`}>
+                  <p className={`mt-1 text-[9px] uppercase tracking-[0.08em] ${message.from === "steinheim" ? "text-white/70" : "text-white/35"}`}>
                     {message.from === "steinheim" ? "Steinheim" : "Client"} · {formatMessageTime(message.sentAt)}
                   </p>
                 </div>
@@ -82,13 +84,13 @@ function MessagesThread({ leadId, initialMessages }: { leadId: string; initialMe
               }}
               placeholder="Reply to client…"
               rows={2}
-              className="min-h-[40px] flex-1 resize-none rounded-lg border border-white/10 bg-black/30 p-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+              className="min-h-[40px] flex-1 resize-none rounded-lg border border-white/10 bg-black/30 p-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
             />
             <button
               type="button"
               disabled={!draft.trim() || sending}
               onClick={handleSend}
-              className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#c9a961] px-4 text-[11px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-30"
+              className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#0a84ff] px-4 text-[11px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-30"
             >
               {sending ? "…" : "Reply"}
             </button>
@@ -141,7 +143,7 @@ function SampleRequestsList({ leadId, initialRequests }: { leadId: string; initi
                 type="button"
                 disabled={busyId === entry.id}
                 onClick={() => handleFulfill(entry.id)}
-                className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
+                className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff] disabled:opacity-40"
               >
                 {busyId === entry.id ? "…" : "Mark fulfilled"}
               </button>
@@ -208,7 +210,7 @@ function DocumentsList({ leadId, initialDocuments }: { leadId: string; initialDo
           <div className="divide-y divide-white/[0.06]">
             {documents.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between gap-3 p-3">
-                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-[12px] text-[#c9a961] underline decoration-white/20">
+                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-[12px] text-[#0a84ff] underline decoration-white/20">
                   {doc.label}
                 </a>
                 <button
@@ -228,19 +230,19 @@ function DocumentsList({ leadId, initialDocuments }: { leadId: string; initialDo
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="Label, e.g. Commercial invoice"
-            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
           />
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://…"
-            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
           />
           <button
             type="button"
             disabled={!label.trim() || !url.trim() || adding}
             onClick={handleAdd}
-            className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#c9a961] px-4 text-[11px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-30"
+            className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#0a84ff] px-4 text-[11px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-30"
           >
             {adding ? "…" : "Add"}
           </button>
@@ -303,18 +305,120 @@ function ScopeStatusList({ leadId, lead }: { leadId: string; lead: TradeLead }) 
   );
 }
 
-function priorityTone(priority: TradeLead["priority"]): BadgeTone {
-  if (priority === "hot") return "danger";
-  if (priority === "warm") return "warning";
-  return "neutral";
-}
-
 function statusTone(status: TradeLeadStatus): BadgeTone {
   if (status === "lost") return "muted";
   if (status === "delivered") return "positive";
   if (status === "won" || status === "in_production" || status === "shipped") return "accent";
   if (status === "quoted") return "warning";
   return "neutral";
+}
+
+function ScopeProductSchedule({ lead }: { lead: TradeLead }) {
+  return (
+    <div className="mt-5">
+      <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-white/35">Scope breakdown</p>
+      <div className="space-y-3">
+        {lead.scopeBreakdown.map((scope) => {
+          const rows = lead.project.items.flatMap((item, index) => {
+            const scopeId = item.scopeId || "manual";
+            if (scopeId !== scope.scopeId) return [];
+
+            const product = getProductBySlug(item.slug);
+            const variant = product?.variants.find((entry) => entry.finish === item.finish);
+            const finish = getFinishById(item.finish);
+            const series = product ? getSeriesById(product.series) : undefined;
+            const image = getProductImage(item.slug, item.finish) ?? getProductDefaultImage(item.slug);
+            const unitPrice = variant?.price ?? 0;
+
+            return [{
+              key: `${scope.scopeId}-${item.slug}-${item.finish}-${index}`,
+              href: `/en/products/${item.slug}`,
+              image,
+              productName: product?.name ?? item.slug.replace(/-/g, " "),
+              seriesName: series?.name,
+              finishName: finish?.name ?? item.finish.replace(/-/g, " "),
+              finishHex: finish?.hex,
+              model: variant?.model,
+              quantity: item.quantity,
+              unitPrice,
+              lineTotal: unitPrice * item.quantity,
+            }];
+          });
+
+          return (
+            <div key={scope.scopeId} className="overflow-hidden rounded-xl border border-white/[0.08] bg-black/20">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/[0.08] p-3">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-medium text-white/90">{scope.scopeName}</p>
+                  <p className="mt-0.5 text-[10px] leading-[1.5] text-white/40">{scope.scopeSummary}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[11px] text-white/70">
+                    {scope.totalUnits} units · {scope.lineCount} {scope.lineCount === 1 ? "line" : "lines"}
+                  </p>
+                  <p className="text-[10px] text-white/40">{formatPrice(scope.retailReferenceTotal)}</p>
+                </div>
+              </div>
+
+              {rows.length > 0 ? (
+                <div className="divide-y divide-white/[0.06]">
+                  {rows.map((row) => (
+                    <div key={row.key} className="grid grid-cols-[52px_1fr_auto] items-center gap-3 p-3">
+                      <a
+                        href={row.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-lg border border-white/[0.08] bg-[#f1f0ed]"
+                        aria-label={`Open ${row.productName}`}
+                      >
+                        {row.image ? (
+                          <Image src={row.image} alt="" width={52} height={52} className="h-full w-full object-contain p-1.5" />
+                        ) : (
+                          <span className="text-[9px] uppercase tracking-[0.12em] text-black/35">No image</span>
+                        )}
+                      </a>
+
+                      <div className="min-w-0">
+                        <a
+                          href={row.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block truncate text-[12px] font-medium text-white/85 transition hover:text-[#0a84ff]"
+                        >
+                          {row.seriesName ? `${row.seriesName} ${row.productName}` : row.productName}
+                        </a>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-white/40">
+                          <span className="inline-flex items-center gap-1.5">
+                            {row.finishHex && (
+                              <span
+                                className="h-2.5 w-2.5 rounded-full border border-white/20"
+                                style={{ backgroundColor: row.finishHex }}
+                              />
+                            )}
+                            {row.finishName}
+                          </span>
+                          {row.model && <span className="text-white/25">· {row.model}</span>}
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 text-right">
+                        <p className="text-[12px] font-medium text-white/80">× {row.quantity}</p>
+                        <p className="text-[10px] text-white/35">
+                          {row.unitPrice ? `${formatPrice(row.lineTotal)} total` : "Price unavailable"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="p-3 text-[11px] text-white/35">No product rows found for this scope.</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function LeadKanbanCard({ lead, onSelect }: { lead: TradeLead; onSelect: () => void }) {
@@ -328,8 +432,7 @@ function LeadKanbanCard({ lead, onSelect }: { lead: TradeLead; onSelect: () => v
       onClick={onSelect}
       className="cursor-grab rounded-lg border border-white/[0.08] bg-[#131316] p-3 transition hover:border-white/20 active:cursor-grabbing"
     >
-      <Badge tone={priorityTone(lead.priority)}>{lead.priority}</Badge>
-      <p className="mt-1.5 truncate text-[12px] font-medium text-white/90">
+      <p className="truncate text-[12px] font-medium text-white/90">
         {lead.project.details.projectName || "Untitled project"}
       </p>
       <p className="mt-0.5 truncate text-[10px] text-white/40">{lead.project.details.company || "—"}</p>
@@ -363,7 +466,7 @@ function LeadKanbanBoard({ leads, onMove, onSelect }: { leads: TradeLead[]; onMo
               if (leadId) onMove(leadId, status);
             }}
             className={`w-[220px] shrink-0 rounded-xl border p-2 transition ${
-              dragOverStatus === status ? "border-[#c9a961]/50 bg-[#c9a961]/[0.06]" : "border-white/[0.08] bg-white/[0.02]"
+              dragOverStatus === status ? "border-[#0a84ff]/50 bg-[#0a84ff]/[0.06]" : "border-white/[0.08] bg-white/[0.02]"
             }`}
           >
             <p className="mb-2 px-1 text-[10px] uppercase tracking-[0.12em] text-white/35">
@@ -390,7 +493,7 @@ function LeadDetail({
   onSave,
 }: {
   lead: TradeLead;
-  onSave: (id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string }) => Promise<void>;
+  onSave: (id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string; archived?: boolean }) => Promise<void>;
 }) {
   const [status, setStatus] = useState<TradeLeadStatus>(lead.status);
   const [notes, setNotes] = useState(lead.internalNotes);
@@ -501,23 +604,7 @@ function LeadDetail({
 
       <DocumentsList leadId={lead.id} initialDocuments={lead.documents} />
 
-      <div className="mt-5">
-        <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-white/35">Scope breakdown</p>
-        <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.08] bg-black/20">
-          {lead.scopeBreakdown.map((scope) => (
-            <div key={scope.scopeId} className="flex items-start justify-between gap-3 p-3">
-              <div className="min-w-0">
-                <p className="truncate text-[12px] font-medium text-white/85">{scope.scopeName}</p>
-                <p className="text-[10px] text-white/40">{scope.scopeSummary}</p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-[11px] text-white/70">{scope.totalUnits} units</p>
-                <p className="text-[10px] text-white/40">{formatPrice(scope.retailReferenceTotal)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ScopeProductSchedule lead={lead} />
 
       <ScopeStatusList leadId={lead.id} lead={lead} />
 
@@ -529,7 +616,7 @@ function LeadDetail({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as TradeLeadStatus)}
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             >
               {tradeLeadStatuses.map((s) => (
                 <option key={s} value={s} className="bg-[#131316]">
@@ -544,7 +631,7 @@ function LeadDetail({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notes for the Steinheim Egypt team — not visible to the client"
-              className="min-h-[80px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="min-h-[80px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
           </div>
         </div>
@@ -556,7 +643,7 @@ function LeadDetail({
               value={quoteUrl}
               onChange={(e) => setQuoteUrl(e.target.value)}
               placeholder="https://… link to the quote PDF"
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
             <p className="mt-1 text-[10px] text-white/35">Client sees a &ldquo;View quote&rdquo; button and can accept in-app once this is set.</p>
           </div>
@@ -566,7 +653,7 @@ function LeadDetail({
               value={quoteAmount}
               onChange={(e) => setQuoteAmount(e.target.value)}
               placeholder="e.g. LE 42,500"
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
             {lead.quoteAcceptedAt && <p className="mt-1 text-[10px] text-white/35">Accepted {formatDate(lead.quoteAcceptedAt)}</p>}
           </div>
@@ -576,7 +663,7 @@ function LeadDetail({
           type="button"
           disabled={invoiceDownloading}
           onClick={handleDownloadInvoice}
-          className="mt-4 flex h-9 items-center justify-center rounded-full border border-white/15 px-4 text-[11px] text-white/70 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
+          className="mt-4 flex h-9 items-center justify-center rounded-full border border-white/15 px-4 text-[11px] text-white/70 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff] disabled:opacity-40"
         >
           {invoiceDownloading ? "Generating…" : "Download draft Egyptian invoice (prototype)"}
         </button>
@@ -603,7 +690,7 @@ function LeadDetail({
             value={warrantyReference}
             onChange={(e) => setWarrantyReference(e.target.value)}
             placeholder="Batch / serial reference for this order, e.g. Batch STM-2026-04, Serials 1001–1050"
-            className="min-h-[60px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+            className="min-h-[60px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
           />
           <p className="mt-1 text-[10px] text-white/35">Client sees this in their Documents tab for warranty claims.</p>
         </div>
@@ -612,9 +699,16 @@ function LeadDetail({
           type="button"
           onClick={handleSave}
           disabled={!dirty || saving}
-          className="mt-4 flex h-10 items-center justify-center rounded-full bg-[#c9a961] px-6 text-[12px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-40"
+          className="mt-4 flex h-10 items-center justify-center rounded-full bg-[#0a84ff] px-6 text-[12px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-40"
         >
           {saving ? "Saving…" : saved && !dirty ? "Saved" : "Save changes"}
+        </button>
+        <button
+          type="button"
+          onClick={() => void onSave(lead.id, { archived: !lead.archivedAt })}
+          className="mt-3 h-9 rounded-full border border-white/10 px-5 text-[11px] text-white/55 transition hover:border-white/25 hover:text-white"
+        >
+          {lead.archivedAt ? "Restore to active leads" : "Archive lead"}
         </button>
       </Panel>
     </div>
@@ -629,10 +723,8 @@ export default function TradeAdminBoard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<TradeLeadStatus | "all">("all");
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
-
-  useEffect(() => {
-    void loadLeads();
-  }, []);
+  const [leadScope, setLeadScope] = useState<"active" | "archived">("active");
+  const [archiving, setArchiving] = useState(false);
 
   async function loadLeads() {
     setLoading(true);
@@ -649,7 +741,12 @@ export default function TradeAdminBoard() {
     }
   }
 
-  async function handleUpdate(id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string }) {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadLeads();
+  }, []);
+
+  async function handleUpdate(id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string; archived?: boolean }) {
     const res = await fetch("/api/trade/leads", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -663,47 +760,79 @@ export default function TradeAdminBoard() {
     setLeads((current) => current?.map((lead) => (lead.id === id ? data.lead : lead)) ?? null);
   }
 
+  async function handleArchiveAll() {
+    const activeCount = leads?.filter((lead) => !lead.archivedAt).length ?? 0;
+    if (!activeCount || !window.confirm(`Archive all ${activeCount} active trade leads? You can restore them from the Archived view.`)) return;
+    setArchiving(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/trade/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ archiveAll: true }),
+      });
+      if (!res.ok) throw new Error("Could not archive leads.");
+      const data = await res.json();
+      setLeads(data.leads);
+      setExpandedId(null);
+      setLeadScope("active");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not archive leads.");
+    } finally {
+      setArchiving(false);
+    }
+  }
+
+  const scopedLeads = leads?.filter((lead) => (leadScope === "archived" ? Boolean(lead.archivedAt) : !lead.archivedAt)) ?? [];
   const searchFilteredLeads =
-    leads?.filter((lead) => {
+    scopedLeads.filter((lead) => {
       const q = search.trim().toLowerCase();
       if (!q) return true;
       const d = lead.project.details;
       return [d.projectName, d.company, d.contactName, lead.reference].some((value) => (value || "").toLowerCase().includes(q));
-    }) ?? [];
+    });
 
   const statusOptions = [
-    { value: "all" as const, label: `All · ${leads?.length ?? 0}` },
+    { value: "all" as const, label: `All · ${scopedLeads.length}` },
     ...tradeLeadStatuses
-      .filter((s) => leads?.some((lead) => lead.status === s))
-      .map((s) => ({ value: s, label: `${TRADE_LEAD_STATUS_LABELS[s]} · ${leads?.filter((l) => l.status === s).length ?? 0}` })),
+      .filter((s) => scopedLeads.some((lead) => lead.status === s))
+      .map((s) => ({ value: s, label: `${TRADE_LEAD_STATUS_LABELS[s]} · ${scopedLeads.filter((l) => l.status === s).length}` })),
   ];
 
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <PageHeader eyebrow="Trade Leads" title="Lead review" subtitle="B2B project quotes and specification requests" />
-        <SegmentedControl
-          options={[
-            { value: "list" as const, label: "List" },
-            { value: "board" as const, label: "Board" },
-          ]}
-          value={viewMode}
-          onChange={setViewMode}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <SegmentedControl
+            options={[
+              { value: "active" as const, label: `Active · ${leads?.filter((lead) => !lead.archivedAt).length ?? 0}` },
+              { value: "archived" as const, label: `Archived · ${leads?.filter((lead) => Boolean(lead.archivedAt)).length ?? 0}` },
+            ]}
+            value={leadScope}
+            onChange={(value) => { setLeadScope(value); setExpandedId(null); setStatusFilter("all"); }}
+          />
+          <SegmentedControl options={[{ value: "list" as const, label: "List" }, { value: "board" as const, label: "Board" }]} value={viewMode} onChange={setViewMode} />
+          {leadScope === "active" && (leads?.some((lead) => !lead.archivedAt) ?? false) && (
+            <button type="button" onClick={() => void handleArchiveAll()} disabled={archiving} className="h-9 rounded-lg border border-white/10 px-3 text-[12px] text-white/55 transition hover:border-white/20 hover:text-white disabled:opacity-40">
+              {archiving ? "Archiving…" : "Archive all"}
+            </button>
+          )}
+        </div>
       </div>
 
       {error && <ErrorState>{error}</ErrorState>}
       {loading && !leads && <p className="mt-8 text-[13px] text-white/35">Loading leads…</p>}
 
-      {leads && leads.length === 0 && <EmptyState>No leads submitted yet.</EmptyState>}
+      {leads && scopedLeads.length === 0 && <EmptyState>{leadScope === "archived" ? "No archived trade leads." : "No active trade leads. The workspace is ready for new requests."}</EmptyState>}
 
-      {leads && leads.length > 0 && (
+      {leads && scopedLeads.length > 0 && (
         <div className="mt-8 mb-6 space-y-3">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by project, company, contact, or reference…"
-            className="h-11 w-full rounded-lg border border-white/10 bg-[#131316] px-4 text-[13px] text-white outline-none transition focus:border-[#c9a961]"
+            className="h-11 w-full rounded-lg border border-white/10 bg-[#131316] px-4 text-[13px] text-white outline-none transition focus:border-[#0a84ff]"
           />
           {viewMode === "list" && <SegmentedControl options={statusOptions} value={statusFilter} onChange={setStatusFilter} />}
         </div>
@@ -733,7 +862,6 @@ export default function TradeAdminBoard() {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <Badge tone={priorityTone(lead.priority)}>{lead.priority}</Badge>
                         {lead.project.persona && <Badge tone="muted">{TRADE_PERSONA_LABELS[lead.project.persona]}</Badge>}
                         <p className="truncate text-[14px] font-medium text-white/90">{lead.project.details.projectName || "Untitled project"}</p>
                       </div>

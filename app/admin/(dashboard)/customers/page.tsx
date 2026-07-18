@@ -95,7 +95,7 @@ export default function AdminCustomersPage() {
                   <td className="px-5 py-3 font-medium text-white/90">
                     {`${customer.first_name ?? ""} ${customer.last_name ?? ""}`.trim() || "—"}
                   </td>
-                  <td className="px-5 py-3 text-[#c9a961]">
+                  <td className="px-5 py-3 text-[#0a84ff]">
                     <InlineEdit
                       value={customer.email ?? ""}
                       onSave={(v) => saveField(customer.id, "email", v)}

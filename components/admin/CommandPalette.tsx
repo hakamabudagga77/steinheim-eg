@@ -194,10 +194,10 @@ export default function CommandPalette() {
                               cmd.run();
                             }}
                             className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13.5px] transition ${
-                              active ? "bg-[#c9a961]/12 text-white" : "text-white/70"
+                              active ? "bg-[#0a84ff]/12 text-white" : "text-white/70"
                             }`}
                           >
-                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#c9a961]" : "text-white/35"}`} />
+                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#0a84ff]" : "text-white/35"}`} />
                             <span className="flex-1 truncate">{cmd.label}</span>
                             {cmd.hint && <span className="text-[11px] text-white/25">{cmd.hint}</span>}
                           </button>

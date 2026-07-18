@@ -133,7 +133,7 @@ export default function AdminContactLeadsPage() {
                   <div className="grid grid-cols-2 gap-4 text-[13px] sm:grid-cols-4">
                     <div>
                       <p className="text-white/35">Email</p>
-                      <a href={`mailto:${lead.email}`} className="mt-1 block text-[#c9a961] underline decoration-white/20">
+                      <a href={`mailto:${lead.email}`} className="mt-1 block text-[#0a84ff] underline decoration-white/20">
                         {lead.email}
                       </a>
                     </div>
@@ -160,7 +160,7 @@ export default function AdminContactLeadsPage() {
                         onClick={() => updateStatus(lead.id, status)}
                         className={`rounded-full border px-4 py-1.5 text-[12px] transition ${
                           lead.status === status
-                            ? "border-[#c9a961] bg-[#c9a961] text-black"
+                            ? "border-[#0a84ff] bg-[#0a84ff] text-white"
                             : "border-white/15 text-white/55 hover:border-white/30"
                         }`}
                       >

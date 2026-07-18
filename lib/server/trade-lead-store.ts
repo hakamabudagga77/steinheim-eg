@@ -1,6 +1,6 @@
 import "server-only";
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 import type { TradeLead } from "@/lib/trade-leads";
 
@@ -40,9 +40,14 @@ async function readLocalLeads() {
   }
 }
 
+// Writes to a temp file then renames over the target so a reader never sees a
+// partially-written file, and two concurrent writers can't interleave their
+// bytes into a corrupt result — rename is atomic, a plain write() is not.
 async function writeLocalLeads(leads: TradeLead[]) {
   await mkdir(path.dirname(localFile), { recursive: true });
-  await writeFile(localFile, JSON.stringify(leads.slice(0, 500), null, 2), "utf8");
+  const tmpFile = `${localFile}.${process.pid}.${Date.now()}.tmp`;
+  await writeFile(tmpFile, JSON.stringify(leads.slice(0, 500), null, 2), "utf8");
+  await rename(tmpFile, localFile);
 }
 
 function requireConfiguredProductionStore() {
@@ -115,4 +120,22 @@ export async function updateTradeLead(id: string, update: Partial<TradeLead>) {
   const lead: TradeLead = { ...existing, ...update, id: existing.id, updatedAt: new Date().toISOString() };
   await saveTradeLead(lead);
   return lead;
+}
+
+export async function archiveAllTradeLeads() {
+  const leads = await listTradeLeads();
+  const archivedAt = new Date().toISOString();
+  // Sequential on purpose: each update reads the current file, modifies one
+  // lead, and writes the whole file back. Running these in parallel means
+  // every call starts from a stale snapshot and races the others' writes.
+  const updated: TradeLead[] = [];
+  for (const lead of leads) {
+    if (lead.archivedAt) {
+      updated.push(lead);
+      continue;
+    }
+    const result = await updateTradeLead(lead.id, { archivedAt });
+    if (result) updated.push(result);
+  }
+  return updated;
 }
