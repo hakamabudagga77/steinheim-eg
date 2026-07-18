@@ -5,9 +5,18 @@ import type { ChannelPlatform } from "@/lib/channel-attribution";
 
 // No background chip by design — these render as free-floating brand marks
 // with just a soft drop-shadow for depth, not a colored box behind them.
+// "meta" stacks both marks — used when Meta's own utm_source=facebook tag
+// and a stripped in-app-browser referrer make it impossible to tell whether
+// the click was on Facebook or Instagram (see channel-attribution.ts).
 const CONFIG: Record<ChannelPlatform, React.ReactNode> = {
   facebook: <FaFacebook className="h-full w-full text-[#1877F2] drop-shadow-[0_3px_6px_rgba(24,119,242,0.4)]" />,
   instagram: <FaInstagram className="h-full w-full text-[#E1306C] drop-shadow-[0_3px_6px_rgba(225,48,108,0.4)]" />,
+  meta: (
+    <div className="relative h-full w-full">
+      <FaFacebook className="absolute left-0 top-0 h-[68%] w-[68%] text-[#1877F2] drop-shadow-[0_2px_4px_rgba(24,119,242,0.4)]" />
+      <FaInstagram className="absolute bottom-0 right-0 h-[68%] w-[68%] text-[#E1306C] drop-shadow-[0_2px_4px_rgba(225,48,108,0.4)]" />
+    </div>
+  ),
   google: <FcGoogle className="h-full w-full drop-shadow-[0_3px_6px_rgba(0,0,0,0.3)]" />,
   direct: <Link2 className="h-[82%] w-[82%] text-white/45" />,
   other: <Link2 className="h-[82%] w-[82%] text-white/45" />,
