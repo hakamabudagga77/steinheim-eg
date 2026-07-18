@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ShopifyOrder } from "@/lib/shopify-client";
 
 function fmtDate(iso: string) {
@@ -14,9 +14,28 @@ function statusTone(status: string | null) {
   return "bg-black/8 text-black/60";
 }
 
+type Timeframe = "today" | "7d" | "30d" | "all" | "custom";
+
+const TIMEFRAME_LABELS: Record<Timeframe, string> = {
+  today: "Today",
+  "7d": "7 days",
+  "30d": "30 days",
+  all: "All time",
+  custom: "Custom",
+};
+
+function startOfDay(d: Date) {
+  const copy = new Date(d);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [timeframe, setTimeframe] = useState<Timeframe>("30d");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -31,6 +50,46 @@ export default function AdminOrdersPage() {
       .catch((err) => setError(err.message));
   }, []);
 
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    if (timeframe === "all") return orders;
+
+    let start: Date;
+    let end = new Date();
+
+    if (timeframe === "today") {
+      start = startOfDay(new Date());
+    } else if (timeframe === "7d") {
+      start = startOfDay(new Date());
+      start.setDate(start.getDate() - 6);
+    } else if (timeframe === "30d") {
+      start = startOfDay(new Date());
+      start.setDate(start.getDate() - 29);
+    } else {
+      if (!customStart || !customEnd) return orders;
+      start = startOfDay(new Date(customStart));
+      end = new Date(customEnd);
+      end.setHours(23, 59, 59, 999);
+    }
+
+    return orders.filter((o) => {
+      const created = new Date(o.created_at);
+      return created >= start && created <= end;
+    });
+  }, [orders, timeframe, customStart, customEnd]);
+
+  const summary = useMemo(() => {
+    const counted = filteredOrders.filter((o) => o.financial_status !== "voided");
+    const revenue = counted.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+    const currency = filteredOrders[0]?.currency ?? "EGP";
+    return {
+      revenue,
+      currency,
+      count: filteredOrders.length,
+      avg: counted.length ? revenue / counted.length : 0,
+    };
+  }, [filteredOrders]);
+
   return (
     <div>
       <p className="text-[11px] uppercase tracking-[0.3em] text-black/40">Orders</p>
@@ -41,12 +100,68 @@ export default function AdminOrdersPage() {
 
       {error && <p className="mt-6 text-[14px] text-red-600">{error}</p>}
 
-      {orders && orders.length === 0 && (
-        <p className="mt-6 text-[14px] text-black/45">No orders yet.</p>
+      {orders && (
+        <>
+          <div className="mt-8 flex flex-wrap items-center gap-2">
+            {(["today", "7d", "30d", "all", "custom"] as Timeframe[]).map((tf) => (
+              <button
+                key={tf}
+                type="button"
+                onClick={() => setTimeframe(tf)}
+                className={`rounded-full border px-4 py-1.5 text-[12px] transition ${
+                  timeframe === tf ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black/30"
+                }`}
+              >
+                {TIMEFRAME_LABELS[tf]}
+              </button>
+            ))}
+            {timeframe === "custom" && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="rounded-full border border-black/15 px-3 py-1.5 text-[12px]"
+                />
+                <span className="text-black/40">to</span>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="rounded-full border border-black/15 px-3 py-1.5 text-[12px]"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-black/8 bg-white p-6">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Revenue</p>
+              <p className="mt-2 text-[26px] font-medium">
+                {summary.currency} {summary.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+              </p>
+              <p className="mt-1 text-[11px] text-black/35">Gross, excludes voided orders</p>
+            </div>
+            <div className="rounded-xl border border-black/8 bg-white p-6">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Orders</p>
+              <p className="mt-2 text-[26px] font-medium">{summary.count}</p>
+            </div>
+            <div className="rounded-xl border border-black/8 bg-white p-6">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">Average order value</p>
+              <p className="mt-2 text-[26px] font-medium">
+                {summary.currency} {summary.avg.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {orders && filteredOrders.length === 0 && (
+        <p className="mt-6 text-[14px] text-black/45">No orders in this timeframe.</p>
       )}
 
       <div className="mt-8 overflow-x-auto rounded-xl border border-black/8 bg-white">
-        {orders && orders.length > 0 && (
+        {filteredOrders.length > 0 && (
           <table className="w-full min-w-[720px] text-[13px]">
             <thead>
               <tr className="border-b border-black/8 text-left text-black/40">
@@ -60,7 +175,7 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id} className="border-b border-black/6 last:border-b-0">
                   <td className="px-5 py-3 font-medium">{order.name}</td>
                   <td className="px-5 py-3">
