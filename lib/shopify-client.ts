@@ -147,6 +147,9 @@ export interface ShopifyOrder {
   fulfillment_status: string | null;
   customer: { id: number; first_name: string | null; last_name: string | null; email: string | null } | null;
   line_items: Array<{ title: string; quantity: number }>;
+  source_name: string | null;
+  referring_site: string | null;
+  landing_site: string | null;
 }
 
 export interface ShopifyCustomer {
@@ -163,7 +166,7 @@ export interface ShopifyCustomer {
 
 export async function fetchOrders(limit = 250): Promise<ShopifyOrder[]> {
   const data = await adminFetch<{ orders: ShopifyOrder[] }>(
-    `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items`,
+    `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items,source_name,referring_site,landing_site`,
     60
   );
   return data.orders;

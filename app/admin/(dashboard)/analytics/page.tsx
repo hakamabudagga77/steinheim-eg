@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Users, Activity, Eye, Clock, UserPlus, MousePointer2 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, ErrorState, SegmentedControl } from "@/components/admin/ui";
+import type { ShopifyOrder } from "@/lib/shopify-client";
 
 type Timeframe = "7d" | "30d" | "90d";
 
@@ -49,10 +50,45 @@ function fmtDate(yyyymmdd: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
+const TIMEFRAME_DAY_COUNT: Record<Timeframe, number> = { "7d": 7, "30d": 30, "90d": 90 };
+
+// Classifies an order by real UTM/referrer data Shopify already captures at
+// checkout — utm_source/utm_medium on the landing page URL first (this is
+// how ad clicks with fbclid/gclid show up), falling back to the referring
+// site's domain, falling back to "Direct" if neither is present.
+function classifyOrderChannel(order: ShopifyOrder): string {
+  if (order.landing_site) {
+    try {
+      const url = new URL(order.landing_site, "https://steinheim-eg.com");
+      const source = url.searchParams.get("utm_source");
+      const medium = url.searchParams.get("utm_medium");
+      if (source) {
+        const label = source.charAt(0).toUpperCase() + source.slice(1);
+        return medium === "paid" || medium === "cpc" ? `${label} (paid)` : `${label} (organic)`;
+      }
+    } catch {
+      // fall through to referring_site
+    }
+  }
+  if (order.referring_site) {
+    try {
+      const host = new URL(order.referring_site).hostname.replace(/^www\./, "");
+      if (host.includes("instagram")) return "Instagram (organic)";
+      if (host.includes("facebook")) return "Facebook (organic)";
+      if (host.includes("google")) return "Google (organic)";
+      return host;
+    } catch {
+      return order.referring_site;
+    }
+  }
+  return "Direct";
+}
+
 export default function AdminAnalyticsPage() {
   const [summary, setSummary] = useState<GA4Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
+  const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -69,6 +105,34 @@ export default function AdminAnalyticsPage() {
       .then((data) => setSummary(data.summary))
       .catch((err) => setError(err.message));
   }, [timeframe]);
+
+  useEffect(() => {
+    fetch("/api/admin/orders")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setOrders(d.orders))
+      .catch(() => {});
+  }, []);
+
+  const salesByChannel = useMemo(() => {
+    if (!orders) return null;
+    const cutoff = Date.now() - TIMEFRAME_DAY_COUNT[timeframe] * 86400000;
+    const inRange = orders.filter((o) => new Date(o.created_at).getTime() >= cutoff && o.financial_status !== "voided");
+    const byChannel = new Map<string, { revenue: number; count: number }>();
+    for (const order of inRange) {
+      const channel = classifyOrderChannel(order);
+      const entry = byChannel.get(channel) ?? { revenue: 0, count: 0 };
+      entry.revenue += Number(order.total_price || 0);
+      entry.count += 1;
+      byChannel.set(channel, entry);
+    }
+    const currency = inRange[0]?.currency ?? "EGP";
+    return {
+      currency,
+      rows: Array.from(byChannel.entries())
+        .map(([channel, v]) => ({ channel, ...v }))
+        .sort((a, b) => b.revenue - a.revenue),
+    };
+  }, [orders, timeframe]);
 
   return (
     <div>
@@ -154,6 +218,40 @@ export default function AdminAnalyticsPage() {
               ) : (
                 <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
               )}
+            </div>
+          </Panel>
+
+          <Panel className="mt-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Sales by channel</p>
+                <p className="mt-1 text-[11px] text-white/25">From real Shopify orders — which channel actually drove revenue, not just visits</p>
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              {salesByChannel?.rows.map((row) => {
+                const max = Math.max(...salesByChannel.rows.map((r) => r.revenue), 1);
+                return (
+                  <div key={row.channel}>
+                    <div className="flex items-baseline justify-between gap-3 text-[13px]">
+                      <span className="truncate capitalize text-white/75">{row.channel}</span>
+                      <span className="shrink-0 text-white/90">
+                        {salesByChannel.currency} {row.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                        <span className="ml-2 text-[11px] text-white/35">
+                          {row.count} order{row.count === 1 ? "" : "s"}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/[0.05]">
+                      <div className="h-full rounded-full bg-[#0a84ff]" style={{ width: `${Math.max(4, (row.revenue / max) * 100)}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {salesByChannel && salesByChannel.rows.length === 0 && (
+                <p className="text-[13px] text-white/30">No orders in this period.</p>
+              )}
+              {!salesByChannel && <div className="h-16 animate-pulse rounded-lg bg-white/[0.04]" />}
             </div>
           </Panel>
 
