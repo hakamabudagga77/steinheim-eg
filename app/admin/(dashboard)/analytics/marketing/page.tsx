@@ -145,9 +145,17 @@ export default function MarketingAnalyticsPage() {
             const max = Math.max(...report.rows.map((r) => r.revenue), 1);
             const aov = row.count > 0 ? row.revenue / row.count : 0;
             return (
-              <div key={row.key} className="flex items-center gap-3.5 py-3.5 first:pt-0 last:pb-0">
-                <ChannelIcon platform={row.platform} />
-                <div className="min-w-0 flex-1">
+              <div key={row.key} className="flex flex-col gap-2 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:gap-3.5">
+                <div className="flex items-center gap-3.5">
+                  <ChannelIcon platform={row.platform} />
+                  <div className="min-w-0 flex-1 sm:hidden">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-[13.5px] text-white/85">{row.key.replace(/\s*\((Paid|Organic|Direct)\)$/, "")}</span>
+                      <Badge tone={TYPE_TONE[row.type]}>{row.type}</Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden min-w-0 flex-1 sm:block">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-[13.5px] text-white/85">{row.key.replace(/\s*\((Paid|Organic|Direct)\)$/, "")}</span>
                     <Badge tone={TYPE_TONE[row.type]}>{row.type}</Badge>
@@ -156,7 +164,10 @@ export default function MarketingAnalyticsPage() {
                     <div className="h-full rounded-full bg-[#0a84ff]" style={{ width: `${Math.max(4, (row.revenue / max) * 100)}%` }} />
                   </div>
                 </div>
-                <div className="shrink-0 text-right">
+                <div className="h-1 overflow-hidden rounded-full bg-white/[0.05] sm:hidden">
+                  <div className="h-full rounded-full bg-[#0a84ff]" style={{ width: `${Math.max(4, (row.revenue / max) * 100)}%` }} />
+                </div>
+                <div className="shrink-0 text-left sm:text-right">
                   <p className="text-[14px] font-medium tabular-nums text-white/90">
                     {report.currency} {row.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                   </p>
