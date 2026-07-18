@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   title: "Steinheim | Premium German Bathroom Fixtures in Egypt",
   description:
     "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export function generateStaticParams() {

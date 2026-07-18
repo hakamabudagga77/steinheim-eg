@@ -14,15 +14,22 @@ export default function SmoothScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Native scrolling already respects the user's motion preference; layering
+    // Lenis on top would fight it and waste a permanent rAF loop.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     let rafId: number;
+    let cancelled = false;
 
     (async () => {
       try {
         const Lenis = (await import("lenis")).default;
+        if (cancelled) return;
         const lenis = new Lenis({
           duration: 1.2,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
+          anchors: true,
         }) as unknown as LenisInstance;
         lenisRef.current = lenis;
 
@@ -37,6 +44,7 @@ export default function SmoothScroll() {
     })();
 
     return () => {
+      cancelled = true;
       if (rafId) cancelAnimationFrame(rafId);
       lenisRef.current?.destroy();
       lenisRef.current = null;
