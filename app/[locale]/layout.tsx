@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import "../globals.css";
 
 const inter = Inter({
@@ -38,6 +39,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} className={inter.variable}>
       <body className="min-h-screen flex flex-col bg-white text-charcoal antialiased">
+        <GoogleAnalytics />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell locale={locale}>{children}</SiteShell>
         </NextIntlClientProvider>
