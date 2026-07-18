@@ -24,7 +24,7 @@ function TradePageContent() {
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         {/* Hero */}
-        <section className="relative flex min-h-[75svh] items-end overflow-hidden bg-black pt-20 text-white">
+        <section dir="ltr" className="relative flex min-h-[75svh] items-end overflow-hidden bg-black pt-20 text-white">
           <AutoplayVideo
             src="/videos/showroom/showroom-3.mp4"
             poster="/images/generated/gessi/steinheim-wellness-architecture.png"
@@ -57,7 +57,7 @@ function TradePageContent() {
         </section>
 
         {/* How it works — Gessi editorial: horizontal dividers, italic serif titles */}
-        <section className="px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
+        <section dir="ltr" className="px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-[1780px]">
             <ScrollReveal>
               <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">How it works</p>
@@ -83,7 +83,7 @@ function TradePageContent() {
         <SmartRoomCalculator />
 
         {/* Browse CTA */}
-        <section className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32">
+        <section dir="ltr" className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32">
           <div className="mx-auto max-w-[1780px]">
             <div className="grid items-center gap-10 rounded-[22px] bg-black p-8 text-white sm:p-12 lg:grid-cols-[1.2fr_0.8fr] lg:p-16">
               <div>
