@@ -1,8 +1,10 @@
 import Image from "next/image";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import { projectReferences } from "@/data/project-references";
+
+const pillarKeys = ["visual", "collection", "schedule"] as const;
 
 export default async function ProjectsPage({
   params,
@@ -11,6 +13,7 @@ export default async function ProjectsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("projectsPage");
   const featured = projectReferences[0];
 
   return (
@@ -31,18 +34,18 @@ export default async function ProjectsPage({
 
           <div className="relative z-10 flex min-h-screen flex-col justify-end px-6 pb-16 pt-32 sm:px-10 lg:px-16 lg:pb-24">
             <div className="max-w-4xl">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/70">Project references</p>
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/70">{t("eyebrow")}</p>
               <h1 className="mt-8 max-w-5xl text-[clamp(4.2rem,10vw,10.5rem)] font-light leading-[0.84] tracking-[-0.07em]">
-                Where design takes shape.
+                {t("heroHeadline")}
               </h1>
               <p className="mt-8 max-w-2xl text-[18px] leading-[1.75] text-white/72">
-                Published Steinheim project references from the UAE: residential developments and branded residences where bathroom systems become part of the architectural specification.
+                {t("heroBody")}
               </p>
               <Link
                 href="#all-projects"
                 className="mt-10 inline-flex h-12 items-center rounded-full border border-white/45 px-8 text-[13px] transition hover:bg-white hover:text-black"
               >
-                Discover more
+                {t("discoverMore")}
               </Link>
             </div>
           </div>
@@ -51,12 +54,12 @@ export default async function ProjectsPage({
         <section id="all-projects" className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-[1780px]">
             <div className="mx-auto max-w-4xl text-center">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/55">All projects</p>
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/55">{t("allProjects")}</p>
               <h2 className="mt-7 text-[clamp(2.8rem,6vw,6.2rem)] font-light leading-[0.94] tracking-[-0.055em]">
-                Official references, not concepts.
+                {t("officialHeadline")}
               </h2>
               <p className="mx-auto mt-7 max-w-2xl text-[17px] leading-[1.8] text-white/58">
-                These are the public project references Steinheim Egypt currently presents. Exact product models, finishes, quantities, and installation details should be confirmed with the Steinheim team before specification.
+                {t("officialBody")}
               </p>
             </div>
 
@@ -106,18 +109,18 @@ export default async function ProjectsPage({
                 className="object-cover"
               />
             </div>
-            <div className="lg:pl-12">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/48">For Egypt projects</p>
+            <div className="lg:ps-12">
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/48">{t("forEgypt")}</p>
               <h2 className="mt-7 text-[clamp(2.8rem,5.8vw,6rem)] font-light leading-[0.92] tracking-[-0.06em]">
-                From reference to schedule.
+                {t("scheduleHeadline")}
               </h2>
               <p className="mt-7 max-w-2xl text-[17px] leading-[1.9] text-white/62">
-                A strong project section should show credibility, then make the next step obvious. The public references prove Steinheim belongs in serious developments; the trade studio turns that interest into a project-ready request for the Egypt team.
+                {t("scheduleBody")}
               </p>
               <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                {["Visual direction", "Collection logic", "Project schedule"].map((item) => (
-                  <div key={item} className="border border-white/12 px-5 py-5">
-                    <p className="text-[12px] uppercase tracking-[0.22em] text-white/56">{item}</p>
+                {pillarKeys.map((key) => (
+                  <div key={key} className="border border-white/12 px-5 py-5">
+                    <p className="text-[12px] uppercase tracking-[0.22em] text-white/56">{t(`pillars.${key}`)}</p>
                   </div>
                 ))}
               </div>
@@ -125,7 +128,7 @@ export default async function ProjectsPage({
                 href="/trade"
                 className="mt-10 inline-flex h-12 items-center rounded-full bg-white px-8 text-[13px] text-black transition hover:bg-white/82"
               >
-                Open trade studio
+                {t("openTradeStudio")}
               </Link>
             </div>
           </div>
