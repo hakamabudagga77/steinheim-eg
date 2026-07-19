@@ -1,59 +1,375 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/images/brand/steinheim-logo-white.png">
+  <img src="public/images/brand/steinheim-logo-black.png" alt="Steinheim" width="420">
+</picture>
 
-First, run the development server:
+### A premium bilingual e-commerce platform for German bathroom design, built for Egypt.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Full EN / AR (RTL) · Shopify-backed commerce**
+
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+[![CI](https://img.shields.io/github/actions/workflow/status/hakamabudagga77/steinheim-eg/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/hakamabudagga77/steinheim-eg/actions/workflows/ci.yml)
+[![Sentry](https://img.shields.io/badge/monitoring-Sentry-362D59?style=flat-square&logo=sentry&logoColor=white)](https://sentry.io)
+[![Vitest](https://img.shields.io/badge/tested%20with-Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev)
+[![i18n](https://img.shields.io/badge/i18n-EN%20%2F%20AR%20(RTL)-8A2BE2?style=flat-square)](#-internationalization)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](#-contributing)
+
+</div>
+
+<br>
+
+<div align="center">
+<table>
+<tr>
+<td width="50%"><img src="public/images/lifestyle/hero.png" alt="Steinheim freestanding bath, brushed nickel floor-mount mixer"></td>
+<td width="50%"><img src="public/images/steinheim/final/about-hero.jpg" alt="Steinheim brushed-gold bath filler against black marble"></td>
+</tr>
+<tr>
+<td width="50%"><img src="public/images/steinheim/karim-2026/landing-joy.webp" alt="Joy collection matte-black wall-mounted basin mixer"></td>
+<td width="50%"><img src="public/images/steinheim/karim-2026/banner-quatro.webp" alt="Quatro collection brushed-gold shower system, skylight bathroom"></td>
+</tr>
+</table>
+</div>
+
+<br>
+
+## ✨ What is this
+
+**Steinheim Egypt** is the production storefront for a premium European bathroom-fixtures
+brand's Egyptian market — four design collections (**Joy · Up · Art · Quatro**), full
+Shopify-backed commerce, a dedicated **B2B trade studio** for architects, developers, and
+hospitality projects, and an **AI concierge** that walks customers through specification
+decisions in natural language.
+
+It's a full-stack, security-hardened, fully bilingual (English / Arabic, true RTL — not a
+mirrored stylesheet) commerce platform, built end-to-end with the App Router, Server
+Components, and every modern Next.js 16 convention — not the patterns most tutorials still
+teach.
+
+<br>
+
+## 📚 Table of contents
+
+- [Feature highlights](#-feature-highlights)
+- [Tech stack](#-tech-stack)
+- [Architecture map](#-architecture-map)
+- [Getting started](#-getting-started)
+- [Testing & quality gates](#-testing--quality-gates)
+- [Load testing](#-load-testing)
+- [Security](#-security)
+- [Internationalization](#-internationalization)
+- [Deployment](#-deployment)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Credits](#-credits)
+
+<br>
+
+## 🚀 Feature highlights
+
+<table>
+<tr><td width="33%" valign="top">
+
+### 🛍️ Commerce
+- Full Shopify Storefront API integration — live pricing, inventory, checkout handoff
+- HMAC-verified Shopify webhooks with cache invalidation
+- Cart, wishlist (with shareable links), and quick-add flows
+- Finish-aware product variants across 6 premium finishes
+
+</td><td width="33%" valign="top">
+
+### 🏗️ Trade Studio (B2B)
+- Room-by-room specification builder for architects & developers
+- PDF quote/invoice generation (`pdf-lib`)
+- Lead intelligence pipeline with email digests
+- Sample requests, scope tracking, project messaging
+
+</td><td width="33%" valign="top">
+
+### 🤖 AI Concierge
+- Claude-powered specification assistant (`@anthropic-ai/sdk`)
+- Deterministic catalogue/rule brain first, LLM rewrite second — never fails open into
+  hallucinated product facts
+- Voice input (Web Speech API) + ElevenLabs voice output, with automatic browser-voice
+  fallback
+
+</td></tr>
+<tr><td width="33%" valign="top">
+
+### 🌍 True bilingual, not translated
+- Complete English / Arabic parity via `next-intl`, including RTL layout, RTL-aware
+  animations, and locale-aware routing
+- Every page, drawer, toast, and error state — not just the marketing copy
+
+</td><td width="33%" valign="top">
+
+### 🔐 Security-hardened
+- CSP, HSTS, and full security header suite
+- Redis-backed rate limiting on public endpoints
+- HMAC-verified webhooks, session-based admin auth
+- Sentry error monitoring wired into both client and server request paths
+
+</td><td width="33%" valign="top">
+
+### ⚡ Performance & quality
+- Server Components by default, `next/dynamic` code-splitting on every overlay
+- Cmd/Ctrl+K global command-palette search
+- Vitest unit suite + k6 load-test harness, both gating CI
+- Full admin dashboard for orders, customers, analytics, content
+
+</td></tr>
+</table>
+
+<br>
+
+## 🧰 Tech stack
+
+| Layer | Technology |
+|---|---|
+| **Framework** | [Next.js 16](https://nextjs.org) (App Router, Server Components, Turbopack, native `instrumentation-client`/`instrumentation` conventions) |
+| **UI** | [React 19](https://react.dev), [TypeScript 5](https://www.typescriptlang.org) |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com) |
+| **Motion** | [Framer Motion](https://www.framer.com/motion/), [Lenis](https://lenis.darkroom.engineering/) smooth scroll |
+| **i18n** | [next-intl](https://next-intl.dev) — locale-prefixed routing, RTL, ICU message formatting |
+| **Commerce** | Shopify Storefront API, HMAC-verified webhooks |
+| **AI** | [Anthropic Claude](https://www.anthropic.com) (`@anthropic-ai/sdk`), ElevenLabs / `msedge-tts` voice |
+| **Data & docs** | `pdf-lib` (quotes/invoices), `recharts` (admin analytics) |
+| **Email** | [Resend](https://resend.com) |
+| **Cache / rate limiting** | Upstash Redis (REST API) |
+| **Observability** | [Sentry](https://sentry.io) (`@sentry/nextjs`) — client + server + edge |
+| **Analytics** | Google Analytics 4 Data API |
+| **Testing** | [Vitest](https://vitest.dev) (unit), [k6](https://k6.io) (load testing) |
+| **CI/CD** | GitHub Actions (lint → typecheck → test → build, required on every PR) |
+| **Hosting** | [Vercel](https://vercel.com) — Edge/Node runtimes, Cron Jobs |
+| **Tooling** | ESLint 9, GitHub CLI-driven PR workflow |
+
+<br>
+
+## 🗺️ Architecture map
+
+```
+steinheim-eg/
+├── app/
+│   ├── [locale]/                # every customer-facing route, locale-prefixed (/en, /ar)
+│   │   ├── page.tsx              # homepage
+│   │   ├── collections/[series]/ # Joy · Up · Art · Quatro collection pages
+│   │   ├── products/[slug]/      # product detail (variants, finishes, 3D viewer)
+│   │   ├── trade/                # B2B trade studio entry
+│   │   ├── trade/restore/[id]/   # resumable trade project links
+│   │   ├── wishlist/             # shared-wishlist landing (?items=... deep link)
+│   │   ├── assistant/            # AI concierge full-page experience
+│   │   ├── 3d-lab/ · 3d-showcase/# interactive product model viewers
+│   │   ├── shop-by-need/         # room-driven product discovery
+│   │   ├── trade-admin/          # trade lead management (authenticated)
+│   │   └── about · projects · contact · warranty · shipping · returns · privacy
+│   ├── admin/                    # full back-office: orders, customers, analytics, content
+│   ├── api/
+│   │   ├── shopify/               # checkout, live pricing
+│   │   ├── webhooks/shopify/      # HMAC-verified inventory sync
+│   │   ├── trade/                 # RFQ, leads, quotes, documents, messaging
+│   │   ├── admin/                 # authenticated back-office endpoints
+│   │   ├── assistant/             # Claude proxy (keys never touch the browser)
+│   │   └── cron/daily-digest/     # scheduled trade-lead summary email
+│   ├── sitemap.ts · robots.ts     # SEO
+│   └── layout.tsx
+│
+├── components/
+│   ├── layout/                   # Navigation, SiteShell (provider composition root), PageTransition
+│   ├── product/ · collections/   # ProductCard, collection landing, finish selectors
+│   ├── cart/ · wishlist/         # CartContext/Drawer, WishlistContext/Drawer (shareable)
+│   ├── catalogue/ · trade/       # trade project board, room calculator, quote flow
+│   ├── search/                   # SiteSearch — Cmd/Ctrl+K command palette
+│   ├── assistant/                # AI concierge UI
+│   ├── three/                    # WebGL/3D product model viewer
+│   ├── admin/                    # back-office UI (command palette, tables, charts)
+│   └── ui/                       # shared primitives (ScrollReveal, BackToTop, AutoplayVideo…)
+│
+├── lib/
+│   ├── utils.ts · search-index.ts · wishlist.ts   # pure domain logic — unit tested
+│   ├── shopify-client.ts · shopify-live-data.ts   # Shopify Storefront API layer
+│   ├── trade-project.ts · trade-leads.ts · trade-schedule.ts
+│   ├── assistant/                # Claude prompt/rule engine (catalogue-grounded)
+│   └── server/                   # Redis client, rate limiting, admin sessions, transactional email
+│
+├── data/                         # product catalogue, finishes, brand knowledge (source of truth)
+├── i18n/                         # next-intl routing, navigation, request config
+├── messages/                     # en.json / ar.json — full UI translation trees
+├── load-tests/                   # k6 storefront load-test scenario + docs
+├── instrumentation.ts            # Sentry server/edge init + onRequestError
+├── instrumentation-client.ts     # Sentry browser init
+├── vitest.config.ts / *.test.ts  # unit test suite
+└── .github/workflows/ci.yml      # lint → typecheck → test → build, required on every PR
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<br>
 
-## AI concierge
+## 🏁 Getting started
 
-The customer-facing concierge is available at `/en/assistant` and `/ar/assistant`.
-Configure these server-side variables in `.env.local` before using it:
+**Requirements:** Node 20+, npm.
 
 ```bash
+git clone https://github.com/hakamabudagga77/steinheim-eg.git
+cd steinheim-eg
+npm install
+cp .env.example .env.local   # fill in the keys you need — see below
+npm run dev
+```
+
+Open [localhost:3000](http://localhost:3000) — you'll land on `/en` (or `/ar`, both fully
+supported from the first paint).
+
+### Environment variables
+
+Every integration degrades gracefully without its key — the site runs and demos fine with
+an empty `.env.local`. Fill in what you're actually testing:
+
+```bash
+# AI concierge (app/[locale]/assistant)
 ANTHROPIC_API_KEY=
 ANTHROPIC_MODEL=claude-haiku-4-5-20251001
 ELEVENLABS_API_KEY=
 ELEVENLABS_VOICE_ID=
+
+# Error monitoring
+NEXT_PUBLIC_SENTRY_DSN=
+SENTRY_DSN=
+SENTRY_ORG=            # optional — only needed for source-map upload
+SENTRY_PROJECT=
+SENTRY_AUTH_TOKEN=
+
+# Shopify commerce
+# ...see lib/shopify-client.ts for the full set
+
+# Redis (rate limiting / caching)
+# Upstash KV_REST_API_URL / KV_REST_API_TOKEN
 ```
 
-Claude and ElevenLabs requests are proxied through Next.js route handlers so API
-keys are never exposed to the browser. The concierge always runs Steinheim's
-deterministic catalogue/rule brain first, then optionally lets Claude rewrite the
-verified answer in a more human luxury-showroom tone. If `ANTHROPIC_API_KEY` is
-missing, exhausted, or the model errors, the interface continues with the
-catalogue-backed concierge rather than failing.
+<br>
 
-Voice input uses the browser Web Speech API and falls back to text-only input
-when speech recognition is unsupported. ElevenLabs automatically falls back to
-the best matching English or Arabic browser voice after a provider error.
+## 🧪 Testing & quality gates
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Every pull request runs the same four checks CI enforces before anything reaches `main`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint        # ESLint 9, flat config
+npm run typecheck    # tsc --noEmit, zero tolerance
+npm run test         # Vitest — pure domain logic (wishlist, search, catalogue lookups)
+npm run build         # production build must succeed
+```
 
-## Learn More
+<br>
 
-To learn more about Next.js, take a look at the following resources:
+## 📈 Load testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+A [k6](https://k6.io) scenario simulates real shopper journeys — homepage → collection →
+product pages → live pricing — against a running build. Fully read-only; it can't create
+real orders, leads, or emails.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build && npm run start &
+BASE_URL=http://localhost:3000 npm run loadtest
+```
 
-## Deploy on Vercel
+See [`load-tests/README.md`](load-tests/README.md) for tuning the ramp and pointing it at a
+deployed environment safely.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+<br>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔐 Security
+
+- **Headers:** CSP, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`,
+  `Permissions-Policy` — see `next.config.ts`.
+- **Rate limiting:** Redis-backed, applied to public write endpoints.
+- **Webhooks:** Shopify webhooks are HMAC-signature verified before any cache mutation.
+- **Admin:** session-based auth, isolated route group, never shares state with the public
+  storefront.
+- **Observability:** Sentry captures both client exceptions and server request errors —
+  wired through Next.js's native `instrumentation.ts` / `instrumentation-client.ts`, not a
+  bolted-on script tag.
+
+<br>
+
+## 🌍 Internationalization
+
+English and Arabic are first-class throughout — not a machine-translated afterthought:
+
+- Locale-prefixed routing (`/en/...`, `/ar/...`) via `next-intl`, with a locale-aware
+  `Link`/`useRouter` that never produces the classic "stuck on the wrong locale" 404.
+- True RTL layout (mirrored flex/grid direction, RTL-aware icons and animation offsets),
+  not a CSS `direction` hack.
+- ICU plural/format rules in every translation key that needs them.
+- Product names, finish names, and shared admin/status labels are deliberately **not**
+  translated — they're a shared data layer with the English-only back office, and
+  translating them would fork product identity between locales.
+
+<br>
+
+## ☁️ Deployment
+
+Deployed on [Vercel](https://vercel.com) with GitHub Actions as the merge gate:
+
+```
+PR opened → lint → typecheck → test → build → Vercel preview deploy → review → merge → production
+```
+
+A Vercel Cron Job (`vercel.json`) triggers `/api/cron/daily-digest` every morning to summarize
+new trade leads.
+
+<br>
+
+## 🤝 Contributing
+
+Issues and pull requests are welcome. The workflow this project actually follows:
+
+1. Branch off `main`: `feat/…`, `fix/…`, or `chore/…`
+2. `npm run lint && npm run typecheck && npm run test && npm run build` — all four, locally,
+   before opening a PR
+3. Open a PR against `main` — CI runs the same four checks and must pass
+4. Squash-friendly, descriptive commit messages (why, not just what)
+
+<br>
+
+## 📄 License
+
+Released under the **[MIT License](LICENSE)** — see [`LICENSE`](LICENSE) for the full text.
+
+<br>
+
+## 🙌 Credits
+
+<div align="center">
+
+**Engineered end-to-end by [EslaM-X](https://github.com/EslaM-X)**
+Lead Software Architect · Full-Stack Engineer · Blockchain / Web3 / Web5
+
+Complete ownership of the codebase — architecture, frontend, backend, commerce integration,
+AI systems, security hardening, CI/CD, testing, monitoring, and every line shipped in this
+repository.
+
+**In collaboration with [hakamabudagga77](https://github.com/hakamabudagga77)**,
+who directed the product vision, brand design, and creative direction, and worked
+alongside Claude (Anthropic) throughout via prompt-driven pair programming to help shape
+this project.
+
+</div>
+
+<br>
+
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/images/brand/steinheim-logo-white.png">
+  <img src="public/images/brand/steinheim-logo-black.png" alt="Steinheim" width="200">
+</picture>
+
+<sub>Steinheim Egypt · Premium German Bathroom Fixtures</sub>
+
+</div>
