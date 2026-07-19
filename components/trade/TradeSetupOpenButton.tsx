@@ -1,14 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 
 export default function TradeSetupOpenButton({
   variant = "primary",
-  label = "Set up your project",
+  label,
 }: {
   variant?: "primary" | "outline" | "outline-light" | "white";
   label?: string;
 }) {
+  const t = useTranslations("tradeOpenButton");
   const { setSetupOpen } = useTradeProject();
 
   const base =
@@ -23,7 +25,7 @@ export default function TradeSetupOpenButton({
 
   return (
     <button type="button" onClick={() => setSetupOpen(true)} className={`${base} ${styles[variant]}`}>
-      {label}
+      {label ?? t("setupProject")}
     </button>
   );
 }

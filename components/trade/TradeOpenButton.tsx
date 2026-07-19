@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 
 export default function TradeOpenButton({
@@ -7,6 +8,7 @@ export default function TradeOpenButton({
 }: {
   variant?: "primary" | "outline" | "outline-light" | "white";
 }) {
+  const t = useTranslations("tradeOpenButton");
   const { project, setOpen } = useTradeProject();
   const count = project.items.length;
 
@@ -28,13 +30,13 @@ export default function TradeOpenButton({
     <button type="button" onClick={() => setOpen(true)} className={`${base} ${styles[variant]}`}>
       {count > 0 ? (
         <>
-          Open project board
+          {t("openBoard")}
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-charcoal text-[9px] text-white">
             {count}
           </span>
         </>
       ) : (
-        "Open project board"
+        t("openBoard")
       )}
     </button>
   );
