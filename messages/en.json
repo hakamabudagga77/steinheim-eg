@@ -18,6 +18,7 @@
     "contact": "Contact",
     "search": "Search",
     "cart": "Cart",
+    "wishlist": "Wishlist",
     "menu": "Menu",
     "close": "Close"
   },
@@ -1251,7 +1252,22 @@
     "emptyBody": "Tap the heart on any product to keep it here.",
     "browse": "Browse collections",
     "remove": "Remove",
-    "addToCart": "Add to cart"
+    "addToCart": "Add to cart",
+    "share": "Copy share link",
+    "shareCopied": "Link copied",
+    "shareFallback": "Copy this link to share your wishlist"
+  },
+  "sharedWishlistPage": {
+    "eyebrow": "Shared wishlist",
+    "title": "A wishlist, shared with you",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "addAllHint": "Add every piece below to your own wishlist in one tap.",
+    "addAll": "Add all to my wishlist",
+    "addedAll": "Added to your wishlist",
+    "viewWishlist": "View my wishlist",
+    "emptyTitle": "This link has nothing to show",
+    "emptyBody": "The wishlist link is empty or no longer valid. Browse our collections to start your own.",
+    "browse": "Browse collections"
   },
   "cards": {
     "quickAdd": "Quick add",
@@ -1261,7 +1277,8 @@
     "outOfStock": "Out of stock",
     "noSpecificRoom": "No specific room",
     "availableFinishes": "Available finishes",
-    "showFinish": "Show {name}"
+    "showFinish": "Show {name}",
+    "wishlistToggle": "Save to wishlist"
   },
   "menu": {
     "forYourProject": "For your project",

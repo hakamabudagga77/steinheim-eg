@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import type { RoomGroup } from "@/lib/trade-project";
 
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
@@ -38,6 +39,7 @@ function ProductCard({
   const [roomOpen, setRoomOpen] = useState(false);
   const [scopeChoice, setScopeChoice] = useState(roomOptions?.[0]?.scopeId ?? "");
   const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
 
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
   // sets this card's default, but the shopper can still pick a different one for this card alone.
@@ -62,8 +64,21 @@ function ProductCard({
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
   const selectedRoom = roomOptions?.find((group) => group.scopeId === scopeChoice) ?? null;
 
+  const inWishlist = isInWishlist(product.slug, variant.finish);
+
   return (
-    <article>
+    <article className="relative">
+      <button
+        type="button"
+        onClick={() => toggleItem(product.slug, variant.finish)}
+        aria-label={t("wishlistToggle")}
+        aria-pressed={inWishlist}
+        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      </button>
       <Link
         href={`/products/${product.slug}`}
         className="group block"

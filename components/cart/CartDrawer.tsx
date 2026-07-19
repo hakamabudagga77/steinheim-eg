@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
@@ -71,27 +71,30 @@ export default function CartDrawer({ locale }: { locale: string }) {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   }
 
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
+  // Not wrapped in AnimatePresence: several rows below navigate via next-intl
+  // Link while also calling setOpen(false) in the same click, and Framer
+  // Motion's exit lifecycle can be interrupted by that concurrent route
+  // change, leaving an invisible-but-clickable backdrop stuck over the page.
+  // A plain conditional render unmounts synchronously and can never get stuck.
+  if (!open) return null;
 
-          <motion.aside
-            initial={{ x: isArabic ? "-100%" : "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: isArabic ? "-100%" : "100%" }}
-            transition={{ duration: 0.45, ease: [0.22, 0.76, 0.2, 1] }}
-            className={`fixed bottom-0 top-0 z-[80] flex w-full max-w-[100vw] sm:max-w-[440px] flex-col bg-white ${isArabic ? "left-0" : "right-0"}`}
-            dir={isArabic ? "rtl" : "ltr"}
-          >
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
+        onClick={() => setOpen(false)}
+      />
+
+      <motion.aside
+        initial={{ x: isArabic ? "-100%" : "100%" }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.45, ease: [0.22, 0.76, 0.2, 1] }}
+        className={`fixed bottom-0 top-0 z-[80] flex w-full max-w-[100vw] sm:max-w-[440px] flex-col bg-white ${isArabic ? "left-0" : "right-0"}`}
+        dir={isArabic ? "rtl" : "ltr"}
+      >
             {/* Header */}
             <header className="shrink-0 border-b border-charcoal/8 px-5 sm:px-7 py-6">
               <div className="flex items-center justify-between">
@@ -320,9 +323,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                 </p>
               </footer>
             )}
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
+      </motion.aside>
+    </>
   );
 }

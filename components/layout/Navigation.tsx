@@ -8,6 +8,7 @@ import Image from "next/image";
 import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
@@ -83,6 +84,7 @@ export default function Navigation({ locale }: { locale: string }) {
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
+  const { itemCount: wishlistCount, setOpen: setWishlistOpen } = useWishlist();
   const {
     project: tradeProject,
     setOpen: setTradeOpen,
@@ -226,6 +228,27 @@ export default function Navigation({ locale }: { locale: string }) {
                   className={`absolute -top-1 -left-1 h-2.5 w-2.5 rounded-full ${useWhite ? "bg-white" : "bg-charcoal"}`}
                   aria-label={`${unreadMessageCount} new message${unreadMessageCount === 1 ? "" : "s"} from Steinheim`}
                 />
+              )}
+            </button>
+            <button
+              onClick={() => setWishlistOpen(true)}
+              className={`relative hidden transition-colors duration-300 cursor-pointer sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
+              aria-label={t("wishlist")}
+              title={t("wishlist")}
+            >
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span
+                  className={`absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full px-0.5 text-[8px] font-medium ${
+                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
+                  }`}
+                >
+                  {wishlistCount}
+                </span>
               )}
             </button>
             <button
