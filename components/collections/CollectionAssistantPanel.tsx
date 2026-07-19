@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { AssistantAction } from "@/lib/assistant/steinheim-assistant";
 import { formatPrice, type Finish, type Product, type Series } from "@/lib/utils";
@@ -33,12 +34,7 @@ type CollectionAssistantPanelProps = {
   onAddPackage: () => void;
 };
 
-const suggestedQuestions = [
-  "Is this collection better for homes or hotel projects?",
-  "Which finish direction should I start with?",
-  "Compare this collection with another Steinheim collection.",
-  "Build a bathroom from this collection.",
-];
+const suggestedQuestionKeys = ["homesOrHotels", "finishDirection", "compare", "buildBathroom"] as const;
 
 function cleanText(text: string) {
   return text.replace(/\n\n\{"type":[\s\S]*$/m, "").trim();
@@ -61,6 +57,7 @@ export default function CollectionAssistantPanel({
   packageFinishName,
   onAddPackage,
 }: CollectionAssistantPanelProps) {
+  const t = useTranslations("collectionAssistantPanel");
   const [input, setInput] = useState("");
   const [answer, setAnswer] = useState("");
   const [action, setAction] = useState<AssistantAction>(null);
@@ -150,7 +147,7 @@ export default function CollectionAssistantPanel({
         }
       }
     } catch {
-      setAnswer("I could not reach the Steinheim Concierge right now. You can still browse the collection or add the starter package to your project board.");
+      setAnswer(t("unreachable"));
     } finally {
       setLoading(false);
       setInput("");
@@ -167,13 +164,13 @@ export default function CollectionAssistantPanel({
       <div className="mx-auto grid max-w-[1600px] gap-8 px-5 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:px-10">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-warm-gray">
-            Steinheim concierge
+            {t("concierge")}
           </p>
           <h2 className="mt-4 max-w-xl font-heading text-[clamp(2rem,4vw,4.4rem)] leading-[0.95] text-charcoal">
-            Decide if {series.name} is the right language.
+            {t("decideHeadline", { series: series.name })}
           </h2>
           <p className="mt-5 max-w-md text-[14px] leading-[1.85] text-warm-gray">
-            Ask how this collection fits a home, hotel, compound, designer brief, or contractor schedule.
+            {t("askBody")}
           </p>
 
           {packageRows.length > 0 && (
@@ -181,10 +178,10 @@ export default function CollectionAssistantPanel({
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">
-                    Starter package
+                    {t("starterPackage")}
                   </p>
                   <p className="mt-2 text-[13px] leading-[1.7] text-stone">
-                    A practical first bathroom set in {packageFinishName}.
+                    {t("starterPackageBody", { finish: packageFinishName })}
                   </p>
                 </div>
                 <button
@@ -192,7 +189,7 @@ export default function CollectionAssistantPanel({
                   onClick={onAddPackage}
                   className="inline-flex h-10 shrink-0 items-center justify-center bg-charcoal px-4 text-[9px] font-medium uppercase tracking-[0.14em] text-white transition hover:bg-black"
                 >
-                  Add package
+                  {t("addPackage")}
                 </button>
               </div>
 
@@ -214,11 +211,11 @@ export default function CollectionAssistantPanel({
               </div>
 
               <p className="mt-4 text-[11px] leading-relaxed text-warm-gray">
-                Retail-reference package total: {formatPrice(totalPackageReference)}. Trade pricing requires confirmation.
+                {t("packageTotal", { total: formatPrice(totalPackageReference) })}
               </p>
               {omittedPackageItems.length > 0 && (
                 <p className="mt-2 text-[10px] leading-relaxed text-warm-gray">
-                  Not active here: {omittedPackageItems.join(", ")}.
+                  {t("notActive", { items: omittedPackageItems.join(", ") })}
                 </p>
               )}
             </div>
@@ -228,25 +225,25 @@ export default function CollectionAssistantPanel({
         <div className="border border-charcoal/10 bg-[#ece9e2] p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="font-heading text-[28px] leading-none text-charcoal">{series.name} guide</p>
+              <p className="font-heading text-[28px] leading-none text-charcoal">{t("guide", { series: series.name })}</p>
               <p className="mt-2 text-[12px] leading-[1.7] text-warm-gray">
-                Catalogue-backed guidance for this collection, its active finishes, and its project fit.
+                {t("guideBody")}
               </p>
             </div>
             <span className="w-fit border border-charcoal/10 bg-white px-3 py-2 text-[9px] font-medium uppercase tracking-[0.16em] text-warm-gray">
-              Catalogue grounded
+              {t("catalogueGrounded")}
             </span>
           </div>
 
           <div className="mt-5 grid gap-2 sm:grid-cols-2">
-            {suggestedQuestions.map((question) => (
+            {suggestedQuestionKeys.map((key) => (
               <button
-                key={question}
+                key={key}
                 type="button"
-                onClick={() => ask(question)}
+                onClick={() => ask(t(`questions.${key}`))}
                 className="border border-charcoal/10 bg-white px-4 py-3 text-left text-[11px] leading-[1.45] text-stone transition hover:border-charcoal/30"
               >
-                {question}
+                {t(`questions.${key}`)}
               </button>
             ))}
           </div>
@@ -254,7 +251,7 @@ export default function CollectionAssistantPanel({
           {(answer || loading) && (
             <div className="mt-5 border border-charcoal/8 bg-white p-4">
               <div className="space-y-3 text-[13px] leading-[1.8] text-stone" dir="auto">
-                {paragraphs(answer || "Reading the collection, finishes, and project context...").map((paragraph) => (
+                {paragraphs(answer || t("readingContext")).map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
@@ -274,14 +271,14 @@ export default function CollectionAssistantPanel({
                     onClick={onAddPackage}
                     className="inline-flex h-9 items-center justify-center border border-charcoal/15 bg-white px-4 text-[9px] font-medium uppercase tracking-[0.14em] text-charcoal transition hover:border-charcoal"
                   >
-                    Add starter package
+                    {t("addStarterPackage")}
                   </button>
                 )}
                 <Link
                   href="/trade#smart-room-calculator"
                   className="inline-flex h-9 items-center justify-center border border-charcoal/15 bg-white px-4 text-[9px] font-medium uppercase tracking-[0.14em] text-charcoal transition hover:border-charcoal"
                 >
-                  Smart room calculator
+                  {t("smartRoomCalculator")}
                 </Link>
               </div>
             </div>
@@ -291,7 +288,7 @@ export default function CollectionAssistantPanel({
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder={`Ask about ${series.name}, finishes, project fit, or package logic...`}
+              placeholder={t("askPlaceholder", { series: series.name })}
               className="h-11 min-w-0 flex-1 border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal"
             />
             <button
@@ -299,7 +296,7 @@ export default function CollectionAssistantPanel({
               disabled={loading || !input.trim()}
               className="h-11 bg-charcoal px-5 text-[9px] font-medium uppercase tracking-[0.14em] text-white transition hover:bg-black disabled:opacity-30"
             >
-              Ask
+              {t("ask")}
             </button>
           </form>
         </div>

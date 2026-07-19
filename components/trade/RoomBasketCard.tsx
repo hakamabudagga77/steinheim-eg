@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { formatPrice, type Finish, type Product, type Variant } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
 import type { TradeProjectItem } from "@/lib/trade-project";
@@ -23,6 +24,7 @@ export function ProjectItemRow({
   onRemove: () => void;
   onQuantityChange: (quantity: number) => void;
 }) {
+  const t = useTranslations("roomBasketCard");
   const img = getProductImage(product.slug, variant.finish);
   return (
     <motion.div
@@ -47,7 +49,7 @@ export function ProjectItemRow({
               {inStock !== undefined && (
                 <span className={`mt-1 inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${inStock ? "text-emerald-600" : "text-red-400"}`}>
                   <span className={`h-1 w-1 rounded-full ${inStock ? "bg-emerald-500" : "bg-red-400"}`} />
-                  {inStock ? "In stock" : "Out of stock"}
+                  {inStock ? t("inStock") : t("outOfStock")}
                 </span>
               )}
             </div>
@@ -55,7 +57,7 @@ export function ProjectItemRow({
               type="button"
               onClick={onRemove}
               className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-              aria-label="Remove"
+              aria-label={t("remove")}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M18 6L6 18M6 6l12 12" />
@@ -113,6 +115,7 @@ export function RoomBasketCard({
   onRemoveItem: (slug: string, finish: string) => void;
   onQuantityChange: (slug: string, finish: string, quantity: number) => void;
 }) {
+  const t = useTranslations("roomBasketCard");
   const totalUnits = itemRows.reduce((sum, row) => sum + row.item.quantity, 0);
   const totalValue = itemRows.reduce((sum, row) => sum + row.variant.price * row.item.quantity, 0);
 
@@ -122,7 +125,7 @@ export function RoomBasketCard({
         <p className="truncate text-[13px] font-medium text-charcoal">{title}</p>
         {summary && <p className="mt-0.5 text-[10px] text-warm-gray">{summary}</p>}
         {itemRows.length > 0 && (
-          <p className="mt-0.5 text-[10px] text-warm-gray/70">{totalUnits} units · {formatPrice(totalValue)}</p>
+          <p className="mt-0.5 text-[10px] text-warm-gray/70">{t("unitsAndValue", { count: totalUnits, value: formatPrice(totalValue) })}</p>
         )}
       </div>
       {itemRows.length > 0 && (

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
@@ -35,6 +35,7 @@ export default async function ProjectReferencePage({
 }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("projectDetail");
 
   const project = getProjectReference(slug);
   if (!project) notFound();
@@ -74,11 +75,11 @@ export default async function ProjectReferencePage({
           {/* Breadcrumb — Gessi style top-left */}
           <div className="absolute left-0 right-0 top-24 z-10 px-6 sm:px-10 lg:top-28 lg:px-16">
             <p className="text-[13px] text-white/70">
-              <Link href="/" className="transition hover:text-white">Home</Link>
+              <Link href="/" className="transition hover:text-white">{t("breadcrumb.home")}</Link>
               <span className="px-2 text-white/40">·</span>
-              <Link href="/projects" className="transition hover:text-white">Projects</Link>
+              <Link href="/projects" className="transition hover:text-white">{t("breadcrumb.projects")}</Link>
               <span className="px-2 text-white/40">·</span>
-              <span>References</span>
+              <span>{t("breadcrumb.references")}</span>
               <span className="px-2 text-white/40">·</span>
               <span className="text-white/90">{project.name}</span>
             </p>
@@ -101,15 +102,15 @@ export default async function ProjectReferencePage({
           <div className="mx-auto grid max-w-[1780px] gap-14 lg:grid-cols-[0.42fr_0.58fr]">
             <div className="grid content-start gap-12 text-[18px] leading-[1.55]">
               <div>
-                <p className="text-[15px] font-semibold">Sector</p>
+                <p className="text-[15px] font-semibold">{t("sector")}</p>
                 <p className="mt-3 text-white/72">{project.sector}</p>
               </div>
               <div>
-                <p className="text-[15px] font-semibold">Designer</p>
+                <p className="text-[15px] font-semibold">{t("designer")}</p>
                 <p className="mt-3 text-white/72">{project.designer}</p>
               </div>
               <div>
-                <p className="text-[15px] font-semibold">Steinheim collection</p>
+                <p className="text-[15px] font-semibold">{t("collection")}</p>
                 <Link
                   href={`/collections/${project.collectionSlug}`}
                   className="mt-3 inline-block text-white/72 underline decoration-white/25 underline-offset-4 transition hover:text-white hover:decoration-white/60"
@@ -118,11 +119,11 @@ export default async function ProjectReferencePage({
                 </Link>
               </div>
               <div>
-                <p className="text-[15px] font-semibold">Finish direction</p>
+                <p className="text-[15px] font-semibold">{t("finishDirection")}</p>
                 <p className="mt-3 text-white/72">{project.finish}</p>
               </div>
               <div className="border-t border-white/12 pt-8">
-                <p className="text-[15px] font-semibold">Published evidence</p>
+                <p className="text-[15px] font-semibold">{t("publishedEvidence")}</p>
                 <p className="mt-3 text-[15px] leading-[1.75] text-white/55">{project.note}</p>
               </div>
             </div>
@@ -158,12 +159,12 @@ export default async function ProjectReferencePage({
               />
             </div>
             <div className="lg:pt-16">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/45">Published reference note</p>
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/45">{t("publishedNote")}</p>
               <p className="mt-8 max-w-3xl text-[20px] leading-[1.75] text-white/78">
                 {project.body}
               </p>
               <p className="mt-8 max-w-2xl text-[14px] leading-[1.7] text-white/42">
-                Project visual shown from Steinheim Egypt&apos;s public project references. Specification details should be confirmed directly with the Steinheim Egypt trade team.
+                {t("disclaimer")}
               </p>
             </div>
           </div>
@@ -173,7 +174,7 @@ export default async function ProjectReferencePage({
         <section className="px-6 pb-24 sm:px-10 lg:px-16 lg:pb-32">
           <div className="mx-auto max-w-[1780px]">
             <div className="mb-12 flex items-end justify-between">
-              <h2 className="text-[clamp(2.4rem,5vw,5.5rem)] font-light tracking-[-0.06em]">Gallery</h2>
+              <h2 className="text-[clamp(2.4rem,5vw,5.5rem)] font-light tracking-[-0.06em]">{t("gallery")}</h2>
               <div className="h-px w-28 bg-white/42" />
             </div>
             <div className={`grid gap-8 ${galleryGridCols}`}>
@@ -197,13 +198,13 @@ export default async function ProjectReferencePage({
         <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-16">
           <div className="mx-auto flex max-w-[1780px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <Link href="/projects" className="text-[13px] text-white/55 transition hover:text-white">
-              Back to all projects
+              {t("backToAll")}
             </Link>
             <Link
               href="/trade"
               className="inline-flex h-12 w-fit items-center rounded-full bg-white px-8 text-[13px] text-black transition hover:bg-white/82"
             >
-              Build a project schedule
+              {t("buildSchedule")}
             </Link>
           </div>
         </section>

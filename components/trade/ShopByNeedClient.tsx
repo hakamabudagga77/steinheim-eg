@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
 import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
@@ -17,9 +18,10 @@ import { getProductsByType } from "@/lib/utils";
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
 
 export default function ShopByNeedClient() {
+  const t = useTranslations("shopByNeed");
   const { project, addItem } = useTradeProject();
   const hasProject = hasActiveRoomNeeds(project);
-  const displayName = project.details.projectName || "your project";
+  const displayName = project.details.projectName || t("yourProject");
   const [liveData, setLiveData] = useState<Record<string, { variants: LiveVariants }>>({});
 
   useEffect(() => {
@@ -57,37 +59,37 @@ export default function ShopByNeedClient() {
     addItem(slug, finish, quantity, target ? {
       scopeId: target.scopeId,
       scopeName: target.roomLabel,
-      scopeSummary: `${target.count} ${target.count === 1 ? "room" : "rooms"}`,
+      scopeSummary: t("roomSummary", { count: target.count }),
     } : undefined);
   }
 
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div dir="ltr" className="px-5 pb-4 pt-[124px] sm:px-8 lg:px-16 text-left">
+        <div className="px-5 pb-4 pt-[124px] sm:px-8 lg:px-16 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">For {displayName}</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("forProject", { name: displayName })}</p>
             <h1
               className="mt-4 max-w-3xl font-heading text-[clamp(2.4rem,5.5vw,5.6rem)] font-light leading-[0.92] tracking-[-0.045em]"
               style={{ fontStyle: "italic" }}
             >
-              Shop by need.
+              {t("headline")}
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-[1.85] text-black/50">
-              Everything {displayName} still needs, grouped by product type across every collection.
+              {t("body", { name: displayName })}
             </p>
           </div>
         </div>
 
         {!hasProject ? (
-          <section dir="ltr" className="px-5 py-24 sm:px-8 lg:px-16">
+          <section className="px-5 py-24 sm:px-8 lg:px-16">
             <div className="mx-auto max-w-[1780px]">
               <div className="border border-black/10 bg-white p-10 text-center sm:p-16">
                 <p className="font-heading text-[22px] leading-tight text-black" style={{ fontStyle: "italic" }}>
-                  Set up your project first
+                  {t("setupFirst")}
                 </p>
                 <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-black/50">
-                  Tell us your rooms and what each one needs — then this page fills in with exactly the products you&apos;re looking for.
+                  {t("setupFirstBody")}
                 </p>
                 <div className="mt-6 flex justify-center">
                   <TradeSetupOpenButton variant="primary" />
@@ -107,7 +109,7 @@ export default function ShopByNeedClient() {
               >
                 <div className="mx-auto max-w-[1780px]">
                   <div className="mb-16 text-center">
-                    <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Shop</p>
+                    <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("shop")}</p>
                     <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
                       {REQUIREMENT_TYPE_LABELS[type]}
                     </h2>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
   sanitizeTradeProject,
@@ -11,6 +12,7 @@ import {
 type State = "loading" | "success" | "error";
 
 export default function TradeRestoreClient({ id, locale }: { id: string; locale: string }) {
+  const t = useTranslations("tradeRestore");
   const [state, setState] = useState<State>("loading");
   const [projectName, setProjectName] = useState("");
 
@@ -35,7 +37,7 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
         const workspace = { activeProjectId: project.id, projects: [project, ...others].slice(0, 25) };
         window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
 
-        setProjectName(project.details.projectName || "your project");
+        setProjectName(project.details.projectName || t("yourProject"));
         setState("success");
         window.setTimeout(() => {
           window.location.href = `/${locale}/trade`;
@@ -54,7 +56,7 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.25" />
             <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
-          <p className="mt-5 text-[13px] text-warm-gray">Restoring your project…</p>
+          <p className="mt-5 text-[13px] text-warm-gray">{t("restoring")}</p>
         </>
       )}
 
@@ -66,10 +68,10 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
             </svg>
           </div>
           <h1 className="mt-8 font-heading text-[28px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
-            Welcome back
+            {t("welcomeBack")}
           </h1>
           <p className="mt-3 max-w-[320px] text-[14px] leading-relaxed text-warm-gray">
-            {projectName} — your products, rooms, and messages with Steinheim are restored. Taking you there now…
+            {t("restoredBody", { name: projectName })}
           </p>
         </>
       )}
@@ -77,16 +79,16 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
       {state === "error" && (
         <>
           <h1 className="font-heading text-[26px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
-            We couldn&apos;t find that project
+            {t("notFoundTitle")}
           </h1>
           <p className="mt-3 max-w-[320px] text-[14px] leading-relaxed text-warm-gray">
-            This link may have expired or the project could not be loaded. You can start a new project or reach out directly.
+            {t("notFoundBody")}
           </p>
           <Link
             href="/trade"
             className="mt-8 flex h-[46px] items-center justify-center bg-charcoal px-8 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
           >
-            Go to Trade Studio
+            {t("goToTradeStudio")}
           </Link>
         </>
       )}
