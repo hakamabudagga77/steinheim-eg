@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 type StoryCard = { eyebrow: string; title: string; body: string; image: string };
 
@@ -32,6 +33,7 @@ function StoryCard({
   index: number;
   onSelectStory: (title: string) => void;
 }) {
+  const t = useTranslations("overviewCardsSpread");
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -62,7 +64,7 @@ function StoryCard({
           onClick={() => onSelectStory(card.title)}
           className="mt-4 inline-flex border-b border-white pb-1 text-[14px] font-medium transition hover:text-white/70 cursor-pointer lg:text-[16px]"
         >
-          Discover more
+          {t("discoverMore")}
         </button>
       </div>
     </motion.article>

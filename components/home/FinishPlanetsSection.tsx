@@ -9,16 +9,17 @@ import { Link } from "@/i18n/navigation";
 const BASE = "/images/steinheim/finish-planets";
 
 const discs = [
-  { id: "chrome", label: "Chrome", tag: "Standard", left: "5%", top: "30%", w: "13.5%", rotate: -6 },
-  { id: "brushed-nickel", label: "Brushed Nickel", tag: "Standard", left: "19.5%", top: "24%", w: "13.5%", rotate: -3 },
-  { id: "matte-black", label: "Matte Black", tag: "PVD", left: "35%", top: "20%", w: "14.5%", rotate: 0 },
-  { id: "brushed-gold", label: "Brushed Gold", tag: "PVD", left: "51%", top: "20%", w: "14.5%", rotate: 2 },
-  { id: "coffee-gold", label: "Coffee Gold", tag: "PVD", left: "66.5%", top: "24%", w: "13.5%", rotate: 4 },
-  { id: "metal-gun", label: "Metal Gun", tag: "PVD", left: "81%", top: "30%", w: "13.5%", rotate: 6 },
+  { id: "chrome", label: "Chrome", tagKey: "standard" as const, left: "5%", top: "30%", w: "13.5%", rotate: -6 },
+  { id: "brushed-nickel", label: "Brushed Nickel", tagKey: "standard" as const, left: "19.5%", top: "24%", w: "13.5%", rotate: -3 },
+  { id: "matte-black", label: "Matte Black", tagKey: "pvd" as const, left: "35%", top: "20%", w: "14.5%", rotate: 0 },
+  { id: "brushed-gold", label: "Brushed Gold", tagKey: "pvd" as const, left: "51%", top: "20%", w: "14.5%", rotate: 2 },
+  { id: "coffee-gold", label: "Coffee Gold", tagKey: "pvd" as const, left: "66.5%", top: "24%", w: "13.5%", rotate: 4 },
+  { id: "metal-gun", label: "Metal Gun", tagKey: "pvd" as const, left: "81%", top: "30%", w: "13.5%", rotate: 6 },
 ];
 
 export default function FinishPlanetsSection() {
   const t = useTranslations("home.finishes");
+  const tt = useTranslations("finishTags");
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-8%" });
 
@@ -137,7 +138,7 @@ export default function FinishPlanetsSection() {
                   {disc.label}
                 </p>
                 <p className="mt-1.5 text-[8px] uppercase tracking-[0.2em] text-white/20 sm:text-[9px]">
-                  {disc.tag}
+                  {tt(disc.tagKey)}
                 </p>
               </motion.div>
             </motion.div>
@@ -171,7 +172,7 @@ export default function FinishPlanetsSection() {
                 {disc.label}
               </p>
               <p className="mt-1 text-center text-[7px] uppercase tracking-[0.15em] text-white/20">
-                {disc.tag}
+                {tt(disc.tagKey)}
               </p>
             </motion.div>
           ))}
