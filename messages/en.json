@@ -1211,6 +1211,19 @@
   "projectsCarousel": {
     "discoverWith": "Discover projects with <c>{collection}</c>"
   },
+  "siteSearch": {
+    "placeholder": "Search products, collections, pages...",
+    "noResults": "No results for \"{query}\"",
+    "hint": "Search the whole site — products, collections, and pages",
+    "groups": {
+      "product": "Products",
+      "collection": "Collections",
+      "page": "Pages"
+    },
+    "shortcutHint": "to search",
+    "closeHint": "to close",
+    "navigateHint": "to navigate"
+  },
   "cartDrawer": {
     "title": "Your cart",
     "noItems": "No items yet",

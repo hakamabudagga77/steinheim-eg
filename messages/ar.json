@@ -1211,6 +1211,19 @@
   "projectsCarousel": {
     "discoverWith": "اكتشف مشروعات بمجموعة <c>{collection}</c>"
   },
+  "siteSearch": {
+    "placeholder": "ابحث عن منتجات، مجموعات، صفحات...",
+    "noResults": "لا نتائج لـ «{query}»",
+    "hint": "ابحث في الموقع كله — المنتجات والمجموعات والصفحات",
+    "groups": {
+      "product": "المنتجات",
+      "collection": "المجموعات",
+      "page": "الصفحات"
+    },
+    "shortcutHint": "للبحث",
+    "closeHint": "للإغلاق",
+    "navigateHint": "للتنقل"
+  },
   "cartDrawer": {
     "title": "سلة مشترياتك",
     "noItems": "لا توجد منتجات بعد",
