@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
@@ -9,6 +10,7 @@ import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useCart } from "@/components/cart/CartContext";
 
 export default function WishlistDrawer({ locale }: { locale: string }) {
+  const t = useTranslations("wishlistDrawer");
   const isArabic = locale === "ar";
   const { wishlist, open, setOpen, removeItem, itemCount } = useWishlist();
   const { addItem: addToCart } = useCart();
@@ -52,16 +54,16 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
             <header className="shrink-0 border-b border-charcoal/8 px-5 sm:px-7 py-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-heading text-[26px] leading-tight">Your wishlist</h2>
+                  <h2 className="font-heading text-[26px] leading-tight">{t("title")}</h2>
                   <p className="mt-0.5 text-[11px] text-warm-gray">
-                    {itemCount === 0 ? "No items yet" : `${itemCount} ${itemCount === 1 ? "item" : "items"}`}
+                    {itemCount === 0 ? t("noItems") : t("itemCount", { count: itemCount })}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   className="flex h-8 w-8 items-center justify-center text-warm-gray transition hover:text-charcoal"
-                  aria-label="Close wishlist"
+                  aria-label={t("close")}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -78,16 +80,16 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                   </div>
-                  <h3 className="mt-6 font-heading text-[22px]">Your wishlist is empty</h3>
+                  <h3 className="mt-6 font-heading text-[22px]">{t("emptyTitle")}</h3>
                   <p className="mt-3 max-w-[240px] text-[13px] leading-relaxed text-warm-gray">
-                    Save products you love and come back to them anytime.
+                    {t("emptyBody")}
                   </p>
                   <Link
                     href="/collections"
                     onClick={() => setOpen(false)}
                     className="mt-8 inline-flex h-11 items-center px-7 text-[10px] font-medium uppercase tracking-[0.15em] bg-charcoal text-white transition hover:bg-black"
                   >
-                    Browse collections
+                    {t("browse")}
                   </Link>
                 </div>
               ) : (
@@ -133,7 +135,7 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
                                   type="button"
                                   onClick={() => removeItem(item.slug, item.finish)}
                                   className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-                                  aria-label="Remove"
+                                  aria-label={t("remove")}
                                 >
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                     <path d="M18 6L6 18M6 6l12 12" />
@@ -153,7 +155,7 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
                                   }}
                                   className="rounded-full border border-charcoal/15 px-4 py-1.5 text-[11px] font-medium text-charcoal transition hover:border-charcoal hover:bg-charcoal hover:text-white"
                                 >
-                                  Move to cart
+                                  {t("addToCart")}
                                 </button>
                               </div>
                             </div>

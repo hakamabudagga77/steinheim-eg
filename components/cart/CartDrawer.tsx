@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
@@ -11,6 +12,7 @@ import { useCart } from "@/components/cart/CartContext";
 const WHATSAPP_NUMBER = "201223998124";
 
 export default function CartDrawer({ locale }: { locale: string }) {
+  const t = useTranslations("cartDrawer");
   const isArabic = locale === "ar";
   const { cart, open, setOpen, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const finishes = useMemo(() => getAllFinishes(), []);
@@ -94,18 +96,16 @@ export default function CartDrawer({ locale }: { locale: string }) {
             <header className="shrink-0 border-b border-charcoal/8 px-5 sm:px-7 py-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-heading text-[26px] leading-tight">Your cart</h2>
+                  <h2 className="font-heading text-[26px] leading-tight">{t("title")}</h2>
                   <p className="mt-0.5 text-[11px] text-warm-gray">
-                    {itemCount === 0
-                      ? "No items yet"
-                      : `${itemCount} ${itemCount === 1 ? "item" : "items"}`}
+                    {itemCount === 0 ? t("noItems") : t("itemCount", { count: itemCount })}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   className="flex h-8 w-8 items-center justify-center text-warm-gray transition hover:text-charcoal"
-                  aria-label="Close cart"
+                  aria-label={t("close")}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -123,30 +123,30 @@ export default function CartDrawer({ locale }: { locale: string }) {
                       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
                     </svg>
                   </div>
-                  <h3 className="mt-6 font-heading text-[22px]">Your cart is empty</h3>
+                  <h3 className="mt-6 font-heading text-[22px]">{t("emptyTitle")}</h3>
                   <p className="mt-3 max-w-[240px] text-[13px] leading-relaxed text-warm-gray">
-                    Browse our collections and add products you love.
+                    {t("emptyBody")}
                   </p>
                   <Link
                     href="/collections"
                     onClick={() => setOpen(false)}
                     className="mt-8 inline-flex h-11 items-center px-7 text-[10px] font-medium uppercase tracking-[0.15em] bg-charcoal text-white transition hover:bg-black"
                   >
-                    Browse collections
+                    {t("browse")}
                   </Link>
                 </div>
               ) : (
                 <div className="px-5 sm:px-7 py-5">
                   <div className="flex items-center justify-between pb-3">
                     <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray">
-                      {rows.length} {rows.length === 1 ? "product" : "products"}
+                      {t("productCount", { count: rows.length })}
                     </p>
                     <button
                       type="button"
                       onClick={clearCart}
                       className="text-[9px] uppercase tracking-[0.12em] text-warm-gray/50 transition hover:text-charcoal"
                     >
-                      Clear all
+                      {t("clearAll")}
                     </button>
                   </div>
 
@@ -197,7 +197,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                                   type="button"
                                   onClick={() => removeItem(item.slug, item.finish)}
                                   className="mt-0.5 text-warm-gray/40 transition hover:text-charcoal"
-                                  aria-label="Remove"
+                                  aria-label={t("remove")}
                                 >
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                     <path d="M18 6L6 18M6 6l12 12" />
@@ -255,7 +255,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
               <footer className="shrink-0 border-t border-charcoal/8 bg-white px-5 sm:px-7 py-5">
                 <div className="flex items-center justify-between pb-4">
                   <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-warm-gray">
-                    Subtotal
+                    {t("subtotal")}
                   </p>
                   <p className="font-heading text-[22px] text-charcoal">
                     {formatPrice(subtotal)}
@@ -263,7 +263,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                 </div>
 
                 <p className="pb-4 text-[10px] leading-relaxed text-warm-gray/60">
-                  Shipping and taxes calculated at checkout. Free delivery within Greater Cairo for orders above LE 15,000.
+                  {t("shippingNote")}
                 </p>
 
                 <button
@@ -295,9 +295,9 @@ export default function CartDrawer({ locale }: { locale: string }) {
                   }}
                   className="flex h-[50px] w-full items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-50"
                 >
-                  {checkingOut ? "Preparing checkout…" : "Checkout"}
+                  {checkingOut ? t("preparingCheckout") : t("checkout")}
                   {!checkingOut && (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   )}
@@ -312,11 +312,11 @@ export default function CartDrawer({ locale }: { locale: string }) {
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                     <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.257-.154-2.871.853.853-2.871-.154-.257A8 8 0 1112 20z" />
                   </svg>
-                  Or enquire via WhatsApp
+                  {t("whatsappEnquire")}
                 </button>
 
                 <p className="mt-3 text-center text-[9px] text-warm-gray/50">
-                  Checkout goes to Steinheim Egypt&apos;s secure payment page
+                  {t("secureNote")}
                 </p>
               </footer>
             )}
