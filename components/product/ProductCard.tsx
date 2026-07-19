@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -41,17 +41,19 @@ function ProductCard({
 
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
   // sets this card's default, but the shopper can still pick a different one for this card alone.
-  useEffect(() => {
+  const [prevGroupFinish, setPrevGroupFinish] = useState(groupFinish);
+  if (groupFinish !== prevGroupFinish) {
+    setPrevGroupFinish(groupFinish);
     if (groupFinish) setSelectedFinish(groupFinish);
-  }, [groupFinish]);
+  }
 
-  useEffect(() => {
-    if (!roomOptions || roomOptions.length === 0) return;
-    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+  const [prevRoomOptions, setPrevRoomOptions] = useState(roomOptions);
+  if (roomOptions !== prevRoomOptions) {
+    setPrevRoomOptions(roomOptions);
+    if (roomOptions && roomOptions.length > 0 && !roomOptions.some((group) => group.scopeId === scopeChoice)) {
       setScopeChoice(roomOptions[0].scopeId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomOptions]);
+  }
 
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const liveVariant = liveVariants?.find((v) => v.finish === variant.finish);

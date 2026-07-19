@@ -85,14 +85,17 @@ export default function CommandPalette() {
   }, [commands, query]);
 
   useEffect(() => {
-    setActiveIndex(0);
-  }, [query, open]);
-
-  useEffect(() => {
     function handleKeydown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen((v) => !v);
+        setOpen((v) => {
+          const next = !v;
+          if (next) {
+            setQuery("");
+            setActiveIndex(0);
+          }
+          return next;
+        });
         return;
       }
       if (e.key === "Escape" && open) {
@@ -105,10 +108,15 @@ export default function CommandPalette() {
 
   useEffect(() => {
     if (open) {
-      setQuery("");
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
+
+  function openPalette() {
+    setQuery("");
+    setActiveIndex(0);
+    setOpen(true);
+  }
 
   function handleListKeydown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
@@ -133,7 +141,7 @@ export default function CommandPalette() {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={openPalette}
         className="flex items-center gap-2.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-left text-[12px] text-white/35 transition hover:border-white/[0.12] hover:text-white/55"
       >
         <Search className="h-3.5 w-3.5 shrink-0" />
@@ -164,7 +172,10 @@ export default function CommandPalette() {
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setActiveIndex(0);
+                  }}
                   onKeyDown={handleListKeydown}
                   placeholder="Go to a section or run an action…"
                   className="flex-1 bg-transparent text-[14px] text-white outline-none placeholder:text-white/25"

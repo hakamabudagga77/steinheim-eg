@@ -31,12 +31,7 @@ jobs:
         run: npm ci
 
       - name: Lint
-        # Reports only for now: the repo currently has ~14 pre-existing
-        # react-hooks/set-state-in-effect findings (a newer, stricter rule)
-        # that need a deliberate one-by-one review rather than a blind
-        # mass refactor. Typecheck and build below remain hard gates.
         run: npm run lint
-        continue-on-error: true
 
       - name: Typecheck
         run: npm run typecheck

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -54,13 +54,15 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
     (item) => item.slug === product.slug && item.finish === variant.finish && (item.scopeId || "") === (scopeChoice || "")
   );
 
-  useEffect(() => {
-    if (roomOptions.length === 0) return;
-    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+  const [prevScopeSlug, setPrevScopeSlug] = useState(product.slug);
+  const [prevRoomPlan, setPrevRoomPlan] = useState(project.roomPlan);
+  if (product.slug !== prevScopeSlug || project.roomPlan !== prevRoomPlan) {
+    setPrevScopeSlug(product.slug);
+    setPrevRoomPlan(project.roomPlan);
+    if (roomOptions.length > 0 && !roomOptions.some((group) => group.scopeId === scopeChoice)) {
       setScopeChoice(roomOptions[0].scopeId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.slug, project.roomPlan]);
+  }
 
   function addToProposal() {
     if (isInProposal) {

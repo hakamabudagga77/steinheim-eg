@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
@@ -43,9 +43,18 @@ export default function SmartRoomCalculator() {
   const t = useTranslations("smartRoomCalculator");
   const { project, setRoomPlan, setOpen, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
   const [step, setStep] = useState<Step>(0);
-  const [counts, setCounts] = useState<Record<RoomKey, number>>(emptyCounts);
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [customRooms, setCustomRooms] = useState<CustomRoomDraft[]>([]);
+  const [counts, setCounts] = useState<Record<RoomKey, number>>(() => {
+    const plan = project.roomPlan;
+    if (!plan) return emptyCounts;
+    const fixed = plan.groups.filter((group) => !group.isCustom);
+    return Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>;
+  });
+  const [activePresetId, setActivePresetId] = useState<string | null>(() => project.roomPlan?.presetId ?? null);
+  const [customRooms, setCustomRooms] = useState<CustomRoomDraft[]>(() =>
+    (project.roomPlan?.groups ?? [])
+      .filter((group) => group.isCustom)
+      .map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count }))
+  );
 
   const persona = project.persona;
   const personaConfig = persona ? PERSONA_META[persona] : null;
@@ -58,15 +67,18 @@ export default function SmartRoomCalculator() {
   );
 
   // Pre-fill from an existing room plan so "Edit property composition" doesn't reset to zero.
-  useEffect(() => {
+  const [prevRoomPlan, setPrevRoomPlan] = useState(project.roomPlan);
+  if (project.roomPlan !== prevRoomPlan) {
+    setPrevRoomPlan(project.roomPlan);
     const plan = project.roomPlan;
-    if (!plan) return;
-    const fixed = plan.groups.filter((group) => !group.isCustom);
-    const custom = plan.groups.filter((group) => group.isCustom);
-    setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
-    setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
-    setActivePresetId(plan.presetId);
-  }, [project.roomPlan]);
+    if (plan) {
+      const fixed = plan.groups.filter((group) => !group.isCustom);
+      const custom = plan.groups.filter((group) => group.isCustom);
+      setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
+      setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
+      setActivePresetId(plan.presetId);
+    }
+  }
 
   const totalRooms = Object.values(counts).reduce((sum, value) => sum + value, 0) + customRooms.reduce((sum, r) => sum + r.count, 0);
 

@@ -631,23 +631,22 @@ export default function TradeAdminBoard() {
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
 
   useEffect(() => {
+    async function loadLeads() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/trade/leads");
+        if (!res.ok) throw new Error("Could not load leads.");
+        const data = await res.json();
+        setLeads(data.leads);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      } finally {
+        setLoading(false);
+      }
+    }
     void loadLeads();
   }, []);
-
-  async function loadLeads() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/trade/leads");
-      if (!res.ok) throw new Error("Could not load leads.");
-      const data = await res.json();
-      setLeads(data.leads);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleUpdate(id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string }) {
     const res = await fetch("/api/trade/leads", {
