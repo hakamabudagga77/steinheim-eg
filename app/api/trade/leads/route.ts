@@ -5,39 +5,42 @@ import { getTradeLead, listTradeLeads, saveTradeLead, updateTradeLead } from "@/
 import { sendTradeLeadConfirmationEmail, sendTradeLeadNotification, sendQuoteReadyNotification, sendStatusUpdateNotification } from "@/lib/server/trade-lead-email";
 import { analyzeProject } from "@/lib/server/trade-lead-intelligence";
 import { isAdminRequest } from "@/lib/server/admin-session";
+import { checkRateLimit } from "@/lib/server/rate-limit";
+import { redisSetEx, redisGet } from "@/lib/server/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const submitBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-}
-
-function canSubmit(request: Request) {
-  const key = clientKey(request);
-  const now = Date.now();
-  const bucket = submitBuckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    submitBuckets.set(key, { count: 1, resetAt: now + 60 * 60 * 1000 });
-    return true;
-  }
-  if (bucket.count >= 5) return false;
-  bucket.count += 1;
-  return true;
-}
-
 export async function POST(request: Request) {
-  if (!canSubmit(request)) return Response.json({ error: "Too many submissions." }, { status: 429 });
+  if (!(await checkRateLimit(request, "trade-leads", 5, 60 * 60))) {
+    return Response.json({ error: "Too many submissions." }, { status: 429 });
+  }
   if (Number(request.headers.get("content-length") || 0) > 120_000) {
     return Response.json({ error: "Request is too large." }, { status: 413 });
   }
-  const body = await request.json().catch(() => null) as { project?: unknown; locale?: unknown; source?: unknown; website?: unknown } | null;
+  const body = await request.json().catch(() => null) as { project?: unknown; locale?: unknown; source?: unknown; website?: unknown; idempotencyKey?: unknown } | null;
   if (body?.website) return Response.json({ ok: true });
   const project = sanitizeTradeProject(body?.project);
   if (!project || !project.items.length || !project.details.projectName || !project.details.contactName || !/^\S+@\S+\.\S+$/.test(project.details.email)) {
     return Response.json({ error: "Project name, contact, email, and at least one valid product are required." }, { status: 400 });
+  }
+
+  // A client-generated idempotency key lets a retried submission (double
+  // click, flaky network, browser back/forward) return the original result
+  // instead of creating a second lead and sending duplicate notification
+  // emails. The key is only meaningful for a few minutes around the
+  // original request.
+  const idempotencyKey = typeof body?.idempotencyKey === "string" ? body.idempotencyKey.slice(0, 100) : null;
+  const idempotencyRedisKey = idempotencyKey ? `steinheim:idempotency:trade-lead:${idempotencyKey}` : null;
+  if (idempotencyRedisKey) {
+    const cached = await redisGet(idempotencyRedisKey).catch(() => null);
+    if (cached) {
+      try {
+        return Response.json(JSON.parse(cached));
+      } catch {
+        // Fall through and process normally if the cached payload is unreadable.
+      }
+    }
   }
 
   const now = new Date();
@@ -83,7 +86,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Trade lead confirmation email failed:", error);
   }
-  return Response.json({ ok: true, id: lead.id, reference: lead.reference, priority: lead.priority, completion: lead.completion });
+  const responseBody = { ok: true, id: lead.id, reference: lead.reference, priority: lead.priority, completion: lead.completion };
+  if (idempotencyRedisKey) {
+    await redisSetEx(idempotencyRedisKey, 10 * 60, JSON.stringify(responseBody)).catch(() => {});
+  }
+  return Response.json(responseBody);
 }
 
 export async function GET(request: Request) {

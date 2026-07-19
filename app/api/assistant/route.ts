@@ -3,6 +3,7 @@ import {
   type AssistantMessage,
 } from "@/lib/assistant/steinheim-assistant";
 import { streamAssistant } from "@/lib/assistant/claude-assistant";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -25,6 +26,14 @@ function chunkText(text: string) {
 }
 
 export async function POST(request: Request) {
+  // The AI path calls a metered, paid model, so this is the most
+  // expensive endpoint on the site to leave unprotected. 20 requests per
+  // 10 minutes comfortably covers a real conversation while blocking
+  // scripted abuse.
+  if (!(await checkRateLimit(request, "assistant", 20, 10 * 60))) {
+    return Response.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+  }
+
   let body: { messages?: AssistantMessage[]; locale?: string; projectContext?: string } = {};
 
   try {
