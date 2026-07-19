@@ -262,7 +262,8 @@ export default function Navigation({ locale }: { locale: string }) {
               )}
             </button>
             <Link
-              href={`/${locale === "en" ? "ar" : "en"}`}
+              href={pathname}
+              locale={locale === "en" ? "ar" : "en"}
               className={`hidden items-center gap-2 text-[12px] font-medium uppercase transition-colors duration-300 lg:flex ${
                 useWhite ? "text-white/70 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
               }`}
