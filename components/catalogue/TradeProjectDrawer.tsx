@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ScaleIn, StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
@@ -57,6 +57,11 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     duplicateProject,
   } = useTradeProject();
   const [step, setStep] = useState<"board" | "details" | "sent" | "messages" | "status" | "quote" | "samples" | "documents">("board");
+  // Generated once per submit attempt and reused across retries (e.g. a
+  // flaky network) so the server can dedupe if our fetch succeeded but the
+  // response never reached us. Cleared once the lead is submitted so a
+  // genuinely new project gets a fresh key.
+  const submitIdempotencyKeyRef = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
@@ -275,11 +280,15 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     setError(null);
     setBusy(true);
 
+    if (!submitIdempotencyKeyRef.current) {
+      submitIdempotencyKeyRef.current = `${project.id}-${crypto.randomUUID()}`;
+    }
+
     try {
       const res = await fetch("/api/trade/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project, locale, source: "project-board" }),
+        body: JSON.stringify({ project, locale, source: "project-board", idempotencyKey: submitIdempotencyKeyRef.current }),
       });
 
       if (!res.ok) {
@@ -288,6 +297,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       }
 
       const data = await res.json();
+      submitIdempotencyKeyRef.current = null;
       markSubmitted(data.id);
       setSentRef(data.reference);
       setStep("sent");
