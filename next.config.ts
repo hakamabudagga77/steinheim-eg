@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
@@ -12,7 +13,7 @@ const CONTENT_SECURITY_POLICY = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com",
+  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
   "frame-src 'self' https:",
   "media-src 'self' https:",
   "object-src 'none'",
@@ -54,4 +55,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Source-map upload (for readable stack traces in Sentry) needs
+// SENTRY_ORG/SENTRY_PROJECT/SENTRY_AUTH_TOKEN, which aren't set up yet —
+// the plugin no-ops that step gracefully without them, so error capture
+// itself (driven by the DSN alone) works either way.
+export default withSentryConfig(withNextIntl(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  widenClientFileUpload: true,
+});
