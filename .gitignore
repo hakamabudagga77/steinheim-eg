@@ -44,3 +44,8 @@ next-env.d.ts
 
 # local runtime data (trade leads fallback store)
 data/runtime/
+
+# scratch / one-off audit output — never commit working files here
+/tmp/
+/tmp_*/
+tmp_*.py
