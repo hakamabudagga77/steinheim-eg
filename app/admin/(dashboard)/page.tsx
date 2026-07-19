@@ -105,9 +105,17 @@ export default function AdminDashboardPage() {
   const [leads, setLeads] = useState<ContactLead[] | null>(null);
   const [ga4, setGa4] = useState<GA4Summary | null>(null);
   const [ga4Error, setGa4Error] = useState(false);
+  const [asOf, setAsOf] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/orders").then((r) => (r.ok ? r.json() : null)).then((d) => d && setOrders(d.orders));
+    fetch("/api/admin/orders")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) {
+          setOrders(d.orders);
+          setAsOf(Date.now());
+        }
+      });
     fetch("/api/admin/products").then((r) => (r.ok ? r.json() : null)).then((d) => d && setProducts(d.products));
     fetch("/api/contact").then((r) => (r.ok ? r.json() : null)).then((d) => d && setLeads(d.leads));
     fetch("/api/admin/analytics?start=30daysAgo&end=today")
@@ -117,14 +125,14 @@ export default function AdminDashboardPage() {
   }, []);
 
   const last30 = useMemo(() => {
-    if (!orders) return null;
-    const cutoff = Date.now() - 29 * 86400000;
+    if (!orders || asOf === null) return null;
+    const cutoff = asOf - 29 * 86400000;
     const inRange = orders.filter((o) => new Date(o.created_at).getTime() >= cutoff);
     const counted = inRange.filter((o) => o.financial_status !== "voided");
     const revenue = counted.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
     const currency = inRange[0]?.currency ?? "EGP";
     return { count: inRange.length, revenue, currency };
-  }, [orders]);
+  }, [orders, asOf]);
 
   const revenueTrend = useMemo(() => {
     if (!orders) return [];

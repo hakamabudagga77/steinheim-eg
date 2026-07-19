@@ -27,8 +27,8 @@ interface TradeProjectContextValue {
   setOpen: (open: boolean) => void;
   setupOpen: boolean;
   setSetupOpen: (open: boolean) => void;
-  setupJustCompleted: boolean;
-  setSetupJustCompleted: (value: boolean) => void;
+  roomProgressExpanded: boolean;
+  setRoomProgressExpanded: (value: boolean) => void;
   addItem: (slug: string, finish: string, quantity?: number, meta?: Pick<TradeProjectItem, "scopeId" | "scopeName" | "scopeSummary">) => void;
   updateQuantity: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   removeItem: (slug: string, finish: string, scopeId?: string) => void;
@@ -72,7 +72,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   }));
   const [open, setOpenRaw] = useState(false);
   const [setupOpen, setSetupOpenRaw] = useState(false);
-  const [setupJustCompleted, setSetupJustCompleted] = useState(false);
+  const [roomProgressExpanded, setRoomProgressExpanded] = useState(false);
   const setOpen = useCallback((value: boolean) => {
     setOpenRaw(value);
     if (value) setSetupOpenRaw(false);
@@ -157,11 +157,14 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
 
   const submittedLeadId = project.submittedLeadId;
 
+  const [prevSubmittedLeadId, setPrevSubmittedLeadId] = useState(submittedLeadId);
+  if (submittedLeadId !== prevSubmittedLeadId) {
+    setPrevSubmittedLeadId(submittedLeadId);
+    if (!submittedLeadId) setUnreadMessageCount(0);
+  }
+
   useEffect(() => {
-    if (!submittedLeadId) {
-      setUnreadMessageCount(0);
-      return;
-    }
+    if (!submittedLeadId) return;
     let cancelled = false;
     async function poll() {
       try {
@@ -382,8 +385,8 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       setOpen,
       setupOpen,
       setSetupOpen,
-      setupJustCompleted,
-      setSetupJustCompleted,
+      roomProgressExpanded,
+      setRoomProgressExpanded,
       addItem,
       updateQuantity,
       removeItem,
@@ -412,7 +415,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       setOpen,
       setupOpen,
       setSetupOpen,
-      setupJustCompleted,
+      roomProgressExpanded,
       addItem,
       updateQuantity,
       removeItem,

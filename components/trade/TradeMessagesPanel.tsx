@@ -21,26 +21,24 @@ export default function TradeMessagesPanel({ leadId }: { leadId: string }) {
   const [scheduleMode, setScheduleMode] = useState<"call" | "service" | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  async function load() {
-    try {
-      const res = await fetch(`/api/trade/leads/${leadId}/messages`, { cache: "no-store" });
-      if (!res.ok) return;
-      const data = await res.json();
-      setMessages(data.messages);
-      if (data.status) setStatus(data.status);
-    } catch {
-      // Keep whatever we last had; a poll will retry shortly.
-    }
-  }
-
   useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/trade/leads/${leadId}/messages`, { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        setMessages(data.messages);
+        if (data.status) setStatus(data.status);
+      } catch {
+        // Keep whatever we last had; a poll will retry shortly.
+      }
+    }
     void load();
     // Skip polling while the tab is hidden — the first visible poll catches up.
     const interval = window.setInterval(() => {
       if (!document.hidden) void load();
     }, 15000);
     return () => window.clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leadId]);
 
   // Opening this panel counts as reading whatever Steinheim has sent so far.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
@@ -38,7 +38,7 @@ function createDraftKey() {
 export default function TradeSetupOverlay({ locale }: { locale: string }) {
   const t = useTranslations("tradeSetupOverlay");
   const isArabic = locale === "ar";
-  const { project, setRoomPlan, setupOpen, setSetupOpen, setSetupJustCompleted, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
+  const { project, setRoomPlan, setupOpen, setSetupOpen, setRoomProgressExpanded, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
   const [step, setStep] = useState<Step>(0);
   const [counts, setCounts] = useState<Record<RoomKey, number>>(emptyCounts);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
@@ -54,21 +54,22 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
     details.projectName.trim()
   );
 
-  useEffect(() => {
-    if (!setupOpen) return;
-    const plan = project.roomPlan;
-    if (!plan) return;
-    const fixed = plan.groups.filter((group) => !group.isCustom);
-    const custom = plan.groups.filter((group) => group.isCustom);
-    setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
-    setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
-    setActivePresetId(plan.presetId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setupOpen, project.roomPlan]);
-
-  useEffect(() => {
-    if (setupOpen) setStep(0);
-  }, [setupOpen]);
+  const [prevSetupOpen, setPrevSetupOpen] = useState(setupOpen);
+  const [prevRoomPlanForHydration, setPrevRoomPlanForHydration] = useState(project.roomPlan);
+  if (setupOpen !== prevSetupOpen || project.roomPlan !== prevRoomPlanForHydration) {
+    const justOpened = setupOpen !== prevSetupOpen && setupOpen;
+    setPrevSetupOpen(setupOpen);
+    setPrevRoomPlanForHydration(project.roomPlan);
+    if (setupOpen && project.roomPlan) {
+      const plan = project.roomPlan;
+      const fixed = plan.groups.filter((group) => !group.isCustom);
+      const custom = plan.groups.filter((group) => group.isCustom);
+      setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
+      setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
+      setActivePresetId(plan.presetId);
+    }
+    if (justOpened) setStep(0);
+  }
 
   const totalRooms = Object.values(counts).reduce((sum, value) => sum + value, 0) + customRooms.reduce((sum, r) => sum + r.count, 0);
 
@@ -132,7 +133,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
   function finishSetup() {
     setSetupOpen(false);
-    setSetupJustCompleted(true);
+    setRoomProgressExpanded(true);
   }
 
   return (
