@@ -25,6 +25,9 @@ const FloatingRoomProgress = dynamic(
   () => import("@/components/trade/FloatingRoomProgress"),
   { ssr: false }
 );
+const SiteSearch = dynamic(() => import("@/components/search/SiteSearch"), {
+  ssr: false,
+});
 
 export default function SiteShell({
   children,
@@ -43,6 +46,7 @@ export default function SiteShell({
         <TradeSetupOverlay locale={locale} />
         <CartDrawer locale={locale} />
         <FloatingRoomProgress locale={locale} />
+        <SiteSearch />
         <BackToTop />
         <SmoothScroll />
       </TradeProjectProvider>
