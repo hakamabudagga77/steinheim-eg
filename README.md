@@ -398,6 +398,7 @@ never imported into the application).
 
 • **Core Architect & Core Team Member** — Pi Network Ecosystem  
 • **Core Protocol & Blockchain Engineer** — Stellar Network  
+• **Core Ecosystem & Network Developer** — TAU Network  
 • **Core Ecosystem Contributor** — Ethereum Protocol & Smart Contracts  
 
 <br>
@@ -410,7 +411,6 @@ never imported into the application).
 **In collaboration with [hakamabudagga77](https://github.com/hakamabudagga77)**, who directed the product vision, brand design, and creative direction, and worked alongside Claude (Anthropic) throughout via prompt-driven pair programming to help shape this project.
 
 </div>
-
 <br>
 
 <div align="center">
