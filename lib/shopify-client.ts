@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN ?? "steinheim.myshopify.com";
 const CLIENT_ID = process.env.SHOPIFY_CLIENT_ID ?? "";
 const CLIENT_SECRET = process.env.SHOPIFY_CLIENT_SECRET ?? "";
@@ -52,12 +54,17 @@ async function adminWrite<T>(endpoint: string, method: "POST" | "PUT", body: unk
   return res.json();
 }
 
-async function adminGraphQL<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+async function adminGraphQL<T>(
+  query: string,
+  variables?: Record<string, unknown>,
+  revalidate = 600
+): Promise<T> {
   const token = await getAccessToken();
   const res = await fetch(`https://${STORE_DOMAIN}/admin/api/${API_VERSION}/graphql.json`, {
     method: "POST",
     headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
+    next: { revalidate },
   });
   if (!res.ok) throw new Error(`Shopify GraphQL: ${res.status}`);
   const data = await res.json();
@@ -87,11 +94,19 @@ export interface ShopifyProduct {
   variants: ShopifyVariant[];
 }
 
+const cachedFetchAllProducts = unstable_cache(
+  async () => {
+    const data = await adminFetch<{ products: ShopifyProduct[] }>(
+      "products.json?limit=250&fields=id,title,handle,tags,product_type,status,image,variants"
+    );
+    return data.products;
+  },
+  ["shopify-products"],
+  { revalidate: 300 }
+);
+
 export async function fetchAllProducts(): Promise<ShopifyProduct[]> {
-  const data = await adminFetch<{ products: ShopifyProduct[] }>(
-    "products.json?limit=250&fields=id,title,handle,tags,product_type,status,image,variants"
-  );
-  return data.products;
+  return cachedFetchAllProducts();
 }
 
 export async function updateProductStatus(productId: number, status: "active" | "draft"): Promise<ShopifyProduct> {
@@ -161,20 +176,36 @@ export interface ShopifyCustomer {
   note: string | null;
 }
 
+const cachedFetchOrders = unstable_cache(
+  async (limit: number) => {
+    const data = await adminFetch<{ orders: ShopifyOrder[] }>(
+      `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items`,
+      60
+    );
+    return data.orders;
+  },
+  ["shopify-orders"],
+  { revalidate: 60 }
+);
+
 export async function fetchOrders(limit = 250): Promise<ShopifyOrder[]> {
-  const data = await adminFetch<{ orders: ShopifyOrder[] }>(
-    `orders.json?status=any&limit=${limit}&fields=id,order_number,name,email,created_at,currency,total_price,financial_status,fulfillment_status,customer,line_items`,
-    60
-  );
-  return data.orders;
+  return cachedFetchOrders(limit);
 }
 
+const cachedFetchCustomers = unstable_cache(
+  async (limit: number) => {
+    const data = await adminFetch<{ customers: ShopifyCustomer[] }>(
+      `customers.json?limit=${limit}&fields=id,first_name,last_name,email,phone,orders_count,total_spent,created_at,note`,
+      60
+    );
+    return data.customers;
+  },
+  ["shopify-customers"],
+  { revalidate: 60 }
+);
+
 export async function fetchCustomers(limit = 50): Promise<ShopifyCustomer[]> {
-  const data = await adminFetch<{ customers: ShopifyCustomer[] }>(
-    `customers.json?limit=${limit}&fields=id,first_name,last_name,email,phone,orders_count,total_spent,created_at,note`,
-    60
-  );
-  return data.customers;
+  return cachedFetchCustomers(limit);
 }
 
 export async function updateCustomer(
@@ -257,7 +288,8 @@ export async function updateShopPolicy(type: string, body: string): Promise<Shop
       }
     }
   `,
-    { policy: { type, body } }
+    { policy: { type, body } },
+    0
   );
   if (data.shopPolicyUpdate.userErrors.length > 0) {
     throw new Error(data.shopPolicyUpdate.userErrors.map((e) => e.message).join("; "));
