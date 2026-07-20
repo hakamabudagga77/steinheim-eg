@@ -8,6 +8,7 @@ import Image from "next/image";
 import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
@@ -28,20 +29,20 @@ const menuLinks = [
 
 const worldLinks = [
   {
-    label: "The Company",
-    eyebrow: "Identity",
+    labelKey: "world.company" as const,
+    eyebrowKey: "world.companyEyebrow" as const,
     href: "/about",
     image: "/images/generated/gessi/steinheim-specification-story.png",
   },
   {
-    label: "Our Finishes",
-    eyebrow: "Surface language",
+    labelKey: "world.finishes" as const,
+    eyebrowKey: "world.finishesEyebrow" as const,
     href: "/about#finishes",
     image: "/images/generated/gessi/steinheim-finish-stack.png",
   },
   {
-    label: "Trade Studio",
-    eyebrow: "Projects",
+    labelKey: "world.tradeStudio" as const,
+    eyebrowKey: "world.tradeStudioEyebrow" as const,
     href: "/trade",
     image: "/images/generated/gessi/steinheim-wellness-architecture.png",
   },
@@ -77,11 +78,13 @@ const navMenuSlugs: Record<string, string[]> = {
 export default function Navigation({ locale }: { locale: string }) {
   const t = useTranslations("nav");
   const tc = useTranslations("collections");
+  const tm = useTranslations("menu");
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
+  const { itemCount: wishlistCount, setOpen: setWishlistOpen } = useWishlist();
   const {
     project: tradeProject,
     setOpen: setTradeOpen,
@@ -91,7 +94,7 @@ export default function Navigation({ locale }: { locale: string }) {
   } = useTradeProject();
   const tradeItemCount = tradeProject.items.length;
   const showShopByNeed = hasActiveRoomNeeds(tradeProject);
-  const projectDisplayName = tradeProject.details.projectName || "your project";
+  const projectDisplayName = tradeProject.details.projectName || tm("yourProject");
   const useWhite = !LIGHT_TOP_PATTERN.test(pathname);
 
   useEffect(() => {
@@ -137,7 +140,7 @@ export default function Navigation({ locale }: { locale: string }) {
               <span className="block h-[1.5px] w-[52px] bg-current" />
               <span className="block h-[1.5px] w-[52px] bg-current" />
             </span>
-            <span className="hidden sm:block">Menu</span>
+            <span className="hidden sm:block">{t("menu")}</span>
           </button>
 
           <Link
@@ -228,6 +231,27 @@ export default function Navigation({ locale }: { locale: string }) {
               )}
             </button>
             <button
+              onClick={() => setWishlistOpen(true)}
+              className={`relative hidden transition-colors duration-300 cursor-pointer sm:flex ${
+                useWhite ? "text-white/80 hover:text-white" : "text-charcoal/55 hover:text-charcoal"
+              }`}
+              aria-label={t("wishlist")}
+              title={t("wishlist")}
+            >
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span
+                  className={`absolute -top-1.5 -right-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full px-0.5 text-[8px] font-medium ${
+                    useWhite ? "bg-white text-black" : "bg-charcoal text-white"
+                  }`}
+                >
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+            <button
               ref={cartIconRef}
               onClick={() => setCartOpen(true)}
               className={`relative flex transition-colors duration-300 cursor-pointer ${
@@ -261,7 +285,8 @@ export default function Navigation({ locale }: { locale: string }) {
               )}
             </button>
             <Link
-              href={`/${locale === "en" ? "ar" : "en"}`}
+              href={pathname}
+              locale={locale === "en" ? "ar" : "en"}
               className={`hidden items-center gap-2 text-[12px] font-medium uppercase transition-colors duration-300 lg:flex ${
                 useWhite ? "text-white/70 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
               }`}
@@ -283,6 +308,7 @@ export default function Navigation({ locale }: { locale: string }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
+            data-lenis-prevent
             className="fixed inset-0 z-[60] bg-black/35 text-charcoal backdrop-blur-md"
           >
             <div className="relative mx-0 my-0 h-[100svh] max-w-[1120px] overflow-hidden bg-[#ece9e2] shadow-[0_24px_80px_rgba(0,0,0,0.16)] sm:mx-3 sm:my-3 sm:h-[calc(100svh-24px)] lg:mx-6 lg:my-6 lg:h-[calc(100vh-48px)]">
@@ -295,7 +321,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   <line x1="4" y1="4" x2="16" y2="16" />
                   <line x1="16" y1="4" x2="4" y2="16" />
                 </svg>
-                <span className="hidden sm:inline">Close</span>
+                <span className="hidden sm:inline">{t("close")}</span>
               </button>
 
               <div className="flex h-full">
@@ -310,7 +336,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
                       >
                         <div className="mb-1.5 inline-flex items-center gap-1.5 bg-black px-2.5 py-1">
-                          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white">For your project</span>
+                          <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white">{tm("forYourProject")}</span>
                         </div>
                         <Link
                           href="/shop-by-need"
@@ -320,7 +346,7 @@ export default function Navigation({ locale }: { locale: string }) {
                             pathname === "/shop-by-need" ? "" : "hover:translate-x-2"
                           }`}
                         >
-                          Shop for {projectDisplayName}
+                          {tm("shopFor", { name: projectDisplayName })}
                         </Link>
                       </motion.div>
                     )}
@@ -337,7 +363,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           pathname === "/collections" ? "text-black" : "text-black/35 hover:translate-x-2 hover:text-black"
                         }`}
                       >
-                        Collections
+                        {t("collections")}
                       </Link>
                     </motion.div>
                     <motion.div
@@ -430,12 +456,12 @@ export default function Navigation({ locale }: { locale: string }) {
 
                 <div className="mb-8 lg:mb-10">
                   <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35">
-                    Our World
+                    {tm("ourWorld")}
                   </p>
                   <div className="space-y-1">
                     {worldLinks.map((link, index) => (
                       <motion.div
-                        key={link.label}
+                        key={link.labelKey}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.42 + index * 0.05, duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
@@ -450,7 +476,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               : "text-black/50 hover:translate-x-2 hover:text-black"
                           }`}
                         >
-                          {link.label}
+                          {tm(link.labelKey)}
                         </Link>
                       </motion.div>
                     ))}
@@ -507,7 +533,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
                           {worldLinks.map((item, index) => (
                             <motion.div
-                              key={item.label}
+                              key={item.labelKey}
                               initial={{ opacity: 0, y: 14 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
@@ -520,7 +546,7 @@ export default function Navigation({ locale }: { locale: string }) {
                               >
                                 <Image
                                   src={item.image}
-                                  alt={item.label}
+                                  alt={tm(item.labelKey)}
                                   fill
                                   sizes="32vw"
                                   className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
@@ -529,10 +555,10 @@ export default function Navigation({ locale }: { locale: string }) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
                                 <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
                                   <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
-                                    {item.eyebrow}
+                                    {tm(item.eyebrowKey)}
                                   </p>
                                   <p className="mt-2 text-[24px] leading-none tracking-[-0.04em]">
-                                    {item.label}
+                                    {tm(item.labelKey)}
                                   </p>
                                 </div>
                               </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { projectReferences, type ProjectReference } from "@/data/project-references";
 
@@ -11,6 +12,7 @@ export default function ProjectsCarousel({
   collectionSlug: ProjectReference["collectionSlug"];
   collectionName: string;
 }) {
+  const t = useTranslations("projectsCarousel");
   const projects = projectReferences.filter((project) => project.collectionSlug === collectionSlug);
   if (projects.length === 0) return null;
 
@@ -18,7 +20,10 @@ export default function ProjectsCarousel({
     <section className="border-t border-black/8 bg-[#ece9e2] px-5 py-20 text-[#0a0a0a] sm:px-8 lg:px-16 lg:py-28">
       <div className="mx-auto max-w-[1780px]">
         <h2 className="text-[clamp(1.8rem,3.4vw,2.8rem)] font-normal tracking-[-0.03em]">
-          Discover projects with <span className="font-medium">{collectionName}</span>
+          {t.rich("discoverWith", {
+            collection: collectionName,
+            c: (chunks) => <span className="font-medium">{chunks}</span>,
+          })}
         </h2>
 
         <div className="mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">

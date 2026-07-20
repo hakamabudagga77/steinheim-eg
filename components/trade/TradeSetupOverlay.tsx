@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import {
   PERSONA_META,
@@ -19,7 +20,7 @@ import {
   type RoomKey,
 } from "@/lib/trade-schedule";
 
-const STEPS = ["You & your project", "Rooms", "What's needed"] as const;
+const STEP_KEYS = ["intro", "rooms", "needs"] as const;
 type Step = 0 | 1 | 2;
 
 const emptyCounts: Record<RoomKey, number> = { master: 0, standard: 0, powder: 0, suite: 0 };
@@ -35,8 +36,9 @@ function createDraftKey() {
 }
 
 export default function TradeSetupOverlay({ locale }: { locale: string }) {
+  const t = useTranslations("tradeSetupOverlay");
   const isArabic = locale === "ar";
-  const { project, setRoomPlan, setupOpen, setSetupOpen, setSetupJustCompleted, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
+  const { project, setRoomPlan, setupOpen, setSetupOpen, setRoomProgressExpanded, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
   const [step, setStep] = useState<Step>(0);
   const [counts, setCounts] = useState<Record<RoomKey, number>>(emptyCounts);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
@@ -52,27 +54,28 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
     details.projectName.trim()
   );
 
-  useEffect(() => {
-    if (!setupOpen) return;
-    const plan = project.roomPlan;
-    if (!plan) return;
-    const fixed = plan.groups.filter((group) => !group.isCustom);
-    const custom = plan.groups.filter((group) => group.isCustom);
-    setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
-    setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
-    setActivePresetId(plan.presetId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setupOpen, project.roomPlan]);
-
-  useEffect(() => {
-    if (setupOpen) setStep(0);
-  }, [setupOpen]);
+  const [prevSetupOpen, setPrevSetupOpen] = useState(setupOpen);
+  const [prevRoomPlanForHydration, setPrevRoomPlanForHydration] = useState(project.roomPlan);
+  if (setupOpen !== prevSetupOpen || project.roomPlan !== prevRoomPlanForHydration) {
+    const justOpened = setupOpen !== prevSetupOpen && setupOpen;
+    setPrevSetupOpen(setupOpen);
+    setPrevRoomPlanForHydration(project.roomPlan);
+    if (setupOpen && project.roomPlan) {
+      const plan = project.roomPlan;
+      const fixed = plan.groups.filter((group) => !group.isCustom);
+      const custom = plan.groups.filter((group) => group.isCustom);
+      setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
+      setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
+      setActivePresetId(plan.presetId);
+    }
+    if (justOpened) setStep(0);
+  }
 
   const totalRooms = Object.values(counts).reduce((sum, value) => sum + value, 0) + customRooms.reduce((sum, r) => sum + r.count, 0);
 
   const activeRooms = [
     ...roomConfig.filter((entry) => counts[entry.key] > 0).map((entry) => ({ roomKey: entry.key as string, label: entry.label, count: counts[entry.key] })),
-    ...customRooms.filter((room) => room.count > 0).map((room) => ({ roomKey: room.roomKey, label: room.label || "Custom room", count: room.count })),
+    ...customRooms.filter((room) => room.count > 0).map((room) => ({ roomKey: room.roomKey, label: room.label || t("step1.fallbackLabel"), count: room.count })),
   ];
 
   function applyPreset(preset: (typeof presets)[number]) {
@@ -130,7 +133,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
   function finishSetup() {
     setSetupOpen(false);
-    setSetupJustCompleted(true);
+    setRoomProgressExpanded(true);
   }
 
   return (
@@ -158,17 +161,17 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-                    Steinheim Trade Studio
+                    {t("studioLabel")}
                   </p>
                   <h2 className="mt-1 font-heading text-[26px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
-                    Set up your project
+                    {t("headline")}
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={handleClose}
                   className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center text-warm-gray transition hover:text-charcoal"
-                  aria-label="Close"
+                  aria-label={t("close")}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -177,8 +180,8 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
               </div>
 
               <div className="mt-5 flex items-center gap-2">
-                {STEPS.map((label, i) => (
-                  <div key={label} className="flex flex-1 items-center gap-2">
+                {STEP_KEYS.map((key, i) => (
+                  <div key={key} className="flex flex-1 items-center gap-2">
                     <div
                       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-medium transition-colors ${
                         i === step ? "bg-charcoal text-white" : i < step ? "bg-charcoal text-white" : "border border-charcoal/15 text-warm-gray"
@@ -191,20 +194,20 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                       )}
                     </div>
                     <span className={`text-[9px] font-medium uppercase tracking-[0.1em] ${i <= step ? "text-charcoal" : "text-warm-gray/50"}`}>
-                      {label}
+                      {t(`steps.${key}`)}
                     </span>
-                    {i < STEPS.length - 1 && <div className="h-px flex-1 bg-charcoal/10" />}
+                    {i < STEP_KEYS.length - 1 && <div className="h-px flex-1 bg-charcoal/10" />}
                   </div>
                 ))}
               </div>
             </header>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-7 py-6">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto px-7 py-6">
               {step === 0 && (
                 <div>
-                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">What kind of project is this?</h3>
+                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">{t("step0.headline")}</h3>
                   <p className="mb-5 text-[12px] text-warm-gray">
-                    Pick the closest match — it shapes what we ask next.
+                    {t("step0.body")}
                   </p>
                   <div className="grid gap-2">
                     {TRADE_PERSONAS.map((id) => (
@@ -233,24 +236,24 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
                   {persona && (
                     <div className="mt-6 border-t border-charcoal/8 pt-6">
-                      <p className="mb-3 text-[12px] font-medium text-charcoal">Who should we reach?</p>
+                      <p className="mb-3 text-[12px] font-medium text-charcoal">{t("step0.reachTitle")}</p>
                       <div className="grid gap-2.5">
                         <input
                           className="h-10 border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Your name *"
+                          placeholder={t("step0.fields.name")}
                           value={details.contactName}
                           onChange={(e) => updateDetails({ contactName: e.target.value })}
                         />
                         <input
                           className="h-10 border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Email *"
+                          placeholder={t("step0.fields.email")}
                           type="email"
                           value={details.email}
                           onChange={(e) => updateDetails({ email: e.target.value })}
                         />
                         <input
                           className="h-10 border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Business or project name *"
+                          placeholder={t("step0.fields.projectName")}
                           value={details.projectName}
                           onChange={(e) => updateDetails({ projectName: e.target.value })}
                         />
@@ -262,9 +265,9 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
               {step === 1 && (
                 <div>
-                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">{personaConfig?.roomsTitle ?? "How many rooms in total?"}</h3>
+                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">{personaConfig?.roomsTitle ?? t("step1.defaultHeadline")}</h3>
                   <p className="mb-5 text-[12px] text-warm-gray">
-                    {personaConfig?.roomsBody ?? "A rough count is fine — you can adjust anything later."}
+                    {personaConfig?.roomsBody ?? t("step1.defaultBody")}
                   </p>
 
                   {!personaConfig?.skipFixedRooms && (
@@ -279,7 +282,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                               activePresetId === preset.id ? "border-charcoal bg-charcoal text-white" : "border-charcoal/15 text-warm-gray hover:border-charcoal hover:text-charcoal"
                             }`}
                           >
-                            Quick fill: {preset.label}
+                            {t("step1.quickFill", { label: preset.label })}
                           </button>
                         ))}
                       </div>
@@ -325,7 +328,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
                   <div className={personaConfig?.skipFixedRooms ? "" : "mt-6"}>
                     <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.15em] text-warm-gray">
-                      {personaConfig?.skipFixedRooms ? "Add each space" : "Custom-named rooms"}
+                      {personaConfig?.skipFixedRooms ? t("step1.addEachSpace") : t("step1.customNamedRooms")}
                     </p>
                     <div className="space-y-2">
                       {customRooms.map((room) => (
@@ -334,7 +337,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                             type="text"
                             value={room.label}
                             onChange={(e) => updateCustomRoomDraft(room.roomKey, { label: e.target.value })}
-                            placeholder={personaConfig?.customRoomCopy ?? "Room name"}
+                            placeholder={personaConfig?.customRoomCopy ?? t("step1.defaultCustomPlaceholder")}
                             className="h-9 flex-1 border border-charcoal/12 bg-white px-3 text-[12px] outline-none"
                           />
                           <input
@@ -344,13 +347,13 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                             value={room.count}
                             onChange={(e) => updateCustomRoomDraft(room.roomKey, { count: clampCount(Number(e.target.value)) })}
                             className="h-9 w-14 border border-charcoal/12 bg-white text-center text-[12px] outline-none"
-                            aria-label="Count"
+                            aria-label={t("step1.count")}
                           />
                           <button
                             type="button"
                             onClick={() => removeCustomRoomDraft(room.roomKey)}
                             className="flex h-9 w-9 shrink-0 items-center justify-center text-warm-gray/50 transition hover:text-charcoal"
-                            aria-label="Remove"
+                            aria-label={t("step1.remove")}
                           >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
                           </button>
@@ -363,7 +366,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                       className="mt-2 flex h-9 w-full items-center justify-center gap-2 border border-dashed border-charcoal/20 text-[11px] font-medium text-warm-gray transition hover:border-charcoal hover:text-charcoal"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 4v16m-8-8h16" /></svg>
-                      Add a custom room
+                      {t("step1.addCustomRoom")}
                     </button>
                   </div>
                 </div>
@@ -371,9 +374,9 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
               {step === 2 && (
                 <div>
-                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">What does each room need?</h3>
+                  <h3 className="mb-2 font-heading text-[18px] text-charcoal">{t("step2.headline")}</h3>
                   <p className="mb-5 text-[12px] text-warm-gray">
-                    Pick what each room needs and how many. You&apos;ll shop for it on the site as you browse.
+                    {t("step2.body")}
                   </p>
 
                   <div className="space-y-6">
@@ -385,7 +388,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
                       return (
                         <div key={room.roomKey} className="border border-charcoal/8 bg-[#ece9e2]/60 p-4">
-                          <p className="mb-3 font-heading text-[14px] text-charcoal">{room.label} <span className="text-[10px] font-sans text-warm-gray">({room.count})</span></p>
+                          <p className="mb-3 font-heading text-[14px] text-charcoal">{room.label} <span className="text-[10px] font-sans text-warm-gray">{t("step2.roomCount", { count: room.count })}</span></p>
                           <div className="space-y-1.5">
                             {candidateTypes.map((type) => {
                               const existing = needs.find((n) => n.type === type);
@@ -424,8 +427,11 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
 
                   <div className="mt-6 border border-charcoal/10 bg-[#ece9e2]/60 p-4">
                     <p className="text-[12px] leading-[1.6] text-charcoal">
-                      <span className="font-medium">You&apos;re set.</span> Once you&apos;re done, browse the site exactly as normal —
-                      or open <span className="font-medium">Shop by need</span> in the menu to see only what {details.projectName || "your project"} still needs, grouped by type.
+                      <span className="font-medium">{t("step2.doneLead")}</span>{" "}
+                      {t.rich("step2.doneNote", {
+                        shop: (chunks) => <span className="font-medium">{chunks}</span>,
+                        project: details.projectName || t("step2.yourProject"),
+                      })}
                     </p>
                   </div>
                 </div>
@@ -440,7 +446,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                     onClick={() => setStep((step - 1) as Step)}
                     className="flex h-[48px] items-center justify-center border border-charcoal/15 text-[10px] font-medium uppercase tracking-[0.12em] text-charcoal transition hover:border-charcoal"
                   >
-                    Back
+                    {t("back")}
                   </button>
                 ) : (
                   <div />
@@ -453,7 +459,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                     disabled={!canContinueFromIntro}
                     className="flex h-[48px] items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black disabled:opacity-30"
                   >
-                    Continue
+                    {t("continue")}
                   </button>
                 )}
                 {step === 1 && (
@@ -463,7 +469,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                     disabled={totalRooms === 0}
                     className="flex h-[48px] items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black disabled:opacity-30"
                   >
-                    Continue
+                    {t("continue")}
                   </button>
                 )}
                 {step === 2 && (
@@ -472,7 +478,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                     onClick={finishSetup}
                     className="flex h-[48px] items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black"
                   >
-                    Done — browse products
+                    {t("done")}
                   </button>
                 )}
               </div>

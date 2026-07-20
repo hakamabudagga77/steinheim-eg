@@ -49,15 +49,11 @@ function fmtDate(yyyymmdd: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-export default function AdminAnalyticsPage() {
+function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
   const [summary, setSummary] = useState<GA4Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState<Timeframe>("30d");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSummary(null);
-    setError(null);
     fetch(`/api/admin/analytics?start=${TIMEFRAME_DAYS[timeframe]}&end=today`)
       .then(async (res) => {
         if (!res.ok) {
@@ -70,131 +66,139 @@ export default function AdminAnalyticsPage() {
       .catch((err) => setError(err.message));
   }, [timeframe]);
 
+  if (error) {
+    return (
+      <ErrorState>
+        {error}
+        {error.includes("not configured") && (
+          <span className="mt-2 block text-white/40">
+            Needs <code className="rounded bg-white/[0.08] px-1.5 py-0.5">GA4_PROPERTY_ID</code> set in the environment.
+          </span>
+        )}
+      </ErrorState>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {summary ? (
+          <>
+            <StatCard icon={Users} label="Visitors" value={summary.activeUsers.toLocaleString()} accent />
+            <StatCard icon={UserPlus} label="New visitors" value={summary.newUsers.toLocaleString()} />
+            <StatCard icon={Activity} label="Sessions" value={summary.sessions.toLocaleString()} />
+            <StatCard icon={Eye} label="Page views" value={summary.pageViews.toLocaleString()} />
+            <StatCard icon={MousePointer2} label="Engagement" value={`${Math.round(summary.engagementRate * 100)}%`} />
+            <StatCard icon={Clock} label="Avg. session" value={fmtDuration(summary.avgSessionDuration)} />
+          </>
+        ) : (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        )}
+      </div>
+
+      <Panel className="mt-4">
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors and sessions</p>
+          <p className="text-[11px] text-white/30">{summary ? `${summary.pagesPerSession.toFixed(1)} pages / session · ${Math.round(summary.bounceRate * 100)}% bounce` : ""}</p>
+        </div>
+        <div className="mt-4 h-[200px]">
+          {summary ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={summary.dailyUsers} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="visitorsFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={fmtDate}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
+                  interval={Math.max(0, Math.floor(summary.dailyUsers.length / 8))}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "#18181b",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 10,
+                    fontSize: 12,
+                    color: "#fff",
+                  }}
+                  labelFormatter={(v) => fmtDate(String(v))}
+                  labelStyle={{ color: "rgba(255,255,255,0.5)" }}
+                />
+                <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
+                <Area type="monotone" dataKey="sessions" stroke="#a78bfa" strokeWidth={1.5} fill="transparent" />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
+          )}
+        </div>
+      </Panel>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Panel>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Top pages</p>
+          <div className="mt-4 space-y-2">
+            {summary?.topPages.map((p) => (
+              <div key={p.path} className="flex items-center justify-between text-[13px]">
+                <span className="truncate text-white/70">{p.path}</span>
+                <span className="shrink-0 pl-3 font-medium text-white/90">{p.views.toLocaleString()}</span>
+              </div>
+            ))}
+            {summary && summary.topPages.length === 0 && (
+              <p className="text-[13px] text-white/30">No data yet for this period.</p>
+            )}
+          </div>
+        </Panel>
+        <Panel>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Traffic sources</p>
+          <div className="mt-4 space-y-2">
+            {summary?.topSources.map((s) => (
+              <div key={s.source} className="flex items-center justify-between text-[13px]">
+                <span className="truncate text-white/70">{s.source}</span>
+                <span className="shrink-0 pl-3 font-medium text-white/90">{s.sessions.toLocaleString()}</span>
+              </div>
+            ))}
+            {summary && summary.topSources.length === 0 && (
+              <p className="text-[13px] text-white/30">No data yet for this period.</p>
+            )}
+          </div>
+        </Panel>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Panel><MetricList title="Acquisition channels" items={summary?.topChannels.map((item) => ({ label: item.channel, value: item.sessions }))} /></Panel>
+        <Panel><MetricList title="Device mix" items={summary?.devices.map((item) => ({ label: item.device, value: item.sessions }))} /></Panel>
+        <Panel><MetricList title="Top markets" items={summary?.topCountries.map((item) => ({ label: item.country, value: item.users }))} /></Panel>
+      </div>
+      <Panel className="mt-4"><MetricList title="Landing pages" items={summary?.landingPages.map((item) => ({ label: item.path, value: item.sessions }))} /></Panel>
+    </>
+  );
+}
+
+export default function AdminAnalyticsPage() {
+  const [timeframe, setTimeframe] = useState<Timeframe>("30d");
+
   return (
     <div>
       <PageHeader eyebrow="Website Analytics · GA4" title="Digital performance" subtitle="The customer journey across the Steinheim website" />
 
-      {error && (
-        <ErrorState>
-          {error}
-          {error.includes("not configured") && (
-            <span className="mt-2 block text-white/40">
-              Needs <code className="rounded bg-white/[0.08] px-1.5 py-0.5">GA4_PROPERTY_ID</code> set in the environment.
-            </span>
-          )}
-        </ErrorState>
-      )}
+      <div className="mt-8">
+        <SegmentedControl options={TIMEFRAME_OPTIONS} value={timeframe} onChange={setTimeframe} />
+      </div>
 
-      {!error && (
-        <>
-          <div className="mt-8">
-            <SegmentedControl options={TIMEFRAME_OPTIONS} value={timeframe} onChange={setTimeframe} />
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {summary ? (
-              <>
-                <StatCard icon={Users} label="Visitors" value={summary.activeUsers.toLocaleString()} accent />
-                <StatCard icon={UserPlus} label="New visitors" value={summary.newUsers.toLocaleString()} />
-                <StatCard icon={Activity} label="Sessions" value={summary.sessions.toLocaleString()} />
-                <StatCard icon={Eye} label="Page views" value={summary.pageViews.toLocaleString()} />
-                <StatCard icon={MousePointer2} label="Engagement" value={`${Math.round(summary.engagementRate * 100)}%`} />
-                <StatCard icon={Clock} label="Avg. session" value={fmtDuration(summary.avgSessionDuration)} />
-              </>
-            ) : (
-              <>
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-                <StatCardSkeleton />
-              </>
-            )}
-          </div>
-
-          <Panel className="mt-4">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors and sessions</p>
-              <p className="text-[11px] text-white/30">{summary ? `${summary.pagesPerSession.toFixed(1)} pages / session · ${Math.round(summary.bounceRate * 100)}% bounce` : ""}</p>
-            </div>
-            <div className="mt-4 h-[200px]">
-              {summary ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={summary.dailyUsers} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="visitorsFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.35} />
-                        <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="date"
-                      tickFormatter={fmtDate}
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
-                      interval={Math.max(0, Math.floor(summary.dailyUsers.length / 8))}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#18181b",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        fontSize: 12,
-                        color: "#fff",
-                      }}
-                      labelFormatter={(v) => fmtDate(String(v))}
-                      labelStyle={{ color: "rgba(255,255,255,0.5)" }}
-                    />
-                    <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
-                    <Area type="monotone" dataKey="sessions" stroke="#a78bfa" strokeWidth={1.5} fill="transparent" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
-              )}
-            </div>
-          </Panel>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Panel>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Top pages</p>
-              <div className="mt-4 space-y-2">
-                {summary?.topPages.map((p) => (
-                  <div key={p.path} className="flex items-center justify-between text-[13px]">
-                    <span className="truncate text-white/70">{p.path}</span>
-                    <span className="shrink-0 pl-3 font-medium text-white/90">{p.views.toLocaleString()}</span>
-                  </div>
-                ))}
-                {summary && summary.topPages.length === 0 && (
-                  <p className="text-[13px] text-white/30">No data yet for this period.</p>
-                )}
-              </div>
-            </Panel>
-            <Panel>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Traffic sources</p>
-              <div className="mt-4 space-y-2">
-                {summary?.topSources.map((s) => (
-                  <div key={s.source} className="flex items-center justify-between text-[13px]">
-                    <span className="truncate text-white/70">{s.source}</span>
-                    <span className="shrink-0 pl-3 font-medium text-white/90">{s.sessions.toLocaleString()}</span>
-                  </div>
-                ))}
-                {summary && summary.topSources.length === 0 && (
-                  <p className="text-[13px] text-white/30">No data yet for this period.</p>
-                )}
-              </div>
-            </Panel>
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Panel><MetricList title="Acquisition channels" items={summary?.topChannels.map((item) => ({ label: item.channel, value: item.sessions }))} /></Panel>
-            <Panel><MetricList title="Device mix" items={summary?.devices.map((item) => ({ label: item.device, value: item.sessions }))} /></Panel>
-            <Panel><MetricList title="Top markets" items={summary?.topCountries.map((item) => ({ label: item.country, value: item.users }))} /></Panel>
-          </div>
-          <Panel className="mt-4"><MetricList title="Landing pages" items={summary?.landingPages.map((item) => ({ label: item.path, value: item.sessions }))} /></Panel>
-        </>
-      )}
+      <AnalyticsData key={timeframe} timeframe={timeframe} />
     </div>
   );
 }

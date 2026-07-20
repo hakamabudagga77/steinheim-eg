@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const events: Array<{ name: string; tag: string; logo: string; width: number; height: number }> = [
@@ -73,6 +74,7 @@ function ReelVideo({
   poster: string;
   active: boolean;
 }) {
+  const t = useTranslations("showroom");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   useAutoplayVideo(videoRef, src);
@@ -94,7 +96,7 @@ function ReelVideo({
         muted={muted}
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster={poster}
         className="h-full w-full object-cover"
       >
@@ -107,7 +109,7 @@ function ReelVideo({
           event.stopPropagation();
           setMuted((value) => !value);
         }}
-        aria-label={muted ? "Turn video sound on" : "Mute video"}
+        aria-label={muted ? t("soundOn") : t("soundOff")}
         className={`absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-md transition duration-500 hover:bg-white hover:text-black ${
           active ? "opacity-100" : "opacity-70"
         }`}
@@ -131,6 +133,7 @@ function ReelVideo({
 }
 
 export default function ShowroomReel() {
+  const t = useTranslations("showroom");
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
   const hoverPausedRef = useRef(false);
@@ -157,12 +160,14 @@ export default function ShowroomReel() {
     const track = trackRef.current;
     if (!track) return;
 
-    let frame: number;
+    let frame = 0;
+    let running = false;
     let lastCenterCheck = 0;
     let lastTimestamp: number | null = null;
     const pixelsPerSecond = 34;
 
     const step = (timestamp: number) => {
+      if (!running) return;
       const delta = lastTimestamp === null ? 16.67 : Math.min(timestamp - lastTimestamp, 80);
       lastTimestamp = timestamp;
 
@@ -198,6 +203,18 @@ export default function ShowroomReel() {
       frame = requestAnimationFrame(step);
     };
 
+    const startLoop = () => {
+      if (running) return;
+      running = true;
+      lastTimestamp = null;
+      frame = requestAnimationFrame(step);
+    };
+    const stopLoop = () => {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(frame);
+    };
+
     const releaseTouchPause = () => setTouchPaused(false);
     window.addEventListener("pointerup", releaseTouchPause);
     window.addEventListener("pointercancel", releaseTouchPause);
@@ -205,9 +222,25 @@ export default function ShowroomReel() {
     document.addEventListener("visibilitychange", releaseTouchPause);
 
     track.scrollLeft = track.scrollWidth / 3;
-    frame = requestAnimationFrame(step);
+
+    // The marquee only needs to animate while it is actually on screen.
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) startLoop();
+          else stopLoop();
+        },
+        { rootMargin: "100px" }
+      );
+      observer.observe(track);
+    } else {
+      startLoop();
+    }
+
     return () => {
-      cancelAnimationFrame(frame);
+      stopLoop();
+      observer?.disconnect();
       window.removeEventListener("pointerup", releaseTouchPause);
       window.removeEventListener("pointercancel", releaseTouchPause);
       window.removeEventListener("blur", releaseTouchPause);
@@ -228,14 +261,12 @@ export default function ShowroomReel() {
           className="mb-12 flex flex-wrap items-center justify-between gap-x-10 gap-y-8"
         >
           <div>
-            <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">{t("eyebrow")}</p>
             <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-              On the floor.
+              {t("headline")}
             </h2>
             <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
-              Moments from Steinheim&apos;s appearances at Le Marché and Ceramica Market in Cairo —
-              the finishes, the mechanisms, and the space where visitors specify a complete
-              bathroom in person.
+              {t("body")}
             </p>
           </div>
 

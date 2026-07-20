@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import ProductCard from "@/components/product/ProductCard";
@@ -13,6 +14,7 @@ function sectionId(type: RequirementType) {
 }
 
 export default function ShopProductsStep() {
+  const t = useTranslations("shopProductsStep");
   const { project, addItem } = useTradeProject();
   const [targets, setTargets] = useState<Record<string, string>>({});
 
@@ -58,8 +60,8 @@ export default function ShopProductsStep() {
       )
     );
     const totalUnits = existingForScope.reduce((sum, item) => sum + item.quantity, 0) + quantity;
-    const scopeSummary = `${totalUnits} unit${totalUnits === 1 ? "" : "s"}${
-      seriesNames.length ? ` · ${seriesNames.length > 1 ? `across ${seriesNames.join(", ")}` : seriesNames[0]}` : ""
+    const scopeSummary = `${t("unitsSummary", { count: totalUnits })}${
+      seriesNames.length ? ` · ${seriesNames.length > 1 ? t("acrossSeries", { series: seriesNames.join(", ") }) : seriesNames[0]}` : ""
     }`;
     addItem(slug, finish, quantity, {
       scopeId: target.scopeId,
@@ -71,7 +73,7 @@ export default function ShopProductsStep() {
   if (neededTypes.length === 0) {
     return (
       <p className="border border-charcoal/10 bg-white p-6 text-center text-[13px] text-warm-gray">
-        Check at least one product need in the previous step before shopping.
+        {t("checkFirst")}
       </p>
     );
   }
@@ -89,7 +91,7 @@ export default function ShopProductsStep() {
                 <section key={type} id={sectionId(type)} className="scroll-mt-24 border-t border-charcoal/8 pt-12 first:border-t-0 first:pt-0">
                   <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
                     <div>
-                      <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">Shop</p>
+                      <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">{t("shop")}</p>
                       <h3 className="mt-2 font-heading text-[clamp(2rem,4vw,3rem)] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
                         {REQUIREMENT_TYPE_LABELS[type]}
                       </h3>
@@ -128,14 +130,14 @@ export default function ShopProductsStep() {
           <aside className="mt-14 lg:mt-0 lg:self-start">
             <details className="lg:hidden" open>
               <summary className="cursor-pointer select-none text-[10px] font-medium uppercase tracking-[0.18em] text-warm-gray">
-                Your rooms
+                {t("yourRooms")}
               </summary>
               <div className="mt-3">
                 <RoomProgressPanel onSelectNeed={handleSelectNeed} />
               </div>
             </details>
             <div className="hidden lg:block lg:sticky lg:top-24">
-              <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-warm-gray">Your rooms</p>
+              <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-warm-gray">{t("yourRooms")}</p>
               <RoomProgressPanel onSelectNeed={handleSelectNeed} />
             </div>
           </aside>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { ScaleIn, StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { formatPrice, getAllFinishes, getProductBySlug } from "@/lib/utils";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
@@ -38,6 +39,7 @@ function formatSampleDate(value: string) {
 }
 
 export default function TradeProjectDrawer({ locale }: { locale: string }) {
+  const t = useTranslations("tradeProjectDrawer");
   const isArabic = locale === "ar";
   const {
     project,
@@ -55,6 +57,11 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
     duplicateProject,
   } = useTradeProject();
   const [step, setStep] = useState<"board" | "details" | "sent" | "messages" | "status" | "quote" | "samples" | "documents">("board");
+  // Generated once per submit attempt and reused across retries (e.g. a
+  // flaky network) so the server can dedupe if our fetch succeeded but the
+  // response never reached us. Cleared once the lead is submitted so a
+  // genuinely new project gets a fresh key.
+  const submitIdempotencyKeyRef = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sentRef, setSentRef] = useState<string | null>(null);
@@ -139,7 +146,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       }
     }
     void load();
-    const interval = window.setInterval(load, 20000);
+    // Skip polling while the tab is hidden — the first visible poll catches up.
+    const interval = window.setInterval(() => {
+      if (!document.hidden) load();
+    }, 20000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
@@ -179,7 +189,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       setSampleNote("");
       setSampleAddress("");
     } catch {
-      setSampleError("Could not send the request. Please try again.");
+      setSampleError(t("samples.requestError"));
     } finally {
       setSampleSending(false);
     }
@@ -201,7 +211,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       const data = await res.json();
       setLeadOverview((current) => current ? { ...current, deliveryDetails: data.deliveryDetails } : current);
     } catch {
-      setDeliveryError("Could not save. Please try again.");
+      setDeliveryError(t("status.saveError"));
     } finally {
       setDeliverySaving(false);
     }
@@ -226,8 +236,8 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       const key = row.item.scopeId || "manual";
       const existing = groups.get(key) ?? {
         id: key,
-        name: row.item.scopeName || "Manually added products",
-        summary: row.item.scopeSummary || "Products added directly from collection and product pages.",
+        name: row.item.scopeName || t("board.manualScopeName"),
+        summary: row.item.scopeSummary || t("board.manualScopeSummary"),
         rows: [] as typeof rows,
       };
       existing.rows.push(row);
@@ -251,43 +261,48 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
 
   async function handleSubmit() {
     if (!project.items.length) {
-      setError("Add at least one product.");
+      setError(t("errors.addProduct"));
       return;
     }
     if (!project.details.contactName.trim()) {
-      setError("Add your name.");
+      setError(t("errors.addName"));
       return;
     }
     if (!project.details.email.trim() || !/^\S+@\S+\.\S+$/.test(project.details.email)) {
-      setError("Add a valid email.");
+      setError(t("errors.addEmail"));
       return;
     }
     if (!project.details.projectName.trim()) {
-      setError("Add the project name.");
+      setError(t("errors.addProjectName"));
       return;
     }
 
     setError(null);
     setBusy(true);
 
+    if (!submitIdempotencyKeyRef.current) {
+      submitIdempotencyKeyRef.current = `${project.id}-${crypto.randomUUID()}`;
+    }
+
     try {
       const res = await fetch("/api/trade/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project, locale, source: "project-board" }),
+        body: JSON.stringify({ project, locale, source: "project-board", idempotencyKey: submitIdempotencyKeyRef.current }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "Could not submit. Please try again.");
+        throw new Error(data?.error || t("errors.submitFailed"));
       }
 
       const data = await res.json();
+      submitIdempotencyKeyRef.current = null;
       markSubmitted(data.id);
       setSentRef(data.reference);
       setStep("sent");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(err instanceof Error ? err.message : t("errors.somethingWrong"));
     } finally {
       setBusy(false);
     }
@@ -314,7 +329,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch {
-      setError("Could not generate the PDF. Try again.");
+      setError(t("errors.pdfFailed"));
     } finally {
       setPdfDownloading(false);
     }
@@ -386,34 +401,34 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     onClick={() => setShowProjectsMenu((v) => !v)}
                     className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray transition hover:text-charcoal"
                   >
-                    Steinheim
+                    {t("brand")}
                     {projects.length > 1 && (
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
                     )}
                   </button>
                   <h2 className="mt-1 font-heading text-[28px] leading-tight">
                     {step === "board"
-                      ? "Project board"
+                      ? t("titles.board")
                       : step === "details"
-                        ? "Your details"
+                        ? t("titles.details")
                         : step === "messages"
-                          ? "Messages"
+                          ? t("titles.messages")
                           : step === "status"
-                            ? "Project status"
+                            ? t("titles.status")
                             : step === "quote"
-                              ? "Trade quote"
+                              ? t("titles.quote")
                               : step === "samples"
-                                ? "Samples"
+                                ? t("titles.samples")
                                 : step === "documents"
-                                  ? "Documents"
-                                  : "Sent"}
+                                  ? t("titles.documents")
+                                  : t("titles.sent")}
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={handleClose}
                   className="mt-1 flex h-8 w-8 items-center justify-center text-warm-gray transition hover:text-charcoal"
-                  aria-label="Close"
+                  aria-label={t("close")}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -430,16 +445,16 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         onClick={() => { switchProject(entry.id); setShowProjectsMenu(false); }}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <p className="truncate text-[12px] font-medium text-charcoal">{entry.details.projectName || "Untitled project"}</p>
-                        <p className="text-[10px] text-warm-gray">{entry.items.length} products</p>
+                        <p className="truncate text-[12px] font-medium text-charcoal">{entry.details.projectName || t("projectsMenu.untitled")}</p>
+                        <p className="text-[10px] text-warm-gray">{t("projectsMenu.productCount", { count: entry.items.length })}</p>
                       </button>
                       <div className="flex shrink-0 gap-1">
                         <button type="button" onClick={() => duplicateProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
-                          Duplicate
+                          {t("projectsMenu.duplicate")}
                         </button>
                         {projects.length > 1 && (
                           <button type="button" onClick={() => deleteProject(entry.id)} className="rounded-full border border-charcoal/15 px-2.5 py-1 text-[9px] uppercase tracking-[0.08em] text-charcoal transition hover:border-charcoal">
-                            Delete
+                            {t("projectsMenu.delete")}
                           </button>
                         )}
                       </div>
@@ -451,7 +466,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     className="flex w-full items-center justify-center gap-2 p-3 text-[10px] font-medium uppercase tracking-[0.12em] text-charcoal transition hover:bg-white"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 4v16m-8-8h16" /></svg>
-                    New project
+                    {t("projectsMenu.newProject")}
                   </button>
                 </div>
               )}
@@ -467,7 +482,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                     }`}
                   >
-                    {project.status === "submitted" ? "Overview" : "1 — Products"}
+                    {project.status === "submitted" ? t("tabs.overview") : t("tabs.products")}
                   </button>
                   {project.status !== "submitted" && (
                     <button
@@ -481,7 +496,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/8 text-warm-gray/40 cursor-default"
                       }`}
                     >
-                      2 — Details & send
+                      {t("tabs.detailsAndSend")}
                     </button>
                   )}
                   {project.status === "submitted" && project.submittedLeadId && (
@@ -495,7 +510,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                         }`}
                       >
-                        Status
+                        {t("tabs.status")}
                       </button>
                       <button
                         type="button"
@@ -506,7 +521,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                         }`}
                       >
-                        Quote
+                        {t("tabs.quote")}
                       </button>
                       <button
                         type="button"
@@ -517,7 +532,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                         }`}
                       >
-                        Documents
+                        {t("tabs.documents")}
                       </button>
                       <button
                         type="button"
@@ -528,7 +543,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                         }`}
                       >
-                        Samples
+                        {t("tabs.samples")}
                       </button>
                       <button
                         type="button"
@@ -539,7 +554,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             : "border-charcoal/15 text-warm-gray hover:text-charcoal"
                         }`}
                       >
-                        Messages
+                        {t("tabs.messages")}
                       </button>
                     </>
                   )}
@@ -548,7 +563,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
             </header>
 
             {/* Content */}
-            <div className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
+            <div data-lenis-prevent className="catalogue-paper min-h-0 flex-1 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {step === "board" ? (
                   <motion.div
@@ -567,24 +582,24 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           </svg>
                         </div>
                         <h3 className="mt-6 font-heading text-2xl" style={{ fontStyle: "italic" }}>
-                          Start your project
+                          {t("board.startTitle")}
                         </h3>
                         <p className="mt-3 max-w-[260px] text-[13px] leading-relaxed text-warm-gray">
-                          Set up your property&apos;s room composition from the trade page, or browse products and tap &ldquo;Add to project&rdquo; to build a mixed specification list.
+                          {t("board.startBody")}
                         </p>
                         <a
                           href={`/${locale}/trade#smart-room-calculator`}
                           onClick={() => setOpen(false)}
                           className="mt-8 flex h-[46px] items-center justify-center bg-charcoal px-6 text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
                         >
-                          Set up your property
+                          {t("board.setupProperty")}
                         </a>
                       </ScaleIn>
                     ) : (
                       <div className="px-7 py-5">
                         <div className="flex items-center justify-between pb-4">
                           <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-warm-gray">
-                            {rows.length} {rows.length === 1 ? "product" : "products"} · {totalItems} {totalItems === 1 ? "unit" : "units"}
+                            {t("board.productAndUnitCount", { products: rows.length, units: totalItems })}
                           </p>
                           {rows.length > 0 && (
                             <button
@@ -592,13 +607,13 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               onClick={clearProject}
                               className="text-[9px] uppercase tracking-[0.12em] text-warm-gray/60 transition hover:text-charcoal"
                             >
-                              Clear all
+                              {t("board.clearAll")}
                             </button>
                           )}
                         </div>
 
                         <p className="mb-4 text-[11px] text-warm-gray">
-                          Retail reference total: <span className="text-charcoal">{formatPrice(retailReferenceTotal)}</span>
+                          {t("board.retailTotal")} <span className="text-charcoal">{formatPrice(retailReferenceTotal)}</span>
                         </p>
 
                         <div className="mb-5 grid grid-cols-2 gap-2">
@@ -607,7 +622,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             onClick={() => setOpen(false)}
                             className="flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                           >
-                            {roomPlan ? "Edit property composition" : "Set up your property"}
+                            {roomPlan ? t("board.editProperty") : t("board.setupPropertyShort")}
                           </a>
                           <button
                             type="button"
@@ -615,7 +630,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             onClick={handleDownloadPdf}
                             className="flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal disabled:opacity-50"
                           >
-                            {pdfDownloading ? "Generating…" : "Download PDF"}
+                            {pdfDownloading ? t("board.generating") : t("board.downloadPdf")}
                           </button>
 
                           {project.status === "submitted" && project.submittedLeadId && (
@@ -626,12 +641,12 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               className="col-span-2 flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal disabled:opacity-50"
                             >
                               {updateStatus === "busy"
-                                ? "Sending…"
+                                ? t("board.sendingUpdate")
                                 : updateStatus === "success"
-                                  ? "Sent — Steinheim notified"
+                                  ? t("board.sentNotified")
                                   : updateStatus === "error"
-                                    ? "Could not send, try again"
-                                    : "Send updated selection to Steinheim"}
+                                    ? t("board.sendError")
+                                    : t("board.sendUpdate")}
                             </button>
                           )}
 
@@ -641,7 +656,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               onClick={() => duplicateProject(project.id)}
                               className="col-span-2 flex h-[42px] items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                             >
-                              Reorder — start a new project from this one
+                              {t("board.reorder")}
                             </button>
                           )}
                         </div>
@@ -660,7 +675,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                   <div className="flex items-start justify-between gap-4">
                                     <div>
                                       <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                                        {group.count} {group.count === 1 ? "room" : "rooms"}
+                                        {t("board.roomCount", { count: group.count })}
                                       </p>
                                       <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
                                         {group.roomLabel}
@@ -672,7 +687,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                         onClick={() => setOpen(false)}
                                         className="shrink-0 rounded-full border border-charcoal bg-charcoal px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black"
                                       >
-                                        Shop on trade page
+                                        {t("board.shopOnTradePage")}
                                       </a>
                                     )}
                                   </div>
@@ -688,7 +703,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                       onQuantityChange={(slug, finish, quantity) => updateQuantity(slug, finish, quantity, group.scopeId)}
                                     />
                                   ) : (
-                                    <p className="p-2 text-[11px] font-medium uppercase tracking-[0.08em] text-amber-700">Not yet assigned</p>
+                                    <p className="p-2 text-[11px] font-medium uppercase tracking-[0.08em] text-amber-700">{t("board.notYetAssigned")}</p>
                                   )}
                                 </div>
                               </section>
@@ -703,7 +718,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                                      Scope
+                                      {t("board.scope")}
                                     </p>
                                     <h3 className="mt-1 font-heading text-[22px] leading-none text-charcoal">
                                       {group.name}
@@ -713,7 +728,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                     </p>
                                   </div>
                                   <div className="shrink-0 text-right">
-                                    <p className="text-[11px] font-medium text-charcoal">{group.totalUnits} units</p>
+                                    <p className="text-[11px] font-medium text-charcoal">{t("board.unitsCount", { count: group.totalUnits })}</p>
                                     <p className="mt-1 text-[10px] text-warm-gray">{formatPrice(group.totalValue)}</p>
                                   </div>
                                 </div>
@@ -739,13 +754,13 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         </StaggerContainer>
 
                         <p className="mt-4 text-[9px] leading-relaxed text-warm-gray/60">
-                          Prices shown are retail references. Trade pricing confirmed after submission.
+                          {t("board.priceDisclaimer")}
                         </p>
 
                         {leadOverview && leadOverview.relatedProjects.length > 0 && (
                           <div className="mt-5 border border-charcoal/10 bg-white p-4">
                             <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                              Your other projects
+                              {t("board.otherProjects")}
                             </p>
                             <div className="mt-3 space-y-2">
                               {leadOverview.relatedProjects.map((rp) => (
@@ -781,41 +796,41 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {/* Summary strip */}
                     <div className="mb-6 border border-charcoal/8 bg-[#ece9e2] p-4">
                       <p className="text-[9px] font-medium uppercase tracking-[0.15em] text-warm-gray">
-                        Your selection
+                        {t("details.yourSelection")}
                       </p>
                       <p className="mt-1 text-[13px]">
-                        {rows.length} {rows.length === 1 ? "product" : "products"} · {totalItems} units
+                        {t("details.productAndUnits", { products: rows.length, units: totalItems })}
                       </p>
                       <button
                         type="button"
                         onClick={() => setStep("board")}
                         className="mt-2 text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray underline underline-offset-2 transition hover:text-charcoal"
                       >
-                        Edit products
+                        {t("details.editProducts")}
                       </button>
                       <a
                         href={`/${locale}/trade#smart-room-calculator`}
                         onClick={() => setOpen(false)}
                         className="mt-3 inline-flex text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray underline underline-offset-2 transition hover:text-charcoal"
                       >
-                        {roomPlan ? "Edit property composition before sending" : "Set up your property before sending"}
+                        {roomPlan ? t("details.editPropertyBeforeSend") : t("details.setupPropertyBeforeSend")}
                       </a>
                     </div>
 
                     {/* Contact form */}
                     <div className="space-y-4">
                       <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal">
-                        About you
+                        {t("details.aboutYou")}
                       </p>
                       <input
                         className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Your name *"
+                        placeholder={t("details.fields.name")}
                         value={project.details.contactName}
                         onChange={(e) => updateDetails({ contactName: e.target.value })}
                       />
                       <input
                         className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Email *"
+                        placeholder={t("details.fields.email")}
                         type="email"
                         value={project.details.email}
                         onChange={(e) => updateDetails({ email: e.target.value })}
@@ -823,7 +838,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                       <div className="grid grid-cols-2 gap-3">
                         <input
                           className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Company"
+                          placeholder={t("details.fields.company")}
                           value={project.details.company}
                           onChange={(e) => updateDetails({ company: e.target.value })}
                         />
@@ -832,31 +847,31 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           value={project.details.role}
                           onChange={(e) => updateDetails({ role: e.target.value })}
                         >
-                          <option value="">Your role</option>
-                          <option>Interior Designer</option>
-                          <option>Architect</option>
-                          <option>Developer</option>
-                          <option>Project Manager</option>
-                          <option>Procurement</option>
-                          <option>Contractor</option>
-                          <option>Homeowner</option>
+                          <option value="">{t("details.fields.role")}</option>
+                          <option>{t("details.roles.interiorDesigner")}</option>
+                          <option>{t("details.roles.architect")}</option>
+                          <option>{t("details.roles.developer")}</option>
+                          <option>{t("details.roles.projectManager")}</option>
+                          <option>{t("details.roles.procurement")}</option>
+                          <option>{t("details.roles.contractor")}</option>
+                          <option>{t("details.roles.homeowner")}</option>
                         </select>
                       </div>
                       <input
                         className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Phone"
+                        placeholder={t("details.fields.phone")}
                         value={project.details.phone}
                         onChange={(e) => updateDetails({ phone: e.target.value })}
                       />
 
                       <div className="mt-2 border-t border-charcoal/8 pt-4">
                         <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal">
-                          About the project
+                          {t("details.aboutProject")}
                         </p>
                       </div>
                       <input
                         className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Project name *"
+                        placeholder={t("details.fields.projectName")}
                         value={project.details.projectName}
                         onChange={(e) => updateDetails({ projectName: e.target.value })}
                       />
@@ -866,36 +881,36 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           value={project.details.projectType}
                           onChange={(e) => updateDetails({ projectType: e.target.value })}
                         >
-                          <option value="">Project type</option>
-                          <option>Hotel / Hospitality</option>
-                          <option>Residential Development</option>
-                          <option>Villa / Private</option>
-                          <option>Commercial / Retail</option>
-                          <option>Other</option>
+                          <option value="">{t("details.fields.projectType")}</option>
+                          <option>{t("details.projectTypes.hospitality")}</option>
+                          <option>{t("details.projectTypes.residential")}</option>
+                          <option>{t("details.projectTypes.villa")}</option>
+                          <option>{t("details.projectTypes.commercial")}</option>
+                          <option>{t("details.projectTypes.other")}</option>
                         </select>
                         <input
                           className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                          placeholder="Location"
+                          placeholder={t("details.fields.location")}
                           value={project.details.location}
                           onChange={(e) => updateDetails({ location: e.target.value })}
                         />
                       </div>
                       <input
                         className="h-11 w-full border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Timeline (e.g. Q2 2027)"
+                        placeholder={t("details.fields.timeline")}
                         value={project.details.timeline}
                         onChange={(e) => updateDetails({ timeline: e.target.value })}
                       />
                       <textarea
                         className="min-h-[80px] w-full border border-charcoal/12 bg-white p-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                        placeholder="Notes — room mix, finishes, quantities per room type, anything helpful"
+                        placeholder={t("details.fields.notes")}
                         value={project.details.notes}
                         onChange={(e) => updateDetails({ notes: e.target.value })}
                       />
 
                       <div className="border-t border-charcoal/8 pt-4">
                         <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal">
-                          PDF spec sheet
+                          {t("details.pdfSpecSheet")}
                         </p>
                         <label className="flex cursor-pointer items-center gap-3 py-1">
                           <input
@@ -904,7 +919,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             onChange={(e) => setIncludePrices(e.target.checked)}
                             className="h-4 w-4 accent-charcoal"
                           />
-                          <span className="text-[12px] text-charcoal">Include retail reference prices</span>
+                          <span className="text-[12px] text-charcoal">{t("details.includePrices")}</span>
                         </label>
                         <label className="flex cursor-pointer items-center gap-3 py-1">
                           <input
@@ -913,7 +928,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             onChange={(e) => setIncludeSpecs(e.target.checked)}
                             className="h-4 w-4 accent-charcoal"
                           />
-                          <span className="text-[12px] text-charcoal">Include technical specifications appendix</span>
+                          <span className="text-[12px] text-charcoal">{t("details.includeSpecs")}</span>
                         </label>
                       </div>
                     </div>
@@ -936,13 +951,13 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {leadOverview ? (
                       <TradeStageTimeline status={leadOverview.status} />
                     ) : (
-                      <p className="text-[12px] text-warm-gray">Loading status…</p>
+                      <p className="text-[12px] text-warm-gray">{t("status.loading")}</p>
                     )}
 
                     {leadOverview && allScopeEntries.length > 1 && (
                       <div className="mt-5 border border-charcoal/10 bg-white p-4">
                         <p className="mb-3 text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                          Progress by room
+                          {t("status.progressByRoom")}
                         </p>
                         <div className="space-y-2">
                           {allScopeEntries.map((entry) => {
@@ -964,27 +979,27 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {leadOverview && (
                       <div className="mt-5 border border-charcoal/10 bg-white p-4">
                         <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                          Delivery details
+                          {t("status.deliveryDetails")}
                         </p>
                         <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
-                          Tell us who to hand this to on-site and when the gate is open, so delivery goes smoothly.
+                          {t("status.deliveryIntro")}
                         </p>
                         <input
                           value={deliveryContactName}
                           onChange={(e) => setDeliveryContactName(e.target.value)}
-                          placeholder="Site contact name"
+                          placeholder={t("status.contactName")}
                           className="mt-3 h-11 w-full border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
                         />
                         <input
                           value={deliveryContactPhone}
                           onChange={(e) => setDeliveryContactPhone(e.target.value)}
-                          placeholder="Site contact phone"
+                          placeholder={t("status.contactPhone")}
                           className="mt-2 h-11 w-full border border-charcoal/12 bg-white px-3 text-[13px] outline-none transition focus:border-charcoal/40"
                         />
                         <textarea
                           value={deliveryAccessNotes}
                           onChange={(e) => setDeliveryAccessNotes(e.target.value)}
-                          placeholder="Access hours, security instructions, anything the driver should know"
+                          placeholder={t("status.accessNotes")}
                           rows={2}
                           className="mt-2 min-h-[54px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
                         />
@@ -995,11 +1010,11 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           onClick={handleSaveDeliveryDetails}
                           className="mt-3 flex h-[42px] w-full items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-40"
                         >
-                          {deliverySaving ? "Saving…" : "Save delivery details"}
+                          {deliverySaving ? t("status.saving") : t("status.save")}
                         </button>
                         {leadOverview.deliveryDetails && (
                           <p className="mt-2 text-[10px] text-warm-gray">
-                            Last saved {formatSampleDate(leadOverview.deliveryDetails.updatedAt)}
+                            {t("status.lastSaved", { date: formatSampleDate(leadOverview.deliveryDetails.updatedAt) })}
                           </p>
                         )}
                       </div>
@@ -1017,7 +1032,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {leadOverview?.quoteUrl ? (
                       <div className="border border-charcoal/10 bg-white p-4">
                         <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                          Trade quote
+                          {t("quote.label")}
                         </p>
                         {leadOverview.quoteAmount && (
                           <p className="mt-2 font-heading text-[22px] text-charcoal">{leadOverview.quoteAmount}</p>
@@ -1029,11 +1044,11 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                             rel="noopener noreferrer"
                             className="flex h-[42px] flex-1 items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                           >
-                            View quote
+                            {t("quote.view")}
                           </a>
                           {leadOverview.quoteAcceptedAt ? (
                             <span className="flex h-[42px] flex-1 items-center justify-center bg-[#ece9e2] text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal">
-                              Accepted
+                              {t("quote.accepted")}
                             </span>
                           ) : (
                             <button
@@ -1042,7 +1057,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               onClick={handleAcceptQuote}
                               className="flex h-[42px] flex-1 items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-50"
                             >
-                              {acceptStatus === "busy" ? "Accepting…" : acceptStatus === "error" ? "Could not accept, try again" : "Accept quote"}
+                              {acceptStatus === "busy" ? t("quote.accepting") : acceptStatus === "error" ? t("quote.acceptError") : t("quote.accept")}
                             </button>
                           )}
                         </div>
@@ -1050,10 +1065,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     ) : (
                       <div className="flex flex-col items-center justify-center py-16 text-center">
                         <p className="font-heading text-[18px] text-charcoal" style={{ fontStyle: "italic" }}>
-                          Quote pending
+                          {t("quote.pendingTitle")}
                         </p>
                         <p className="mt-2 max-w-[260px] text-[12px] leading-relaxed text-warm-gray">
-                          Steinheim will share trade pricing for this project here as soon as it&apos;s ready.
+                          {t("quote.pendingBody")}
                         </p>
                       </div>
                     )}
@@ -1061,7 +1076,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {leadOverview && leadOverview.quoteHistory.length > 0 && (
                       <div className="mt-5">
                         <p className="mb-2 text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">
-                          Previous quotes
+                          {t("quote.previousQuotes")}
                         </p>
                         <div className="space-y-2">
                           {leadOverview.quoteHistory.slice().reverse().map((revision, index) => (
@@ -1074,10 +1089,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                                     rel="noopener noreferrer"
                                     className="text-[12px] text-charcoal underline underline-offset-2"
                                   >
-                                    {revision.amount || "View quote"}
+                                    {revision.amount || t("quote.view")}
                                   </a>
                                 ) : (
-                                  <p className="text-[12px] text-warm-gray">No quote set yet</p>
+                                  <p className="text-[12px] text-warm-gray">{t("quote.noQuoteSet")}</p>
                                 )}
                                 <p className="text-[9px] uppercase tracking-[0.08em] text-warm-gray">
                                   {formatSampleDate(revision.changedAt)}
@@ -1118,10 +1133,10 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     ) : !leadOverview?.warrantyReference && (
                       <div className="flex flex-col items-center justify-center py-16 text-center">
                         <p className="font-heading text-[18px] text-charcoal" style={{ fontStyle: "italic" }}>
-                          Nothing here yet
+                          {t("documents.emptyTitle")}
                         </p>
                         <p className="mt-2 max-w-[260px] text-[12px] leading-relaxed text-warm-gray">
-                          Invoices, certificates, and spec sheets will show up here as Steinheim adds them.
+                          {t("documents.emptyBody")}
                         </p>
                       </div>
                     )}
@@ -1129,11 +1144,11 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     {leadOverview?.warrantyReference && (
                       <div className={leadOverview.documents.length > 0 ? "mt-5 border border-charcoal/10 bg-white p-4" : "border border-charcoal/10 bg-white p-4"}>
                         <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                          Warranty reference
+                          {t("documents.warrantyReference")}
                         </p>
                         <p className="mt-2 whitespace-pre-wrap text-[13px] text-charcoal">{leadOverview.warrantyReference}</p>
                         <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
-                          Keep this reference for any warranty claim. Request a technician anytime from the Messages tab.
+                          {t("documents.warrantyNote")}
                         </p>
                       </div>
                     )}
@@ -1152,30 +1167,30 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                       onClick={() => setShowroomOpen(true)}
                       className="mb-5 flex h-[46px] w-full items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                     >
-                      Book a showroom visit
+                      {t("samples.bookShowroom")}
                     </button>
 
                     <div className="border border-charcoal/10 bg-white p-4">
                       <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                        Request samples
+                        {t("samples.requestSamples")}
                       </p>
                       <p className="mt-2 text-[11px] leading-relaxed text-warm-gray">
-                        Tell us which finishes or products you&apos;d like to see in person before committing.
+                        {t("samples.intro")}
                       </p>
                       <textarea
                         value={sampleNote}
                         onChange={(e) => setSampleNote(e.target.value)}
-                        placeholder="e.g. Chrome and Brushed Nickel finish for the Up Shower Column"
+                        placeholder={t("samples.notePlaceholder")}
                         rows={3}
                         className="mt-3 min-h-[70px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
                       />
                       <p className="mt-4 text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
-                        Delivery address
+                        {t("samples.deliveryAddress")}
                       </p>
                       <textarea
                         value={sampleAddress}
                         onChange={(e) => setSampleAddress(e.target.value)}
-                        placeholder="Full address, including area and city — e.g. 12 Shagaret El Dor St, Zamalek, Cairo"
+                        placeholder={t("samples.addressPlaceholder")}
                         rows={2}
                         className="mt-3 min-h-[54px] w-full resize-none border border-charcoal/12 bg-white p-3 text-[13px] outline-none transition focus:border-charcoal/40"
                       />
@@ -1186,14 +1201,14 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         onClick={handleRequestSamples}
                         className="mt-3 flex h-[42px] w-full items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-40"
                       >
-                        {sampleSending ? "Sending…" : "Request samples"}
+                        {sampleSending ? t("samples.sending") : t("samples.requestSamples")}
                       </button>
                     </div>
 
                     {leadOverview && leadOverview.sampleRequests.length > 0 && (
                       <div className="mt-5 space-y-2">
                         <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-warm-gray">
-                          Your requests
+                          {t("samples.yourRequests")}
                         </p>
                         {leadOverview.sampleRequests.slice().reverse().map((entry) => (
                           <div key={entry.id} className="border border-charcoal/8 bg-[#ece9e2] p-3">
@@ -1206,7 +1221,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                               <span className={`px-2 py-0.5 text-[8px] font-medium uppercase tracking-[0.1em] ${
                                 entry.fulfilledAt ? "bg-charcoal text-white" : "border border-charcoal/15 text-charcoal"
                               }`}>
-                                {entry.fulfilledAt ? "Fulfilled" : "Requested"}
+                                {entry.fulfilledAt ? t("samples.fulfilled") : t("samples.requested")}
                               </span>
                             </div>
                           </div>
@@ -1218,9 +1233,9 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                       open={showroomOpen}
                       onClose={() => setShowroomOpen(false)}
                       onRequestByMessage={() => setStep("messages")}
-                      title="Book a showroom visit"
-                      fallbackCopy="Live booking isn't set up yet — send Steinheim a message with a few times that work for you to visit the showroom, and the team will confirm one directly in the Messages tab."
-                      ctaLabel="Request a visit by message"
+                      title={t("samples.showroomTitle")}
+                      fallbackCopy={t("samples.showroomFallback")}
+                      ctaLabel={t("samples.showroomCta")}
                     />
                   </motion.div>
                 ) : step === "messages" && project.submittedLeadId ? (
@@ -1250,17 +1265,17 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     </div>
 
                     <h3 className="mt-8 font-heading text-[28px] leading-tight">
-                      Sent to Steinheim
+                      {t("sent.title")}
                     </h3>
 
                     {sentRef && (
                       <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.15em] text-warm-gray">
-                        Reference: {sentRef}
+                        {t("sent.reference", { ref: sentRef })}
                       </p>
                     )}
 
                     <p className="mt-5 max-w-[300px] text-[14px] leading-relaxed text-stone">
-                      The team will review your project and respond with trade pricing within 24 hours.
+                      {t("sent.body")}
                     </p>
 
                     <div className="mt-10 w-full max-w-[280px] space-y-3">
@@ -1273,7 +1288,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
                         </svg>
-                        {pdfDownloading ? "Generating…" : "Download your spec sheet"}
+                        {pdfDownloading ? t("sent.generating") : t("sent.downloadSpec")}
                       </button>
 
                       {project.submittedLeadId && (
@@ -1283,7 +1298,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                           className="flex h-[46px] w-full items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.13em] text-white transition hover:bg-black"
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg>
-                          Message Steinheim
+                          {t("sent.messageSteinheim")}
                         </button>
                       )}
 
@@ -1292,7 +1307,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         onClick={handleNewProject}
                         className="flex h-[42px] w-full items-center justify-center text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray transition hover:text-charcoal"
                       >
-                        Start a new project
+                        {t("sent.newProject")}
                       </button>
                     </div>
                   </motion.div>
@@ -1309,7 +1324,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     onClick={() => setOpen(false)}
                     className="flex h-[50px] items-center justify-center border border-charcoal/15 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
                   >
-                    {roomPlan ? "Edit property" : "Set up property"}
+                    {roomPlan ? t("footer.editProperty") : t("footer.setupProperty")}
                   </a>
                   <button
                     type="button"
@@ -1317,8 +1332,8 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     onClick={() => setStep("details")}
                     className="flex h-[50px] items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-30"
                   >
-                    Details
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    {t("footer.detailsCta")}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -1340,19 +1355,19 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.25" />
                         <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                      Sending…
+                      {t("footer.sending")}
                     </>
                   ) : (
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                       </svg>
-                      Send to Steinheim
+                      {t("footer.sendToSteinheim")}
                     </>
                   )}
                 </button>
                 <p className="mt-3 text-center text-[9px] text-warm-gray/50">
-                  You&apos;ll receive a confirmation with your spec sheet
+                  {t("footer.confirmationNote")}
                 </p>
               </footer>
             )}

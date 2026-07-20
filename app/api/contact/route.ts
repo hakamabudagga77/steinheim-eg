@@ -3,33 +3,17 @@ import { isContactLeadStatus, type ContactLead } from "@/lib/contact-leads";
 import { listContactLeads, saveContactLead, updateContactLead } from "@/lib/server/contact-lead-store";
 import { sendContactLeadNotification } from "@/lib/server/contact-lead-email";
 import { isAdminRequest } from "@/lib/server/admin-session";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const submitBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-}
-
-function canSubmit(request: Request) {
-  const key = clientKey(request);
-  const now = Date.now();
-  const bucket = submitBuckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    submitBuckets.set(key, { count: 1, resetAt: now + 60 * 60 * 1000 });
-    return true;
-  }
-  if (bucket.count >= 5) return false;
-  bucket.count += 1;
-  return true;
-}
-
 const ENQUIRY_TYPES = ["homeowner", "trade", "general"] as const;
 
 export async function POST(request: Request) {
-  if (!canSubmit(request)) return Response.json({ error: "Too many submissions." }, { status: 429 });
+  if (!(await checkRateLimit(request, "contact", 5, 60 * 60))) {
+    return Response.json({ error: "Too many submissions." }, { status: 429 });
+  }
 
   const body = (await request.json().catch(() => null)) as {
     website?: unknown;

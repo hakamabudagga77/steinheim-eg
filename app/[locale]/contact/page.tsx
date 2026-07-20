@@ -2,17 +2,15 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import PageTransition from "@/components/layout/PageTransition";
 
-const enquiryTypes = [
-  { id: "homeowner", label: "Homeowner", desc: "Product enquiry or order support" },
-  { id: "trade", label: "Trade / Professional", desc: "Project specification or bulk pricing" },
-  { id: "general", label: "General", desc: "Press, partnerships, or other" },
-] as const;
+const enquiryTypeIds = ["homeowner", "trade", "general"] as const;
 
 export default function ContactPage() {
+  const t = useTranslations("contactPage");
   const [submitted, setSubmitted] = useState(false);
-  const [enquiryType, setEnquiryType] = useState<string>("homeowner");
+  const [enquiryType, setEnquiryType] = useState<(typeof enquiryTypeIds)[number]>("homeowner");
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -33,7 +31,7 @@ export default function ContactPage() {
                 transition={{ delay: 0.1, duration: 0.6 }}
                 className="text-[11px] uppercase tracking-[0.45em] text-white/40"
               >
-                Get in touch
+                {t("hero.eyebrow")}
               </motion.p>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
@@ -42,7 +40,7 @@ export default function ContactPage() {
                 className="mt-5 max-w-3xl font-heading text-[clamp(2.8rem,6vw,5.5rem)] leading-[0.9] tracking-[-0.04em] text-white"
                 style={{ fontStyle: "italic" }}
               >
-                We&rsquo;d love to hear from you.
+                {t("hero.headline")}
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
@@ -50,7 +48,7 @@ export default function ContactPage() {
                 transition={{ delay: 0.35, duration: 0.6 }}
                 className="mt-6 max-w-lg text-[16px] leading-[1.85] text-white/40"
               >
-                Whether you&rsquo;re designing a single bathroom or specifying for a 200-unit development, we respond within 24 hours.
+                {t("hero.body")}
               </motion.p>
             </div>
           </div>
@@ -73,9 +71,9 @@ export default function ContactPage() {
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                     </div>
-                    <h2 className="mt-8 font-heading text-[36px] tracking-[-0.03em]">Message received.</h2>
+                    <h2 className="mt-8 font-heading text-[36px] tracking-[-0.03em]">{t("successTitle")}</h2>
                     <p className="mt-4 max-w-sm text-[15px] leading-[1.75] text-black/50">
-                      Thank you for reaching out. Our team will review your enquiry and respond within one business day.
+                      {t("successBody")}
                     </p>
                   </motion.div>
                 ) : (
@@ -127,66 +125,66 @@ export default function ContactPage() {
 
                     {/* Enquiry type */}
                     <div className="mb-10">
-                      <p className="text-[11px] uppercase tracking-[0.3em] text-black/35">I am a</p>
+                      <p className="text-[11px] uppercase tracking-[0.3em] text-black/35">{t("iAm")}</p>
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {enquiryTypes.map((type) => (
+                        {enquiryTypeIds.map((id) => (
                           <button
-                            key={type.id}
+                            key={id}
                             type="button"
-                            onClick={() => setEnquiryType(type.id)}
+                            onClick={() => setEnquiryType(id)}
                             className={`rounded-full border px-6 py-2.5 text-[13px] font-medium transition cursor-pointer ${
-                              enquiryType === type.id
+                              enquiryType === id
                                 ? "border-black bg-black text-white"
                                 : "border-black/12 text-black/55 hover:border-black/25"
                             }`}
                           >
-                            {type.label}
+                            {t(`enquiryTypes.${id}.label`)}
                           </button>
                         ))}
                       </div>
                       <p className="mt-3 text-[12px] text-black/35">
-                        {enquiryTypes.find((t) => t.id === enquiryType)?.desc}
+                        {t(`enquiryTypes.${enquiryType}.desc`)}
                       </p>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Name</label>
-                        <input type="text" name="name" autoComplete="name" placeholder="Your full name" className={inputBase} required />
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.name")}</label>
+                        <input type="text" name="name" autoComplete="name" placeholder={t("fields.namePlaceholder")} className={inputBase} required />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Email</label>
-                        <input type="email" name="email" autoComplete="email" placeholder="you@example.com" className={inputBase} required />
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.email")}</label>
+                        <input type="email" name="email" autoComplete="email" placeholder={t("fields.emailPlaceholder")} className={inputBase} required />
                       </div>
                     </div>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Phone</label>
-                        <input type="tel" name="phone" autoComplete="tel" placeholder="+20 xxx xxx xxxx" className={inputBase} />
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.phone")}</label>
+                        <input type="tel" name="phone" autoComplete="tel" placeholder={t("fields.phonePlaceholder")} className={inputBase} />
                       </div>
                       <div>
                         <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">
-                          {enquiryType === "homeowner" ? "City" : "Company"}
+                          {enquiryType === "homeowner" ? t("fields.city") : t("fields.company")}
                         </label>
                         <input
                           type="text"
                           name={enquiryType === "homeowner" ? "city" : "company"}
                           autoComplete={enquiryType === "homeowner" ? "address-level2" : "organization"}
-                          placeholder={enquiryType === "homeowner" ? "Cairo, Alexandria..." : "Company name"}
+                          placeholder={enquiryType === "homeowner" ? t("fields.cityPlaceholder") : t("fields.companyPlaceholder")}
                           className={inputBase}
                         />
                       </div>
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Subject</label>
-                      <input type="text" name="subject" placeholder="What can we help with?" className={inputBase} />
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.subject")}</label>
+                      <input type="text" name="subject" placeholder={t("fields.subjectPlaceholder")} className={inputBase} />
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">Message</label>
-                      <textarea rows={4} name="message" placeholder="Tell us about your project or question..." className={`${inputBase} resize-none`} required />
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.message")}</label>
+                      <textarea rows={4} name="message" placeholder={t("fields.messagePlaceholder")} className={`${inputBase} resize-none`} required />
                     </div>
 
                     {submitError && <p className="mt-4 text-[13px] text-red-600">{submitError}</p>}
@@ -196,7 +194,7 @@ export default function ContactPage() {
                       disabled={submitting}
                       className="mt-8 flex h-[50px] items-center justify-center rounded-full border border-black/30 px-14 text-[13px] font-medium text-black transition hover:bg-black hover:text-white cursor-pointer disabled:opacity-50"
                     >
-                      {submitting ? "Sending…" : "Send message"}
+                      {submitting ? t("sending") : t("send")}
                     </button>
                   </form>
                 )}
@@ -205,9 +203,9 @@ export default function ContactPage() {
               {/* Info sidebar */}
               <div className="space-y-6 lg:pt-4">
                 {[
-                  { label: "Showroom", lines: ["El Sharbatly International Group", "Cairo, Egypt"] },
-                  { label: "Email", lines: ["inquiries@steinheim-eg.com"], href: "mailto:inquiries@steinheim-eg.com" },
-                  { label: "WhatsApp", lines: ["+20 122 399 8124"], href: "https://wa.me/201223998124" },
+                  { label: t("info.showroom.label"), lines: t.raw("info.showroom.lines") as string[] },
+                  { label: t("info.email.label"), lines: ["inquiries@steinheim-eg.com"], href: "mailto:inquiries@steinheim-eg.com" },
+                  { label: t("info.whatsapp.label"), lines: ["+20 122 399 8124"], href: "https://wa.me/201223998124" },
                 ].map((block) => (
                   <div key={block.label} className="rounded-[12px] bg-white p-6">
                     <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{block.label}</p>
@@ -224,10 +222,10 @@ export default function ContactPage() {
                 ))}
 
                 <div className="rounded-[12px] border border-black/6 bg-white p-6">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">Response time</p>
-                  <p className="mt-3 font-heading text-[24px]">Under 24 hours</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{t("info.responseTime.label")}</p>
+                  <p className="mt-3 font-heading text-[24px]">{t("info.responseTime.value")}</p>
                   <p className="mt-2 text-[13px] leading-[1.7] text-black/45">
-                    Trade enquiries receive a detailed quote with pricing, availability, and lead times.
+                    {t("info.responseTime.note")}
                   </p>
                 </div>
               </div>

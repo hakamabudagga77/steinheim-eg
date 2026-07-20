@@ -18,6 +18,7 @@
     "contact": "Contact",
     "search": "Search",
     "cart": "Cart",
+    "wishlist": "Wishlist",
     "menu": "Menu",
     "close": "Close"
   },
@@ -267,7 +268,26 @@
     "neoperlAerators": "Neoperl aerators and brass body",
     "pvdFinishes": "PVD finishes (Matte Black, Metal Gun, Brushed Gold, Coffee Gold)",
     "validInEgypt": "Valid in Egypt only. Covers manufacturing defects, not misuse.",
-    "claimsProcess": "Claims process"
+    "claimsProcess": "Claims process",
+    "assurance": "Product assurance",
+    "heroBody": "Every Steinheim fixture is built to endure. Our warranty reflects the confidence we place in German engineering and precision manufacturing.",
+    "coverageTiers": "Coverage tiers",
+    "coverageHeadline": "Protection matched to material performance.",
+    "notes": {
+      "sedal": "The heart of every fixture — engineered to outlast the space it serves.",
+      "chromeNickel": "Classic finishes with enduring reflective clarity.",
+      "neoperl": "Precision flow technology and solid brass construction.",
+      "pvd": "Physical Vapour Deposition for scratch-resistant speciality tones."
+    },
+    "filingClaim": "Filing a claim",
+    "claimsParagraphs": [
+      "To file a warranty claim, contact your point of purchase or reach out to El Sharbatly International Group directly at {email}.",
+      "Please provide your proof of purchase, product model number, date of installation, and a description of the defect. Photos of the issue are helpful for faster processing.",
+      "Warranty claims are typically processed within 14 business days. Replacement parts or units will be provided at no cost for valid claims within the warranty period."
+    ],
+    "needHelp": "Need assistance?",
+    "helpHeadline": "Our team is here to help with any product concern.",
+    "getInTouch": "Get in touch"
   },
   "journal": {
     "title": "Journal",
@@ -295,7 +315,18 @@
   "footer": {
     "tagline": "Premium German bathroom systems",
     "distributor": "Exclusive distributor: El Sharbatly International Group",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "assistance": { "label": "Assistance", "desc": "Do you need assistance or would you like to request information?" },
+    "news": { "label": "News & Events", "desc": "News, insights and must-see moments." },
+    "catalogues": { "label": "Catalogues", "desc": "Flip through the catalogs to find the newest collections." },
+    "discoverMore": "Discover more",
+    "links": {
+      "collections": "Collections",
+      "ourWorld": "Our World",
+      "help": "Do You Need Help?",
+      "newsletter": "Newsletter"
+    },
+    "localeLabel": "Egypt / EN"
   },
   "cart": {
     "title": "Cart",
@@ -309,5 +340,958 @@
     "learnMore": "Learn more",
     "viewAll": "View all",
     "currency": "LE"
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Steinheim Egypt",
+      "headline": "Water, designed.",
+      "body": "Premium bathroom systems for homes, hospitality, and design-led projects in Egypt.",
+      "discover": "Discover more",
+      "viewProducts": "View products",
+      "pause": "Pause background video",
+      "play": "Play background video",
+      "playShort": "Play",
+      "scroll": "Scroll"
+    },
+    "collections": {
+      "title": "Explore our collections",
+      "joy": "Soft balance for private villas, suites, and warm hospitality rooms.",
+      "up": "A repeatable modern language for developments and project schedules.",
+      "art": "Architectural precision for statement bathrooms and design-led spaces.",
+      "quatro": "Crisp geometry for sharp, contemporary interiors."
+    },
+    "ritual": {
+      "headline": "The quiet ritual of precision.",
+      "body": "Steinheim is specified where the bathroom must feel resolved: proportion, finish, mechanism, and long-term reliability working as one complete language."
+    },
+    "projects": {
+      "eyebrow": "Project references",
+      "headline": "Where design takes shape",
+      "viewAll": "View all projects"
+    },
+    "trade": {
+      "eyebrow": "For the trade",
+      "headline": "Specifying for a project?",
+      "body": "Set your room composition and what each one needs once — then shop the site normally, with your rooms tracked as you go.",
+      "setup": "Set up your project",
+      "visit": "Visit Trade Studio"
+    }
+  },
+  "showroom": {
+    "eyebrow": "Inside Steinheim",
+    "headline": "The showroom, as it is.",
+    "body": "Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms, and the space where clients specify a complete bathroom in person.",
+    "soundOn": "Turn video sound on",
+    "soundOff": "Mute video"
+  },
+  "productPage": {
+    "collectionLabel": "{series} Collection",
+    "outOfStock": "Out of stock",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added to Cart",
+    "noSpecificRoom": "No specific room",
+    "needsThis": "Needs this",
+    "noRoomManual": "No specific room (manual)",
+    "setupRoomCta": "Set up your project to auto-assign this to a room",
+    "openBoard": "Open project board",
+    "addedBoard": "Added to project board",
+    "addBoard": "Add to project board",
+    "infoNote": "Technical information, product details, and catalogue downloads are available below.",
+    "tabs": {
+      "description": "Product Description",
+      "detail": "Product Detail",
+      "downloads": "Downloads"
+    },
+    "detailRows": {
+      "number": "Product Number",
+      "collection": "Collection",
+      "finish": "Finish",
+      "application": "Application"
+    },
+    "descriptionBody": "{product} from the {series} collection brings Steinheim's architectural bathroom language into a precise, project-ready product. The current selection is shown in {finish}.",
+    "downloadsIntro": "Download the current Steinheim catalogue or request the exact technical sheet for {series} {product} in {finish}.",
+    "downloadsNote": "Final stock, trade pricing, lead times, and project quantities should still be confirmed with Steinheim Egypt.",
+    "openCatalogue": "Open Steinheim Catalogue 2026",
+    "requestSheet": "Request technical sheet for {model}",
+    "context": {
+      "eyebrow": "In context",
+      "headline": "Part of a complete bathroom language.",
+      "body": "See how the {series} collection's form, finish, and proportions work within a resolved bathroom environment.",
+      "cta": "View {series} collection"
+    },
+    "related": {
+      "eyebrow": "Related",
+      "headline": "Continue the {series} language.",
+      "viewCollection": "View collection"
+    },
+    "qty": {
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "label": "Quantity"
+    }
+  },
+  "aboutPage": {
+    "breadcrumb": { "home": "Home", "world": "Our World", "company": "The Company" },
+    "hero": { "eyebrow": "Steinheim Egypt", "headline": "A premium bathroom language for Egypt." },
+    "tabs": { "intro": "Intro", "identity": "Identity", "quality": "Quality", "finishes": "Finishes", "trade": "Trade" },
+    "world": {
+      "eyebrow": "Our World",
+      "headline": "The bathroom, treated as architecture.",
+      "cards": {
+        "company": { "eyebrow": "Company", "title": "The Steinheim standard" },
+        "collections": { "eyebrow": "Collections", "title": "Four bathroom languages" },
+        "finishes": { "eyebrow": "Finishes", "title": "Surfaces with presence" },
+        "trade": { "eyebrow": "Trade", "title": "Built for specification" }
+      }
+    },
+    "identity": {
+      "eyebrow": "A luxury lifestyle experience",
+      "headline": "Crafting beauty, creating value.",
+      "body": "Steinheim Egypt presents premium European bathroom fixtures as complete design systems. The goal is not only to sell a mixer or shower, but to help homeowners, designers, developers, and hospitality teams choose a coherent bathroom direction.",
+      "cta": "Discover the Collections"
+    },
+    "european": {
+      "eyebrow": "European direction",
+      "headline": "Precision becomes identity.",
+      "body": "The Steinheim language is calm, architectural, and specification-ready. Joy, Up, Art, and Quatro give each project a distinct tone while staying consistent enough for real homes and large commercial schedules.",
+      "cta": "Trade Studio"
+    },
+    "excellence": {
+      "headline": "The excellence that makes a bathroom feel complete."
+    },
+    "quality": {
+      "headline": "Quality",
+      "body": "Quality is not a claim on the surface. It is the practical discipline behind every recommendation, product schedule, finish choice, and installation conversation.",
+      "items": {
+        "reliability": { "title": "Product reliability", "body": "Steinheim products are selected for long-term daily use across homes, hotels, villas, and developer projects in Egypt." },
+        "finish": { "title": "Finish discipline", "body": "Chrome and PVD finishes are treated as part of the design language, not as an afterthought. Every finish must support the room visually and practically." },
+        "specification": { "title": "Specification clarity", "body": "For trade clients, Steinheim works around clear product schedules, collection logic, finish direction, quantities, and project review." },
+        "support": { "title": "Egypt support", "body": "The website guides customers toward the right direction, while final pricing, availability, and project conditions are confirmed by Steinheim Egypt." }
+      }
+    },
+    "finishes": {
+      "eyebrow": "Surface language",
+      "headline": "Finishes define the emotional direction.",
+      "body": "Chrome, brushed nickel, matte black, brushed gold, coffee gold, and metal gun allow every bathroom to move from quiet and universal to warm, expressive, or architectural.",
+      "cta": "Explore products"
+    },
+    "trade": {
+      "eyebrow": "For professionals",
+      "headline": "A simpler way to specify Steinheim.",
+      "body": "For designers, developers, contractors, and hospitality teams, Steinheim Egypt supports project logic: room types, collection direction, finishes, quantities, and one consolidated review request.",
+      "cta": "Open Trade Studio"
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "eyebrow": "Get in touch",
+      "headline": "We'd love to hear from you.",
+      "body": "Whether you're designing a single bathroom or specifying for a 200-unit development, we respond within 24 hours."
+    },
+    "enquiryTypes": {
+      "homeowner": { "label": "Homeowner", "desc": "Product enquiry or order support" },
+      "trade": { "label": "Trade / Professional", "desc": "Project specification or bulk pricing" },
+      "general": { "label": "General", "desc": "Press, partnerships, or other" }
+    },
+    "iAm": "I am a",
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+20 xxx xxx xxxx",
+      "city": "City",
+      "cityPlaceholder": "Cairo, Alexandria...",
+      "company": "Company",
+      "companyPlaceholder": "Company name",
+      "subject": "Subject",
+      "subjectPlaceholder": "What can we help with?",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your project or question..."
+    },
+    "sending": "Sending…",
+    "send": "Send message",
+    "successTitle": "Message received.",
+    "successBody": "Thank you for reaching out. Our team will review your enquiry and respond within one business day.",
+    "info": {
+      "showroom": { "label": "Showroom", "lines": ["El Sharbatly International Group", "Cairo, Egypt"] },
+      "email": { "label": "Email" },
+      "whatsapp": { "label": "WhatsApp" },
+      "responseTime": { "label": "Response time", "value": "Under 24 hours", "note": "Trade enquiries receive a detailed quote with pricing, availability, and lead times." }
+    }
+  },
+  "policyCommon": {
+    "policy": "Policy",
+    "lastUpdated": "Last updated: June 2026. This policy applies to orders placed through steinheim-eg.com."
+  },
+  "shippingPage": {
+    "title": "Shipping & delivery",
+    "sections": {
+      "deliveryAreas": {
+        "title": "Delivery areas",
+        "content": [
+          "We deliver Steinheim products throughout the Arab Republic of Egypt. All orders are shipped from our Cairo warehouse.",
+          "For addresses outside Greater Cairo, delivery timelines may vary depending on the governorate."
+        ]
+      },
+      "shippingCosts": {
+        "title": "Shipping costs",
+        "content": [
+          "Orders above LE 15,000: Free delivery within Greater Cairo.",
+          "Orders below LE 15,000: A flat shipping fee of LE 250 applies within Greater Cairo.",
+          "Outside Greater Cairo: Shipping is calculated based on destination and order weight. You will be informed of the exact cost before confirming your order."
+        ]
+      },
+      "processingTime": {
+        "title": "Processing time",
+        "content": [
+          "Orders are processed within 1–3 business days. You will receive a confirmation email once your order has been dispatched.",
+          "Business days are Sunday through Thursday, 9:00 AM to 5:00 PM (Cairo time). Orders placed on Fridays, Saturdays, or public holidays will be processed on the next business day."
+        ]
+      },
+      "estimatedDelivery": {
+        "title": "Estimated delivery",
+        "content": [
+          "Greater Cairo: 2–5 business days after dispatch.",
+          "Alexandria, Delta, and Canal Zone: 4–7 business days.",
+          "Upper Egypt and remote areas: 7–12 business days.",
+          "These are estimates. Actual delivery times may vary during peak seasons or due to circumstances beyond our control."
+        ]
+      },
+      "orderTracking": {
+        "title": "Order tracking",
+        "content": [
+          "Once your order is dispatched, you will receive a tracking number via email or WhatsApp. You can use this to monitor your shipment status."
+        ]
+      },
+      "inspection": {
+        "title": "Inspection on delivery",
+        "content": [
+          "We recommend inspecting your package at the time of delivery. If the outer packaging appears damaged, please note this on the delivery receipt and contact us within 24 hours.",
+          "All products are carefully packaged to ensure they arrive in perfect condition."
+        ]
+      },
+      "questions": {
+        "title": "Questions",
+        "content": [
+          "For any shipping-related enquiries, contact us at inquiries@steinheim-eg.com or via WhatsApp at +20 122 399 8124."
+        ]
+      }
+    }
+  },
+  "returnsPage": {
+    "title": "Returns & exchanges",
+    "sections": {
+      "eligibility": {
+        "title": "Return eligibility",
+        "content": [
+          "We accept returns within 14 days of delivery, provided the product is unused, uninstalled, and in its original sealed packaging with all accessories and documentation included.",
+          "Items that have been installed, modified, or show signs of use are not eligible for return."
+        ]
+      },
+      "nonReturnable": {
+        "title": "Non-returnable items",
+        "content": [
+          "The following items cannot be returned or exchanged:",
+          "• Products that have been installed or connected to plumbing",
+          "• Custom or special-order finishes not part of the standard catalogue",
+          "• Accessories with broken seals (angle valves, click-clack wastes, bidet sprays) once packaging is opened",
+          "• Products purchased during clearance or final-sale promotions"
+        ]
+      },
+      "howToRequest": {
+        "title": "How to request a return",
+        "content": [
+          "To initiate a return, contact us at inquiries@steinheim-eg.com or via WhatsApp at +20 122 399 8124 with your order number and reason for return.",
+          "Our team will confirm eligibility and provide return instructions within 1–2 business days."
+        ]
+      },
+      "returnShipping": {
+        "title": "Return shipping",
+        "content": [
+          "For returns due to a defect or error on our part, Steinheim Egypt will cover the return shipping cost.",
+          "For returns due to change of mind, the customer is responsible for return shipping. Products must be shipped in protective packaging to avoid damage in transit."
+        ]
+      },
+      "exchanges": {
+        "title": "Exchanges",
+        "content": [
+          "We offer exchanges for different finishes or models, subject to availability. The same 14-day window and condition requirements apply.",
+          "If the replacement item has a different price, we will refund or charge the difference accordingly."
+        ]
+      },
+      "refundProcess": {
+        "title": "Refund process",
+        "content": [
+          "Once we receive and inspect the returned product, we will process your refund within 5–7 business days.",
+          "Refunds are issued to the original payment method. Bank processing times may add 3–5 additional business days."
+        ]
+      },
+      "damaged": {
+        "title": "Damaged or defective products",
+        "content": [
+          "If your product arrives damaged or with a manufacturing defect, contact us within 48 hours of delivery with photographs of the damage.",
+          "We will arrange a free replacement or full refund at your choice. For warranty-covered defects discovered after installation, please refer to our warranty policy."
+        ]
+      },
+      "questions": {
+        "title": "Questions",
+        "content": [
+          "For any return or exchange enquiries, contact us at inquiries@steinheim-eg.com or via WhatsApp at +20 122 399 8124."
+        ]
+      }
+    }
+  },
+  "privacyPage": {
+    "title": "Privacy policy",
+    "lastUpdated": "Last updated: June 2026. This policy applies to steinheim-eg.com operated by El Sharbatly International Group.",
+    "sections": {
+      "informationWeCollect": {
+        "title": "Information we collect",
+        "content": [
+          "When you place an order, submit a contact form, or use our trade portal, we collect information necessary to fulfil your request. This may include your name, email address, phone number, delivery address, and company name (for trade accounts).",
+          "We also collect non-personal data through cookies and analytics tools, such as pages visited, browser type, and device information, to improve your experience on our website."
+        ]
+      },
+      "howWeUse": {
+        "title": "How we use your information",
+        "content": [
+          "We use your personal information to:",
+          "• Process and deliver your orders",
+          "• Respond to enquiries and provide customer support",
+          "• Send order confirmations, shipping updates, and delivery notifications",
+          "• Process trade account applications and project quotations",
+          "• Improve our website, products, and services",
+          "We do not sell, rent, or share your personal information with third parties for their own marketing purposes."
+        ]
+      },
+      "paymentSecurity": {
+        "title": "Payment security",
+        "content": [
+          "All payments are processed securely through Shopify's payment infrastructure. We do not store your credit card details on our servers.",
+          "Shopify's payment processing is PCI DSS compliant, ensuring your financial information is handled with the highest security standards."
+        ]
+      },
+      "thirdParty": {
+        "title": "Third-party services",
+        "content": [
+          "We use the following third-party services to operate our website:",
+          "• Shopify — Order processing and payment handling",
+          "• Vercel — Website hosting and content delivery",
+          "• WhatsApp Business — Customer communication",
+          "These services have their own privacy policies governing how they handle your data."
+        ]
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": [
+          "Our website uses essential cookies to maintain your shopping cart and session. We may also use analytics cookies to understand how visitors interact with our site.",
+          "You can control cookie preferences through your browser settings. Disabling essential cookies may affect the functionality of our website."
+        ]
+      },
+      "dataRetention": {
+        "title": "Data retention",
+        "content": [
+          "We retain your personal information for as long as necessary to fulfil the purposes described in this policy, including order records for accounting and warranty purposes.",
+          "Trade account information is retained for the duration of the business relationship and for a reasonable period thereafter."
+        ]
+      },
+      "yourRights": {
+        "title": "Your rights",
+        "content": [
+          "You have the right to:",
+          "• Access the personal information we hold about you",
+          "• Request correction of inaccurate information",
+          "• Request deletion of your personal data, subject to legal retention requirements",
+          "• Opt out of marketing communications at any time",
+          "To exercise any of these rights, contact us at inquiries@steinheim-eg.com."
+        ]
+      },
+      "contact": {
+        "title": "Contact",
+        "content": [
+          "For privacy-related enquiries, contact us at inquiries@steinheim-eg.com or via WhatsApp at +20 122 399 8124.",
+          "Steinheim Egypt — El Sharbatly International Group, Cairo, Egypt."
+        ]
+      }
+    }
+  },
+  "projectsPage": {
+    "eyebrow": "Project references",
+    "heroHeadline": "Where design takes shape.",
+    "heroBody": "Published Steinheim project references from the UAE: residential developments and branded residences where bathroom systems become part of the architectural specification.",
+    "discoverMore": "Discover more",
+    "allProjects": "All projects",
+    "officialHeadline": "Official references, not concepts.",
+    "officialBody": "These are the public project references Steinheim Egypt currently presents. Exact product models, finishes, quantities, and installation details should be confirmed with the Steinheim team before specification.",
+    "forEgypt": "For Egypt projects",
+    "scheduleHeadline": "From reference to schedule.",
+    "scheduleBody": "A strong project section should show credibility, then make the next step obvious. The public references prove Steinheim belongs in serious developments; the trade studio turns that interest into a project-ready request for the Egypt team.",
+    "pillars": {
+      "visual": "Visual direction",
+      "collection": "Collection logic",
+      "schedule": "Project schedule"
+    },
+    "openTradeStudio": "Open trade studio"
+  },
+  "projectDetail": {
+    "breadcrumb": { "home": "Home", "projects": "Projects", "references": "References" },
+    "sector": "Sector",
+    "designer": "Designer",
+    "collection": "Steinheim collection",
+    "finishDirection": "Finish direction",
+    "publishedEvidence": "Published evidence",
+    "publishedNote": "Published reference note",
+    "disclaimer": "Project visual shown from Steinheim Egypt's public project references. Specification details should be confirmed directly with the Steinheim Egypt trade team.",
+    "gallery": "Gallery",
+    "backToAll": "Back to all projects",
+    "buildSchedule": "Build a project schedule"
+  },
+  "collectionsLanding": {
+    "breadcrumb": { "home": "Home", "collections": "Collections" },
+    "eyebrow": "Collections",
+    "headline": "Four systems.",
+    "pause": "Pause background video",
+    "play": "Play background video",
+    "exclusiveHeadline": "Exclusive collections for the most intimate space in living",
+    "brandHeadline": "Steinheim, synonymous with design in refined bathroom spaces",
+    "brandBody": "With collections ranging from soft minimal mixers to sharper architectural systems, Steinheim creates a complete bathroom language for homes, hotels, designers, and developers in Egypt.",
+    "gridTitle": "Steinheim Collections",
+    "family": {
+      "joy": "Series 60",
+      "up": "Series 50",
+      "art": "Series 70",
+      "quatro": "Series 40"
+    }
+  },
+  "collectionPage": {
+    "breadcrumb": { "home": "Home", "collections": "Collections" },
+    "nav": { "overview": "Overview", "setup": "Set-up", "products": "Products" },
+    "chooseFinish": "Choose a finish",
+    "seeRange": "See the entire {series} range in one finish.",
+    "setupEyebrow": "Set-up",
+    "setupHeadline": "How this collection belongs in a project.",
+    "backToOverview": { "title": "Back to overview", "body": "Return to the story and design direction of the collection." },
+    "tradeStudio": { "title": "Trade studio", "body": "Build a project scope and prepare a Steinheim specification." },
+    "viewProducts": "View products",
+    "viewSetup": "View set-up",
+    "close": "Close",
+    "notFound": "Collection not found.",
+    "strategy": {
+      "joy": {
+        "family": "Series 60",
+        "headline": "A refined balance of softness, reliability, and everyday premium comfort.",
+        "description": "Joy is the Steinheim collection for warm private bathrooms, hospitality rooms, and projects where the fittings should feel elevated without becoming loud.",
+        "setup": "Use Joy for guest bathrooms, master bathrooms, hotel rooms, and premium apartments where consistency and calm design matter.",
+        "cards": {
+          "intro": { "eyebrow": "Intro", "title": "Soft Minimal", "body": "Rounded forms and quiet proportions for spaces that need warmth." },
+          "concept": { "eyebrow": "Concept", "title": "Everyday Premium", "body": "A practical collection that still feels considered and complete." },
+          "design": { "eyebrow": "Design", "title": "Warm Precision", "body": "Suitable for villas, hotel rooms, and repeatable premium bathrooms." }
+        }
+      },
+      "up": {
+        "family": "Series 50",
+        "headline": "A streamlined modern collection for repeatable contemporary projects.",
+        "description": "Up gives the bathroom a cleaner, more dynamic silhouette while staying practical for larger schedules, designers, and developers.",
+        "setup": "Use Up when the project needs a sharper modern look, efficient specification, and a collection that can repeat across many units.",
+        "cards": {
+          "intro": { "eyebrow": "Intro", "title": "Fluid Modern", "body": "Slimmer lines and an easy contemporary silhouette." },
+          "concept": { "eyebrow": "Concept", "title": "Project Ready", "body": "Built for apartments, developments, and modern hospitality scopes." },
+          "design": { "eyebrow": "Design", "title": "Clean Momentum", "body": "A directional collection without unnecessary visual noise." }
+        }
+      },
+      "art": {
+        "family": "Series 70",
+        "headline": "Architectural precision for bathrooms that need a stronger design signature.",
+        "description": "Art is for spaces where the fitting should feel intentional, sculptural, and closely connected to the architecture of the room.",
+        "setup": "Use Art for statement suites, villas, show bathrooms, and projects where the specification should feel more expressive.",
+        "cards": {
+          "intro": { "eyebrow": "Intro", "title": "Sculptural Precision", "body": "A more architectural language for statement bathrooms." },
+          "concept": { "eyebrow": "Concept", "title": "Design-Led", "body": "For clients who want the fixture to be part of the room identity." },
+          "design": { "eyebrow": "Design", "title": "Confident Lines", "body": "Premium, controlled, and visually memorable." }
+        }
+      },
+      "quatro": {
+        "family": "Series 40",
+        "headline": "Geometric clarity for sharp, contemporary bathrooms.",
+        "description": "Quatro brings defined edges, clean planes, and a more graphic silhouette to modern homes, offices, and developer schemes.",
+        "setup": "Use Quatro where the architecture is sharper: modern apartments, office washrooms, show units, and contemporary villas.",
+        "cards": {
+          "intro": { "eyebrow": "Intro", "title": "Geometric Calm", "body": "Crisp geometry with controlled visual tension." },
+          "concept": { "eyebrow": "Concept", "title": "Sharp Modern", "body": "A clean-edged collection for confident interiors." },
+          "design": { "eyebrow": "Design", "title": "Defined Planes", "body": "For bathrooms that need structure and architectural clarity." }
+        }
+      }
+    }
+  },
+  "tradePage": {
+    "eyebrow": "For professionals",
+    "headline": "Specify by room, not by cart.",
+    "body": "Set your property's room composition once, then assign a collection to each room group — mix collections freely — and combine everything into one Steinheim Egypt RFQ.",
+    "setupProperty": "Set up your property",
+    "howItWorks": "How it works",
+    "howHeadline": "One property, one setup, any mix of collections.",
+    "howBody": "Each room group can carry its own collection, finish, and even mix products across collections. Reassigning a group updates it in place — nothing to delete by hand.",
+    "steps": {
+      "setRooms": { "title": "Set your rooms", "body": "Enter your property once — master, standard, powder, suite, and how many of each." },
+      "assign": { "title": "Assign per group", "body": "Pick a collection and finish for each room group, or hand-pick exact products across collections." },
+      "editAnytime": { "title": "Edit anytime", "body": "Reopen any group to change its collection — it replaces that group cleanly, nothing to delete by hand." },
+      "submit": { "title": "Submit one RFQ", "body": "The board combines every group into one Steinheim Egypt trade request." }
+    },
+    "alreadyKnow": "Already know what you need?",
+    "browseHeadline": "Browse products directly and build your board.",
+    "browseCollections": "Browse collections"
+  },
+  "tradeOpenButton": {
+    "openBoard": "Open project board",
+    "setupProject": "Set up your project"
+  },
+  "smartRoomCalculator": {
+    "eyebrow": "Steinheim Trade Studio",
+    "headline": "Tell us your property, once",
+    "body": "Set your room composition, then assign real products to each room — right here on this page. Everything you pick is saved to your project board as you go.",
+    "steps": { "intro": "You & your project", "rooms": "Rooms", "needs": "What's needed", "shop": "Shop products" },
+    "step0": {
+      "headline": "What kind of project is this?",
+      "body": "Pick the closest match — it shapes what we ask next. You can always adjust details later.",
+      "reachTitle": "Tell us who to reach",
+      "reachBody": "So our team has everything they need before the first call — no back-and-forth just to get the basics.",
+      "fields": {
+        "name": "Your name *",
+        "email": "Email *",
+        "company": "Company",
+        "phone": "Phone",
+        "projectName": "Business or project name *",
+        "location": "Location",
+        "timeline": "Timeline (e.g. Q2 2027)"
+      }
+    },
+    "step1": {
+      "defaultHeadline": "How many rooms in total?",
+      "defaultBody": "This is the full property. You'll assign a collection to each group next, right here on this page.",
+      "quickFill": "Quick fill: {label}",
+      "powderHelper": "Basin only - no shower included",
+      "addEachSpace": "Add each space",
+      "customNamedRooms": "Custom-named rooms",
+      "customRoomsNote": "For a bespoke project — name a specific room instead of using the categories above (e.g. “Primary Ensuite”, “Kids' Bathroom”).",
+      "defaultCustomPlaceholder": "Room name — e.g. Primary Ensuite",
+      "count": "Count",
+      "remove": "Remove",
+      "addCustomRoom": "Add a custom room",
+      "fallbackLabel": "Custom room",
+      "roomsConfigured": "{count, plural, one {room} other {rooms}} configured",
+      "continueAssign": "Continue — assign products to each room"
+    },
+    "step2": {
+      "headline": "What does each room need?",
+      "body": "Pick what each room needs and how many. You'll shop for the exact products next.",
+      "roomCount": "{count, plural, one {room} other {rooms}}",
+      "continueShop": "Continue — shop your products"
+    },
+    "step3": {
+      "headline": "Shop your products",
+      "body": "Every collection, side by side. Mix products and finishes freely to fill what each room needs — everything you add is saved to your project board immediately.",
+      "continueBoard": "Continue to project board",
+      "disclaimer": "Retail references only. Trade pricing, stock, lead times, and final package structure are confirmed by the Steinheim Egypt team after submission."
+    },
+    "back": "Back",
+    "continue": "Continue"
+  },
+  "shopByNeed": {
+    "forProject": "For {name}",
+    "headline": "Shop by need.",
+    "body": "Everything {name} still needs, grouped by product type across every collection.",
+    "yourProject": "your project",
+    "setupFirst": "Set up your project first",
+    "setupFirstBody": "Tell us your rooms and what each one needs — then this page fills in with exactly the products you're looking for.",
+    "shop": "Shop",
+    "roomSummary": "{count, plural, one {# room} other {# rooms}}"
+  },
+  "shopProductsStep": {
+    "checkFirst": "Check at least one product need in the previous step before shopping.",
+    "shop": "Shop",
+    "yourRooms": "Your rooms",
+    "unitsSummary": "{count, plural, one {# unit} other {# units}}",
+    "acrossSeries": "across {series}"
+  },
+  "roomProgressPanel": {
+    "roomCount": "{count, plural, one {# room} other {# rooms}}",
+    "selectedOfNeeded": "{selected} of {needed}"
+  },
+  "roomBasketCard": {
+    "unitsAndValue": "{count, plural, one {# unit} other {# units}} · {value}",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "remove": "Remove"
+  },
+  "tradeStageTimeline": {
+    "projectStatus": "Project status",
+    "projectJourney": "Project journey",
+    "stepOf": "Step {current} of {total}"
+  },
+  "scheduleCallModal": {
+    "title": "Schedule a call",
+    "fallbackCopy": "Live booking isn't set up yet — send Steinheim a message with a few times that work for you, and the team will confirm one directly in this thread.",
+    "ctaLabel": "Request a call by message",
+    "iframeTitle": "Schedule a call with Steinheim",
+    "close": "Close"
+  },
+  "floatingRoomProgress": {
+    "studioLabel": "Steinheim Trade Studio",
+    "yourRooms": "Your rooms",
+    "close": "Close",
+    "selectedOfTotal": "{selected} of {total} selected",
+    "continueOnTradePage": "Continue on trade page",
+    "leftCount": "{count, plural, one {# left} other {# left}}"
+  },
+  "tradeMessagesPanel": {
+    "callTemplate": "I'd like to schedule a call to discuss this project. Here are some times that work for me: ",
+    "serviceTemplate": "I'd like to book a service visit for a product from this project. Here are some times that work for me: ",
+    "projectStatus": "Project status",
+    "loadingMessages": "Loading messages…",
+    "talkToSteinheim": "Talk to Steinheim",
+    "talkBody": "Ask a question, request a call, or follow up on your submission — the team replies here and by email.",
+    "you": "You",
+    "steinheim": "Steinheim",
+    "scheduleCall": "Schedule a call",
+    "requestService": "Request a service visit",
+    "messagePlaceholder": "Message Steinheim…",
+    "sending": "…",
+    "send": "Send",
+    "sendError": "Could not send. Please try again.",
+    "serviceFallback": "Live booking isn't set up yet — send Steinheim a message with a few times that work for a technician to visit, and the team will confirm one directly in this thread.",
+    "serviceCta": "Request a service visit by message"
+  },
+  "tradeSetupOverlay": {
+    "studioLabel": "Steinheim Trade Studio",
+    "headline": "Set up your project",
+    "close": "Close",
+    "steps": { "intro": "You & your project", "rooms": "Rooms", "needs": "What's needed" },
+    "step0": {
+      "headline": "What kind of project is this?",
+      "body": "Pick the closest match — it shapes what we ask next.",
+      "reachTitle": "Who should we reach?",
+      "fields": { "name": "Your name *", "email": "Email *", "projectName": "Business or project name *" }
+    },
+    "step1": {
+      "defaultHeadline": "How many rooms in total?",
+      "defaultBody": "A rough count is fine — you can adjust anything later.",
+      "quickFill": "Quick fill: {label}",
+      "addEachSpace": "Add each space",
+      "customNamedRooms": "Custom-named rooms",
+      "defaultCustomPlaceholder": "Room name",
+      "count": "Count",
+      "remove": "Remove",
+      "addCustomRoom": "Add a custom room",
+      "fallbackLabel": "Custom room"
+    },
+    "step2": {
+      "headline": "What does each room need?",
+      "body": "Pick what each room needs and how many. You'll shop for it on the site as you browse.",
+      "roomCount": "({count})",
+      "doneLead": "You're set.",
+      "doneNote": "Once you're done, browse the site exactly as normal — or open <shop>Shop by need</shop> in the menu to see only what {project} still needs, grouped by type.",
+      "yourProject": "your project"
+    },
+    "back": "Back",
+    "continue": "Continue",
+    "done": "Done — browse products"
+  },
+  "tradeProjectDrawer": {
+    "brand": "Steinheim",
+    "close": "Close",
+    "titles": {
+      "board": "Project board",
+      "details": "Your details",
+      "messages": "Messages",
+      "status": "Project status",
+      "quote": "Trade quote",
+      "samples": "Samples",
+      "documents": "Documents",
+      "sent": "Sent"
+    },
+    "projectsMenu": {
+      "untitled": "Untitled project",
+      "productCount": "{count, plural, one {# product} other {# products}}",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "newProject": "New project"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "products": "1 — Products",
+      "detailsAndSend": "2 — Details & send",
+      "status": "Status",
+      "quote": "Quote",
+      "documents": "Documents",
+      "samples": "Samples",
+      "messages": "Messages"
+    },
+    "board": {
+      "startTitle": "Start your project",
+      "startBody": "Set up your property's room composition from the trade page, or browse products and tap “Add to project” to build a mixed specification list.",
+      "setupProperty": "Set up your property",
+      "productAndUnitCount": "{products, plural, one {# product} other {# products}} · {units, plural, one {# unit} other {# units}}",
+      "clearAll": "Clear all",
+      "retailTotal": "Retail reference total:",
+      "editProperty": "Edit property composition",
+      "setupPropertyShort": "Set up your property",
+      "generating": "Generating…",
+      "downloadPdf": "Download PDF",
+      "sendingUpdate": "Sending…",
+      "sentNotified": "Sent — Steinheim notified",
+      "sendError": "Could not send, try again",
+      "sendUpdate": "Send updated selection to Steinheim",
+      "reorder": "Reorder — start a new project from this one",
+      "roomCount": "{count, plural, one {# room} other {# rooms}}",
+      "shopOnTradePage": "Shop on trade page",
+      "notYetAssigned": "Not yet assigned",
+      "scope": "Scope",
+      "unitsCount": "{count, plural, one {# unit} other {# units}}",
+      "priceDisclaimer": "Prices shown are retail references. Trade pricing confirmed after submission.",
+      "otherProjects": "Your other projects",
+      "manualScopeName": "Manually added products",
+      "manualScopeSummary": "Products added directly from collection and product pages."
+    },
+    "details": {
+      "yourSelection": "Your selection",
+      "productAndUnits": "{products, plural, one {# product} other {# products}} · {units, plural, one {# unit} other {# units}}",
+      "editProducts": "Edit products",
+      "editPropertyBeforeSend": "Edit property composition before sending",
+      "setupPropertyBeforeSend": "Set up your property before sending",
+      "aboutYou": "About you",
+      "fields": {
+        "name": "Your name *",
+        "email": "Email *",
+        "company": "Company",
+        "phone": "Phone",
+        "role": "Your role",
+        "projectName": "Project name *",
+        "projectType": "Project type",
+        "location": "Location",
+        "timeline": "Timeline (e.g. Q2 2027)",
+        "notes": "Notes — room mix, finishes, quantities per room type, anything helpful"
+      },
+      "roles": {
+        "interiorDesigner": "Interior Designer",
+        "architect": "Architect",
+        "developer": "Developer",
+        "projectManager": "Project Manager",
+        "procurement": "Procurement",
+        "contractor": "Contractor",
+        "homeowner": "Homeowner"
+      },
+      "projectTypes": {
+        "hospitality": "Hotel / Hospitality",
+        "residential": "Residential Development",
+        "villa": "Villa / Private",
+        "commercial": "Commercial / Retail",
+        "other": "Other"
+      },
+      "aboutProject": "About the project",
+      "pdfSpecSheet": "PDF spec sheet",
+      "includePrices": "Include retail reference prices",
+      "includeSpecs": "Include technical specifications appendix"
+    },
+    "status": {
+      "loading": "Loading status…",
+      "progressByRoom": "Progress by room",
+      "deliveryDetails": "Delivery details",
+      "deliveryIntro": "Tell us who to hand this to on-site and when the gate is open, so delivery goes smoothly.",
+      "contactName": "Site contact name",
+      "contactPhone": "Site contact phone",
+      "accessNotes": "Access hours, security instructions, anything the driver should know",
+      "saving": "Saving…",
+      "save": "Save delivery details",
+      "lastSaved": "Last saved {date}",
+      "saveError": "Could not save. Please try again."
+    },
+    "quote": {
+      "label": "Trade quote",
+      "view": "View quote",
+      "accepted": "Accepted",
+      "accepting": "Accepting…",
+      "acceptError": "Could not accept, try again",
+      "accept": "Accept quote",
+      "pendingTitle": "Quote pending",
+      "pendingBody": "Steinheim will share trade pricing for this project here as soon as it's ready.",
+      "previousQuotes": "Previous quotes",
+      "noQuoteSet": "No quote set yet"
+    },
+    "documents": {
+      "emptyTitle": "Nothing here yet",
+      "emptyBody": "Invoices, certificates, and spec sheets will show up here as Steinheim adds them.",
+      "warrantyReference": "Warranty reference",
+      "warrantyNote": "Keep this reference for any warranty claim. Request a technician anytime from the Messages tab."
+    },
+    "samples": {
+      "bookShowroom": "Book a showroom visit",
+      "requestSamples": "Request samples",
+      "intro": "Tell us which finishes or products you'd like to see in person before committing.",
+      "notePlaceholder": "e.g. Chrome and Brushed Nickel finish for the Up Shower Column",
+      "deliveryAddress": "Delivery address",
+      "addressPlaceholder": "Full address, including area and city — e.g. 12 Shagaret El Dor St, Zamalek, Cairo",
+      "sending": "Sending…",
+      "requestError": "Could not send the request. Please try again.",
+      "yourRequests": "Your requests",
+      "fulfilled": "Fulfilled",
+      "requested": "Requested",
+      "showroomTitle": "Book a showroom visit",
+      "showroomFallback": "Live booking isn't set up yet — send Steinheim a message with a few times that work for you to visit the showroom, and the team will confirm one directly in the Messages tab.",
+      "showroomCta": "Request a visit by message"
+    },
+    "sent": {
+      "title": "Sent to Steinheim",
+      "reference": "Reference: {ref}",
+      "body": "The team will review your project and respond with trade pricing within 24 hours.",
+      "generating": "Generating…",
+      "downloadSpec": "Download your spec sheet",
+      "messageSteinheim": "Message Steinheim",
+      "newProject": "Start a new project"
+    },
+    "footer": {
+      "editProperty": "Edit property",
+      "setupProperty": "Set up property",
+      "detailsCta": "Details",
+      "sending": "Sending…",
+      "sendToSteinheim": "Send to Steinheim",
+      "confirmationNote": "You'll receive a confirmation with your spec sheet"
+    },
+    "errors": {
+      "addProduct": "Add at least one product.",
+      "addName": "Add your name.",
+      "addEmail": "Add a valid email.",
+      "addProjectName": "Add the project name.",
+      "submitFailed": "Could not submit. Please try again.",
+      "somethingWrong": "Something went wrong. Please try again.",
+      "pdfFailed": "Could not generate the PDF. Try again."
+    }
+  },
+  "tradeRestore": {
+    "restoring": "Restoring your project…",
+    "welcomeBack": "Welcome back",
+    "restoredBody": "{name} — your products, rooms, and messages with Steinheim are restored. Taking you there now…",
+    "yourProject": "your project",
+    "notFoundTitle": "We couldn't find that project",
+    "notFoundBody": "This link may have expired or the project could not be loaded. You can start a new project or reach out directly.",
+    "goToTradeStudio": "Go to Trade Studio"
+  },
+  "collectionAssistantPanel": {
+    "questions": {
+      "homesOrHotels": "Is this collection better for homes or hotel projects?",
+      "finishDirection": "Which finish direction should I start with?",
+      "compare": "Compare this collection with another Steinheim collection.",
+      "buildBathroom": "Build a bathroom from this collection."
+    },
+    "unreachable": "I could not reach the Steinheim Concierge right now. You can still browse the collection or add the starter package to your project board.",
+    "concierge": "Steinheim concierge",
+    "decideHeadline": "Decide if {series} is the right language.",
+    "askBody": "Ask how this collection fits a home, hotel, compound, designer brief, or contractor schedule.",
+    "starterPackage": "Starter package",
+    "starterPackageBody": "A practical first bathroom set in {finish}.",
+    "addPackage": "Add package",
+    "packageTotal": "Retail-reference package total: {total}. Trade pricing requires confirmation.",
+    "notActive": "Not active here: {items}.",
+    "guide": "{series} guide",
+    "guideBody": "Catalogue-backed guidance for this collection, its active finishes, and its project fit.",
+    "catalogueGrounded": "Catalogue grounded",
+    "readingContext": "Reading the collection, finishes, and project context...",
+    "addStarterPackage": "Add starter package",
+    "smartRoomCalculator": "Smart room calculator",
+    "askPlaceholder": "Ask about {series}, finishes, project fit, or package logic...",
+    "ask": "Ask"
+  },
+  "finishTags": {
+    "standard": "Standard",
+    "pvd": "PVD"
+  },
+  "overviewCardsSpread": {
+    "discoverMore": "Discover more"
+  },
+  "projectsCarousel": {
+    "discoverWith": "Discover projects with <c>{collection}</c>"
+  },
+  "siteSearch": {
+    "placeholder": "Search products, collections, pages...",
+    "noResults": "No results for \"{query}\"",
+    "hint": "Search the whole site — products, collections, and pages",
+    "groups": {
+      "product": "Products",
+      "collection": "Collections",
+      "page": "Pages"
+    },
+    "shortcutHint": "to search",
+    "closeHint": "to close",
+    "navigateHint": "to navigate"
+  },
+  "cartDrawer": {
+    "title": "Your cart",
+    "noItems": "No items yet",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "close": "Close cart",
+    "emptyTitle": "Your cart is empty",
+    "emptyBody": "Browse our collections and add products you love.",
+    "browse": "Browse collections",
+    "clearAll": "Clear all",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "shippingNote": "Shipping and taxes calculated at checkout. Free delivery within Greater Cairo for orders above LE 15,000.",
+    "checkout": "Checkout",
+    "preparingCheckout": "Preparing checkout…",
+    "whatsappEnquire": "Or enquire via WhatsApp",
+    "secureNote": "Checkout goes to Steinheim Egypt's secure payment page"
+  },
+  "wishlistDrawer": {
+    "title": "Wishlist",
+    "noItems": "No saved items yet",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "close": "Close wishlist",
+    "emptyTitle": "Nothing saved yet",
+    "emptyBody": "Tap the heart on any product to keep it here.",
+    "browse": "Browse collections",
+    "remove": "Remove",
+    "addToCart": "Add to cart",
+    "share": "Copy share link",
+    "shareCopied": "Link copied",
+    "shareFallback": "Copy this link to share your wishlist"
+  },
+  "sharedWishlistPage": {
+    "eyebrow": "Shared wishlist",
+    "title": "A wishlist, shared with you",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "addAllHint": "Add every piece below to your own wishlist in one tap.",
+    "addAll": "Add all to my wishlist",
+    "addedAll": "Added to your wishlist",
+    "viewWishlist": "View my wishlist",
+    "emptyTitle": "This link has nothing to show",
+    "emptyBody": "The wishlist link is empty or no longer valid. Browse our collections to start your own.",
+    "browse": "Browse collections"
+  },
+  "cards": {
+    "quickAdd": "Quick add",
+    "add": "Add",
+    "added": "Added",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "noSpecificRoom": "No specific room",
+    "availableFinishes": "Available finishes",
+    "showFinish": "Show {name}",
+    "wishlistToggle": "Save to wishlist"
+  },
+  "menu": {
+    "forYourProject": "For your project",
+    "shopFor": "Shop for {name}",
+    "yourProject": "your project",
+    "ourWorld": "Our World",
+    "world": {
+      "company": "The Company",
+      "companyEyebrow": "Identity",
+      "finishes": "Our Finishes",
+      "finishesEyebrow": "Surface language",
+      "tradeStudio": "Trade Studio",
+      "tradeStudioEyebrow": "Projects"
+    }
   }
 }

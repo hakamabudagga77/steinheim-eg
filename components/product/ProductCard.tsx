@@ -1,17 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
+import { useWishlist } from "@/components/wishlist/WishlistContext";
 import type { RoomGroup } from "@/lib/trade-project";
 
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
 
-export default function ProductCard({
+// Memoized: rendered in grids of 20+ cards, so unrelated page-state changes
+// (modals, finish selectors) must not re-render every card.
+export default memo(ProductCard);
+
+function ProductCard({
   product,
   liveVariants,
   hidePrice = false,
@@ -29,12 +35,14 @@ export default function ProductCard({
   /** Restricts the swatch picker + default image to just these finishes (e.g. an active catalogue filter). Omit to show all. */
   visibleFinishes?: string[];
 }) {
+  const t = useTranslations("cards");
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [roomOpen, setRoomOpen] = useState(false);
   const [scopeChoice, setScopeChoice] = useState(roomOptions?.[0]?.scopeId ?? "");
   const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
 
   const displayVariants =
     visibleFinishes && visibleFinishes.length > 0
@@ -43,27 +51,29 @@ export default function ProductCard({
 
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
   // sets this card's default, but the shopper can still pick a different one for this card alone.
-  useEffect(() => {
+  const [prevGroupFinish, setPrevGroupFinish] = useState(groupFinish);
+  if (groupFinish !== prevGroupFinish) {
+    setPrevGroupFinish(groupFinish);
     if (groupFinish) setSelectedFinish(groupFinish);
-  }, [groupFinish]);
+  }
 
   // When an active finish filter no longer includes the currently shown finish
   // (or first applies), snap to the first finish that's still visible.
-  useEffect(() => {
-    if (groupFinish) return;
-    if (displayVariants.length > 0 && !displayVariants.some((v) => v.finish === selectedFinish)) {
+  const [prevVisibleFinishes, setPrevVisibleFinishes] = useState(visibleFinishes);
+  if (visibleFinishes !== prevVisibleFinishes) {
+    setPrevVisibleFinishes(visibleFinishes);
+    if (!groupFinish && displayVariants.length > 0 && !displayVariants.some((v) => v.finish === selectedFinish)) {
       setSelectedFinish(displayVariants[0].finish);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visibleFinishes]);
+  }
 
-  useEffect(() => {
-    if (!roomOptions || roomOptions.length === 0) return;
-    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+  const [prevRoomOptions, setPrevRoomOptions] = useState(roomOptions);
+  if (roomOptions !== prevRoomOptions) {
+    setPrevRoomOptions(roomOptions);
+    if (roomOptions && roomOptions.length > 0 && !roomOptions.some((group) => group.scopeId === scopeChoice)) {
       setScopeChoice(roomOptions[0].scopeId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomOptions]);
+  }
 
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? displayVariants[0] ?? product.variants[0];
   const liveVariant = liveVariants?.find((v) => v.finish === variant.finish);
@@ -72,8 +82,21 @@ export default function ProductCard({
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
   const selectedRoom = roomOptions?.find((group) => group.scopeId === scopeChoice) ?? null;
 
+  const inWishlist = isInWishlist(product.slug, variant.finish);
+
   return (
-    <article>
+    <article className="relative">
+      <button
+        type="button"
+        onClick={() => toggleItem(product.slug, variant.finish)}
+        aria-label={t("wishlistToggle")}
+        aria-pressed={inWishlist}
+        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      </button>
       <Link
         href={`/products/${product.slug}`}
         className="group block"
@@ -99,7 +122,7 @@ export default function ProductCard({
               {liveVariant && (
                 <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
                   <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
-                  {liveVariant.inStock ? "In stock" : "Out of stock"}
+                  {liveVariant.inStock ? t("inStock") : t("outOfStock")}
                 </span>
               )}
             </div>
@@ -137,7 +160,7 @@ export default function ProductCard({
                 onClick={() => setRoomOpen((o) => !o)}
                 className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-black/10 pb-1.5 text-left text-[11px] text-black/55 transition hover:border-black/30 hover:text-black"
               >
-                <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : "No specific room"}</span>
+                <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : t("noSpecificRoom")}</span>
                 <span className="shrink-0 text-[9px] text-black/35">{roomOpen ? "▲" : "▼"}</span>
               </button>
               <AnimatePresence>
@@ -182,6 +205,7 @@ export default function ProductCard({
               </button>
               <input
                 type="number"
+                inputMode="numeric"
                 min={1}
                 max={9999}
                 value={quantity}
@@ -205,12 +229,12 @@ export default function ProductCard({
                 setAdded(true);
                 setTimeout(() => setAdded(false), 1600);
               }}
-              aria-label={added ? "Added" : "Add"}
+              aria-label={added ? t("added") : t("add")}
               className={`flex h-8 shrink-0 items-center justify-center rounded-full border px-4 text-[11px] font-medium uppercase tracking-[0.08em] transition cursor-pointer ${
                 added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
               }`}
             >
-              {added ? "Added" : "Add"}
+              {added ? t("added") : t("add")}
             </button>
           </div>
         </div>
@@ -244,13 +268,13 @@ export default function ProductCard({
               setAdded(true);
               setTimeout(() => setAdded(false), 1600);
             }}
-            aria-label={added ? "Added to cart" : "Quick add to cart"}
+            aria-label={added ? t("added") : t("quickAdd")}
             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
               added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
             }`}
           >
             <span className="sm:hidden">{added ? "✓" : "+"}</span>
-            <span className="hidden sm:inline">{added ? "Added" : "Quick add"}</span>
+            <span className="hidden sm:inline">{added ? t("added") : t("quickAdd")}</span>
           </button>
         </div>
       )}

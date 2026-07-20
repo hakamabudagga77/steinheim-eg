@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import {
@@ -23,7 +24,7 @@ import { getRepresentativeProductForType } from "@/lib/utils";
 import { getProductDefaultImage } from "@/data/images";
 import ShopProductsStep from "@/components/trade/ShopProductsStep";
 
-const STEPS = ["You & your project", "Rooms", "What's needed", "Shop products"] as const;
+const STEP_KEYS = ["intro", "rooms", "needs", "shop"] as const;
 type Step = 0 | 1 | 2 | 3;
 
 const emptyCounts: Record<RoomKey, number> = { master: 0, standard: 0, powder: 0, suite: 0 };
@@ -39,11 +40,21 @@ function createDraftKey() {
 }
 
 export default function SmartRoomCalculator() {
+  const t = useTranslations("smartRoomCalculator");
   const { project, setRoomPlan, setOpen, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
   const [step, setStep] = useState<Step>(0);
-  const [counts, setCounts] = useState<Record<RoomKey, number>>(emptyCounts);
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [customRooms, setCustomRooms] = useState<CustomRoomDraft[]>([]);
+  const [counts, setCounts] = useState<Record<RoomKey, number>>(() => {
+    const plan = project.roomPlan;
+    if (!plan) return emptyCounts;
+    const fixed = plan.groups.filter((group) => !group.isCustom);
+    return Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>;
+  });
+  const [activePresetId, setActivePresetId] = useState<string | null>(() => project.roomPlan?.presetId ?? null);
+  const [customRooms, setCustomRooms] = useState<CustomRoomDraft[]>(() =>
+    (project.roomPlan?.groups ?? [])
+      .filter((group) => group.isCustom)
+      .map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count }))
+  );
 
   const persona = project.persona;
   const personaConfig = persona ? PERSONA_META[persona] : null;
@@ -56,21 +67,24 @@ export default function SmartRoomCalculator() {
   );
 
   // Pre-fill from an existing room plan so "Edit property composition" doesn't reset to zero.
-  useEffect(() => {
+  const [prevRoomPlan, setPrevRoomPlan] = useState(project.roomPlan);
+  if (project.roomPlan !== prevRoomPlan) {
+    setPrevRoomPlan(project.roomPlan);
     const plan = project.roomPlan;
-    if (!plan) return;
-    const fixed = plan.groups.filter((group) => !group.isCustom);
-    const custom = plan.groups.filter((group) => group.isCustom);
-    setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
-    setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
-    setActivePresetId(plan.presetId);
-  }, [project.roomPlan]);
+    if (plan) {
+      const fixed = plan.groups.filter((group) => !group.isCustom);
+      const custom = plan.groups.filter((group) => group.isCustom);
+      setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
+      setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
+      setActivePresetId(plan.presetId);
+    }
+  }
 
   const totalRooms = Object.values(counts).reduce((sum, value) => sum + value, 0) + customRooms.reduce((sum, r) => sum + r.count, 0);
 
   const activeRooms = [
     ...roomConfig.filter((entry) => counts[entry.key] > 0).map((entry) => ({ roomKey: entry.key as string, label: entry.label, count: counts[entry.key] })),
-    ...customRooms.filter((room) => room.count > 0).map((room) => ({ roomKey: room.roomKey, label: room.label || "Custom room", count: room.count })),
+    ...customRooms.filter((room) => room.count > 0).map((room) => ({ roomKey: room.roomKey, label: room.label || t("step1.fallbackLabel"), count: room.count })),
   ];
 
   function applyPreset(preset: (typeof presets)[number]) {
@@ -127,19 +141,18 @@ export default function SmartRoomCalculator() {
       <div className="mx-auto max-w-[960px] px-5 sm:px-8">
         {/* Header */}
         <ScrollReveal className="mb-10 text-center">
-          <div dir="ltr">
+          <div>
             <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-              Steinheim Trade Studio
+              {t("eyebrow")}
             </p>
             <h2
               className="mt-3 font-heading text-[clamp(1.8rem,4vw,3rem)] leading-[1] text-charcoal"
               style={{ fontStyle: "italic" }}
             >
-              Tell us your property, once
+              {t("headline")}
             </h2>
             <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-warm-gray">
-              Set your room composition, then assign real products to each room — right here on this
-              page. Everything you pick is saved to your project board as you go.
+              {t("body")}
             </p>
           </div>
         </ScrollReveal>
@@ -147,9 +160,9 @@ export default function SmartRoomCalculator() {
         {/* Progress stepper */}
         <div className="mb-10">
           <div className="flex items-center justify-between">
-            {STEPS.map((label, i) => (
+            {STEP_KEYS.map((key, i) => (
               <button
-                key={label}
+                key={key}
                 type="button"
                 onClick={() => {
                   if (i <= step) setStep(i as Step);
@@ -177,14 +190,14 @@ export default function SmartRoomCalculator() {
                       i + 1
                     )}
                   </div>
-                  {i < STEPS.length - 1 && (
+                  {i < STEP_KEYS.length - 1 && (
                     <div className={`h-[2px] flex-1 transition-colors duration-300 ${i < step ? "bg-charcoal" : "bg-charcoal/10"}`} />
                   )}
                 </div>
                 <span className={`text-[9px] font-medium uppercase tracking-[0.12em] transition-colors ${
                   i <= step ? "text-charcoal" : "text-warm-gray/50"
                 } hidden sm:block`}>
-                  {label}
+                  {t(`steps.${key}`)}
                 </span>
               </button>
             ))}
@@ -196,10 +209,10 @@ export default function SmartRoomCalculator() {
           {/* Step 0: Who you are + your project */}
           {step === 0 && (
             <div>
-              <div dir="ltr" className="text-left">
-                <h3 className="mb-2 font-heading text-[22px] text-charcoal">What kind of project is this?</h3>
+              <div className="text-start">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step0.headline")}</h3>
                 <p className="mb-8 text-[13px] text-warm-gray">
-                  Pick the closest match — it shapes what we ask next. You can always adjust details later.
+                  {t("step0.body")}
                 </p>
               </div>
 
@@ -223,7 +236,7 @@ export default function SmartRoomCalculator() {
                           <path d={PERSONA_META[id].icon} />
                         </svg>
                       </div>
-                      <div dir="ltr" className="text-left">
+                      <div className="text-start">
                         <span className="block font-heading text-[20px] leading-tight">
                           {TRADE_PERSONA_LABELS[id]}
                         </span>
@@ -240,55 +253,55 @@ export default function SmartRoomCalculator() {
 
               {persona && (
                 <ScrollReveal className="mt-8 border-t border-charcoal/8 pt-8">
-                  <div dir="ltr" className="text-left">
+                  <div className="text-start">
                     <p className="mb-1 font-heading text-[20px] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
-                      Tell us who to reach
+                      {t("step0.reachTitle")}
                     </p>
                     <p className="mb-5 text-[12px] leading-[1.6] text-warm-gray">
-                      So our team has everything they need before the first call — no back-and-forth just to get the basics.
+                      {t("step0.reachBody")}
                     </p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Your name *"
+                      placeholder={t("step0.fields.name")}
                       value={details.contactName}
                       onChange={(e) => updateDetails({ contactName: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Email *"
+                      placeholder={t("step0.fields.email")}
                       type="email"
                       value={details.email}
                       onChange={(e) => updateDetails({ email: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Company"
+                      placeholder={t("step0.fields.company")}
                       value={details.company}
                       onChange={(e) => updateDetails({ company: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Phone"
+                      placeholder={t("step0.fields.phone")}
                       value={details.phone}
                       onChange={(e) => updateDetails({ phone: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40 sm:col-span-2"
-                      placeholder="Business or project name *"
+                      placeholder={t("step0.fields.projectName")}
                       value={details.projectName}
                       onChange={(e) => updateDetails({ projectName: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Location"
+                      placeholder={t("step0.fields.location")}
                       value={details.location}
                       onChange={(e) => updateDetails({ location: e.target.value })}
                     />
                     <input
                       className="h-11 border border-charcoal/12 bg-white px-4 text-[13px] outline-none transition focus:border-charcoal/40"
-                      placeholder="Timeline (e.g. Q2 2027)"
+                      placeholder={t("step0.fields.timeline")}
                       value={details.timeline}
                       onChange={(e) => updateDetails({ timeline: e.target.value })}
                     />
@@ -301,10 +314,10 @@ export default function SmartRoomCalculator() {
           {/* Step 1: Room counts */}
           {step === 1 && (
             <div>
-              <div dir="ltr" className="text-left">
-                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{personaConfig?.roomsTitle ?? "How many rooms in total?"}</h3>
+              <div className="text-start">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{personaConfig?.roomsTitle ?? t("step1.defaultHeadline")}</h3>
                 <p className="mb-8 text-[13px] text-warm-gray">
-                  {personaConfig?.roomsBody ?? "This is the full property. You'll assign a collection to each group next, right here on this page."}
+                  {personaConfig?.roomsBody ?? t("step1.defaultBody")}
                 </p>
               </div>
 
@@ -321,7 +334,7 @@ export default function SmartRoomCalculator() {
                         }`}
                         title={preset.description}
                       >
-                        Quick fill: {preset.label}
+                        {t("step1.quickFill", { label: preset.label })}
                       </button>
                     ))}
                   </div>
@@ -338,7 +351,7 @@ export default function SmartRoomCalculator() {
                         <div className="min-w-0 flex-1">
                           <p className="text-[14px] font-medium text-charcoal">{label}</p>
                           <p className="text-[11px] text-warm-gray">
-                            {key === "powder" ? "Basin only - no shower included" : helper}
+                            {key === "powder" ? t("step1.powderHelper") : helper}
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
@@ -377,11 +390,11 @@ export default function SmartRoomCalculator() {
               {/* Custom rooms */}
               <div className={personaConfig?.skipFixedRooms ? "" : "mt-8"}>
                 <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-warm-gray">
-                  {personaConfig?.skipFixedRooms ? "Add each space" : "Custom-named rooms"}
+                  {personaConfig?.skipFixedRooms ? t("step1.addEachSpace") : t("step1.customNamedRooms")}
                 </p>
                 {!personaConfig?.skipFixedRooms && (
                   <p className="mb-3 text-[11px] leading-[1.6] text-warm-gray">
-                    For a bespoke project — name a specific room instead of using the categories above (e.g. &ldquo;Primary Ensuite&rdquo;, &ldquo;Kids&apos; Bathroom&rdquo;).
+                    {t("step1.customRoomsNote")}
                   </p>
                 )}
                 <div className="space-y-3">
@@ -391,7 +404,7 @@ export default function SmartRoomCalculator() {
                         type="text"
                         value={room.label}
                         onChange={(e) => updateCustomRoomDraft(room.roomKey, { label: e.target.value })}
-                        placeholder={personaConfig?.customRoomCopy ?? "Room name — e.g. Primary Ensuite"}
+                        placeholder={personaConfig?.customRoomCopy ?? t("step1.defaultCustomPlaceholder")}
                         className="h-10 flex-1 border border-charcoal/12 bg-white px-3 text-[13px] outline-none placeholder:text-warm-gray/50"
                       />
                       <input
@@ -401,13 +414,13 @@ export default function SmartRoomCalculator() {
                         value={room.count}
                         onChange={(e) => updateCustomRoomDraft(room.roomKey, { count: clampCount(Number(e.target.value)) })}
                         className="h-10 w-16 border border-charcoal/12 bg-white text-center text-[13px] outline-none"
-                        aria-label="Count"
+                        aria-label={t("step1.count")}
                       />
                       <button
                         type="button"
                         onClick={() => removeCustomRoomDraft(room.roomKey)}
                         className="flex h-10 w-10 shrink-0 items-center justify-center text-warm-gray/50 transition hover:text-charcoal"
-                        aria-label="Remove"
+                        aria-label={t("step1.remove")}
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
                       </button>
@@ -420,14 +433,14 @@ export default function SmartRoomCalculator() {
                   className="mt-3 flex h-11 w-full items-center justify-center gap-2 border border-dashed border-charcoal/20 text-[12px] font-medium text-warm-gray transition hover:border-charcoal hover:text-charcoal"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 4v16m-8-8h16" /></svg>
-                  Add a custom room
+                  {t("step1.addCustomRoom")}
                 </button>
               </div>
 
               {totalRooms > 0 && (
                 <div className="mt-6 flex items-center justify-between border border-charcoal/10 bg-white px-5 py-3">
                   <span className="text-[13px] text-charcoal">
-                    <strong>{totalRooms}</strong> {totalRooms === 1 ? "room" : "rooms"} configured
+                    <strong>{totalRooms}</strong> {t("step1.roomsConfigured", { count: totalRooms })}
                   </span>
                 </div>
               )}
@@ -439,8 +452,8 @@ export default function SmartRoomCalculator() {
                   disabled={totalRooms === 0}
                   className="flex h-[52px] w-full items-center justify-center gap-3 bg-charcoal text-[11px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-30"
                 >
-                  Continue — assign products to each room
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  {t("step1.continueAssign")}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
               </div>
             </div>
@@ -449,10 +462,10 @@ export default function SmartRoomCalculator() {
           {/* Step 2: What each room needs */}
           {step === 2 && (
             <div>
-              <div dir="ltr" className="text-left">
-                <h3 className="mb-2 font-heading text-[22px] text-charcoal">What does each room need?</h3>
+              <div className="text-start">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step2.headline")}</h3>
                 <p className="mb-8 text-[13px] text-warm-gray">
-                  Pick what each room needs and how many. You&apos;ll shop for the exact products next.
+                  {t("step2.body")}
                 </p>
               </div>
 
@@ -469,7 +482,7 @@ export default function SmartRoomCalculator() {
                         <section key={room.roomKey} className="border-t border-charcoal/8 pt-12 first:border-t-0 first:pt-0">
                           <div className="mb-10">
                             <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">
-                              {room.count} {room.count === 1 ? "room" : "rooms"}
+                              {room.count} {t("step2.roomCount", { count: room.count })}
                             </p>
                             <h4 className="mt-2 font-heading text-[clamp(2rem,4vw,3rem)] leading-tight text-charcoal" style={{ fontStyle: "italic" }}>
                               {room.label}
@@ -558,8 +571,8 @@ export default function SmartRoomCalculator() {
                   onClick={() => setStep(3)}
                   className="flex h-[52px] w-full items-center justify-center gap-3 bg-charcoal text-[11px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
                 >
-                  Continue — shop your products
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  {t("step2.continueShop")}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
               </div>
             </div>
@@ -568,11 +581,10 @@ export default function SmartRoomCalculator() {
           {/* Step 3: Shop real products, by type, across all collections */}
           {step === 3 && (
             <div>
-              <div dir="ltr" className="text-left">
-                <h3 className="mb-2 font-heading text-[22px] text-charcoal">Shop your products</h3>
+              <div className="text-start">
+                <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step3.headline")}</h3>
                 <p className="mb-8 text-[13px] text-warm-gray">
-                  Every collection, side by side. Mix products and finishes freely to fill what each room needs —
-                  everything you add is saved to your project board immediately.
+                  {t("step3.body")}
                 </p>
               </div>
 
@@ -585,11 +597,10 @@ export default function SmartRoomCalculator() {
                   className="flex h-[52px] w-full items-center justify-center gap-3 bg-charcoal text-[11px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m-10 4a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z" /></svg>
-                  Continue to project board
+                  {t("step3.continueBoard")}
                 </button>
-                <p dir="ltr" className="mt-4 text-left text-[10px] leading-relaxed text-warm-gray/60">
-                  Retail references only. Trade pricing, stock, lead times, and final package structure are
-                  confirmed by the Steinheim Egypt team after submission.
+                <p className="mt-4 text-start text-[10px] leading-relaxed text-warm-gray/60">
+                  {t("step3.disclaimer")}
                 </p>
               </div>
             </div>
@@ -604,10 +615,10 @@ export default function SmartRoomCalculator() {
               onClick={() => setStep((step - 1) as Step)}
               className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-warm-gray transition hover:text-charcoal"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
-              Back
+              {t("back")}
             </button>
           ) : (
             <div />
@@ -620,8 +631,8 @@ export default function SmartRoomCalculator() {
               disabled={!canContinueFromIntro}
               className="flex h-[44px] items-center gap-2 bg-charcoal px-8 text-[11px] font-medium uppercase tracking-[0.12em] text-white transition hover:bg-black disabled:opacity-30"
             >
-              Continue
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              {t("continue")}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="rtl:rotate-180">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </button>

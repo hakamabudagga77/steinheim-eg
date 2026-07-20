@@ -22,7 +22,7 @@ export default function AutoplayVideo({
       muted
       loop
       playsInline
-      preload="auto"
+      preload="metadata"
       poster={poster}
       className={className}
     >

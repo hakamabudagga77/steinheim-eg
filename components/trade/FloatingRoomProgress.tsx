@@ -1,22 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import RoomProgressPanel from "@/components/trade/RoomProgressPanel";
 import { hasActiveRoomNeeds, type RequirementType } from "@/lib/trade-project";
 import { getProductBySlug } from "@/lib/utils";
 
 export default function FloatingRoomProgress({ locale }: { locale: string }) {
-  const { project, setupJustCompleted, setSetupJustCompleted } = useTradeProject();
-  const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    if (setupJustCompleted) {
-      setExpanded(true);
-      setSetupJustCompleted(false);
-    }
-  }, [setupJustCompleted, setSetupJustCompleted]);
+  const t = useTranslations("floatingRoomProgress");
+  const { project, roomProgressExpanded: expanded, setRoomProgressExpanded: setExpanded } = useTradeProject();
 
   if (!hasActiveRoomNeeds(project)) return null;
 
@@ -58,17 +51,17 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-white/40">
-                    Steinheim Trade Studio
+                    {t("studioLabel")}
                   </p>
                   <p className="mt-1 font-heading text-[20px] leading-tight text-white" style={{ fontStyle: "italic" }}>
-                    Your rooms
+                    {t("yourRooms")}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setExpanded(false)}
                   className="flex h-7 w-7 shrink-0 items-center justify-center text-white/50 transition hover:text-white"
-                  aria-label="Close"
+                  aria-label={t("close")}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
                 </button>
@@ -77,7 +70,7 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
               {totalNeeded > 0 && (
                 <div className="mt-4">
                   <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-[0.1em] text-white/40">
-                    <span>{totalSelected} of {totalNeeded} selected</span>
+                    <span>{t("selectedOfTotal", { selected: totalSelected, total: totalNeeded })}</span>
                     <span>{progressPct}%</span>
                   </div>
                   <div className="mt-2 h-[3px] w-full bg-white/15">
@@ -92,7 +85,7 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
               )}
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto bg-[#f4f3f1] px-5 py-4">
+            <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto bg-[#f4f3f1] px-5 py-4">
               <RoomProgressPanel onSelectNeed={handleSelectNeed} />
             </div>
 
@@ -101,7 +94,7 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
                 href={`/${locale}/trade#smart-room-calculator`}
                 className="flex h-11 w-full items-center justify-center border border-black bg-white text-[10px] font-medium uppercase tracking-[0.12em] text-black transition hover:bg-black hover:text-white"
               >
-                Continue on trade page
+                {t("continueOnTradePage")}
               </a>
             </div>
           </motion.div>
@@ -110,11 +103,11 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
 
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={() => setExpanded(!expanded)}
         className="flex h-11 items-center gap-2 border border-black bg-black px-5 text-[10px] font-medium uppercase tracking-[0.14em] text-white shadow-[0_14px_40px_rgba(0,0,0,0.28)] transition hover:bg-white hover:text-black"
       >
-        <span>Your rooms</span>
-        {remaining > 0 && <span className="opacity-45">· {remaining} left</span>}
+        <span>{t("yourRooms")}</span>
+        {remaining > 0 && <span className="opacity-45">· {t("leftCount", { count: remaining })}</span>}
       </button>
     </div>
   );

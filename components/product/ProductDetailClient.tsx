@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
@@ -15,14 +16,15 @@ import { hasActiveRoomNeeds } from "@/lib/trade-project";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
-const productInfoTabs = ["Product Description", "Product Detail", "Downloads"] as const;
+const productInfoTabs = ["description", "detail", "downloads"] as const;
 
 export default function ProductDetailClient({ slug, liveData = null }: { slug: string; liveData?: LiveProductData }) {
+  const t = useTranslations("productPage");
   const product = getProductBySlug(slug)!;
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
   const [finishOpen, setFinishOpen] = useState(false);
   const [roomOpen, setRoomOpen] = useState(false);
-  const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("Product Description");
+  const [activeInfoTab, setActiveInfoTab] = useState<(typeof productInfoTabs)[number]>("description");
   const [cartAdded, setCartAdded] = useState(false);
   const [projectAdded, setProjectAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -52,13 +54,15 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
     (item) => item.slug === product.slug && item.finish === variant.finish && (item.scopeId || "") === (scopeChoice || "")
   );
 
-  useEffect(() => {
-    if (roomOptions.length === 0) return;
-    if (!roomOptions.some((group) => group.scopeId === scopeChoice)) {
+  const [prevScopeSlug, setPrevScopeSlug] = useState(product.slug);
+  const [prevRoomPlan, setPrevRoomPlan] = useState(project.roomPlan);
+  if (product.slug !== prevScopeSlug || project.roomPlan !== prevRoomPlan) {
+    setPrevScopeSlug(product.slug);
+    setPrevRoomPlan(project.roomPlan);
+    if (roomOptions.length > 0 && !roomOptions.some((group) => group.scopeId === scopeChoice)) {
       setScopeChoice(roomOptions[0].scopeId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.slug, project.roomPlan]);
+  }
 
   function addToProposal() {
     if (isInProposal) {
@@ -82,24 +86,25 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         type="button"
         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
         className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
-        aria-label="Decrease quantity"
+        aria-label={t("qty.decrease")}
       >
         −
       </button>
       <input
         type="number"
+        inputMode="numeric"
         min={1}
         max={9999}
         value={quantity}
         onChange={(e) => setQuantity(Math.max(1, Math.round(Number(e.target.value)) || 1))}
         className="h-9 w-9 bg-transparent text-center text-[14px] outline-none"
-        aria-label="Quantity"
+        aria-label={t("qty.label")}
       />
       <button
         type="button"
         onClick={() => setQuantity((q) => q + 1)}
         className="flex h-9 w-8 items-center justify-center text-[17px] text-black/55 transition hover:text-black"
-        aria-label="Increase quantity"
+        aria-label={t("qty.increase")}
       >
         +
       </button>
@@ -160,7 +165,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 transition={{ duration: 0.6, delay: 0.15 }}
                 className="w-full max-w-[620px]"
               >
-                <p className="text-[16px] text-black/72 sm:text-[17px]">{seriesName} Collection</p>
+                <p className="text-[16px] text-black/72 sm:text-[17px]">{t("collectionLabel", { series: seriesName })}</p>
                 <h1 className="mt-2 whitespace-nowrap text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[1.8rem] lg:text-[clamp(1.3rem,2.1vw,2.6rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
@@ -170,7 +175,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                      Out of stock
+                      {t("outOfStock")}
                     </span>
                   )}
                 </div>
@@ -238,8 +243,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 {entryFinish?.type === "pvd" ? " Pvd" : ""}
                               </span>
                               {entryLive && entryLive.inStock === false && (
-                                <span className="ml-auto shrink-0 text-[9px] font-medium uppercase tracking-[0.08em] text-red-400">
-                                  Out of stock
+                                <span className="ms-auto shrink-0 text-[9px] font-medium uppercase tracking-[0.08em] text-red-400">
+                                  {t("outOfStock")}
                                 </span>
                               )}
                             </button>
@@ -275,7 +280,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M4 12l6 6L20 6" />
                             </svg>
-                            Added to Cart
+                            {t("addedToCart")}
                           </motion.span>
                         ) : (
                           <motion.span
@@ -285,7 +290,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                             exit={{ opacity: 0, y: -6 }}
                             transition={{ duration: 0.25 }}
                           >
-                            Add to Cart
+                            {t("addToCart")}
                           </motion.span>
                         )}
                       </AnimatePresence>
@@ -300,7 +305,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
                       >
                         <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
-                          {selectedGroup ? selectedGroup.roomLabel : "No specific room"}
+                          {selectedGroup ? selectedGroup.roomLabel : t("noSpecificRoom")}
                         </span>
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#ece9e2] text-[0px] leading-none text-black/45 after:text-[18px] after:content-['↓']">
                           {roomOpen ? "⌃" : "⌄"}
@@ -337,7 +342,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                     {group.roomLabel}
                                   </span>
                                   {needsThis && (
-                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/40">Needs this</span>
+                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/40">{t("needsThis")}</span>
                                   )}
                                 </button>
                               );
@@ -348,9 +353,9 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 setScopeChoice("");
                                 setRoomOpen(false);
                               }}
-                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-left text-[14px] text-black/45 transition hover:bg-black/[0.035]"
+                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-start text-[14px] text-black/45 transition hover:bg-black/[0.035]"
                             >
-                              No specific room (manual)
+                              {t("noRoomManual")}
                             </button>
                           </motion.div>
                         )}
@@ -365,7 +370,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       onClick={() => setSetupOpen(true)}
                       className="mt-3 flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-black/12 text-[11px] font-medium text-black/50 transition hover:border-black/30 hover:text-black"
                     >
-                      Set up your project to auto-assign this to a room
+                      {t("setupRoomCta")}
                     </button>
                   )}
                   <button
@@ -380,24 +385,24 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     <AnimatePresence mode="wait" initial={false}>
                       {isInProposal ? (
                         <motion.span key="open" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
-                          Open project board
+                          {t("openBoard")}
                         </motion.span>
                       ) : projectAdded ? (
                         <motion.span key="added" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
-                          Added to project board
+                          {t("addedBoard")}
                         </motion.span>
                       ) : (
                         <motion.span key="add" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
-                          Add to project board
+                          {t("addBoard")}
                         </motion.span>
                       )}
                     </AnimatePresence>
                   </button>
                 </div>
 
-                <div className="mt-10 hidden border-t border-black/10 pt-6 text-left sm:block" dir="ltr">
+                <div className="mt-10 hidden border-t border-black/10 pt-6 text-start sm:block">
                   <p className="text-[13px] leading-[1.8] text-black/45">
-                    Technical information, product details, and catalogue downloads are available below.
+                    {t("infoNote")}
                   </p>
                 </div>
               </motion.div>
@@ -405,7 +410,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
           </div>
         </section>
 
-        <section dir="ltr" className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 text-left sm:px-8 lg:px-16 lg:py-16">
+        <section className="border-y border-black/10 bg-[#ece9e2] px-5 py-12 text-start sm:px-8 lg:px-16 lg:py-16">
           <div className="mx-auto max-w-[1560px]">
             <div className="border-b border-black/18">
               <div className="grid grid-cols-3 gap-0">
@@ -418,7 +423,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       activeInfoTab === tab ? "text-black" : "text-black/42 hover:text-black/70"
                     }`}
                   >
-                    {tab}
+                    {t(`tabs.${tab}`)}
                     <span
                       className={`absolute bottom-[-1px] left-1/2 h-[2px] -translate-x-1/2 bg-black transition-all duration-300 ${
                         activeInfoTab === tab ? "w-full" : "w-0"
@@ -438,35 +443,39 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 transition={{ duration: 0.28 }}
                 className="grid gap-10 py-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-14"
               >
-                {activeInfoTab === "Product Description" && (
+                {activeInfoTab === "description" && (
                   <>
                     <div className="space-y-6">
                       <p className="max-w-xl text-[17px] leading-[1.85] text-black/72">
-                        {`${product.name} from the ${seriesName} collection brings Steinheim's architectural bathroom language into a precise, project-ready product. The current selection is shown in ${finish?.name ?? "the selected finish"}.`}
+                        {t("descriptionBody", {
+                          product: product.name,
+                          series: seriesName,
+                          finish: finish?.name ?? variant.finish,
+                        })}
                       </p>
                     </div>
                   </>
                 )}
 
-                {activeInfoTab === "Product Detail" && (
+                {activeInfoTab === "detail" && (
                   <>
                     <div className="border border-black/10 p-8 lg:p-10">
                       <div className="grid gap-5 text-[16px]">
                         <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
-                          <span className="text-black/52">Product Number</span>
-                          <span className="text-right font-medium">{variant.model}</span>
+                          <span className="text-black/52">{t("detailRows.number")}</span>
+                          <span className="text-end font-medium">{variant.model}</span>
                         </div>
                         <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
-                          <span className="text-black/52">Collection</span>
-                          <span className="text-right font-medium">{seriesName}</span>
+                          <span className="text-black/52">{t("detailRows.collection")}</span>
+                          <span className="text-end font-medium">{seriesName}</span>
                         </div>
                         <div className="flex justify-between gap-8 border-b border-black/8 pb-4">
-                          <span className="text-black/52">Finish</span>
-                          <span className="text-right font-medium">{finish?.name ?? variant.finish}</span>
+                          <span className="text-black/52">{t("detailRows.finish")}</span>
+                          <span className="text-end font-medium">{finish?.name ?? variant.finish}</span>
                         </div>
                         <div className="flex justify-between gap-8">
-                          <span className="text-black/52">Application</span>
-                          <span className="text-right font-medium">{product.name}</span>
+                          <span className="text-black/52">{t("detailRows.application")}</span>
+                          <span className="text-end font-medium">{product.name}</span>
                         </div>
                       </div>
                     </div>
@@ -476,15 +485,18 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   </>
                 )}
 
-                {activeInfoTab === "Downloads" && (
+                {activeInfoTab === "downloads" && (
                   <>
                     <div>
                       <p className="max-w-xl text-[17px] leading-[1.85] text-black/70">
-                        Download the current Steinheim catalogue or request the exact technical sheet for
-                        {` ${seriesName} ${product.name}`} in {finish?.name ?? "the selected finish"}.
+                        {t("downloadsIntro", {
+                          product: product.name,
+                          series: seriesName,
+                          finish: finish?.name ?? variant.finish,
+                        })}
                       </p>
                       <p className="mt-5 max-w-xl text-[14px] leading-[1.85] text-black/45">
-                        Final stock, trade pricing, lead times, and project quantities should still be confirmed with Steinheim Egypt.
+                        {t("downloadsNote")}
                       </p>
                     </div>
                     <div className="space-y-3">
@@ -494,15 +506,15 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         rel="noreferrer"
                         className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
-                        <span>Open Steinheim Catalogue 2026</span>
+                        <span>{t("openCatalogue")}</span>
                         <span aria-hidden="true" className="hidden sm:inline">↗</span>
                       </a>
                       <Link
                         href="/contact"
                         className="flex items-center justify-between border border-black/12 px-6 py-5 text-[15px] transition hover:border-black hover:bg-black hover:text-white"
                       >
-                        <span>Request technical sheet for {variant.model}</span>
-                        <span aria-hidden="true" className="hidden sm:inline">→</span>
+                        <span>{t("requestSheet", { model: variant.model })}</span>
+                        <span aria-hidden="true" className="hidden rtl:rotate-180 sm:inline">→</span>
                       </Link>
                     </div>
                   </>
@@ -513,7 +525,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </section>
 
         {contextImage && (
-          <section dir="ltr" className="px-5 py-20 text-left sm:px-8 lg:px-16 lg:py-28">
+          <section className="px-5 py-20 text-start sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-black">
@@ -527,18 +539,18 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   />
                 </div>
                 <div className="max-w-lg">
-                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">In context</p>
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("context.eyebrow")}</p>
                   <h2 className="mt-4 font-heading text-[clamp(2.4rem,4.6vw,4.4rem)] font-light leading-[0.92] tracking-[-0.055em]">
-                    Part of a complete bathroom language.
+                    {t("context.headline")}
                   </h2>
                   <p className="mt-6 text-[16px] leading-[1.85] text-black/55">
-                    {`See how the ${seriesName} collection's form, finish, and proportions work within a resolved bathroom environment.`}
+                    {t("context.body", { series: seriesName })}
                   </p>
                   <Link
                     href={`/collections/${product.series}`}
                     className="mt-8 inline-flex rounded-full border border-black/25 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white"
                   >
-                    View {seriesName} collection
+                    {t("context.cta", { series: seriesName })}
                   </Link>
                 </div>
               </div>
@@ -547,20 +559,20 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         )}
 
         {related.length > 0 && (
-          <section dir="ltr" className="border-t border-black/6 px-5 py-20 text-left sm:px-8 lg:px-16 lg:py-28">
+          <section className="border-t border-black/6 px-5 py-20 text-start sm:px-8 lg:px-16 lg:py-28">
             <div className="mx-auto max-w-[1780px]">
               <div className="mb-14 flex items-end justify-between">
                 <div>
-                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Related</p>
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("related.eyebrow")}</p>
                   <h2 className="mt-3 font-heading text-[clamp(2.4rem,4.5vw,4.6rem)] font-light leading-[0.92] tracking-[-0.055em]">
-                    Continue the {seriesName} language.
+                    {t("related.headline", { series: seriesName })}
                   </h2>
                 </div>
                 <Link
                   href={`/collections/${product.series}`}
                   className="hidden rounded-full border border-black/25 px-7 py-3 text-[13px] transition hover:bg-black hover:text-white sm:inline-flex"
                 >
-                  View collection
+                  {t("related.viewCollection")}
                 </Link>
               </div>
               <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-7">

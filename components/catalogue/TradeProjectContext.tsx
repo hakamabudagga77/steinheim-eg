@@ -27,8 +27,8 @@ interface TradeProjectContextValue {
   setOpen: (open: boolean) => void;
   setupOpen: boolean;
   setSetupOpen: (open: boolean) => void;
-  setupJustCompleted: boolean;
-  setSetupJustCompleted: (value: boolean) => void;
+  roomProgressExpanded: boolean;
+  setRoomProgressExpanded: (value: boolean) => void;
   addItem: (slug: string, finish: string, quantity?: number, meta?: Pick<TradeProjectItem, "scopeId" | "scopeName" | "scopeSummary">) => void;
   updateQuantity: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   removeItem: (slug: string, finish: string, scopeId?: string) => void;
@@ -72,7 +72,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   }));
   const [open, setOpenRaw] = useState(false);
   const [setupOpen, setSetupOpenRaw] = useState(false);
-  const [setupJustCompleted, setSetupJustCompleted] = useState(false);
+  const [roomProgressExpanded, setRoomProgressExpanded] = useState(false);
   const setOpen = useCallback((value: boolean) => {
     setOpenRaw(value);
     if (value) setSetupOpenRaw(false);
@@ -157,11 +157,14 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
 
   const submittedLeadId = project.submittedLeadId;
 
+  const [prevSubmittedLeadId, setPrevSubmittedLeadId] = useState(submittedLeadId);
+  if (submittedLeadId !== prevSubmittedLeadId) {
+    setPrevSubmittedLeadId(submittedLeadId);
+    if (!submittedLeadId) setUnreadMessageCount(0);
+  }
+
   useEffect(() => {
-    if (!submittedLeadId) {
-      setUnreadMessageCount(0);
-      return;
-    }
+    if (!submittedLeadId) return;
     let cancelled = false;
     async function poll() {
       try {
@@ -178,7 +181,10 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       }
     }
     void poll();
-    const interval = window.setInterval(poll, 20000);
+    // Skip polling while the tab is hidden — the first visible poll catches up.
+    const interval = window.setInterval(() => {
+      if (!document.hidden) void poll();
+    }, 20000);
     return () => {
       cancelled = true;
       window.clearInterval(interval);
@@ -369,16 +375,18 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
     });
   }, [updateActive]);
 
-  return (
-    <TradeProjectContext.Provider value={{
+  // Stable value identity: flight animations update provider-local state and
+  // must not re-render every context consumer mid-animation.
+  const value = useMemo(
+    () => ({
       project,
       projects: workspace.projects,
       open,
       setOpen,
       setupOpen,
       setSetupOpen,
-      setupJustCompleted,
-      setSetupJustCompleted,
+      roomProgressExpanded,
+      setRoomProgressExpanded,
       addItem,
       updateQuantity,
       removeItem,
@@ -399,7 +407,39 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       bump,
       unreadMessageCount,
       markMessagesSeen,
-    }}>
+    }),
+    [
+      project,
+      workspace.projects,
+      open,
+      setOpen,
+      setupOpen,
+      setSetupOpen,
+      roomProgressExpanded,
+      addItem,
+      updateQuantity,
+      removeItem,
+      updateDetails,
+      setPersona,
+      newProject,
+      switchProject,
+      deleteProject,
+      duplicateProject,
+      markSubmitted,
+      clearProject,
+      setRoomPlan,
+      updateProductNeeds,
+      addCustomRoom,
+      removeCustomRoom,
+      flyToProject,
+      bump,
+      unreadMessageCount,
+      markMessagesSeen,
+    ]
+  );
+
+  return (
+    <TradeProjectContext.Provider value={value}>
       {children}
       <AnimatePresence>
         {flights.map((flight) => (

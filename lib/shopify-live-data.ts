@@ -1,5 +1,6 @@
 import { fetchAllProducts, type ShopifyProduct } from "./shopify-client";
 import { SLUG_TO_HANDLE, FINISH_ALIASES } from "./shopify-product-map";
+import { redisGet, redisSetEx, redisDel } from "@/lib/server/redis";
 
 export interface LiveVariantData {
   finish: string;
@@ -13,16 +14,38 @@ export interface LiveProductData {
   variants: LiveVariantData[];
 }
 
-let cachedProducts: { data: ShopifyProduct[]; fetchedAt: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000;
+const REDIS_CACHE_KEY = "steinheim:shopify:products";
+const CACHE_TTL_SECONDS = 5 * 60;
+
+// Per-instance fallback for when Redis isn't configured (local dev). On
+// serverless with Redis configured this is bypassed in favor of the shared
+// cache below, which the Shopify webhook can actually invalidate.
+let memoryCache: { data: ShopifyProduct[]; fetchedAt: number } | null = null;
 
 async function getCachedProducts(): Promise<ShopifyProduct[]> {
-  if (cachedProducts && Date.now() - cachedProducts.fetchedAt < CACHE_TTL) {
-    return cachedProducts.data;
+  const cached = await redisGet(REDIS_CACHE_KEY).catch(() => null);
+  if (cached) {
+    try {
+      return JSON.parse(cached) as ShopifyProduct[];
+    } catch {
+      // Corrupt cache entry — fall through and refetch.
+    }
   }
+
+  if (!cached && memoryCache && Date.now() - memoryCache.fetchedAt < CACHE_TTL_SECONDS * 1000) {
+    return memoryCache.data;
+  }
+
   const data = await fetchAllProducts();
-  cachedProducts = { data, fetchedAt: Date.now() };
+  memoryCache = { data, fetchedAt: Date.now() };
+  await redisSetEx(REDIS_CACHE_KEY, CACHE_TTL_SECONDS, JSON.stringify(data)).catch(() => {});
   return data;
+}
+
+/** Called by the Shopify webhook handler when inventory or prices change. */
+export async function invalidateShopifyProductCache(): Promise<void> {
+  memoryCache = null;
+  await redisDel(REDIS_CACHE_KEY).catch(() => {});
 }
 
 const FINISH_REVERSE: Record<string, string> = Object.fromEntries(

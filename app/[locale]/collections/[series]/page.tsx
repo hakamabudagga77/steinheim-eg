@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
@@ -26,71 +27,35 @@ const collectionHeroVideos: Record<string, string> = {
   art: "/videos/art-hero.mp4",
 };
 
-const collectionStrategy: Record<
-  string,
-  {
-    family: string;
-    headline: string;
-    description: string;
-    cards: Array<{ eyebrow: string; title: string; body: string; image: string }>;
-    setup: string;
-  }
-> = {
-  joy: {
-    family: "Series 60",
-    headline: "A refined balance of softness, reliability, and everyday premium comfort.",
-    description:
-      "Joy is the Steinheim collection for warm private bathrooms, hospitality rooms, and projects where the fittings should feel elevated without becoming loud.",
-    setup:
-      "Use Joy for guest bathrooms, master bathrooms, hotel rooms, and premium apartments where consistency and calm design matter.",
-    cards: [
-      { eyebrow: "Intro", title: "Soft Minimal", body: "Rounded forms and quiet proportions for spaces that need warmth.", image: "/images/steinheim/karim-2026/detail-joy-basin.webp" },
-      { eyebrow: "Concept", title: "Everyday Premium", body: "A practical collection that still feels considered and complete.", image: "/images/steinheim/karim-2026/home-joy.webp" },
-      { eyebrow: "Design", title: "Warm Precision", body: "Suitable for villas, hotel rooms, and repeatable premium bathrooms.", image: "/images/steinheim/karim-2026/landing-joy.webp" },
-    ],
-  },
-  up: {
-    family: "Series 50",
-    headline: "A streamlined modern collection for repeatable contemporary projects.",
-    description:
-      "Up gives the bathroom a cleaner, more dynamic silhouette while staying practical for larger schedules, designers, and developers.",
-    setup:
-      "Use Up when the project needs a sharper modern look, efficient specification, and a collection that can repeat across many units.",
-    cards: [
-      { eyebrow: "Intro", title: "Fluid Modern", body: "Slimmer lines and an easy contemporary silhouette.", image: "/images/steinheim/karim-2026/detail-up-shower.webp" },
-      { eyebrow: "Concept", title: "Project Ready", body: "Built for apartments, developments, and modern hospitality scopes.", image: "/images/steinheim/karim-2026/home-up.webp" },
-      { eyebrow: "Design", title: "Clean Momentum", body: "A directional collection without unnecessary visual noise.", image: "/images/steinheim/karim-2026/landing-up.webp" },
-    ],
-  },
-  art: {
-    family: "Series 70",
-    headline: "Architectural precision for bathrooms that need a stronger design signature.",
-    description:
-      "Art is for spaces where the fitting should feel intentional, sculptural, and closely connected to the architecture of the room.",
-    setup:
-      "Use Art for statement suites, villas, show bathrooms, and projects where the specification should feel more expressive.",
-    cards: [
-      { eyebrow: "Intro", title: "Sculptural Precision", body: "A more architectural language for statement bathrooms.", image: "/images/steinheim/karim-2026/detail-art-bath.webp" },
-      { eyebrow: "Concept", title: "Design-Led", body: "For clients who want the fixture to be part of the room identity.", image: "/images/steinheim/karim-2026/home-art.webp" },
-      { eyebrow: "Design", title: "Confident Lines", body: "Premium, controlled, and visually memorable.", image: "/images/steinheim/karim-2026/landing-art.webp" },
-    ],
-  },
-  quatro: {
-    family: "Series 40",
-    headline: "Geometric clarity for sharp, contemporary bathrooms.",
-    description:
-      "Quatro brings defined edges, clean planes, and a more graphic silhouette to modern homes, offices, and developer schemes.",
-    setup:
-      "Use Quatro where the architecture is sharper: modern apartments, office washrooms, show units, and contemporary villas.",
-    cards: [
-      { eyebrow: "Intro", title: "Geometric Calm", body: "Crisp geometry with controlled visual tension.", image: "/images/steinheim/karim-2026/detail-quatro-wall.webp" },
-      { eyebrow: "Concept", title: "Sharp Modern", body: "A clean-edged collection for confident interiors.", image: "/images/steinheim/karim-2026/home-quatro.webp" },
-      { eyebrow: "Design", title: "Defined Planes", body: "For bathrooms that need structure and architectural clarity.", image: "/images/steinheim/karim-2026/landing-quatro.webp" },
-    ],
-  },
+// Card images stay code-defined (they are visual assets, not copy); the
+// eyebrow/title/body text for each card is resolved from collectionPage.strategy.
+const collectionCardImages: Record<string, string[]> = {
+  joy: [
+    "/images/steinheim/karim-2026/detail-joy-basin.webp",
+    "/images/steinheim/karim-2026/home-joy.webp",
+    "/images/steinheim/karim-2026/landing-joy.webp",
+  ],
+  up: [
+    "/images/steinheim/karim-2026/detail-up-shower.webp",
+    "/images/steinheim/karim-2026/home-up.webp",
+    "/images/steinheim/karim-2026/landing-up.webp",
+  ],
+  art: [
+    "/images/steinheim/karim-2026/detail-art-bath.webp",
+    "/images/steinheim/karim-2026/home-art.webp",
+    "/images/steinheim/karim-2026/landing-art.webp",
+  ],
+  quatro: [
+    "/images/steinheim/karim-2026/detail-quatro-wall.webp",
+    "/images/steinheim/karim-2026/home-quatro.webp",
+    "/images/steinheim/karim-2026/landing-quatro.webp",
+  ],
 };
 
+const cardOrder = ["intro", "concept", "design"] as const;
+
 export default function CollectionPage() {
+  const t = useTranslations("collectionPage");
   const params = useParams();
   const seriesId = String(params.series || "");
   const series = getSeriesById(seriesId);
@@ -127,12 +92,23 @@ export default function CollectionPage() {
   if (!series) {
     return (
       <div className="flex min-h-screen items-center justify-center pt-20 text-sm text-black/40">
-        Collection not found.
+        {t("notFound")}
       </div>
     );
   }
 
-  const strategy = collectionStrategy[series.id];
+  const strategy = {
+    family: t(`strategy.${series.id}.family`),
+    headline: t(`strategy.${series.id}.headline`),
+    description: t(`strategy.${series.id}.description`),
+    setup: t(`strategy.${series.id}.setup`),
+    cards: cardOrder.map((key, i) => ({
+      eyebrow: t(`strategy.${series.id}.cards.${key}.eyebrow`),
+      title: t(`strategy.${series.id}.cards.${key}.title`),
+      body: t(`strategy.${series.id}.cards.${key}.body`),
+      image: collectionCardImages[series.id]?.[i] ?? "",
+    })),
+  };
   const contextImage = getCollectionContextImage(series.id);
   const selectedStoryCard = selectedStory
     ? strategy.cards.find((card) => card.title === selectedStory)
@@ -170,9 +146,9 @@ export default function CollectionPage() {
               <div className="absolute left-0 right-0 top-[124px] px-6 sm:px-10 lg:px-16">
                 <div className="mx-auto max-w-[1780px]">
                   <p className="text-[18px] font-medium text-white">
-                    <Link href="/" className="transition hover:text-white/70">Home</Link>
+                    <Link href="/" className="transition hover:text-white/70">{t("breadcrumb.home")}</Link>
                     <span className="px-2 text-white/75">·</span>
-                    <Link href="/collections" className="transition hover:text-white/70">Collections</Link>
+                    <Link href="/collections" className="transition hover:text-white/70">{t("breadcrumb.collections")}</Link>
                     <span className="px-2 text-white/75">·</span>
                     <span>{series.name}</span>
                   </p>
@@ -210,9 +186,9 @@ export default function CollectionPage() {
             <p className="shrink-0 text-[16px] font-medium tracking-[-0.03em] sm:text-[20px]">{series.name}</p>
             <div className="flex items-center gap-4 overflow-x-auto text-[14px] sm:gap-8 sm:text-[16px]">
               {([
-                ["overview", "Overview"],
-                ["setup", "Set-up"],
-                ["products", "Products"],
+                ["overview", t("nav.overview")],
+                ["setup", t("nav.setup")],
+                ["products", t("nav.products")],
               ] as Array<[string, string]>).map(([anchor, label]) => (
                 <a
                   key={anchor}
@@ -235,9 +211,9 @@ export default function CollectionPage() {
         <section id="products" className="scroll-mt-[140px] border-t border-black/8 px-5 py-16 sm:px-8 lg:px-16 lg:py-20">
           <div className="mx-auto max-w-[1780px]">
             <div className="mb-16 text-center">
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Choose a finish</p>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("chooseFinish")}</p>
               <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
-                See the entire {series.name} range in one finish.
+                {t("seeRange", { series: series.name })}
               </h2>
               <div className="mt-10 flex flex-nowrap items-start justify-center gap-3 sm:flex-wrap sm:gap-4">
                 {finishes.map((finish) => {
@@ -294,9 +270,9 @@ export default function CollectionPage() {
         <section id="setup" className="scroll-mt-[140px] border-t border-black/8 px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
           <div className="mx-auto grid max-w-[1780px] items-center gap-16 lg:grid-cols-2">
             <div>
-              <p className="text-[18px] uppercase tracking-[0.3em] text-black/45">Set-up</p>
+              <p className="text-[18px] uppercase tracking-[0.3em] text-black/45">{t("setupEyebrow")}</p>
               <h2 className="mt-8 max-w-3xl text-[clamp(3rem,6vw,6rem)] font-normal leading-[0.98] tracking-[-0.06em]">
-                How this collection belongs in a project.
+                {t("setupHeadline")}
               </h2>
               <p className="mt-8 max-w-2xl text-[20px] leading-[1.65] text-black/62">
                 {strategy.setup}
@@ -328,8 +304,8 @@ export default function CollectionPage() {
         <section className="border-t border-black/8 px-5 py-20 sm:px-8 lg:px-16">
           <div className="mx-auto grid max-w-[1780px] lg:grid-cols-2">
             {[
-              ["Back to overview", "Return to the story and design direction of the collection.", "#overview"],
-              ["Trade studio", "Build a project scope and prepare a Steinheim specification.", "/trade"],
+              [t("backToOverview.title"), t("backToOverview.body"), "#overview"],
+              [t("tradeStudio.title"), t("tradeStudio.body"), "/trade"],
             ].map(([title, body, href]) => (
               <Link
                 key={title}
@@ -367,8 +343,8 @@ export default function CollectionPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedStory(null)}
-                  aria-label="Close"
-                  className="absolute right-6 top-6 z-20 flex h-16 w-16 items-center justify-center rounded-full bg-black/8 text-black/45 transition hover:bg-black hover:text-white"
+                  aria-label={t("close")}
+                  className="absolute end-6 top-6 z-20 flex h-16 w-16 items-center justify-center rounded-full bg-black/8 text-black/45 transition hover:bg-black hover:text-white"
                 >
                   <svg width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.2">
                     <line x1="4" y1="4" x2="16" y2="16" />
@@ -405,7 +381,7 @@ export default function CollectionPage() {
                         }}
                         className="rounded-full border border-black px-10 py-3 text-[15px] transition hover:bg-black hover:text-white"
                       >
-                        View products
+                        {t("viewProducts")}
                       </button>
                       <button
                         type="button"
@@ -415,7 +391,7 @@ export default function CollectionPage() {
                         }}
                         className="rounded-full border border-black/18 px-10 py-3 text-[15px] text-black/58 transition hover:border-black/45 hover:text-black"
                       >
-                        View set-up
+                        {t("viewSetup")}
                       </button>
                     </div>
                   </div>
