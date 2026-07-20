@@ -7,20 +7,32 @@
 
 ### A premium bilingual e-commerce platform for German bathroom design, built for Egypt.
 
+<sub>Designed, engineered, and delivered to the standard of a dedicated product studio —<br>full-stack architecture, commerce, AI, and security, shipped as one cohesive system.</sub>
+
 **Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Full EN / AR (RTL) · Shopify-backed commerce**
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+<br>
 
-[![CI](https://img.shields.io/github/actions/workflow/status/hakamabudagga77/steinheim-eg/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/hakamabudagga77/steinheim-eg/actions/workflows/ci.yml)
-[![Sentry](https://img.shields.io/badge/monitoring-Sentry-362D59?style=flat-square&logo=sentry&logoColor=white)](https://sentry.io)
-[![Vitest](https://img.shields.io/badge/tested%20with-Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)](https://vitest.dev)
-[![i18n](https://img.shields.io/badge/i18n-EN%20%2F%20AR%20(RTL)-8A2BE2?style=flat-square)](#-internationalization)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](#-contributing)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-1A1A1A?style=for-the-badge&logo=next.js&logoColor=C9A96E)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-1A1A1A?style=for-the-badge&logo=react&logoColor=C9A96E)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-1A1A1A?style=for-the-badge&logo=typescript&logoColor=C9A96E)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-1A1A1A?style=for-the-badge&logo=tailwindcss&logoColor=C9A96E)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-1A1A1A?style=for-the-badge&logo=vercel&logoColor=C9A96E)](https://vercel.com)
+[![License](https://img.shields.io/badge/License-MIT-C9A96E?style=for-the-badge&labelColor=1A1A1A)](LICENSE)
+
+[![CI](https://img.shields.io/github/actions/workflow/status/hakamabudagga77/steinheim-eg/ci.yml?branch=main&style=flat-square&label=CI&labelColor=1A1A1A&color=C9A96E)](https://github.com/hakamabudagga77/steinheim-eg/actions/workflows/ci.yml)
+[![Sentry](https://img.shields.io/badge/monitoring-Sentry-1A1A1A?style=flat-square&logo=sentry&logoColor=C9A96E&labelColor=1A1A1A)](https://sentry.io)
+[![Vitest](https://img.shields.io/badge/tested%20with-Vitest-1A1A1A?style=flat-square&logo=vitest&logoColor=C9A96E)](https://vitest.dev)
+[![k6](https://img.shields.io/badge/load--tested-k6-1A1A1A?style=flat-square&logo=k6&logoColor=C9A96E)](load-tests/README.md)
+[![ESLint](https://img.shields.io/badge/lint-ESLint%209-1A1A1A?style=flat-square&logo=eslint&logoColor=C9A96E)](eslint.config.mjs)
+[![Shopify](https://img.shields.io/badge/commerce-Shopify-1A1A1A?style=flat-square&logo=shopify&logoColor=C9A96E)](https://www.shopify.com)
+[![Claude](https://img.shields.io/badge/AI%20concierge-Claude-1A1A1A?style=flat-square&logo=anthropic&logoColor=C9A96E)](https://www.anthropic.com)
+[![Redis](https://img.shields.io/badge/cache-Upstash%20Redis-1A1A1A?style=flat-square&logo=redis&logoColor=C9A96E)](https://upstash.com)
+[![i18n](https://img.shields.io/badge/i18n-EN%20%2F%20AR%20(RTL)-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](#-internationalization)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-1A1A1A?style=flat-square&logo=node.js&logoColor=C9A96E)](package.json)
+[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-License-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![Maintained](https://img.shields.io/badge/maintained-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://github.com/hakamabudagga77/steinheim-eg/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](#-contributing)
 
 </div>
 
@@ -68,7 +80,7 @@ teach.
 - [Internationalization](#-internationalization)
 - [Deployment](#-deployment)
 - [Contributing](#-contributing)
-- [License](#-license)
+- [Open source & licensing](#-open-source--licensing)
 - [Credits](#-credits)
 
 <br>
@@ -337,9 +349,43 @@ Issues and pull requests are welcome. The workflow this project actually follows
 
 <br>
 
-## 📄 License
+## 📜 Open source & licensing
 
-Released under the **[MIT License](LICENSE)** — see [`LICENSE`](LICENSE) for the full text.
+<div align="center">
+
+[![License](https://img.shields.io/badge/Project%20License-MIT-C9A96E?style=for-the-badge&labelColor=1A1A1A)](LICENSE)
+[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![FSF Free/Libre](https://img.shields.io/badge/FSF%20Free%2FLibre-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.gnu.org/licenses/license-list.html#Expat)
+[![SPDX](https://img.shields.io/badge/SPDX-MIT-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://spdx.org/licenses/MIT.html)
+
+</div>
+
+This project itself is released under the **[MIT License](LICENSE)** — permissive, OSI-approved,
+and recognized by the FSF as a free/libre license. See [`LICENSE`](LICENSE) for the full text.
+
+It's also built entirely on trusted, industry-standard open-source licenses. Every core
+dependency's license below was verified directly from its published `package.json` — not
+assumed:
+
+<div align="center">
+
+[![MIT](https://img.shields.io/badge/MIT-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![Apache 2.0](https://img.shields.io/badge/Apache%202.0-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.apache.org/licenses/LICENSE-2.0)
+[![ISC](https://img.shields.io/badge/ISC-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/ISC)
+[![AGPL 3.0](https://img.shields.io/badge/AGPL%203.0-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+
+</div>
+
+| License | Used by | Type |
+|---|---|---|
+| **MIT** | Next.js, React, Tailwind CSS, Framer Motion, next-intl, Vitest, ESLint, `@sentry/nextjs`, `@anthropic-ai/sdk`, Lenis, `pdf-lib`, Resend, Recharts, `msedge-tts` | Permissive |
+| **Apache-2.0** | TypeScript, `@google-analytics/data` | Permissive, patent grant |
+| **ISC** | `lucide-react` | Permissive |
+| **AGPL-3.0** | [k6](https://k6.io) — external load-testing CLI used in [`load-tests/`](load-tests/), not bundled with the app | Copyleft |
+
+Four distinct license families, all OSI-recognized, none of them viral into this codebase
+(the one copyleft tool here — k6 — is invoked as an external CLI against a running build,
+never imported into the application).
 
 <br>
 
