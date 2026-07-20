@@ -9,6 +9,49 @@ const events: Array<{ name: string; tag: string; logo: string; width: number; he
   { name: "Ceramica Market", tag: "Ceramics & bath market", logo: "/images/events/ceramica-market-logo.png", width: 1054, height: 864 },
 ];
 
+function EventLogo({ event, index }: { event: (typeof events)[number]; index: number }) {
+  const maskStyle = {
+    WebkitMaskImage: `url(${event.logo})`,
+    maskImage: `url(${event.logo})`,
+    WebkitMaskSize: "contain",
+    maskSize: "contain",
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+  } as const;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.7, delay: 0.15 + index * 0.14, ease: [0.16, 1, 0.3, 1] }}
+      whileHover="hover"
+      className="relative h-16 sm:h-20"
+      style={{ aspectRatio: `${event.width} / ${event.height}` }}
+    >
+      <motion.img
+        src={event.logo}
+        alt={event.name}
+        className="h-full w-full object-contain"
+        initial={{ opacity: 0.82 }}
+        variants={{ hover: { opacity: 1, scale: 1.04 } }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      />
+      {/* Shimmer sweep, clipped to the logo's own silhouette via mask-image */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={maskStyle}>
+        <motion.div
+          className="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/90 to-transparent"
+          initial={{ left: "-60%" }}
+          variants={{ hover: { left: "130%" } }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
 const clips: Array<{
   src: string;
   poster: string;
@@ -197,15 +240,8 @@ export default function ShowroomReel() {
           </div>
 
           <div className="ml-auto flex items-center gap-10">
-            {events.map((event) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={event.name}
-                src={event.logo}
-                alt={event.name}
-                className="h-16 w-auto object-contain sm:h-20"
-                style={{ aspectRatio: `${event.width} / ${event.height}` }}
-              />
+            {events.map((event, index) => (
+              <EventLogo key={event.name} event={event} index={index} />
             ))}
           </div>
         </motion.div>
