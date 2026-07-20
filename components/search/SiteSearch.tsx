@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import Modal from "@/components/ui/Modal";
 import { buildSearchIndex, searchIndex, type SearchResult } from "@/lib/search-index";
 
 const SERIES_IDS = ["joy", "up", "art", "quatro"] as const;
@@ -67,6 +68,8 @@ export default function SiteSearch() {
   }
 
   useEffect(() => {
+    // Only the global Cmd/Ctrl+K toggle lives here; Escape-to-close is handled
+    // by the Modal below (which only listens while it's open).
     function handleKeydown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -78,15 +81,11 @@ export default function SiteSearch() {
           }
           return next;
         });
-        return;
-      }
-      if (e.key === "Escape" && open) {
-        closeSearch();
       }
     }
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     if (open) requestAnimationFrame(() => inputRef.current?.focus());
@@ -114,24 +113,13 @@ export default function SiteSearch() {
     }
   }
 
-  // Deliberately not wrapped in AnimatePresence: selecting a result closes
-  // this modal in the same tick as a route navigation, and Framer Motion's
-  // exit-animation lifecycle can be interrupted by that concurrent
-  // transition, leaving an invisible-but-still-pointer-events-auto backdrop
-  // stuck over the whole page. A plain conditional render unmounts
-  // synchronously the instant `open` flips false, which can never get
-  // stuck; the entrance animation below is unaffected.
-  if (!open) return null;
-
   return (
-    <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
-            onClick={closeSearch}
-          />
+    <Modal
+      open={open}
+      onClose={closeSearch}
+      backdropClassName="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
+      backdropTransition={{ duration: 0.2 }}
+    >
           <motion.div
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -221,6 +209,6 @@ export default function SiteSearch() {
               </span>
             </div>
           </motion.div>
-    </>
+    </Modal>
   );
 }
