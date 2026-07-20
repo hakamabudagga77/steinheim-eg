@@ -418,4 +418,12 @@ this project.
 
 <sub>Steinheim Egypt · Premium German Bathroom Fixtures</sub>
 
+<br><br>
+
+<a href="https://github.com/EslaM-X">
+  <img src="public/images/brand/eslamx-logo.jpeg" alt="EslaM-X" width="72">
+</a>
+
+<sub>**BY [EslaM-X](https://github.com/EslaM-X)**</sub>
+
 </div>
