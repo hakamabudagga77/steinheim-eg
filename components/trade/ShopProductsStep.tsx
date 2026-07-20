@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
@@ -13,10 +13,33 @@ function sectionId(type: RequirementType) {
   return `shop-type-${type}`;
 }
 
-export default function ShopProductsStep() {
+export default function ShopProductsStep({
+  focusScopeId = null,
+  focusType = null,
+}: {
+  focusScopeId?: string | null;
+  focusType?: RequirementType | null;
+}) {
   const t = useTranslations("shopProductsStep");
   const { project, addItem } = useTradeProject();
-  const [targets, setTargets] = useState<Record<string, string>>({});
+  const [targets, setTargets] = useState<Record<string, string>>(() =>
+    focusScopeId && focusType ? { [focusType]: focusScopeId } : {}
+  );
+
+  // Re-select and re-scroll if the shopper picks another need from the
+  // floating room-progress widget without leaving this step.
+  const focusKey = focusScopeId && focusType ? `${focusScopeId}:${focusType}` : null;
+  const [prevFocusKey, setPrevFocusKey] = useState(focusKey);
+  if (focusKey && focusKey !== prevFocusKey && focusScopeId && focusType) {
+    setPrevFocusKey(focusKey);
+    setTargets((current) => ({ ...current, [focusType]: focusScopeId }));
+  }
+
+  useEffect(() => {
+    if (!focusKey || !focusType) return;
+    document.getElementById(sectionId(focusType))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusKey]);
 
   const activeRooms = project.roomPlan?.groups.filter((group) => group.count > 0) ?? [];
 

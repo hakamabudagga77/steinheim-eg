@@ -82,7 +82,7 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const [deliveryAccessNotes, setDeliveryAccessNotes] = useState("");
   const [deliverySaving, setDeliverySaving] = useState(false);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
-  const [deliveryHydrated, setDeliveryHydrated] = useState(false);
+  const [, setDeliveryHydrated] = useState(false);
   const [liveStock, setLiveStock] = useState<Record<string, boolean>>({});
   const finishes = useMemo(() => getAllFinishes(), []);
 

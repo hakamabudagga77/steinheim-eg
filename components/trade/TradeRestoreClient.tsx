@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -15,6 +15,13 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
   const t = useTranslations("tradeRestore");
   const [state, setState] = useState<State>("loading");
   const [projectName, setProjectName] = useState("");
+
+  // Kept in a ref (rather than a `t` dependency) so this fetch-once-per-lead
+  // effect doesn't re-run every time the translation function is re-created.
+  const yourProjectFallbackRef = useRef(t("yourProject"));
+  useEffect(() => {
+    yourProjectFallbackRef.current = t("yourProject");
+  });
 
   useEffect(() => {
     (async () => {
@@ -37,7 +44,7 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
         const workspace = { activeProjectId: project.id, projects: [project, ...others].slice(0, 25) };
         window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
 
-        setProjectName(project.details.projectName || t("yourProject"));
+        setProjectName(project.details.projectName || yourProjectFallbackRef.current);
         setState("success");
         window.setTimeout(() => {
           window.location.href = `/${locale}/trade`;

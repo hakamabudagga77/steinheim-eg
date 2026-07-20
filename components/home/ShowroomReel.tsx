@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
@@ -142,19 +142,19 @@ export default function ShowroomReel() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [centeredIndex, setCenteredIndex] = useState<number | null>(null);
 
-  const syncPausedState = () => {
+  const syncPausedState = useCallback(() => {
     pausedRef.current = hoverPausedRef.current || touchPausedRef.current;
-  };
+  }, []);
 
-  const setHoverPaused = (paused: boolean) => {
+  const setHoverPaused = useCallback((paused: boolean) => {
     hoverPausedRef.current = paused;
     syncPausedState();
-  };
+  }, [syncPausedState]);
 
-  const setTouchPaused = (paused: boolean) => {
+  const setTouchPaused = useCallback((paused: boolean) => {
     touchPausedRef.current = paused;
     syncPausedState();
-  };
+  }, [syncPausedState]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -246,7 +246,7 @@ export default function ShowroomReel() {
       window.removeEventListener("blur", releaseTouchPause);
       document.removeEventListener("visibilitychange", releaseTouchPause);
     };
-  }, []);
+  }, [setTouchPaused]);
 
   const activeIndex = hoveredIndex ?? centeredIndex;
 
