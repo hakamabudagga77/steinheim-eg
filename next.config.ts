@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+// This project builds with Turbopack, and @next/bundle-analyzer only hooks into
+// webpack builds (it no-ops under Turbopack). The primary analyzer is the
+// Turbopack-native one — `npm run analyze` (next experimental-analyze). This
+// wrapper stays wired so `npm run analyze:webpack` (ANALYZE=true next build
+// --webpack) can still produce the classic treemap when that view is wanted.
+const withAnalyzer = withBundleAnalyzer({ enabled: process.env.ANALYZE === "true" });
 
 // Known third-party origins the site actually loads: Google Analytics
 // (gtag.js + beacons), Google's <model-viewer> CDN build (used by the 3D
@@ -32,8 +40,18 @@ const SECURITY_HEADERS = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+// The webpack analyze build (npm run analyze:webpack) exists only to emit the
+// bundle treemap. Skip the type/lint passes for that run — they're a Turbopack
+// project's generated-types quirk under --webpack, and real type/lint checking
+// lives in `npm run typecheck` / `npm run lint` / CI. Only active when ANALYZE
+// is set, so normal builds keep full checking.
+const isAnalyze = process.env.ANALYZE === "true";
+
 const nextConfig: NextConfig = {
   devIndicators: false,
+  ...(isAnalyze
+    ? { typescript: { ignoreBuildErrors: true }, eslint: { ignoreDuringBuilds: true } }
+    : {}),
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 82, 85, 90, 92, 94, 100],
@@ -59,10 +77,12 @@ const nextConfig: NextConfig = {
 // SENTRY_ORG/SENTRY_PROJECT/SENTRY_AUTH_TOKEN, which aren't set up yet —
 // the plugin no-ops that step gracefully without them, so error capture
 // itself (driven by the DSN alone) works either way.
-export default withSentryConfig(withNextIntl(nextConfig), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: true,
-  widenClientFileUpload: true,
-});
+export default withAnalyzer(
+  withSentryConfig(withNextIntl(nextConfig), {
+    org: process.env.SENTRY_ORG,
+    project: process.env.SENTRY_PROJECT,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+    widenClientFileUpload: true,
+  })
+);

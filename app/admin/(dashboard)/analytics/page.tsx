@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { Users, Activity, Eye, Clock } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, ErrorState, SegmentedControl } from "@/components/admin/ui";
+
+// recharts (~120 KB gzip) loads on demand instead of in this page's initial JS.
+const VisitorsAreaChart = dynamic(() => import("./AnalyticsChart").then((m) => m.VisitorsAreaChart), {
+  ssr: false,
+  loading: () => <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />,
+});
 
 type Timeframe = "7d" | "30d" | "90d";
 
@@ -33,12 +39,6 @@ function fmtDuration(seconds: number) {
   const m = Math.floor(seconds / 60);
   const s = Math.round(seconds % 60);
   return `${m}m ${s}s`;
-}
-
-function fmtDate(yyyymmdd: string) {
-  if (yyyymmdd.length !== 8) return yyyymmdd;
-  const d = new Date(`${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
 function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
@@ -95,36 +95,7 @@ function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
         <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors per day</p>
         <div className="mt-4 h-[200px]">
           {summary ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={summary.dailyUsers} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="visitorsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={fmtDate}
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
-                  interval={Math.max(0, Math.floor(summary.dailyUsers.length / 8))}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "#18181b",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 10,
-                    fontSize: 12,
-                    color: "#fff",
-                  }}
-                  labelFormatter={(v) => fmtDate(String(v))}
-                  labelStyle={{ color: "rgba(255,255,255,0.5)" }}
-                />
-                <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            <VisitorsAreaChart data={summary.dailyUsers} />
           ) : (
             <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
           )}

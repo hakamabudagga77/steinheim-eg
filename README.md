@@ -76,6 +76,7 @@ teach.
 - [Getting started](#-getting-started)
 - [Testing & quality gates](#-testing--quality-gates)
 - [Load testing](#-load-testing)
+- [Bundle analysis](#-bundle-analysis)
 - [Security](#-security)
 - [Internationalization](#-internationalization)
 - [Deployment](#-deployment)
@@ -292,6 +293,21 @@ BASE_URL=http://localhost:3000 npm run loadtest
 
 See [`load-tests/README.md`](load-tests/README.md) for tuning the ramp and pointing it at a
 deployed environment safely.
+
+<br>
+
+## 📦 Bundle analysis
+
+```bash
+npm run analyze          # Turbopack-native analyzer (primary) — interactive module graph
+npm run analyze:webpack  # @next/bundle-analyzer treemap (webpack build) at .next/analyze/*.html
+```
+
+`npm run analyze` uses Next's Turbopack-native bundle analyzer, which matches the real
+production build. `npm run analyze:webpack` runs the classic `@next/bundle-analyzer`
+treemap via a one-off webpack build (Turbopack builds skip that plugin). Charts on the
+admin pages load `recharts` (~120 KB gzip) on demand via `next/dynamic`, keeping it out of
+those pages' initial JS.
 
 <br>
 
