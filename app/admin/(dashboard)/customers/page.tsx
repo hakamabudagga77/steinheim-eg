@@ -84,6 +84,7 @@ function CustomersInner() {
       return;
     }
     if (filtered.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- selection depends on the async customers fetch, not derivable at render time
       setSelectedId(null);
       return;
     }

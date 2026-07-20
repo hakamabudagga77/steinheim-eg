@@ -142,6 +142,7 @@ function ProductsInner() {
     const targetId = deepLinkId ? Number(deepLinkId) : null;
     if (targetId && products.some((p) => p.id === targetId)) {
       deepLinkConsumed.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time deep-link consumption gated by a ref, depends on the async products fetch
       setOpenId(targetId);
     }
   }, [products, deepLinkId]);

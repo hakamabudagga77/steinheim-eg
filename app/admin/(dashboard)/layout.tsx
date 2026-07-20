@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
   Inbox,
@@ -43,9 +43,11 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
   const [navOpen, setNavOpen] = useState(false);
 
   // Close the mobile drawer whenever navigation actually happens.
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setNavOpen(false);
-  }, [pathname]);
+  }
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });

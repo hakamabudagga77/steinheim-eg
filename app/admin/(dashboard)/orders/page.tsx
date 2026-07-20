@@ -159,6 +159,7 @@ function OrdersInner() {
     const targetId = deepLinkId ? Number(deepLinkId) : null;
     if (targetId && orders.some((o) => o.id === targetId)) {
       deepLinkConsumed.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time deep-link consumption gated by a ref, depends on the async orders fetch
       setTimeframe("all");
       setExpandedId(targetId);
     }

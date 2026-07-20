@@ -97,6 +97,7 @@ function ContactLeadsInner() {
       return;
     }
     if (filteredLeads.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- deep-link/filter selection depends on the async leads fetch, not derivable at render time
       setSelectedId(null);
       return;
     }
@@ -110,6 +111,7 @@ function ContactLeadsInner() {
 
   useEffect(() => {
     if (selected && selected.status === "new") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs "read" status to the server, a genuine external-system side effect
       updateStatus(selected.id, "read");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

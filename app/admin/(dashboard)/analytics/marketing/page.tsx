@@ -37,11 +37,17 @@ export default function MarketingAnalyticsPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
   const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [customers, setCustomers] = useState<ShopifyCustomer[] | null>(null);
+  const [asOf, setAsOf] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/orders")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => d && setOrders(d.orders))
+      .then((d) => {
+        if (d) {
+          setOrders(d.orders);
+          setAsOf(Date.now());
+        }
+      })
       .catch(() => {});
     fetch("/api/admin/customers?limit=250")
       .then((r) => (r.ok ? r.json() : null))
@@ -55,8 +61,8 @@ export default function MarketingAnalyticsPage() {
   }, [customers]);
 
   const report = useMemo(() => {
-    if (!orders || !returningCustomerIds) return null;
-    const cutoff = Date.now() - TIMEFRAME_DAY_COUNT[timeframe] * 86400000;
+    if (!orders || !returningCustomerIds || asOf === null) return null;
+    const cutoff = asOf - TIMEFRAME_DAY_COUNT[timeframe] * 86400000;
     const inRange = orders.filter((o) => new Date(o.created_at).getTime() >= cutoff && o.financial_status !== "voided");
 
     const byChannel = new Map<string, ChannelRow>();
@@ -95,7 +101,7 @@ export default function MarketingAnalyticsPage() {
       paidSharePct: totalRevenue > 0 ? (paidRevenue / totalRevenue) * 100 : 0,
       returningSharePct: totalOrders > 0 ? (returningOrders / totalOrders) * 100 : 0,
     };
-  }, [orders, returningCustomerIds, timeframe]);
+  }, [orders, returningCustomerIds, timeframe, asOf]);
 
   return (
     <div>

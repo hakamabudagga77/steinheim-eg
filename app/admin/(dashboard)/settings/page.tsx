@@ -90,8 +90,8 @@ export default function AdminSettingsPage() {
             {!status && <p className="text-[13px] text-white/30">Checking…</p>}
           </div>
           <p className="mt-5 text-[12.5px] leading-[1.6] text-white/35">
-            These are also environment variables in Vercel. If something shows as not configured, that feature's admin page will
-            explain what's missing.
+            These are also environment variables in Vercel. If something shows as not configured, that feature&apos;s admin page will
+            explain what&apos;s missing.
           </p>
         </Panel>
       </div>
