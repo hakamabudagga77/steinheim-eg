@@ -13,26 +13,26 @@
 
 <br>
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2-1A1A1A?style=for-the-badge&logo=next.js&logoColor=C9A96E)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-19-1A1A1A?style=for-the-badge&logo=react&logoColor=C9A96E)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-1A1A1A?style=for-the-badge&logo=typescript&logoColor=C9A96E)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-1A1A1A?style=for-the-badge&logo=tailwindcss&logoColor=C9A96E)](https://tailwindcss.com)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-1A1A1A?style=for-the-badge&logo=vercel&logoColor=C9A96E)](https://vercel.com)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-1A1A1A?style=for-the-badge&logo=next.js&logoColor=00DC82)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-1A1A1A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-1A1A1A?style=for-the-badge&logo=typescript&logoColor=3178C6)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-1A1A1A?style=for-the-badge&logo=tailwindcss&logoColor=38BDF8)](https://tailwindcss.com)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-1A1A1A?style=for-the-badge&logo=vercel&logoColor=FFFFFF)](https://vercel.com)
 [![License](https://img.shields.io/badge/License-MIT-C9A96E?style=for-the-badge&labelColor=1A1A1A)](LICENSE)
 
-[![CI](https://img.shields.io/github/actions/workflow/status/hakamabudagga77/steinheim-eg/ci.yml?branch=main&style=flat-square&label=CI&labelColor=1A1A1A&color=C9A96E)](https://github.com/hakamabudagga77/steinheim-eg/actions/workflows/ci.yml)
-[![Sentry](https://img.shields.io/badge/monitoring-Sentry-1A1A1A?style=flat-square&logo=sentry&logoColor=C9A96E&labelColor=1A1A1A)](https://sentry.io)
-[![Vitest](https://img.shields.io/badge/tested%20with-Vitest-1A1A1A?style=flat-square&logo=vitest&logoColor=C9A96E)](https://vitest.dev)
-[![k6](https://img.shields.io/badge/load--tested-k6-1A1A1A?style=flat-square&logo=k6&logoColor=C9A96E)](load-tests/README.md)
-[![ESLint](https://img.shields.io/badge/lint-ESLint%209-1A1A1A?style=flat-square&logo=eslint&logoColor=C9A96E)](eslint.config.mjs)
-[![Shopify](https://img.shields.io/badge/commerce-Shopify-1A1A1A?style=flat-square&logo=shopify&logoColor=C9A96E)](https://www.shopify.com)
-[![Claude](https://img.shields.io/badge/AI%20concierge-Claude-1A1A1A?style=flat-square&logo=anthropic&logoColor=C9A96E)](https://www.anthropic.com)
-[![Redis](https://img.shields.io/badge/cache-Upstash%20Redis-1A1A1A?style=flat-square&logo=redis&logoColor=C9A96E)](https://upstash.com)
-[![i18n](https://img.shields.io/badge/i18n-EN%20%2F%20AR%20(RTL)-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](#-internationalization)
-[![Node](https://img.shields.io/badge/node-%3E%3D20-1A1A1A?style=flat-square&logo=node.js&logoColor=C9A96E)](package.json)
-[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-License-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
-[![Maintained](https://img.shields.io/badge/maintained-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://github.com/hakamabudagga77/steinheim-eg/commits/main)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](#-contributing)
+[![CI](https://img.shields.io/github/actions/workflow/status/hakamabudagga77/steinheim-eg/ci.yml?branch=main&style=flat-square&label=CI&labelColor=1A1A1A&color=2ECC71)](https://github.com/hakamabudagga77/steinheim-eg/actions/workflows/ci.yml)
+[![Sentry](https://img.shields.io/badge/monitoring-Sentry-1A1A1A?style=flat-square&logo=sentry&logoColor=9B6BFF&labelColor=1A1A1A)](https://sentry.io)
+[![Vitest](https://img.shields.io/badge/tested%20with-Vitest-1A1A1A?style=flat-square&logo=vitest&logoColor=A8FF60)](https://vitest.dev)
+[![k6](https://img.shields.io/badge/load--tested-k6-1A1A1A?style=flat-square&logo=k6&logoColor=B19CFF)](load-tests/README.md)
+[![ESLint](https://img.shields.io/badge/lint-ESLint%209-1A1A1A?style=flat-square&logo=eslint&logoColor=9B8CFF)](eslint.config.mjs)
+[![Shopify](https://img.shields.io/badge/commerce-Shopify-1A1A1A?style=flat-square&logo=shopify&logoColor=95BF47)](https://www.shopify.com)
+[![Claude](https://img.shields.io/badge/AI%20concierge-Claude-1A1A1A?style=flat-square&logo=anthropic&logoColor=FF9269)](https://www.anthropic.com)
+[![Redis](https://img.shields.io/badge/cache-Upstash%20Redis-1A1A1A?style=flat-square&logo=redis&logoColor=FF6B6B)](https://upstash.com)
+[![i18n](https://img.shields.io/badge/i18n-EN%20%2F%20AR%20(RTL)-1A1A1A?style=flat-square&color=F472B6&labelColor=1A1A1A)](#-internationalization)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-1A1A1A?style=flat-square&logo=node.js&logoColor=68CC58)](package.json)
+[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-License-1A1A1A?style=flat-square&color=FFC857&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![Maintained](https://img.shields.io/badge/maintained-yes-1A1A1A?style=flat-square&color=34D399&labelColor=1A1A1A)](https://github.com/hakamabudagga77/steinheim-eg/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-1A1A1A?style=flat-square&color=22D3EE&labelColor=1A1A1A)](#-contributing)
 
 </div>
 
@@ -353,10 +353,10 @@ Issues and pull requests are welcome. The workflow this project actually follows
 
 <div align="center">
 
-[![License](https://img.shields.io/badge/Project%20License-MIT-C9A96E?style=for-the-badge&labelColor=1A1A1A)](LICENSE)
-[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
-[![FSF Free/Libre](https://img.shields.io/badge/FSF%20Free%2FLibre-yes-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.gnu.org/licenses/license-list.html#Expat)
-[![SPDX](https://img.shields.io/badge/SPDX-MIT-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://spdx.org/licenses/MIT.html)
+[![License](https://img.shields.io/badge/Project%20License-MIT-3DA639?style=for-the-badge&labelColor=1A1A1A)](LICENSE)
+[![OSI Approved](https://img.shields.io/badge/OSI%20Approved-yes-1A1A1A?style=flat-square&color=FFC857&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![FSF Free/Libre](https://img.shields.io/badge/FSF%20Free%2FLibre-yes-1A1A1A?style=flat-square&color=22D3EE&labelColor=1A1A1A)](https://www.gnu.org/licenses/license-list.html#Expat)
+[![SPDX](https://img.shields.io/badge/SPDX-MIT-1A1A1A?style=flat-square&color=F472B6&labelColor=1A1A1A)](https://spdx.org/licenses/MIT.html)
 
 </div>
 
@@ -369,10 +369,10 @@ assumed:
 
 <div align="center">
 
-[![MIT](https://img.shields.io/badge/MIT-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
-[![Apache 2.0](https://img.shields.io/badge/Apache%202.0-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.apache.org/licenses/LICENSE-2.0)
-[![ISC](https://img.shields.io/badge/ISC-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://opensource.org/licenses/ISC)
-[![AGPL 3.0](https://img.shields.io/badge/AGPL%203.0-1A1A1A?style=flat-square&color=C9A96E&labelColor=1A1A1A)](https://www.gnu.org/licenses/agpl-3.0.en.html)
+[![MIT](https://img.shields.io/badge/MIT-1A1A1A?style=flat-square&color=3DA639&labelColor=1A1A1A)](https://opensource.org/licenses/MIT)
+[![Apache 2.0](https://img.shields.io/badge/Apache%202.0-1A1A1A?style=flat-square&color=D22128&labelColor=1A1A1A)](https://www.apache.org/licenses/LICENSE-2.0)
+[![ISC](https://img.shields.io/badge/ISC-1A1A1A?style=flat-square&color=339AF0&labelColor=1A1A1A)](https://opensource.org/licenses/ISC)
+[![AGPL 3.0](https://img.shields.io/badge/AGPL%203.0-1A1A1A?style=flat-square&color=FF8C42&labelColor=1A1A1A)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 
 </div>
 
