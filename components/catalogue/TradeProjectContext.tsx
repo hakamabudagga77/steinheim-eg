@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   createCustomRoomKey,
   createEmptyTradeProject,
@@ -20,6 +18,7 @@ import {
   type TradeWorkspace,
 } from "@/lib/trade-project";
 import { createEmptyCustomRoomGroup, createEmptyRoomPlan } from "@/lib/trade-schedule";
+import { useFlyAnimation } from "@/components/ui/useFlyAnimation";
 
 interface TradeProjectContextValue {
   project: TradeProject;
@@ -52,13 +51,6 @@ interface TradeProjectContextValue {
   markMessagesSeen: () => void;
 }
 
-interface Flight {
-  id: number;
-  image: string;
-  start: DOMRect;
-  end: DOMRect;
-}
-
 const TradeProjectContext = createContext<TradeProjectContextValue | null>(null);
 
 function freshWorkspace(): TradeWorkspace {
@@ -84,23 +76,17 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   }, []);
   const hydrated = useRef(false);
   const projectIconRef = useRef<HTMLButtonElement | null>(null);
-  const flightId = useRef(0);
-  const [flights, setFlights] = useState<Flight[]>([]);
   const [bump, setBump] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const steinheimMessageCountRef = useRef(0);
+  const { fly, FlightLayer } = useFlyAnimation(projectIconRef);
 
-  const flyToProject = useCallback((originEl: HTMLElement | null, image: string) => {
-    if (!originEl || !projectIconRef.current) return;
-    const start = originEl.getBoundingClientRect();
-    const end = projectIconRef.current.getBoundingClientRect();
-    const id = ++flightId.current;
-    setFlights((f) => [...f, { id, image, start, end }]);
-    window.setTimeout(() => {
-      setFlights((f) => f.filter((item) => item.id !== id));
-      setBump((b) => b + 1);
-    }, 750);
-  }, []);
+  const flyToProject = useCallback(
+    (originEl: HTMLElement | null, image: string) => {
+      fly(originEl, image, () => setBump((b) => b + 1));
+    },
+    [fly]
+  );
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -442,33 +428,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
   return (
     <TradeProjectContext.Provider value={value}>
       {children}
-      <AnimatePresence>
-        {flights.map((flight) => (
-          <motion.div
-            key={flight.id}
-            initial={{
-              left: flight.start.left,
-              top: flight.start.top,
-              width: flight.start.width,
-              height: flight.start.height,
-              opacity: 1,
-              borderRadius: 20,
-            }}
-            animate={{
-              left: flight.end.left + flight.end.width / 2 - 13,
-              top: flight.end.top + flight.end.height / 2 - 13,
-              width: 26,
-              height: 26,
-              opacity: [1, 1, 0],
-              borderRadius: 999,
-            }}
-            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            style={{ position: "fixed", zIndex: 200, overflow: "hidden", pointerEvents: "none" }}
-          >
-            <Image src={flight.image} alt="" fill sizes="26px" className="object-cover" />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+      <FlightLayer />
     </TradeProjectContext.Provider>
   );
 }

@@ -13,25 +13,15 @@ import {
   Wallet,
   Eye,
   AlertTriangle,
-  Mail,
-  Check,
 } from "lucide-react";
 import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { PageHeader, StatCard, StatCardSkeleton, Panel, Badge } from "@/components/admin/ui";
+import DigestTestButton from "@/components/admin/DigestTestButton";
 import type { ContactLead } from "@/lib/contact-leads";
 import type { ShopifyOrder, ShopifyProduct } from "@/lib/shopify-client";
+import { fmtDate, type GA4Summary } from "./analytics-summary-helpers";
 
 const LOW_STOCK_THRESHOLD = 10;
-
-interface GA4Summary {
-  activeUsers: number;
-  sessions: number;
-  pageViews: number;
-  avgSessionDuration: number;
-  topPages: Array<{ path: string; views: number }>;
-  topSources: Array<{ source: string; sessions: number }>;
-  dailyUsers: Array<{ date: string; users: number }>;
-}
 
 const SECTIONS = [
   { href: "/admin/contact", label: "Contact Leads", desc: "General enquiries from the site.", icon: Inbox },
@@ -52,51 +42,6 @@ function fmtRelative(iso: string) {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.round(hours / 24);
   return `${days}d ago`;
-}
-
-function fmtDate(yyyymmdd: string) {
-  if (yyyymmdd.length !== 8) return yyyymmdd;
-  const d = new Date(`${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-}
-
-function DigestTestButton() {
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [message, setMessage] = useState<string | null>(null);
-
-  async function send() {
-    setStatus("sending");
-    setMessage(null);
-    try {
-      const res = await fetch("/api/cron/daily-digest");
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.sent) {
-        setStatus("error");
-        setMessage(data.reason || data.error || "Could not send.");
-        return;
-      }
-      setStatus("sent");
-      setTimeout(() => setStatus("idle"), 3000);
-    } catch {
-      setStatus("error");
-      setMessage("Could not reach the server.");
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={send}
-        disabled={status === "sending"}
-        className="flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-[12px] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
-      >
-        {status === "sent" ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Mail className="h-3.5 w-3.5" />}
-        {status === "sending" ? "Sending…" : status === "sent" ? "Sent" : "Send test digest"}
-      </button>
-      {message && <span className="text-[11px] text-amber-300">{message}</span>}
-    </div>
-  );
 }
 
 export default function AdminDashboardPage() {
