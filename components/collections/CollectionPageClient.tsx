@@ -10,6 +10,7 @@ import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
 import OverviewCardsSpread from "@/components/collections/OverviewCardsSpread";
 import PageTransition from "@/components/layout/PageTransition";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
+import Modal from "@/components/ui/Modal";
 import {
   collectionBanners,
   getCollectionContextImage,
@@ -301,14 +302,13 @@ export default function CollectionPageClient({
           </div>
         </section>
 
-        {selectedStoryCard && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[80] flex items-center justify-center bg-black/72 px-4 py-6 backdrop-blur-[2px]"
-              onClick={() => setSelectedStory(null)}
-            >
+        <Modal
+          open={!!selectedStoryCard}
+          onClose={() => setSelectedStory(null)}
+          centered
+          backdropClassName="fixed inset-0 z-[80] flex items-center justify-center bg-black/72 px-4 py-6 backdrop-blur-[2px]"
+        >
+          {selectedStoryCard && (
               <motion.div
                 initial={{ opacity: 0, y: 24, scale: 0.985 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -373,8 +373,8 @@ export default function CollectionPageClient({
                   </div>
                 </div>
               </motion.div>
-            </motion.div>
-        )}
+          )}
+        </Modal>
       </div>
     </PageTransition>
   );
