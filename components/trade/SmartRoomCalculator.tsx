@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import {
+  isRequirementType,
   PERSONA_META,
   REQUIREMENT_TYPE_LABELS,
   TRADE_PERSONAS,
@@ -65,6 +67,19 @@ export default function SmartRoomCalculator() {
     /^\S+@\S+\.\S+$/.test(details.email) &&
     details.projectName.trim()
   );
+
+  // Deep link from the floating room-progress widget: jump straight to the shop
+  // step with the right room + product type focused, instead of step 0.
+  const searchParams = useSearchParams();
+  const focusScopeId = searchParams.get("focusScope");
+  const rawFocusType = searchParams.get("focusType");
+  const focusType = isRequirementType(rawFocusType) ? rawFocusType : null;
+  const focusKey = focusScopeId && focusType ? `${focusScopeId}:${focusType}` : null;
+  const [prevFocusKey, setPrevFocusKey] = useState<string | null>(null);
+  if (focusKey && focusKey !== prevFocusKey) {
+    setPrevFocusKey(focusKey);
+    setStep(3);
+  }
 
   // Pre-fill from an existing room plan so "Edit property composition" doesn't reset to zero.
   const [prevRoomPlan, setPrevRoomPlan] = useState(project.roomPlan);
@@ -588,7 +603,7 @@ export default function SmartRoomCalculator() {
                 </p>
               </div>
 
-              <ShopProductsStep />
+              <ShopProductsStep focusScopeId={focusScopeId} focusType={focusType} />
 
               <div className="mt-10">
                 <button

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import ScrollReveal from "@/components/ui/ScrollReveal";
@@ -73,7 +74,9 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        <SmartRoomCalculator />
+        <Suspense fallback={null}>
+          <SmartRoomCalculator />
+        </Suspense>
 
         {/* Browse CTA */}
         <section className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32 text-start">

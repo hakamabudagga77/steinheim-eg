@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import RoomProgressPanel from "@/components/trade/RoomProgressPanel";
 import { hasActiveRoomNeeds, type RequirementType } from "@/lib/trade-project";
@@ -9,6 +10,7 @@ import { getProductBySlug } from "@/lib/utils";
 
 export default function FloatingRoomProgress({ locale }: { locale: string }) {
   const t = useTranslations("floatingRoomProgress");
+  const router = useRouter();
   const { project, roomProgressExpanded: expanded, setRoomProgressExpanded: setExpanded } = useTradeProject();
 
   if (!hasActiveRoomNeeds(project)) return null;
@@ -32,8 +34,11 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
   const remaining = Math.max(0, totalNeeded - totalSelected);
   const progressPct = totalNeeded > 0 ? Math.round((totalSelected / totalNeeded) * 100) : 0;
 
-  function handleSelectNeed(_scopeId: string, _type: RequirementType) {
-    window.location.href = `/${locale}/trade#smart-room-calculator`;
+  // Deep-links straight to the exact room + product type in the shop step,
+  // instead of dropping the shopper at the top of the calculator to re-find it.
+  function handleSelectNeed(scopeId: string, type: RequirementType) {
+    const query = new URLSearchParams({ focusScope: scopeId, focusType: type }).toString();
+    router.push(`/trade?${query}#smart-room-calculator`, { locale });
   }
 
   return (
