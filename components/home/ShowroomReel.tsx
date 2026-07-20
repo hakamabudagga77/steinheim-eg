@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
+const events: Array<{ name: string; tag: string; logo: string }> = [
+  { name: "Le Marché", tag: "Cairo · Furniture exhibition", logo: "/images/events/le-marche.jpeg" },
+  { name: "Ceramica Market", tag: "Cairo · Ceramics & bath market", logo: "/images/events/ceramica-market.png" },
+];
+
 const clips: Array<{
   src: string;
   poster: string;
@@ -181,12 +186,31 @@ export default function ShowroomReel() {
         >
           <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
           <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-            The showroom, as it is.
+            On the floor.
           </h2>
           <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
-            Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms,
-            and the space where clients specify a complete bathroom in person.
+            Moments from Steinheim&apos;s appearances at Le Marché and Ceramica Market in Cairo —
+            the finishes, the mechanisms, and the space where visitors specify a complete
+            bathroom in person.
           </p>
+
+          <div className="mt-8 flex flex-wrap gap-4">
+            {events.map((event) => (
+              <div
+                key={event.name}
+                className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.03] p-3 pr-5"
+              >
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={event.logo} alt={event.name} className="h-full w-full object-contain" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-medium text-white">{event.name}</p>
+                  <p className="text-[11px] text-white/40">{event.tag}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
 

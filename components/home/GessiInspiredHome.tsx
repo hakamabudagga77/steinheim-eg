@@ -5,7 +5,6 @@ import Image from "next/image";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import Logo from "@/components/ui/Logo";
-import FinishPlanetsSection from "@/components/home/FinishPlanetsSection";
 import ShowroomReel from "@/components/home/ShowroomReel";
 import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
@@ -387,8 +386,6 @@ export default function GessiInspiredHome() {
       </section>
 
       <ShowroomReel />
-
-      <FinishPlanetsSection />
     </div>
   );
 }
