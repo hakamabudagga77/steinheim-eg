@@ -1,28 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/server/admin-session";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const loginBuckets = new Map<string, { count: number; resetAt: number }>();
-
-function clientKey(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-}
-
-function canAttempt(request: Request) {
-  const key = clientKey(request);
-  const now = Date.now();
-  const bucket = loginBuckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    loginBuckets.set(key, { count: 1, resetAt: now + 15 * 60 * 1000 });
-    return true;
-  }
-  if (bucket.count >= 10) return false;
-  bucket.count += 1;
-  return true;
-}
 
 function safeEqual(a: string, b: string) {
   const bufA = Buffer.from(a);
@@ -32,7 +14,7 @@ function safeEqual(a: string, b: string) {
 }
 
 export async function POST(request: Request) {
-  if (!canAttempt(request)) {
+  if (!(await checkRateLimit(request, "admin-login", 10, 15 * 60))) {
     return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   }
 

@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { invalidateShopifyProductCache } from "@/lib/shopify-live-data";
+import { redisCommand, redisConfig } from "@/lib/server/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,6 +29,23 @@ function verifySignature(rawBody: string, signatureHeader: string | null): boole
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+// Shopify retries webhooks that don't respond quickly, and a captured
+// request could be replayed -- both would otherwise re-run the cache
+// invalidation below. Cheap to guard even though the current effect is
+// idempotent by nature, so this doesn't become a real bug if the handler
+// is ever extended to mutate order/lead state. Skips the check entirely
+// when Redis isn't configured (matches "SET NX" being unavailable, not
+// "already seen") rather than blocking on an infra gap.
+async function alreadyProcessed(webhookId: string | null): Promise<boolean> {
+  if (!webhookId || !redisConfig()) return false;
+  try {
+    const result = await redisCommand(["SET", `steinheim:webhook-seen:${webhookId}`, "1", "NX", "EX", 300]);
+    return result === null;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Shopify webhook receiver. Register this URL (https://<domain>/api/webhooks/shopify)
  * against the topics in CACHE_INVALIDATING_TOPICS in the Shopify admin
@@ -46,8 +64,9 @@ export async function POST(request: Request) {
   }
 
   const topic = request.headers.get("x-shopify-topic") ?? "";
+  const webhookId = request.headers.get("x-shopify-webhook-id");
 
-  if (CACHE_INVALIDATING_TOPICS.has(topic)) {
+  if (CACHE_INVALIDATING_TOPICS.has(topic) && !(await alreadyProcessed(webhookId))) {
     await invalidateShopifyProductCache();
   }
 
