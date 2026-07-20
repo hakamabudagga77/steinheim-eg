@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
-const events: Array<{ name: string; tag: string; logo: string }> = [
-  { name: "Le Marché", tag: "Cairo · Furniture exhibition", logo: "/images/events/le-marche.jpeg" },
-  { name: "Ceramica Market", tag: "Cairo · Ceramics & bath market", logo: "/images/events/ceramica-market.png" },
+const events: Array<{ name: string; tag: string; logo: string; width: number; height: number }> = [
+  { name: "Le Marché", tag: "Furniture exhibition", logo: "/images/events/le-marche-logo.png", width: 308, height: 84 },
+  { name: "Ceramica Market", tag: "Ceramics & bath market", logo: "/images/events/ceramica-market-logo.png", width: 1054, height: 864 },
 ];
 
 const clips: Array<{
@@ -194,20 +194,18 @@ export default function ShowroomReel() {
             bathroom in person.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <p className="mr-1 text-[11px] uppercase tracking-[0.3em] text-white/30">As seen at</p>
             {events.map((event) => (
-              <div
-                key={event.name}
-                className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.03] p-3 pr-5"
-              >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-1.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={event.logo} alt={event.name} className="h-full w-full object-contain" />
-                </div>
-                <div>
-                  <p className="text-[13px] font-medium text-white">{event.name}</p>
-                  <p className="text-[11px] text-white/40">{event.tag}</p>
-                </div>
+              <div key={event.name} className="flex flex-col items-start gap-1.5 pl-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={event.logo}
+                  alt={event.name}
+                  className="h-8 w-auto object-contain"
+                  style={{ aspectRatio: `${event.width} / ${event.height}` }}
+                />
+                <p className="text-[10.5px] text-white/35">{event.tag}</p>
               </div>
             ))}
           </div>
