@@ -104,8 +104,10 @@ const ALL_REQUIREMENT_TYPES: RequirementType[] = [
 ];
 
 /** The full product-type gallery, shown for every room regardless of kind — nobody should be
- * forced into a curated subset. Room kind only affects which needs are pre-checked by default. */
-export function allRequirementTypesFor(_room: RoomKey): RequirementType[] {
+ * forced into a curated subset. Room kind only affects which needs are pre-checked by default.
+ * Takes `room` to keep the signature stable for callers and future per-kind curation. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function allRequirementTypesFor(room: RoomKey): RequirementType[] {
   return ALL_REQUIREMENT_TYPES;
 }
 

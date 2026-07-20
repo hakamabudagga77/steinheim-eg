@@ -267,19 +267,29 @@ export default function AdminOrdersPage() {
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <StatCard
-              icon={Wallet}
-              label="Revenue"
-              value={`${summary.currency} ${summary.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
-              hint="Gross, excludes voided"
-              accent
-            />
-            <StatCard icon={ShoppingBag} label="Orders" value={summary.count} />
-            <StatCard
-              icon={TrendingUp}
-              label="Average order value"
-              value={`${summary.currency} ${summary.avg.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
-            />
+            {orders ? (
+              <>
+                <StatCard
+                  icon={Wallet}
+                  label="Revenue"
+                  value={`${summary.currency} ${summary.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+                  hint="Gross, excludes voided"
+                  accent
+                />
+                <StatCard icon={ShoppingBag} label="Orders" value={summary.count} />
+                <StatCard
+                  icon={TrendingUp}
+                  label="Average order value"
+                  value={`${summary.currency} ${summary.avg.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
+                />
+              </>
+            ) : (
+              <>
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+                <StatCardSkeleton />
+              </>
+            )}
           </div>
 
           <Panel className="mt-4">

@@ -84,7 +84,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const doc = await PDFDocument.create();
   const helvetica = await doc.embedFont(StandardFonts.Helvetica);
   const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const timesRoman = await doc.embedFont(StandardFonts.TimesRoman);
 
   const logoBytes = await loadLogo();
   const logoImage = logoBytes ? await doc.embedPng(logoBytes) : null;

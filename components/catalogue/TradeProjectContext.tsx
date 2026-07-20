@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   createCustomRoomKey,
@@ -277,7 +278,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       projects: [createEmptyTradeProject(id), ...current.projects].slice(0, 25),
     }));
     setOpen(true);
-  }, []);
+  }, [setOpen]);
 
   const switchProject = useCallback((id: string) => {
     setWorkspace((current) => current.projects.some((entry) => entry.id === id)
@@ -321,7 +322,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
       return { activeProjectId: newId, projects: [duplicated, ...current.projects].slice(0, 25) };
     });
     setOpen(true);
-  }, []);
+  }, [setOpen]);
 
   const markSubmitted = useCallback((leadId: string) => {
     setWorkspace((current) => ({
@@ -464,7 +465,7 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
             style={{ position: "fixed", zIndex: 200, overflow: "hidden", pointerEvents: "none" }}
           >
-            <img src={flight.image} alt="" className="h-full w-full object-cover" />
+            <Image src={flight.image} alt="" fill sizes="26px" className="object-cover" />
           </motion.div>
         ))}
       </AnimatePresence>
