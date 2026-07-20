@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -23,7 +23,6 @@ export default function SiteSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const index = useMemo(() => {
     const pageLabels = {
@@ -87,9 +86,8 @@ export default function SiteSearch() {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, []);
 
-  useEffect(() => {
-    if (open) requestAnimationFrame(() => inputRef.current?.focus());
-  }, [open]);
+  // Initial focus on the input is handled by Modal (it focuses the dialog's
+  // first focusable on open, which is this input).
 
   // Reset the highlighted result whenever the query changes, without a
   // setState-in-effect: compare against the previous query during render.
@@ -121,6 +119,9 @@ export default function SiteSearch() {
       backdropTransition={{ duration: 0.2 }}
     >
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("placeholder")}
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.25, ease: [0.22, 0.76, 0.2, 1] }}
@@ -132,7 +133,6 @@ export default function SiteSearch() {
                 <path d="M20 20l-3.5-3.5" />
               </svg>
               <input
-                ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleListKeydown}

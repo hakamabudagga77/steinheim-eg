@@ -310,6 +310,9 @@ export default function CollectionPageClient({
         >
           {selectedStoryCard && (
               <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="collection-story-title"
                 initial={{ opacity: 0, y: 24, scale: 0.985 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
@@ -342,7 +345,7 @@ export default function CollectionPageClient({
                     <p className="text-[18px] uppercase tracking-[0.32em] text-black/80">
                       {selectedStoryCard.eyebrow}
                     </p>
-                    <h2 className="mt-8 text-[clamp(3rem,5vw,6rem)] font-normal leading-[0.95] tracking-[-0.07em]">
+                    <h2 id="collection-story-title" className="mt-8 text-[clamp(3rem,5vw,6rem)] font-normal leading-[0.95] tracking-[-0.07em]">
                       {selectedStoryCard.title}
                     </h2>
                     <p className="mt-8 text-[clamp(1.1rem,1.45vw,1.45rem)] leading-[1.65] text-black/72">
