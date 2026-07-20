@@ -8,6 +8,7 @@ import { getProductDefaultImage, getProductImage } from "@/data/images";
 import { tradeLeadStatuses, TRADE_LEAD_STATUS_LABELS, type TradeLead, type TradeLeadMessage, type TradeLeadStatus } from "@/lib/trade-leads";
 import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
 import { PageHeader, Panel, Badge, SegmentedControl, EmptyState, ErrorState, type BadgeTone } from "@/components/admin/ui";
+import { routing } from "@/i18n/routing";
 
 function formatMessageTime(value: string) {
   return new Date(value).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -332,7 +333,9 @@ function ScopeProductSchedule({ lead }: { lead: TradeLead }) {
 
             return [{
               key: `${scope.scopeId}-${item.slug}-${item.finish}-${index}`,
-              href: `/en/products/${item.slug}`,
+              // Admin-only preview link — always opens in the default locale, since this
+              // panel has no locale context of its own to base it on.
+              href: `/${routing.defaultLocale}/products/${item.slug}`,
               image,
               productName: product?.name ?? item.slug.replace(/-/g, " "),
               seriesName: series?.name,

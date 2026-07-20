@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
 import ProductCard from "@/components/product/ProductCard";
 import PageTransition from "@/components/layout/PageTransition";
@@ -12,32 +13,20 @@ type LiveVariant = { finish: string; price: number; inventory: number; inStock: 
 type LiveData = Record<string, { variants: LiveVariant[] }>;
 type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc";
 
-const TYPE_LABELS: Record<string, string> = {
-  "basin-mixer": "Basin Mixers",
-  "tall-basin-mixer": "Tall Basin Mixers",
-  "wall-mounted": "Wall-Mounted Mixers",
-  "concealed-shower": "Concealed Showers",
-  "shower-column": "Shower Columns",
-  "free-standing": "Free-Standing Mixers",
-  accessories: "Accessories",
-  "bidet-spray": "Bidet Sprays",
-  "click-clack": "Click-Clack Wastes",
-  "angle-valve": "Angle Valves",
-};
-
 const PRICE_BRACKETS = [
-  { id: "under-3000", label: "Under EGP 3,000", min: 0, max: 3000 },
-  { id: "3000-10000", label: "EGP 3,000 – 10,000", min: 3000, max: 10000 },
-  { id: "10000-20000", label: "EGP 10,000 – 20,000", min: 10000, max: 20000 },
-  { id: "20000-plus", label: "EGP 20,000+", min: 20000, max: Infinity },
+  { id: "under-3000", min: 0, max: 3000 },
+  { id: "3000-10000", min: 3000, max: 10000 },
+  { id: "10000-20000", min: 10000, max: 20000 },
+  { id: "20000-plus", min: 20000, max: Infinity },
 ] as const;
 
-const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
-  { value: "featured", label: "Featured" },
-  { value: "price-asc", label: "Price: Low to High" },
-  { value: "price-desc", label: "Price: High to Low" },
-  { value: "name-asc", label: "Name: A–Z" },
-];
+const SORT_OPTIONS: SortOption[] = ["featured", "price-asc", "price-desc", "name-asc"];
+const SORT_KEYS: Record<SortOption, string> = {
+  featured: "featured",
+  "price-asc": "priceAsc",
+  "price-desc": "priceDesc",
+  "name-asc": "nameAsc",
+};
 
 function minPrice(product: Product, liveData: LiveData): number {
   const prices = product.variants.map(
@@ -85,6 +74,7 @@ function CheckPill({
 }
 
 export default function AllProductsPage() {
+  const t = useTranslations("products");
   const params = useParams();
   const isArabic = String(params.locale || "") === "ar";
 
@@ -145,11 +135,11 @@ export default function AllProductsPage() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           (getSeriesById(p.series)?.name ?? "").toLowerCase().includes(q) ||
-          (TYPE_LABELS[p.type] ?? p.type).toLowerCase().includes(q)
+          t(`types.${p.type}`).toLowerCase().includes(q)
       );
     }
     return list;
-  }, [allProducts, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData]);
+  }, [allProducts, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData, t]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -164,12 +154,12 @@ export default function AllProductsPage() {
       <div className="min-h-screen bg-[#ece9e2] px-5 pb-24 pt-32 text-[#0a0a0a] sm:px-8 lg:px-16 lg:pt-40">
         <div className="mx-auto max-w-[1780px]">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">Full range</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("eyebrow")}</p>
             <h1 className="mt-4 max-w-3xl font-heading text-[clamp(2.6rem,6vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-              All products.
+              {t("heading")}
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-[1.75] text-black/55">
-              Every collection, every finish, in one place — {allProducts.length} products across Joy, Up, Art, and Quatro.
+              {t("description", { count: allProducts.length })}
             </p>
           </motion.div>
 
@@ -183,7 +173,7 @@ export default function AllProductsPage() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search products…"
+                placeholder={t("searchPlaceholder")}
                 className="w-full min-w-0 bg-transparent text-[14px] outline-none placeholder:text-black/35"
               />
             </div>
@@ -194,8 +184,8 @@ export default function AllProductsPage() {
               className="border border-black/15 bg-transparent px-4 py-2.5 text-[13px] outline-none"
             >
               {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  Sort: {opt.label}
+                <option key={opt} value={opt}>
+                  {t("sort.label", { label: t(`sort.${SORT_KEYS[opt]}`) })}
                 </option>
               ))}
             </select>
@@ -205,7 +195,7 @@ export default function AllProductsPage() {
               onClick={() => setFiltersOpen(true)}
               className="flex items-center gap-2 border border-black/15 px-4 py-2.5 text-[13px] transition hover:border-black"
             >
-              Filters
+              {t("filters")}
               {activeFilterCount > 0 && (
                 <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[10px] text-white">
                   {activeFilterCount}
@@ -213,15 +203,15 @@ export default function AllProductsPage() {
               )}
             </button>
 
-            <p className="ml-auto shrink-0 text-[13px] text-black/40">{sorted.length} product{sorted.length === 1 ? "" : "s"}</p>
+            <p className="ml-auto shrink-0 text-[13px] text-black/40">{t("resultCount", { count: sorted.length })}</p>
           </div>
 
           {/* Grid */}
           {sorted.length === 0 ? (
             <div className="flex flex-col items-center gap-4 py-32 text-center">
-              <p className="text-[15px] text-black/50">No products match these filters.</p>
+              <p className="text-[15px] text-black/50">{t("emptyState")}</p>
               <button type="button" onClick={clearAllFilters} className="rounded-full border border-black/20 px-6 py-2.5 text-[13px] transition hover:border-black">
-                Clear all filters
+                {t("clearAllFilters")}
               </button>
             </div>
           ) : (
@@ -264,8 +254,8 @@ export default function AllProductsPage() {
               dir={isArabic ? "rtl" : "ltr"}
             >
               <div className="flex items-center justify-between border-b border-black/10 px-6 py-5">
-                <p className="text-[16px] font-medium">Filters</p>
-                <button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters" className="text-black/40 hover:text-black">
+                <p className="text-[16px] font-medium">{t("drawer.title")}</p>
+                <button type="button" onClick={() => setFiltersOpen(false)} aria-label={t("drawer.close")} className="text-black/40 hover:text-black">
                   <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.3">
                     <line x1="4" y1="4" x2="16" y2="16" />
                     <line x1="16" y1="4" x2="4" y2="16" />
@@ -274,7 +264,7 @@ export default function AllProductsPage() {
               </div>
 
               <div data-lenis-prevent className="flex-1 overflow-y-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <FilterSection title="Collection">
+                <FilterSection title={t("drawer.collection")}>
                   <div className="flex flex-wrap gap-2">
                     {allSeries.map((series) => (
                       <CheckPill key={series.id} active={selectedSeries.includes(series.id)} onClick={() => toggle(selectedSeries, series.id, setSelectedSeries)}>
@@ -284,17 +274,17 @@ export default function AllProductsPage() {
                   </div>
                 </FilterSection>
 
-                <FilterSection title="Product type">
+                <FilterSection title={t("drawer.productType")}>
                   <div className="flex flex-wrap gap-2">
                     {allTypes.map((type) => (
                       <CheckPill key={type} active={selectedTypes.includes(type)} onClick={() => toggle(selectedTypes, type, setSelectedTypes)}>
-                        {TYPE_LABELS[type] ?? type}
+                        {t(`types.${type}`)}
                       </CheckPill>
                     ))}
                   </div>
                 </FilterSection>
 
-                <FilterSection title="Finish">
+                <FilterSection title={t("drawer.finish")}>
                   <div className="flex flex-wrap gap-3">
                     {allFinishes.map((finish) => {
                       const active = selectedFinishes.includes(finish.id);
@@ -329,7 +319,7 @@ export default function AllProductsPage() {
                   </div>
                 </FilterSection>
 
-                <FilterSection title="Price">
+                <FilterSection title={t("drawer.price")}>
                   <div className="flex flex-col gap-2">
                     {PRICE_BRACKETS.map((bracket) => (
                       <CheckPill
@@ -337,15 +327,15 @@ export default function AllProductsPage() {
                         active={priceBracket === bracket.id}
                         onClick={() => setPriceBracket(priceBracket === bracket.id ? null : bracket.id)}
                       >
-                        {bracket.label}
+                        {t(`priceBrackets.${bracket.id}`)}
                       </CheckPill>
                     ))}
                   </div>
                 </FilterSection>
 
-                <FilterSection title="Availability">
+                <FilterSection title={t("drawer.availability")}>
                   <label className="flex cursor-pointer items-center justify-between">
-                    <span className="text-[13px] text-black/70">In stock only</span>
+                    <span className="text-[13px] text-black/70">{t("drawer.inStockOnly")}</span>
                     <button
                       type="button"
                       role="switch"
@@ -361,14 +351,14 @@ export default function AllProductsPage() {
 
               <div className="flex items-center justify-between gap-3 border-t border-black/10 px-6 py-5">
                 <button type="button" onClick={clearAllFilters} className="text-[13px] text-black/50 underline decoration-black/20 hover:text-black">
-                  Clear all
+                  {t("drawer.clearAll")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFiltersOpen(false)}
                   className="rounded-full bg-black px-8 py-3 text-[13px] font-medium text-white transition hover:bg-black/85"
                 >
-                  Show {sorted.length} product{sorted.length === 1 ? "" : "s"}
+                  {t("drawer.showResults", { count: sorted.length })}
                 </button>
               </div>
             </motion.aside>

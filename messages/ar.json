@@ -898,6 +898,53 @@
     "back": "رجوع",
     "continue": "متابعة"
   },
+  "products": {
+    "eyebrow": "التشكيلة الكاملة",
+    "heading": "كل المنتجات.",
+    "description": "كل مجموعة، بكل درجات التشطيب، في مكان واحد — {count, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}} من Joy وUp وArt وQuatro.",
+    "searchPlaceholder": "ابحث عن المنتجات…",
+    "sort": {
+      "label": "الترتيب: {label}",
+      "featured": "الأبرز",
+      "priceAsc": "السعر: من الأقل للأعلى",
+      "priceDesc": "السعر: من الأعلى للأقل",
+      "nameAsc": "الاسم: أ-ي"
+    },
+    "filters": "الفلاتر",
+    "resultCount": "{count, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}}",
+    "emptyState": "لا توجد منتجات مطابقة لهذه الفلاتر.",
+    "clearAllFilters": "مسح كل الفلاتر",
+    "drawer": {
+      "title": "الفلاتر",
+      "close": "إغلاق الفلاتر",
+      "collection": "المجموعة",
+      "productType": "نوع المنتج",
+      "finish": "التشطيب",
+      "price": "السعر",
+      "availability": "التوفر",
+      "inStockOnly": "المتوفر فقط",
+      "clearAll": "مسح الكل",
+      "showResults": "{count, plural, zero {عرض المنتجات} one {عرض منتج واحد} two {عرض منتجين} few {عرض # منتجات} many {عرض # منتجًا} other {عرض # منتج}}"
+    },
+    "types": {
+      "basin-mixer": "خلاطات مغاسل",
+      "tall-basin-mixer": "خلاطات مغاسل طويلة",
+      "wall-mounted": "خلاطات حائطية",
+      "concealed-shower": "دشات مخفية",
+      "shower-column": "أعمدة دش",
+      "free-standing": "خلاطات مستقلة",
+      "accessories": "إكسسوارات",
+      "bidet-spray": "دشاشات بيديه",
+      "click-clack": "بالطات كليك-كلاك",
+      "angle-valve": "محابس زاوية"
+    },
+    "priceBrackets": {
+      "under-3000": "أقل من 3,000 جنيه",
+      "3000-10000": "3,000 – 10,000 جنيه",
+      "10000-20000": "10,000 – 20,000 جنيه",
+      "20000-plus": "أكثر من 20,000 جنيه"
+    }
+  },
   "shopByNeed": {
     "forProject": "لـ {name}",
     "headline": "تسوَّق حسب الاحتياج.",
