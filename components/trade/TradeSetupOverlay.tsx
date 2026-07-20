@@ -9,7 +9,6 @@ import {
   REQUIREMENT_TYPE_LABELS,
   TRADE_PERSONAS,
   TRADE_PERSONA_LABELS,
-  type RoomProductNeed,
 } from "@/lib/trade-project";
 import {
   allRequirementTypesFor,
@@ -19,30 +18,16 @@ import {
   roomConfig,
   type RoomKey,
 } from "@/lib/trade-schedule";
+import { useRoomSetupState } from "@/components/trade/useRoomSetupState";
 
 const STEP_KEYS = ["intro", "rooms", "needs"] as const;
 type Step = 0 | 1 | 2;
-
-const emptyCounts: Record<RoomKey, number> = { master: 0, standard: 0, powder: 0, suite: 0 };
-
-interface CustomRoomDraft {
-  roomKey: string;
-  label: string;
-  count: number;
-}
-
-function createDraftKey() {
-  return `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
 
 export default function TradeSetupOverlay({ locale }: { locale: string }) {
   const t = useTranslations("tradeSetupOverlay");
   const isArabic = locale === "ar";
   const { project, setRoomPlan, setupOpen, setSetupOpen, setRoomProgressExpanded, setPersona, updateDetails, updateProductNeeds } = useTradeProject();
   const [step, setStep] = useState<Step>(0);
-  const [counts, setCounts] = useState<Record<RoomKey, number>>(emptyCounts);
-  const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [customRooms, setCustomRooms] = useState<CustomRoomDraft[]>([]);
 
   const persona = project.persona;
   const personaConfig = persona ? PERSONA_META[persona] : null;
@@ -54,77 +39,40 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
     details.projectName.trim()
   );
 
+  // Re-hydrate room-setup state each time the drawer opens, so it always reflects
+  // whatever is currently confirmed rather than a stale in-progress edit.
   const [prevSetupOpen, setPrevSetupOpen] = useState(setupOpen);
-  const [prevRoomPlanForHydration, setPrevRoomPlanForHydration] = useState(project.roomPlan);
-  if (setupOpen !== prevSetupOpen || project.roomPlan !== prevRoomPlanForHydration) {
-    const justOpened = setupOpen !== prevSetupOpen && setupOpen;
+  if (setupOpen !== prevSetupOpen) {
     setPrevSetupOpen(setupOpen);
-    setPrevRoomPlanForHydration(project.roomPlan);
-    if (setupOpen && project.roomPlan) {
-      const plan = project.roomPlan;
-      const fixed = plan.groups.filter((group) => !group.isCustom);
-      const custom = plan.groups.filter((group) => group.isCustom);
-      setCounts(Object.fromEntries(fixed.map((group) => [group.roomKey, group.count])) as Record<RoomKey, number>);
-      setCustomRooms(custom.map((group) => ({ roomKey: group.roomKey, label: group.roomLabel, count: group.count })));
-      setActivePresetId(plan.presetId);
-    }
-    if (justOpened) setStep(0);
+    if (setupOpen) setStep(0);
   }
 
-  const totalRooms = Object.values(counts).reduce((sum, value) => sum + value, 0) + customRooms.reduce((sum, r) => sum + r.count, 0);
-
-  const activeRooms = [
-    ...roomConfig.filter((entry) => counts[entry.key] > 0).map((entry) => ({ roomKey: entry.key as string, label: entry.label, count: counts[entry.key] })),
-    ...customRooms.filter((room) => room.count > 0).map((room) => ({ roomKey: room.roomKey, label: room.label || t("step1.fallbackLabel"), count: room.count })),
-  ];
-
-  function applyPreset(preset: (typeof presets)[number]) {
-    setCounts(preset.counts);
-    setActivePresetId(preset.id);
-    setStep(1);
-  }
-
-  function updateRoom(room: RoomKey, value: number) {
-    setCounts((current) => ({ ...current, [room]: clampCount(value) }));
-    setActivePresetId(null);
-  }
-
-  function adjustRoom(room: RoomKey, delta: number) {
-    setCounts((current) => ({ ...current, [room]: clampCount(current[room] + delta) }));
-    setActivePresetId(null);
-  }
-
-  function addCustomRoomDraft() {
-    setCustomRooms((current) => [...current, { roomKey: createDraftKey(), label: "", count: 1 }]);
-  }
-
-  function updateCustomRoomDraft(roomKey: string, patch: Partial<CustomRoomDraft>) {
-    setCustomRooms((current) => current.map((room) => (room.roomKey === roomKey ? { ...room, ...patch } : room)));
-  }
-
-  function removeCustomRoomDraft(roomKey: string) {
-    setCustomRooms((current) => current.filter((room) => room.roomKey !== roomKey));
-  }
+  const {
+    counts,
+    activePresetId,
+    customRooms,
+    applyPreset,
+    updateRoom,
+    adjustRoom,
+    addCustomRoomDraft,
+    updateCustomRoomDraft,
+    removeCustomRoomDraft,
+    toggleNeed,
+    setNeedQuantity,
+    totalRooms,
+    activeRooms,
+  } = useRoomSetupState(
+    project.roomPlan,
+    setupOpen ? project.roomPlan : null,
+    t("step1.fallbackLabel"),
+    updateProductNeeds,
+    () => setStep(1)
+  );
 
   function enterNeedsStep() {
     const plan = buildRoomPlan(project.roomPlan, activePresetId, counts, {}, customRooms.filter((r) => r.count > 0));
     setRoomPlan(plan);
     setStep(2);
-  }
-
-  function toggleNeed(roomKey: string, type: RoomProductNeed["type"], checked: boolean) {
-    const group = project.roomPlan?.groups.find((g) => g.roomKey === roomKey);
-    const existing = group?.productNeeds ?? [];
-    const next = checked
-      ? existing.some((n) => n.type === type) ? existing : [...existing, { type, quantity: 1 }]
-      : existing.filter((n) => n.type !== type);
-    updateProductNeeds(roomKey, next);
-  }
-
-  function setNeedQuantity(roomKey: string, type: RoomProductNeed["type"], quantity: number) {
-    const group = project.roomPlan?.groups.find((g) => g.roomKey === roomKey);
-    const next = (group?.productNeeds ?? []).map((n) => (n.type === type ? { ...n, quantity: Math.max(1, Math.min(9999, Math.round(quantity) || 1)) } : n));
-    updateProductNeeds(roomKey, next);
   }
 
   function handleClose() {
