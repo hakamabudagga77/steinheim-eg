@@ -50,3 +50,9 @@ data/runtime/
 /tmp/
 /tmp_*/
 tmp_*.py
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
