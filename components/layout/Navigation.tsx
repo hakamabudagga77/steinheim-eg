@@ -490,6 +490,30 @@ export default function Navigation({ locale }: { locale: string }) {
                   ))}
                 </div>
 
+                {/* Language toggle for mobile/tablet — the top-bar switcher is
+                    desktop-only (lg:flex), so without this there is no way to
+                    change language on small screens. Hidden on lg+ to avoid
+                    duplicating the top-bar control. */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
+                  className="mt-6 lg:hidden"
+                >
+                  <Link
+                    href={pathname}
+                    locale={locale === "en" ? "ar" : "en"}
+                    onClick={handleNavigate}
+                    className="flex items-center gap-2.5 py-2 text-[14px] font-medium text-black/50 transition-colors duration-300 hover:text-black"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+                    </svg>
+                    <span>{locale === "en" ? "العربية" : "English"}</span>
+                  </Link>
+                </motion.div>
+
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
