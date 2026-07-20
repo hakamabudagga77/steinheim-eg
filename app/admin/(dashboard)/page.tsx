@@ -14,12 +14,24 @@ import {
   Eye,
   AlertTriangle,
 } from "lucide-react";
-import { AreaChart, Area, LineChart, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import dynamic from "next/dynamic";
 import { PageHeader, StatCard, StatCardSkeleton, Panel, Badge } from "@/components/admin/ui";
 import DigestTestButton from "@/components/admin/DigestTestButton";
 import type { ContactLead } from "@/lib/contact-leads";
 import type { ShopifyOrder, ShopifyProduct } from "@/lib/shopify-client";
-import { fmtDate, type GA4Summary } from "./analytics-summary-helpers";
+import { type GA4Summary } from "./analytics-summary-helpers";
+
+// Charts pull in recharts (~120 KB gzip). Load them on demand so they stay out
+// of the dashboard's initial JS; the pulse placeholder covers the brief load.
+const chartPlaceholder = () => <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />;
+const RevenueChart = dynamic(() => import("./DashboardCharts").then((m) => m.RevenueChart), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
+const VisitorsChart = dynamic(() => import("./DashboardCharts").then((m) => m.VisitorsChart), {
+  ssr: false,
+  loading: chartPlaceholder,
+});
 
 const LOW_STOCK_THRESHOLD = 10;
 
@@ -187,35 +199,7 @@ export default function AdminDashboardPage() {
           </div>
           <div className="mt-4 h-[180px]">
             {orders ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueTrend} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#c9a961" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="#c9a961" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
-                    interval={2}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#18181b",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 10,
-                      fontSize: 12,
-                      color: "#fff",
-                    }}
-                    labelStyle={{ color: "rgba(255,255,255,0.5)" }}
-                    formatter={(v) => [Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 }), "Revenue"]}
-                  />
-                  <Area type="monotone" dataKey="revenue" stroke="#c9a961" strokeWidth={2} fill="url(#revenueFill)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <RevenueChart data={revenueTrend} />
             ) : (
               <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
             )}
@@ -226,23 +210,7 @@ export default function AdminDashboardPage() {
           <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors · last 30 days</p>
           <div className="mt-4 h-[180px]">
             {ga4 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={ga4.dailyUsers} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                  <XAxis dataKey="date" hide />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#18181b",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 10,
-                      fontSize: 12,
-                      color: "#fff",
-                    }}
-                    labelFormatter={(v) => fmtDate(String(v))}
-                    labelStyle={{ color: "rgba(255,255,255,0.5)" }}
-                  />
-                  <Line type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <VisitorsChart data={ga4.dailyUsers} />
             ) : (
               <div className="flex h-full items-center justify-center text-[12px] text-white/25">
                 {ga4Error ? "Not configured yet" : "Loading…"}

@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { Wallet, ShoppingBag, TrendingUp, Truck, X } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import type { ShopifyOrder } from "@/lib/shopify-client";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
+
+// recharts (~120 KB gzip) loads on demand instead of in this page's initial JS.
+const RevenueTrendChart = dynamic(() => import("./OrdersChart").then((m) => m.RevenueTrendChart), {
+  ssr: false,
+  loading: () => <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />,
+});
 
 function FulfillModal({
   order,
@@ -295,38 +301,7 @@ export default function AdminOrdersPage() {
           <Panel className="mt-4">
             <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Revenue trend</p>
             <div className="mt-4 h-[180px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="ordersRevenueFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#c9a961" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="#c9a961" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }}
-                    interval={Math.max(0, Math.floor(trend.length / 8))}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: "#18181b",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 10,
-                      fontSize: 12,
-                      color: "#fff",
-                    }}
-                    labelStyle={{ color: "rgba(255,255,255,0.5)" }}
-                    formatter={(v) => [
-                      `${summary.currency} ${Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
-                      "Revenue",
-                    ]}
-                  />
-                  <Area type="monotone" dataKey="revenue" stroke="#c9a961" strokeWidth={2} fill="url(#ordersRevenueFill)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <RevenueTrendChart data={trend} currency={summary.currency} />
             </div>
           </Panel>
         </>
