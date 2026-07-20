@@ -17,12 +17,26 @@ test.describe("cart", () => {
     await expect(drawer).toBeVisible();
     await expect(drawer.getByText(/1 item/i)).toBeVisible();
 
+    // The cart is written to localStorage by a deferred effect — wait for that
+    // before reloading so the reload can't race the write.
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          try {
+            return JSON.parse(localStorage.getItem("steinheim-cart-v1") || '{"items":[]}').items.length;
+          } catch {
+            return 0;
+          }
+        })
+      )
+      .toBeGreaterThan(0);
+
     // It survives a reload (localStorage persistence).
     await page.reload();
-    const cartButton = page.getByRole("button", { name: "Cart" });
-    await cartButton.click();
-    await expect(page.locator("aside").filter({ hasText: /your cart/i })).toBeVisible();
-    await expect(page.getByText(/1 item/i)).toBeVisible();
+    await page.getByRole("button", { name: "Cart" }).click();
+    const drawerAfter = page.locator("aside").filter({ hasText: /your cart/i });
+    await expect(drawerAfter).toBeVisible();
+    await expect(drawerAfter.getByText(/1 item/i)).toBeVisible();
   });
 
   test("removing the only item empties the cart", async ({ page }) => {

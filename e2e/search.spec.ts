@@ -4,11 +4,17 @@ import { test, expect } from "@playwright/test";
 // data) — no backend needed.
 test("Cmd+K search finds a product and navigates to it", async ({ page }) => {
   await page.goto("/en");
-
-  await page.keyboard.press("Control+k");
+  await page.waitForLoadState("networkidle");
 
   const input = page.getByPlaceholder(/search products/i);
-  await expect(input).toBeVisible();
+
+  // The global Cmd/Ctrl+K listener attaches on hydration; on a cold CI runner
+  // the first keypress can land just before that. Retry the shortcut until the
+  // palette actually opens (a no-op keypress is simply ignored, not buffered).
+  await expect(async () => {
+    await page.keyboard.press("Control+k");
+    await expect(input).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 20000 });
 
   await input.fill("joy basin");
 

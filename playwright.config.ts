@@ -9,8 +9,12 @@ const BASE_URL = `http://localhost:${PORT}`;
 // external service (Shopify, GA4, Redis, Resend all degrade gracefully).
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 60_000,
-  expect: { timeout: 15_000 },
+  globalSetup: "./e2e/global-setup.ts",
+  // Generous timeouts: the suite runs against `next dev`, where the first hit
+  // to a route compiles it on demand (cold routes can take 20s+ on a CI
+  // runner). These absorb that so tests gate on behaviour, not compile latency.
+  timeout: 90_000,
+  expect: { timeout: 30_000 },
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
@@ -18,8 +22,8 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
-    actionTimeout: 15_000,
-    navigationTimeout: 30_000,
+    actionTimeout: 20_000,
+    navigationTimeout: 45_000,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
