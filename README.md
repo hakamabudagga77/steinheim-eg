@@ -421,7 +421,7 @@ this project.
 <br><br>
 
 <a href="https://github.com/EslaM-X">
-  <img src="public/images/brand/eslamx-logo.jpeg" alt="EslaM-X" width="72">
+  <img src="public/images/brand/eslamx-logo.jpeg" alt="EslaM-X" width="160">
 </a>
 
 <sub>**BY [EslaM-X](https://github.com/EslaM-X)**</sub>
