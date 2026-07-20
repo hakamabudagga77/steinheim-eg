@@ -234,7 +234,7 @@ export default function AllProductsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.2) }}
                 >
-                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} />
+                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} visibleFinishes={selectedFinishes} />
                 </motion.div>
               ))}
             </motion.div>
@@ -273,7 +273,7 @@ export default function AllProductsPage() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div data-lenis-prevent className="flex-1 overflow-y-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <FilterSection title="Collection">
                   <div className="flex flex-wrap gap-2">
                     {allSeries.map((series) => (

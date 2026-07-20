@@ -18,6 +18,7 @@ export default function ProductCard({
   finish: groupFinish,
   onAdd,
   roomOptions,
+  visibleFinishes,
 }: {
   product: Product;
   liveVariants?: LiveVariants;
@@ -25,6 +26,8 @@ export default function ProductCard({
   finish?: string | null;
   onAdd?: (slug: string, finish: string, quantity: number, scopeId?: string) => void;
   roomOptions?: RoomGroup[];
+  /** Restricts the swatch picker + default image to just these finishes (e.g. an active catalogue filter). Omit to show all. */
+  visibleFinishes?: string[];
 }) {
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
   const [added, setAdded] = useState(false);
@@ -33,11 +36,26 @@ export default function ProductCard({
   const [scopeChoice, setScopeChoice] = useState(roomOptions?.[0]?.scopeId ?? "");
   const { addItem } = useCart();
 
+  const displayVariants =
+    visibleFinishes && visibleFinishes.length > 0
+      ? product.variants.filter((v) => visibleFinishes.includes(v.finish))
+      : product.variants;
+
   // A group-level finish choice (e.g. the collection page's "Choose a finish" selector)
   // sets this card's default, but the shopper can still pick a different one for this card alone.
   useEffect(() => {
     if (groupFinish) setSelectedFinish(groupFinish);
   }, [groupFinish]);
+
+  // When an active finish filter no longer includes the currently shown finish
+  // (or first applies), snap to the first finish that's still visible.
+  useEffect(() => {
+    if (groupFinish) return;
+    if (displayVariants.length > 0 && !displayVariants.some((v) => v.finish === selectedFinish)) {
+      setSelectedFinish(displayVariants[0].finish);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleFinishes]);
 
   useEffect(() => {
     if (!roomOptions || roomOptions.length === 0) return;
@@ -47,7 +65,7 @@ export default function ProductCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomOptions]);
 
-  const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
+  const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? displayVariants[0] ?? product.variants[0];
   const liveVariant = liveVariants?.find((v) => v.finish === variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
   const series = getSeriesById(product.series);
@@ -92,7 +110,7 @@ export default function ProductCard({
       {onAdd ? (
         <div className="mt-3 space-y-2.5">
           <div className="flex flex-wrap items-center gap-1.5" aria-label="Available finishes">
-            {product.variants.map((entry) => {
+            {displayVariants.map((entry) => {
               const finish = getFinishById(entry.finish);
               const disc = getFinishDiscImage(entry.finish);
               if (!finish) return null;
@@ -199,7 +217,7 @@ export default function ProductCard({
       ) : (
         <div className="mt-3 flex items-center justify-between gap-1.5 sm:gap-2">
           <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
-            {product.variants.map((entry) => {
+            {displayVariants.map((entry) => {
               const finish = getFinishById(entry.finish);
               const disc = getFinishDiscImage(entry.finish);
               if (!finish) return null;
