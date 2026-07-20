@@ -1,6 +1,7 @@
 import "server-only";
 
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
+import { redisGet, redisSetEx } from "@/lib/server/redis";
 
 let cachedClient: BetaAnalyticsDataClient | null = null;
 
@@ -36,7 +37,13 @@ export interface GA4Summary {
   dailyUsers: Array<{ date: string; users: number }>;
 }
 
-export async function fetchGA4Summary(startDate: string, endDate: string): Promise<GA4Summary> {
+const CACHE_TTL_SECONDS = 5 * 60;
+
+// Per-instance fallback for when Redis isn't configured (local dev), keyed by
+// date range since GA4Summary is scoped per range unlike the Shopify cache.
+const memoryCache = new Map<string, { data: GA4Summary; fetchedAt: number }>();
+
+async function fetchGA4SummaryUncached(startDate: string, endDate: string): Promise<GA4Summary> {
   const client = getClient();
   const property = propertyPath();
 
@@ -96,4 +103,27 @@ export async function fetchGA4Summary(startDate: string, endDate: string): Promi
       sessions: Number(row.metricValues?.[0]?.value ?? 0),
     })),
   };
+}
+
+export async function fetchGA4Summary(startDate: string, endDate: string): Promise<GA4Summary> {
+  const cacheKey = `steinheim:ga4:${startDate}:${endDate}`;
+
+  const cached = await redisGet(cacheKey).catch(() => null);
+  if (cached) {
+    try {
+      return JSON.parse(cached) as GA4Summary;
+    } catch {
+      // Corrupt cache entry — fall through and refetch.
+    }
+  }
+
+  const fromMemory = memoryCache.get(cacheKey);
+  if (!cached && fromMemory && Date.now() - fromMemory.fetchedAt < CACHE_TTL_SECONDS * 1000) {
+    return fromMemory.data;
+  }
+
+  const data = await fetchGA4SummaryUncached(startDate, endDate);
+  memoryCache.set(cacheKey, { data, fetchedAt: Date.now() });
+  await redisSetEx(cacheKey, CACHE_TTL_SECONDS, JSON.stringify(data)).catch(() => {});
+  return data;
 }
