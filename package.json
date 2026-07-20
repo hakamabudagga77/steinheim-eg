@@ -11,6 +11,8 @@
     "eval:assistant": "node scripts/evaluate-assistant.mjs",
     "loadtest": "k6 run load-tests/storefront.js",
     "test": "vitest run",
+    "e2e": "playwright test",
+    "e2e:report": "playwright show-report",
     "analyze": "next experimental-analyze",
     "analyze:webpack": "cross-env ANALYZE=true next build --webpack && node -e \"require('fs').rmSync('.next/dev',{recursive:true,force:true})\""
   },
@@ -33,6 +35,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.10",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
