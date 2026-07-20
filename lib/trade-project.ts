@@ -203,7 +203,7 @@ function capitalize(value: string) {
 
 const REQUIREMENT_TYPES = Object.keys(REQUIREMENT_TYPE_LABELS) as RequirementType[];
 
-function isRequirementType(value: unknown): value is RequirementType {
+export function isRequirementType(value: unknown): value is RequirementType {
   return typeof value === "string" && (REQUIREMENT_TYPES as string[]).includes(value);
 }
 

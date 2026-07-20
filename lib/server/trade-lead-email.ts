@@ -22,7 +22,8 @@ function fmtCurrency(value: number) {
 
 function buildEmailHtml(lead: TradeLead): string {
   const d = lead.project.details;
-  const priorityColor = lead.priority === "hot" ? "#b3441f" : lead.priority === "warm" ? "#946b1f" : "#6b6b66";
+  // Tuned for legibility on the dark #141414 header band below, not the light body background.
+  const priorityColor = lead.priority === "hot" ? "#ff6b4a" : lead.priority === "warm" ? "#e8c073" : "#9a9a94";
 
   const detailRows: Array<[string, string]> = [
     ["Contact", d.contactName || "—"],
@@ -67,7 +68,7 @@ function buildEmailHtml(lead: TradeLead): string {
     <div style="background:#141414;padding:20px 24px;">
       <p style="margin:0;color:#a8a8a4;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">New trade lead</p>
       <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600;">${escapeHtml(d.projectName || "Untitled project")}</h1>
-      <p style="margin:8px 0 0;color:#c9a86b;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">${lead.priority.toUpperCase()} · Score ${lead.score}/100</p>
+      <p style="margin:8px 0 0;color:${priorityColor};font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">${lead.priority.toUpperCase()} · Score ${lead.score}/100</p>
     </div>
 
     <div style="padding:20px 24px;background:#fafaf8;">

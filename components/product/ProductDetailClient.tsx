@@ -28,7 +28,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const [cartAdded, setCartAdded] = useState(false);
   const [projectAdded, setProjectAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const { project, addItem, setOpen: setProposalOpen, setSetupOpen, flyToProject } = useTradeProject();
+  const { project, addItem, setOpen: setProposalOpen, setSetupOpen, setRoomProgressExpanded, flyToProject } = useTradeProject();
   const { addItem: addToCart, flyToCart } = useCart();
   const imageWrapRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +76,19 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
       scopeName: group.roomLabel,
       scopeSummary: `${group.count} ${group.count === 1 ? "room" : "rooms"} · includes a manually added product`,
     } : undefined);
+
+    // If this add just completed the room's need for this product type,
+    // surface the room-progress widget so the shopper sees it tick over.
+    const need = group?.productNeeds.find((entry) => entry.type === product.type);
+    if (group && need) {
+      const alreadySelected = project.items
+        .filter((item) => item.scopeId === group.scopeId && getProductBySlug(item.slug)?.type === need.type)
+        .reduce((sum, item) => sum + item.quantity, 0);
+      const wasMet = alreadySelected >= need.quantity;
+      const nowMet = alreadySelected + quantity >= need.quantity;
+      if (!wasMet && nowMet) setRoomProgressExpanded(true);
+    }
+
     setProjectAdded(true);
     setTimeout(() => setProjectAdded(false), 2200);
   }
