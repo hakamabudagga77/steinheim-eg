@@ -258,7 +258,7 @@ export default function AllProductsPage() {
               animate={{ x: 0 }}
               exit={{ x: isArabic ? "-100%" : "100%" }}
               transition={{ duration: 0.4, ease: [0.22, 0.76, 0.2, 1] }}
-              className={`fixed bottom-0 top-0 z-[80] flex w-full max-w-[100vw] flex-col overflow-y-auto bg-white sm:max-w-[420px] ${
+              className={`fixed bottom-0 top-0 z-[80] flex w-full max-w-[100vw] flex-col bg-white sm:max-w-[420px] ${
                 isArabic ? "left-0" : "right-0"
               }`}
               dir={isArabic ? "rtl" : "ltr"}
@@ -273,7 +273,7 @@ export default function AllProductsPage() {
                 </button>
               </div>
 
-              <div className="flex-1 px-6">
+              <div className="flex-1 overflow-y-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <FilterSection title="Collection">
                   <div className="flex flex-wrap gap-2">
                     {allSeries.map((series) => (
