@@ -389,21 +389,25 @@ never imported into the application).
 
 <br>
 
-## 🙌 Credits
+## 🙌 Credits & Technical Ownership
 
 <div align="center">
 
-**Engineered end-to-end by [EslaM-X](https://github.com/EslaM-X)**
-Lead Software Architect · Full-Stack Engineer · Blockchain / Web3 / Web5
+**Engineered End-to-End by [EslaM-X](https://github.com/EslaM-X)**  
+**Lead Technical Architect · Top-Tier Cybersecurity & Smart Contract Auditor · Full-Stack Engineer · Web3 / Web5 Architect**
 
-Complete ownership of the codebase — architecture, frontend, backend, commerce integration,
-AI systems, security hardening, CI/CD, testing, monitoring, and every line shipped in this
-repository.
+• **Core Architect & Core Team Member** — Pi Network Ecosystem  
+• **Core Protocol & Blockchain Engineer** — Stellar Network  
+• **Core Ecosystem Contributor** — Ethereum Protocol & Smart Contracts  
 
-**In collaboration with [hakamabudagga77](https://github.com/hakamabudagga77)**,
-who directed the product vision, brand design, and creative direction, and worked
-alongside Claude (Anthropic) throughout via prompt-driven pair programming to help shape
-this project.
+<br>
+
+> **Complete Engineering Ownership:**  
+> Architectural design, frontend & backend infrastructure, smart contract security auditing, zero-trust cyber defense, enterprise commerce integration, AI core systems, CI/CD pipelines, and every production line committed to this repository.
+
+<br>
+
+**In collaboration with [hakamabudagga77](https://github.com/hakamabudagga77)**, who directed the product vision, brand design, and creative direction, and worked alongside Claude (Anthropic) throughout via prompt-driven pair programming to help shape this project.
 
 </div>
 
