@@ -182,31 +182,30 @@ export default function ShowroomReel() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8 }}
-          className="mb-12"
+          className="mb-12 flex flex-wrap items-center justify-between gap-x-10 gap-y-8"
         >
-          <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
-          <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
-            On the floor.
-          </h2>
-          <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
-            Moments from Steinheim&apos;s appearances at Le Marché and Ceramica Market in Cairo —
-            the finishes, the mechanisms, and the space where visitors specify a complete
-            bathroom in person.
-          </p>
+          <div>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">Inside Steinheim</p>
+            <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
+              On the floor.
+            </h2>
+            <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
+              Moments from Steinheim&apos;s appearances at Le Marché and Ceramica Market in Cairo —
+              the finishes, the mechanisms, and the space where visitors specify a complete
+              bathroom in person.
+            </p>
+          </div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <p className="mr-1 text-[11px] uppercase tracking-[0.3em] text-white/30">As seen at</p>
+          <div className="ml-auto flex items-center gap-10">
             {events.map((event) => (
-              <div key={event.name} className="flex flex-col items-start gap-1.5 pl-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={event.logo}
-                  alt={event.name}
-                  className="h-8 w-auto object-contain"
-                  style={{ aspectRatio: `${event.width} / ${event.height}` }}
-                />
-                <p className="text-[10.5px] text-white/35">{event.tag}</p>
-              </div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={event.name}
+                src={event.logo}
+                alt={event.name}
+                className="h-16 w-auto object-contain sm:h-20"
+                style={{ aspectRatio: `${event.width} / ${event.height}` }}
+              />
             ))}
           </div>
         </motion.div>
