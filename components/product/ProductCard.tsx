@@ -81,6 +81,7 @@ function ProductCard({
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
   const selectedRoom = roomOptions?.find((group) => group.scopeId === scopeChoice) ?? null;
+  const selectedFinishName = getFinishById(variant.finish)?.name;
 
   const inWishlist = isInWishlist(product.slug, variant.finish);
 
@@ -132,6 +133,9 @@ function ProductCard({
 
       {onAdd ? (
         <div className="mt-3 space-y-2.5">
+          {displayVariants.length > 1 && (
+            <p className="text-[10px] uppercase tracking-[0.15em] text-black/40">{selectedFinishName}</p>
+          )}
           <div className="flex flex-wrap items-center gap-1.5" aria-label="Available finishes">
             {displayVariants.map((entry) => {
               const finish = getFinishById(entry.finish);
@@ -239,43 +243,48 @@ function ProductCard({
           </div>
         </div>
       ) : (
-        <div className="mt-3 flex items-center justify-between gap-1.5 sm:gap-2">
-          <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
-            {displayVariants.map((entry) => {
-              const finish = getFinishById(entry.finish);
-              const disc = getFinishDiscImage(entry.finish);
-              if (!finish) return null;
-              return (
-                <button
-                  key={entry.finish}
-                  type="button"
-                  onClick={() => setSelectedFinish(entry.finish)}
-                  title={finish.name}
-                  aria-label={`Show ${finish.name}`}
-                  aria-pressed={selectedFinish === entry.finish}
-                  className={`relative h-5 w-5 shrink-0 overflow-hidden rounded-full border transition cursor-pointer sm:h-6 sm:w-6 ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1 sm:ring-offset-2" : "border-black/10 hover:border-black/40"}`}
-                >
-                  {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
-                </button>
-              );
-            })}
-          </div>
+        <div className="mt-3">
+          {displayVariants.length > 1 && (
+            <p className="mb-1.5 text-[10px] uppercase tracking-[0.15em] text-black/40">{selectedFinishName}</p>
+          )}
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+            <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">
+              {displayVariants.map((entry) => {
+                const finish = getFinishById(entry.finish);
+                const disc = getFinishDiscImage(entry.finish);
+                if (!finish) return null;
+                return (
+                  <button
+                    key={entry.finish}
+                    type="button"
+                    onClick={() => setSelectedFinish(entry.finish)}
+                    title={finish.name}
+                    aria-label={`Show ${finish.name}`}
+                    aria-pressed={selectedFinish === entry.finish}
+                    className={`relative h-5 w-5 shrink-0 overflow-hidden rounded-full border transition cursor-pointer sm:h-6 sm:w-6 ${selectedFinish === entry.finish ? "scale-110 border-black ring-1 ring-black ring-offset-1 sm:ring-offset-2" : "border-black/10 hover:border-black/40"}`}
+                  >
+                    {disc ? <Image src={disc} alt="" fill sizes="24px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
+                  </button>
+                );
+              })}
+            </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              addItem(product.slug, variant.finish);
-              setAdded(true);
-              setTimeout(() => setAdded(false), 1600);
-            }}
-            aria-label={added ? t("added") : t("quickAdd")}
-            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
-              added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
-            }`}
-          >
-            <span className="sm:hidden">{added ? "✓" : "+"}</span>
-            <span className="hidden sm:inline">{added ? t("added") : t("quickAdd")}</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                addItem(product.slug, variant.finish);
+                setAdded(true);
+                setTimeout(() => setAdded(false), 1600);
+              }}
+              aria-label={added ? t("added") : t("quickAdd")}
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[15px] transition cursor-pointer sm:h-auto sm:w-auto sm:rounded-full sm:px-3 sm:py-1.5 sm:text-[11px] sm:font-medium ${
+                added ? "border-black bg-black text-white" : "border-black/15 text-black/55 hover:border-black hover:text-black"
+              }`}
+            >
+              <span className="sm:hidden">{added ? "✓" : "+"}</span>
+              <span className="hidden sm:inline">{added ? t("added") : t("quickAdd")}</span>
+            </button>
+          </div>
         </div>
       )}
     </article>

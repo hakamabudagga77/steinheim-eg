@@ -164,7 +164,7 @@ export default function AllProductsPage() {
           </motion.div>
 
           {/* Control bar */}
-          <div className="sticky top-[76px] z-20 mt-10 flex flex-wrap items-center gap-3 border-y border-black/10 bg-[#ece9e2]/95 py-4 backdrop-blur-sm">
+          <div className="sticky top-[76px] z-20 mt-10 flex flex-wrap items-center gap-3 border-y border-black/10 bg-[#ece9e2] py-4">
             <div className="flex w-full min-w-0 items-center gap-2 border border-black/15 px-4 py-2.5 sm:w-auto sm:flex-1">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="shrink-0 text-black/35">
                 <circle cx="11" cy="11" r="7" />

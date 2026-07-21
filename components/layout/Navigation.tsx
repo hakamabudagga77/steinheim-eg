@@ -379,7 +379,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           pathname === "/products" ? "text-black" : ""
                         }`}
                       >
-                        All products
+                        {t("allProducts")}
                       </Link>
                     </motion.div>
                     {collections.map((collection, index) => (
