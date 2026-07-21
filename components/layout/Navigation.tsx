@@ -13,7 +13,7 @@ import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
 
-const LIGHT_TOP_PATTERN = /^\/products\//;
+const LIGHT_TOP_PATTERN = /^\/products(\/|$)/;
 
 const collections = [
   { id: "joy", href: "/collections/joy" },
@@ -364,6 +364,22 @@ export default function Navigation({ locale }: { locale: string }) {
                         }`}
                       >
                         {t("collections")}
+                      </Link>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.12, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
+                    >
+                      <Link
+                        href="/products"
+                        onClick={handleNavigate}
+                        onMouseEnter={() => setActivePanel("collections")}
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/45 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                          pathname === "/products" ? "text-black" : ""
+                        }`}
+                      >
+                        All products
                       </Link>
                     </motion.div>
                     {collections.map((collection, index) => (

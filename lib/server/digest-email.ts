@@ -66,7 +66,7 @@ export async function buildAndSendDailyDigest(): Promise<{ sent: boolean; reason
   const html = `
     <div style="font-family:Helvetica,Arial,sans-serif;max-width:520px;margin:0 auto;">
       <div style="background:#0a0a0b;padding:24px 28px;">
-        <p style="margin:0;color:#c9a961;font-size:10px;letter-spacing:2px;text-transform:uppercase;">Steinheim Egypt</p>
+        <p style="margin:0;color:#0a84ff;font-size:10px;letter-spacing:2px;text-transform:uppercase;">Steinheim Egypt</p>
         <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-family:Georgia,serif;">Daily digest</h1>
         <p style="margin:6px 0 0;color:rgba(255,255,255,0.4);font-size:12px;">${new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</p>
       </div>
@@ -80,7 +80,7 @@ export async function buildAndSendDailyDigest(): Promise<{ sent: boolean; reason
           : ""
       }
       <div style="padding:20px 16px;">
-        <a href="${SITE_URL}/admin" style="display:inline-block;background:#c9a961;color:#000;text-decoration:none;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;">Open admin →</a>
+        <a href="${SITE_URL}/admin" style="display:inline-block;background:#0a84ff;color:#000;text-decoration:none;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;">Open admin →</a>
       </div>
     </div>
   `;

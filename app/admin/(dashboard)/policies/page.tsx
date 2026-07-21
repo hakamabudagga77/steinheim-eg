@@ -107,7 +107,7 @@ export default function AdminPoliciesPage() {
                   type="button"
                   onClick={() => save(policy)}
                   disabled={savingType === policy.type || drafts[policy.type] === stripHtml(policy.body)}
-                  className="rounded-full bg-[#c9a961] px-4 py-1.5 text-[12px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-30"
+                  className="rounded-full bg-[#0a84ff] px-4 py-1.5 text-[12px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-30"
                 >
                   {savingType === policy.type ? "Saving…" : "Save"}
                 </button>
@@ -117,7 +117,7 @@ export default function AdminPoliciesPage() {
               value={drafts[policy.type] ?? ""}
               onChange={(e) => setDrafts((prev) => ({ ...prev, [policy.type]: e.target.value }))}
               rows={6}
-              className="mt-4 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[13px] leading-[1.6] text-white/80 outline-none focus:border-[#c9a961]"
+              className="mt-4 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[13px] leading-[1.6] text-white/80 outline-none focus:border-[#0a84ff]"
             />
           </Panel>
         ))}

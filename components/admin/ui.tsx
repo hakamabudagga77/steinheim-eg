@@ -64,7 +64,7 @@ export function StatCard({
           {Icon && (
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                accent ? "bg-[#c9a961]/12 text-[#c9a961]" : "bg-white/[0.06] text-white/40"
+                accent ? "bg-[#0a84ff]/12 text-[#0a84ff]" : "bg-white/[0.06] text-white/40"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function StatCard({
 
 const BADGE_TONES = {
   neutral: "bg-white/[0.06] text-white/55",
-  accent: "bg-[#c9a961]/15 text-[#c9a961]",
+  accent: "bg-[#0a84ff]/15 text-[#0a84ff]",
   positive: "bg-emerald-400/12 text-emerald-400",
   warning: "bg-amber-400/12 text-amber-300",
   danger: "bg-red-400/12 text-red-400",
@@ -131,7 +131,7 @@ export function SegmentedControl<T extends string>({
           type="button"
           onClick={() => onChange(opt.value)}
           className={`rounded-full px-3.5 py-1.5 text-[12px] transition ${
-            value === opt.value ? "bg-[#c9a961] text-black font-medium" : "text-white/50 hover:text-white/80"
+            value === opt.value ? "bg-[#0a84ff] text-white font-medium" : "text-white/50 hover:text-white/80"
           }`}
         >
           {opt.label}
@@ -253,7 +253,7 @@ export function InlineEdit({
           if (e.key === "Escape") cancel();
         }}
         disabled={saving}
-        className={`w-20 rounded border border-[#c9a961]/50 bg-black/40 px-1.5 py-0.5 text-white outline-none focus:border-[#c9a961] ${className}`}
+        className={`w-20 rounded border border-[#0a84ff]/50 bg-black/40 px-1.5 py-0.5 text-white outline-none focus:border-[#0a84ff] ${className}`}
       />
       {saving ? (
         <Loader2 className="h-3.5 w-3.5 animate-spin text-white/40" />

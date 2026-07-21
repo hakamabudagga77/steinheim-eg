@@ -43,3 +43,21 @@ export async function updateTradeLead(id: string, update: Partial<TradeLead>) {
   await saveTradeLead(lead);
   return lead;
 }
+
+export async function archiveAllTradeLeads() {
+  const leads = await listTradeLeads();
+  const archivedAt = new Date().toISOString();
+  // Sequential on purpose: each update reads the current file, modifies one
+  // lead, and writes the whole file back. Running these in parallel means
+  // every call starts from a stale snapshot and races the others' writes.
+  const updated: TradeLead[] = [];
+  for (const lead of leads) {
+    if (lead.archivedAt) {
+      updated.push(lead);
+      continue;
+    }
+    const result = await updateTradeLead(lead.id, { archivedAt });
+    if (result) updated.push(result);
+  }
+  return updated;
+}

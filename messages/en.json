@@ -898,6 +898,53 @@
     "back": "Back",
     "continue": "Continue"
   },
+  "products": {
+    "eyebrow": "Full range",
+    "heading": "All products.",
+    "description": "Every collection, every finish, in one place — {count, plural, one {# product} other {# products}} across Joy, Up, Art, and Quatro.",
+    "searchPlaceholder": "Search products…",
+    "sort": {
+      "label": "Sort: {label}",
+      "featured": "Featured",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name: A–Z"
+    },
+    "filters": "Filters",
+    "resultCount": "{count, plural, one {# product} other {# products}}",
+    "emptyState": "No products match these filters.",
+    "clearAllFilters": "Clear all filters",
+    "drawer": {
+      "title": "Filters",
+      "close": "Close filters",
+      "collection": "Collection",
+      "productType": "Product type",
+      "finish": "Finish",
+      "price": "Price",
+      "availability": "Availability",
+      "inStockOnly": "In stock only",
+      "clearAll": "Clear all",
+      "showResults": "{count, plural, one {Show # product} other {Show # products}}"
+    },
+    "types": {
+      "basin-mixer": "Basin Mixers",
+      "tall-basin-mixer": "Tall Basin Mixers",
+      "wall-mounted": "Wall-Mounted Mixers",
+      "concealed-shower": "Concealed Showers",
+      "shower-column": "Shower Columns",
+      "free-standing": "Free-Standing Mixers",
+      "accessories": "Accessories",
+      "bidet-spray": "Bidet Sprays",
+      "click-clack": "Click-Clack Wastes",
+      "angle-valve": "Angle Valves"
+    },
+    "priceBrackets": {
+      "under-3000": "Under EGP 3,000",
+      "3000-10000": "EGP 3,000 – 10,000",
+      "10000-20000": "EGP 10,000 – 20,000",
+      "20000-plus": "EGP 20,000+"
+    }
+  },
   "shopByNeed": {
     "forProject": "For {name}",
     "headline": "Shop by need.",

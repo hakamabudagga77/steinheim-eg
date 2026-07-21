@@ -52,11 +52,11 @@ export function MessagesThread({ leadId, initialMessages }: { leadId: string; in
               <div key={message.id} className={`flex ${message.from === "steinheim" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-lg px-3 py-2 text-[12px] leading-[1.5] ${
-                    message.from === "steinheim" ? "bg-[#c9a961] text-black" : "border border-white/10 bg-white/[0.04] text-white/80"
+                    message.from === "steinheim" ? "bg-[#0a84ff] text-white" : "border border-white/10 bg-white/[0.04] text-white/80"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.body}</p>
-                  <p className={`mt-1 text-[9px] uppercase tracking-[0.08em] ${message.from === "steinheim" ? "text-black/50" : "text-white/35"}`}>
+                  <p className={`mt-1 text-[9px] uppercase tracking-[0.08em] ${message.from === "steinheim" ? "text-white/70" : "text-white/35"}`}>
                     {message.from === "steinheim" ? "Steinheim" : "Client"} · {formatMessageTime(message.sentAt)}
                   </p>
                 </div>
@@ -78,13 +78,13 @@ export function MessagesThread({ leadId, initialMessages }: { leadId: string; in
               }}
               placeholder="Reply to client…"
               rows={2}
-              className="min-h-[40px] flex-1 resize-none rounded-lg border border-white/10 bg-black/30 p-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+              className="min-h-[40px] flex-1 resize-none rounded-lg border border-white/10 bg-black/30 p-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
             />
             <button
               type="button"
               disabled={!draft.trim() || sending}
               onClick={handleSend}
-              className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#c9a961] px-4 text-[11px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-30"
+              className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#0a84ff] px-4 text-[11px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-30"
             >
               {sending ? "…" : "Reply"}
             </button>
