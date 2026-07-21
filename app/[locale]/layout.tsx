@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import WebVitals from "@/components/analytics/WebVitals";
 import "../globals.css";
 
 const inter = Inter({
@@ -32,6 +33,8 @@ const amiri = Amiri({
   display: "swap",
 });
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";
+
 export async function generateMetadata({
   params,
 }: {
@@ -41,16 +44,28 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "metadata" });
 
   return {
+    // Absolute base for every relative URL in metadata (OG images, canonical,
+    // alternates). Without it Next falls back to the deploy host — localhost
+    // in local builds — which is exactly what its build warning flags.
+    metadataBase: new URL(BASE_URL),
     title: t("title"),
     description: t("description"),
     // hreflang alternates so search engines index each language correctly
     // and never serve the wrong locale to a searcher.
     alternates: {
+      canonical: `/${locale}`,
       languages: {
         en: "/en",
         ar: "/ar",
         "x-default": "/en",
       },
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Steinheim Egypt",
+      locale: locale === "ar" ? "ar_EG" : "en_US",
+      title: t("title"),
+      description: t("description"),
     },
   };
 }
@@ -77,10 +92,25 @@ export default async function LocaleLayout({
   const messages = await getMessages();
   const dir = locale === "ar" ? "rtl" : "ltr";
 
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Steinheim Egypt",
+    url: BASE_URL,
+    logo: `${BASE_URL}/images/brand/steinheim-logo-black.png`,
+    email: "inquiries@steinheim-eg.com",
+    areaServed: "EG",
+  };
+
   return (
     <html lang={locale} dir={dir} className={`${inter.variable} ${plexArabic.variable} ${amiri.variable}`}>
       <body className="min-h-screen flex flex-col bg-white text-charcoal antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <GoogleAnalytics />
+        <WebVitals />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell locale={locale}>{children}</SiteShell>
         </NextIntlClientProvider>

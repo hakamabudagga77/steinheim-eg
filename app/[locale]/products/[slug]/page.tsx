@@ -57,9 +57,27 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }),
   };
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${baseUrl}/${locale}` },
+      { "@type": "ListItem", position: 2, name: "Collections", item: `${baseUrl}/${locale}/collections` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: series?.name ?? product.series,
+        item: `${baseUrl}/${locale}/collections/${product.series}`,
+      },
+      { "@type": "ListItem", position: 4, name: product.name },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <ProductDetailClient
         key={slug}
         slug={slug}
