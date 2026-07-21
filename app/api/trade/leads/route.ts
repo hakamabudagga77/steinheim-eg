@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { sanitizeTradeProject } from "@/lib/trade-project";
 import { isTradeLeadStatus, type TradeLead } from "@/lib/trade-leads";
-import { getTradeLead, listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
+import { archiveAllTradeLeads, getTradeLead, listTradeLeads, saveTradeLead, updateTradeLead } from "@/lib/server/trade-lead-store";
 import { sendTradeLeadConfirmationEmail, sendTradeLeadNotification, sendQuoteReadyNotification, sendStatusUpdateNotification } from "@/lib/server/trade-lead-email";
 import { analyzeProject } from "@/lib/server/trade-lead-intelligence";
 import { isAdminRequest } from "@/lib/server/admin-session";
@@ -112,10 +112,17 @@ export async function PATCH(request: Request) {
     quoteUrl?: unknown;
     quoteAmount?: unknown;
     warrantyReference?: unknown;
+    archived?: unknown;
+    archiveAll?: unknown;
   } | null;
+  if (body?.archiveAll === true) {
+    const leads = await archiveAllTradeLeads();
+    return Response.json({ leads });
+  }
   const hasQuoteField = typeof body?.quoteUrl === "string" || typeof body?.quoteAmount === "string";
   const hasWarrantyField = typeof body?.warrantyReference === "string";
-  if (!body || typeof body.id !== "string" || (!isTradeLeadStatus(body.status) && typeof body.internalNotes !== "string" && !hasQuoteField && !hasWarrantyField)) {
+  const hasArchiveField = typeof body?.archived === "boolean";
+  if (!body || typeof body.id !== "string" || (!isTradeLeadStatus(body.status) && typeof body.internalNotes !== "string" && !hasQuoteField && !hasWarrantyField && !hasArchiveField)) {
     return Response.json({ error: "A valid lead update is required." }, { status: 400 });
   }
   const update: Partial<TradeLead> = {};
@@ -124,6 +131,7 @@ export async function PATCH(request: Request) {
   if (typeof body.quoteUrl === "string") update.quoteUrl = body.quoteUrl.trim().slice(0, 500);
   if (typeof body.quoteAmount === "string") update.quoteAmount = body.quoteAmount.trim().slice(0, 100);
   if (typeof body.warrantyReference === "string") update.warrantyReference = body.warrantyReference.trim().slice(0, 500);
+  if (typeof body.archived === "boolean") update.archivedAt = body.archived ? new Date().toISOString() : undefined;
 
   const needsBefore = hasQuoteField || isTradeLeadStatus(body.status);
   const before = needsBefore ? await getTradeLead(body.id) : null;

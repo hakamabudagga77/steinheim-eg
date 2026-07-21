@@ -11,21 +11,37 @@ import {
   Users,
   Package,
   BarChart3,
+  Megaphone,
   FileText,
   ShieldCheck,
+  Settings,
   LogOut,
   ExternalLink,
   Search,
   type LucideIcon,
 } from "lucide-react";
+import type { ShopifyOrder, ShopifyCustomer, ShopifyProduct } from "@/lib/shopify-client";
+import type { ContactLead } from "@/lib/contact-leads";
+import type { TradeLead } from "@/lib/trade-leads";
 
 interface Command {
   id: string;
   label: string;
   hint?: string;
   icon: LucideIcon;
-  group: "Go to" | "Actions";
+  group: string;
   run: () => void;
+}
+
+const GROUP_ORDER = ["Go to", "Orders", "Customers", "Contact Leads", "Trade Leads", "Products", "Actions"];
+const MAX_RESULTS_PER_GROUP = 5;
+
+interface DataCache {
+  orders: ShopifyOrder[] | null;
+  customers: ShopifyCustomer[] | null;
+  contactLeads: ContactLead[] | null;
+  tradeLeads: TradeLead[] | null;
+  products: ShopifyProduct[] | null;
 }
 
 export default function CommandPalette() {
@@ -34,6 +50,26 @@ export default function CommandPalette() {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fetchedRef = useRef(false);
+  const [cache, setCache] = useState<DataCache>({
+    orders: null,
+    customers: null,
+    contactLeads: null,
+    tradeLeads: null,
+    products: null,
+  });
+
+  // Fetched once, lazily, the first time the palette is opened — not on
+  // every admin page load, since most sessions never touch search.
+  useEffect(() => {
+    if (!open || fetchedRef.current) return;
+    fetchedRef.current = true;
+    fetch("/api/admin/orders").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCache((c) => ({ ...c, orders: d.orders })));
+    fetch("/api/admin/customers?limit=250").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCache((c) => ({ ...c, customers: d.customers })));
+    fetch("/api/contact").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCache((c) => ({ ...c, contactLeads: d.leads })));
+    fetch("/api/trade/leads").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCache((c) => ({ ...c, tradeLeads: d.leads })));
+    fetch("/api/admin/products").then((r) => (r.ok ? r.json() : null)).then((d) => d && setCache((c) => ({ ...c, products: d.products })));
+  }, [open]);
 
   const commands: Command[] = useMemo(
     () => [
@@ -43,9 +79,11 @@ export default function CommandPalette() {
       { id: "orders", label: "Orders", icon: ShoppingCart, group: "Go to", run: () => router.push("/admin/orders") },
       { id: "customers", label: "Customers", icon: Users, group: "Go to", run: () => router.push("/admin/customers") },
       { id: "products", label: "Products", icon: Package, group: "Go to", run: () => router.push("/admin/products") },
-      { id: "analytics", label: "Analytics", icon: BarChart3, group: "Go to", run: () => router.push("/admin/analytics") },
+      { id: "analytics", label: "Website Analytics", icon: BarChart3, group: "Go to", run: () => router.push("/admin/analytics") },
+      { id: "marketing-analytics", label: "Marketing Analytics", icon: Megaphone, group: "Go to", run: () => router.push("/admin/analytics/marketing") },
       { id: "policies", label: "Policies", icon: ShieldCheck, group: "Go to", run: () => router.push("/admin/policies") },
       { id: "content", label: "Content", icon: FileText, group: "Go to", run: () => router.push("/admin/content") },
+      { id: "settings", label: "Settings", icon: Settings, group: "Go to", run: () => router.push("/admin/settings") },
       {
         id: "shopify",
         label: "Open Shopify Admin",
@@ -78,11 +116,110 @@ export default function CommandPalette() {
     [router]
   );
 
+  // Data results only kick in once the query is specific enough to be
+  // useful — two characters keeps "1007" or "ah" from flooding the list.
+  const dataCommands: Command[] = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) return [];
+    const results: Command[] = [];
+
+    (cache.orders ?? [])
+      .filter((o) => {
+        const customerName = o.customer ? `${o.customer.first_name ?? ""} ${o.customer.last_name ?? ""}` : "";
+        return (
+          o.name.toLowerCase().includes(q) ||
+          customerName.toLowerCase().includes(q) ||
+          (o.email ?? "").toLowerCase().includes(q)
+        );
+      })
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .forEach((o) => {
+        const customerName = o.customer ? `${o.customer.first_name ?? ""} ${o.customer.last_name ?? ""}`.trim() : "";
+        results.push({
+          id: `order-${o.id}`,
+          label: `${o.name} — ${customerName || o.email || "Guest"}`,
+          hint: `${o.currency} ${o.total_price}`,
+          icon: ShoppingCart,
+          group: "Orders",
+          run: () => router.push(`/admin/orders?id=${o.id}`),
+        });
+      });
+
+    (cache.customers ?? [])
+      .filter((c) => {
+        const name = `${c.first_name ?? ""} ${c.last_name ?? ""}`;
+        return name.toLowerCase().includes(q) || (c.email ?? "").toLowerCase().includes(q);
+      })
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .forEach((c) => {
+        results.push({
+          id: `customer-${c.id}`,
+          label: `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || c.email || "—",
+          hint: `${c.orders_count} order${c.orders_count === 1 ? "" : "s"}`,
+          icon: Users,
+          group: "Customers",
+          run: () => router.push(`/admin/customers?id=${c.id}`),
+        });
+      });
+
+    (cache.contactLeads ?? [])
+      .filter(
+        (l) =>
+          l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || (l.subject ?? "").toLowerCase().includes(q)
+      )
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .forEach((l) => {
+        results.push({
+          id: `contact-${l.id}`,
+          label: l.name,
+          hint: l.subject || l.enquiryType,
+          icon: Inbox,
+          group: "Contact Leads",
+          run: () => router.push(`/admin/contact?id=${l.id}`),
+        });
+      });
+
+    (cache.tradeLeads ?? [])
+      .filter(
+        (l) =>
+          (l.project.details.projectName ?? "").toLowerCase().includes(q) ||
+          (l.project.details.company ?? "").toLowerCase().includes(q) ||
+          l.reference.toLowerCase().includes(q)
+      )
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .forEach((l) => {
+        results.push({
+          id: `trade-${l.id}`,
+          label: l.project.details.projectName || l.reference,
+          hint: l.project.details.company || "Trade enquiry",
+          icon: Briefcase,
+          group: "Trade Leads",
+          run: () => router.push("/admin/trade"),
+        });
+      });
+
+    (cache.products ?? [])
+      .filter((p) => p.title.toLowerCase().includes(q))
+      .slice(0, MAX_RESULTS_PER_GROUP)
+      .forEach((p) => {
+        results.push({
+          id: `product-${p.id}`,
+          label: p.title,
+          hint: p.product_type || undefined,
+          icon: Package,
+          group: "Products",
+          run: () => router.push(`/admin/products?id=${p.id}`),
+        });
+      });
+
+    return results;
+  }, [cache, query, router]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return commands;
-    return commands.filter((c) => c.label.toLowerCase().includes(q));
-  }, [commands, query]);
+    const staticMatches = q ? commands.filter((c) => c.label.toLowerCase().includes(q)) : commands;
+    return [...staticMatches, ...dataCommands];
+  }, [commands, dataCommands, query]);
 
   useEffect(() => {
     function handleKeydown(e: KeyboardEvent) {
@@ -135,7 +272,7 @@ export default function CommandPalette() {
     }
   }
 
-  const groups: Array<Command["group"]> = ["Go to", "Actions"];
+  const groups = GROUP_ORDER.filter((g) => filtered.some((c) => c.group === g));
 
   return (
     <>
@@ -145,7 +282,7 @@ export default function CommandPalette() {
         className="flex items-center gap-2.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-left text-[12px] text-white/35 transition hover:border-white/[0.12] hover:text-white/55"
       >
         <Search className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1">Search…</span>
+        <span className="flex-1">Search everything…</span>
         <kbd className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/30">⌘K</kbd>
       </button>
 
@@ -177,13 +314,13 @@ export default function CommandPalette() {
                     setActiveIndex(0);
                   }}
                   onKeyDown={handleListKeydown}
-                  placeholder="Go to a section or run an action…"
+                  placeholder="Search orders, customers, leads, products…"
                   className="flex-1 bg-transparent text-[14px] text-white outline-none placeholder:text-white/25"
                 />
                 <kbd className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-white/30">esc</kbd>
               </div>
 
-              <div className="max-h-[360px] overflow-y-auto p-2">
+              <div className="max-h-[420px] overflow-y-auto p-2">
                 {filtered.length === 0 && <p className="px-3 py-6 text-center text-[13px] text-white/30">No matches.</p>}
                 {groups.map((group) => {
                   const items = filtered.filter((c) => c.group === group);
@@ -205,12 +342,12 @@ export default function CommandPalette() {
                               cmd.run();
                             }}
                             className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13.5px] transition ${
-                              active ? "bg-[#c9a961]/12 text-white" : "text-white/70"
+                              active ? "bg-[#0a84ff]/12 text-white" : "text-white/70"
                             }`}
                           >
-                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#c9a961]" : "text-white/35"}`} />
+                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#0a84ff]" : "text-white/35"}`} />
                             <span className="flex-1 truncate">{cmd.label}</span>
-                            {cmd.hint && <span className="text-[11px] text-white/25">{cmd.hint}</span>}
+                            {cmd.hint && <span className="shrink-0 text-[11px] text-white/25">{cmd.hint}</span>}
                           </button>
                         );
                       })}

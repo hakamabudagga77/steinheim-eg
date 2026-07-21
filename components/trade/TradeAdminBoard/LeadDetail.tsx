@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { formatPrice } from "@/lib/utils";
 import { tradeLeadStatuses, TRADE_LEAD_STATUS_LABELS, type TradeLead, type TradeLeadStatus } from "@/lib/trade-leads";
 import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
 import { Panel } from "@/components/admin/ui";
@@ -9,6 +8,7 @@ import { formatDate } from "./helpers";
 import { MessagesThread } from "./MessagesThread";
 import { SampleRequestsList } from "./SampleRequestsList";
 import { DocumentsList } from "./DocumentsList";
+import { ScopeProductSchedule } from "./ScopeProductSchedule";
 import { ScopeStatusList } from "./ScopeStatusList";
 
 export function LeadDetail({
@@ -16,7 +16,7 @@ export function LeadDetail({
   onSave,
 }: {
   lead: TradeLead;
-  onSave: (id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string }) => Promise<void>;
+  onSave: (id: string, update: { status?: TradeLeadStatus; internalNotes?: string; quoteUrl?: string; quoteAmount?: string; warrantyReference?: string; archived?: boolean }) => Promise<void>;
 }) {
   const [status, setStatus] = useState<TradeLeadStatus>(lead.status);
   const [notes, setNotes] = useState(lead.internalNotes);
@@ -127,23 +127,7 @@ export function LeadDetail({
 
       <DocumentsList leadId={lead.id} initialDocuments={lead.documents} />
 
-      <div className="mt-5">
-        <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-white/35">Scope breakdown</p>
-        <div className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.08] bg-black/20">
-          {lead.scopeBreakdown.map((scope) => (
-            <div key={scope.scopeId} className="flex items-start justify-between gap-3 p-3">
-              <div className="min-w-0">
-                <p className="truncate text-[12px] font-medium text-white/85">{scope.scopeName}</p>
-                <p className="text-[10px] text-white/40">{scope.scopeSummary}</p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-[11px] text-white/70">{scope.totalUnits} units</p>
-                <p className="text-[10px] text-white/40">{formatPrice(scope.retailReferenceTotal)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ScopeProductSchedule lead={lead} />
 
       <ScopeStatusList leadId={lead.id} lead={lead} />
 
@@ -155,7 +139,7 @@ export function LeadDetail({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as TradeLeadStatus)}
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             >
               {tradeLeadStatuses.map((s) => (
                 <option key={s} value={s} className="bg-[#131316]">
@@ -170,7 +154,7 @@ export function LeadDetail({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notes for the Steinheim Egypt team — not visible to the client"
-              className="min-h-[80px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="min-h-[80px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
           </div>
         </div>
@@ -182,7 +166,7 @@ export function LeadDetail({
               value={quoteUrl}
               onChange={(e) => setQuoteUrl(e.target.value)}
               placeholder="https://… link to the quote PDF"
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
             <p className="mt-1 text-[10px] text-white/35">Client sees a &ldquo;View quote&rdquo; button and can accept in-app once this is set.</p>
           </div>
@@ -192,7 +176,7 @@ export function LeadDetail({
               value={quoteAmount}
               onChange={(e) => setQuoteAmount(e.target.value)}
               placeholder="e.g. LE 42,500"
-              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="h-10 w-full rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
             />
             {lead.quoteAcceptedAt && <p className="mt-1 text-[10px] text-white/35">Accepted {formatDate(lead.quoteAcceptedAt)}</p>}
           </div>
@@ -202,7 +186,7 @@ export function LeadDetail({
           type="button"
           disabled={invoiceDownloading}
           onClick={handleDownloadInvoice}
-          className="mt-4 flex h-9 items-center justify-center rounded-full border border-white/15 px-4 text-[11px] text-white/70 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
+          className="mt-4 flex h-9 items-center justify-center rounded-full border border-white/15 px-4 text-[11px] text-white/70 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff] disabled:opacity-40"
         >
           {invoiceDownloading ? "Generating…" : "Download draft Egyptian invoice (prototype)"}
         </button>
@@ -229,7 +213,7 @@ export function LeadDetail({
             value={warrantyReference}
             onChange={(e) => setWarrantyReference(e.target.value)}
             placeholder="Batch / serial reference for this order, e.g. Batch STM-2026-04, Serials 1001–1050"
-            className="min-h-[60px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#c9a961]"
+            className="min-h-[60px] w-full rounded-lg border border-white/10 bg-black/30 p-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
           />
           <p className="mt-1 text-[10px] text-white/35">Client sees this in their Documents tab for warranty claims.</p>
         </div>
@@ -238,9 +222,16 @@ export function LeadDetail({
           type="button"
           onClick={handleSave}
           disabled={!dirty || saving}
-          className="mt-4 flex h-10 items-center justify-center rounded-full bg-[#c9a961] px-6 text-[12px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-40"
+          className="mt-4 flex h-10 items-center justify-center rounded-full bg-[#0a84ff] px-6 text-[12px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-40"
         >
           {saving ? "Saving…" : saved && !dirty ? "Saved" : "Save changes"}
+        </button>
+        <button
+          type="button"
+          onClick={() => void onSave(lead.id, { archived: !lead.archivedAt })}
+          className="mt-3 h-9 rounded-full border border-white/10 px-5 text-[11px] text-white/55 transition hover:border-white/25 hover:text-white"
+        >
+          {lead.archivedAt ? "Restore to active leads" : "Archive lead"}
         </button>
       </Panel>
     </div>

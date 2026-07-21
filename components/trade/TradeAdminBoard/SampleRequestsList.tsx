@@ -46,7 +46,7 @@ export function SampleRequestsList({ leadId, initialRequests }: { leadId: string
                 type="button"
                 disabled={busyId === entry.id}
                 onClick={() => handleFulfill(entry.id)}
-                className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961] disabled:opacity-40"
+                className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff] disabled:opacity-40"
               >
                 {busyId === entry.id ? "…" : "Mark fulfilled"}
               </button>

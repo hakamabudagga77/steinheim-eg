@@ -1,20 +1,42 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Users, Repeat, Wallet } from "lucide-react";
-import type { ShopifyCustomer } from "@/lib/shopify-client";
-import { PageHeader, Panel, StatCard, StatCardSkeleton, EmptyState, ErrorState, InlineEdit } from "@/components/admin/ui";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Users, Repeat, Wallet, Search, ArrowUpRight, ChevronLeft } from "lucide-react";
+import type { ShopifyCustomer, ShopifyOrder } from "@/lib/shopify-client";
+import { PageHeader, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, InlineEdit } from "@/components/admin/ui";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", { dateStyle: "medium" });
 }
 
-export default function AdminCustomersPage() {
+function initials(customer: ShopifyCustomer) {
+  const a = customer.first_name?.[0] ?? "";
+  const b = customer.last_name?.[0] ?? "";
+  return (a + b).toUpperCase() || "—";
+}
+
+function tierFor(customer: ShopifyCustomer): { label: string; tone: "accent" | "positive" | "neutral" } {
+  const spent = Number(customer.total_spent || 0);
+  if (spent >= 50000 || customer.orders_count >= 3) return { label: "VIP", tone: "accent" };
+  if (customer.orders_count > 1) return { label: "Returning", tone: "positive" };
+  return { label: "New", tone: "neutral" };
+}
+
+function CustomersInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [customers, setCustomers] = useState<ShopifyCustomer[] | null>(null);
+  const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [query, setQuery] = useState("");
+  const [showDetailMobile, setShowDetailMobile] = useState(false);
+  const deepLinkConsumed = useRef(false);
 
   useEffect(() => {
-    fetch("/api/admin/customers")
+    fetch("/api/admin/customers?limit=250")
       .then(async (res) => {
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
@@ -24,6 +46,10 @@ export default function AdminCustomersPage() {
       })
       .then((data) => setCustomers(data.customers))
       .catch((err) => setError(err.message));
+    fetch("/api/admin/orders")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setOrders(d.orders))
+      .catch(() => {});
   }, []);
 
   const stats = useMemo(() => {
@@ -32,6 +58,50 @@ export default function AdminCustomersPage() {
     const totalSpent = customers.reduce((sum, c) => sum + Number(c.total_spent || 0), 0);
     return { returning, totalSpent };
   }, [customers]);
+
+  const sorted = useMemo(() => {
+    if (!customers) return [];
+    return [...customers].sort((a, b) => Number(b.total_spent || 0) - Number(a.total_spent || 0));
+  }, [customers]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter((c) => {
+      const name = `${c.first_name ?? ""} ${c.last_name ?? ""}`.toLowerCase();
+      return name.includes(q) || (c.email ?? "").toLowerCase().includes(q);
+    });
+  }, [sorted, query]);
+
+  useEffect(() => {
+    if (!customers) return;
+    const targetId = deepLinkId ? Number(deepLinkId) : null;
+    if (targetId && !deepLinkConsumed.current && customers.some((c) => c.id === targetId)) {
+      deepLinkConsumed.current = true;
+      setQuery("");
+      setSelectedId(targetId);
+      setShowDetailMobile(true);
+      return;
+    }
+    if (filtered.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- selection depends on the async customers fetch, not derivable at render time
+      setSelectedId(null);
+      return;
+    }
+    if (!filtered.some((c) => c.id === selectedId)) {
+      setSelectedId(filtered[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, customers, deepLinkId]);
+
+  const selected = filtered.find((c) => c.id === selectedId) ?? null;
+
+  const selectedOrders = useMemo(() => {
+    if (!selected || !orders) return [];
+    return orders
+      .filter((o) => o.customer?.id === selected.id)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [selected, orders]);
 
   async function saveField(customerId: number, field: "phone" | "email" | "note", value: string) {
     const res = await fetch("/api/admin/customers", {
@@ -48,7 +118,7 @@ export default function AdminCustomersPage() {
       <PageHeader
         eyebrow="Customers"
         title={customers ? `${customers.length} customer${customers.length === 1 ? "" : "s"}` : "Loading…"}
-        subtitle="Live from Shopify · click email, phone, or note to edit"
+        subtitle="Live from Shopify · click a customer to view their profile"
       />
 
       {error && <ErrorState>{error}</ErrorState>}
@@ -76,56 +146,165 @@ export default function AdminCustomersPage() {
       {customers && customers.length === 0 && <EmptyState>No customers yet.</EmptyState>}
 
       {customers && customers.length > 0 && (
-        <Panel className="mt-6 overflow-x-auto" padded={false}>
-          <table className="w-full min-w-[820px] text-[13px]">
-            <thead>
-              <tr className="border-b border-white/[0.06] text-left text-white/35">
-                <th className="px-5 py-3 font-normal">Name</th>
-                <th className="px-5 py-3 font-normal">Email</th>
-                <th className="px-5 py-3 font-normal">Phone</th>
-                <th className="px-5 py-3 font-normal">Orders</th>
-                <th className="px-5 py-3 font-normal">Total spent</th>
-                <th className="px-5 py-3 font-normal">Customer since</th>
-                <th className="px-5 py-3 font-normal">Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((customer) => (
-                <tr key={customer.id} className="border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02]">
-                  <td className="px-5 py-3 font-medium text-white/90">
-                    {`${customer.first_name ?? ""} ${customer.last_name ?? ""}`.trim() || "—"}
-                  </td>
-                  <td className="px-5 py-3 text-[#c9a961]">
+        <div className="mt-6 flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-[#131316] lg:flex-row">
+          {/* Directory list pane */}
+          <div className={`w-full shrink-0 border-white/[0.08] lg:w-[300px] lg:border-r ${showDetailMobile ? "hidden lg:block" : "block"}`}>
+            <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
+              <Search className="h-3.5 w-3.5 shrink-0 text-white/30" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search name or email…"
+                className="w-full bg-transparent text-[13px] text-white outline-none placeholder:text-white/25"
+              />
+            </div>
+            <div className="max-h-[560px] divide-y divide-white/[0.05] overflow-y-auto py-1">
+              {filtered.length === 0 && <p className="px-4 py-6 text-[13px] text-white/30">No matches.</p>}
+              {filtered.map((customer) => {
+                const active = customer.id === selectedId;
+                const tier = tierFor(customer);
+                return (
+                  <button
+                    key={customer.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedId(customer.id);
+                      setShowDetailMobile(true);
+                    }}
+                    className={`flex w-full items-center gap-3 px-4 py-3 text-left transition ${
+                      active ? "bg-[#0a84ff]/[0.09]" : "hover:bg-white/[0.025]"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-medium ${
+                        tier.tone === "accent" ? "bg-[#0a84ff]/15 text-[#0a84ff]" : "bg-white/[0.06] text-white/50"
+                      }`}
+                    >
+                      {initials(customer)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13.5px] text-white/85">
+                        {`${customer.first_name ?? ""} ${customer.last_name ?? ""}`.trim() || customer.email || "—"}
+                      </p>
+                      <p className="truncate text-[11.5px] text-white/35">
+                        {customer.orders_count} order{customer.orders_count === 1 ? "" : "s"} · EGP{" "}
+                        {Number(customer.total_spent || 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Profile pane */}
+          {selected && (
+            <div className={`min-w-0 flex-1 px-5 py-6 lg:px-7 ${showDetailMobile ? "block" : "hidden lg:block"}`}>
+              <button
+                type="button"
+                onClick={() => setShowDetailMobile(false)}
+                className="mb-4 flex items-center gap-1 text-[13px] text-white/40 lg:hidden"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back to list
+              </button>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0a84ff]/12 text-[15px] font-medium text-[#0a84ff]">
+                    {initials(selected)}
+                  </div>
+                  <div>
+                    <h2 className="font-heading text-[20px] tracking-[-0.01em] text-white">
+                      {`${selected.first_name ?? ""} ${selected.last_name ?? ""}`.trim() || "—"}
+                    </h2>
+                    <p className="mt-0.5 text-[13px] text-white/35">Customer since {fmtDate(selected.created_at)}</p>
+                  </div>
+                </div>
+                <Badge tone={tierFor(selected).tone}>{tierFor(selected).label}</Badge>
+              </div>
+
+              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-white/[0.06] pt-5 text-[13px] sm:grid-cols-4">
+                <div>
+                  <p className="text-white/35">Email</p>
+                  <div className="mt-1 text-[#0a84ff]">
                     <InlineEdit
-                      value={customer.email ?? ""}
-                      onSave={(v) => saveField(customer.id, "email", v)}
+                      value={selected.email ?? ""}
+                      onSave={(v) => saveField(selected.id, "email", v)}
                       confirmMessage={(v) => `Change this customer's email to "${v}"? This updates the live Shopify store immediately.`}
                     />
-                  </td>
-                  <td className="px-5 py-3 text-white/70">
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white/35">Phone</p>
+                  <div className="mt-1 text-white/75">
                     <InlineEdit
-                      value={customer.phone ?? ""}
-                      onSave={(v) => saveField(customer.id, "phone", v)}
+                      value={selected.phone ?? ""}
+                      onSave={(v) => saveField(selected.id, "phone", v)}
                       confirmMessage={(v) => `Change this customer's phone to "${v}"? This updates the live Shopify store immediately.`}
                     />
-                  </td>
-                  <td className="px-5 py-3 text-white/45">{customer.orders_count}</td>
-                  <td className="px-5 py-3 font-medium text-white/90">{customer.total_spent}</td>
-                  <td className="px-5 py-3 text-white/45">{fmtDate(customer.created_at)}</td>
-                  <td className="px-5 py-3 text-white/50">
-                    <InlineEdit
-                      value={customer.note ?? ""}
-                      onSave={(v) => saveField(customer.id, "note", v)}
-                      className="w-32"
-                      confirmMessage={(v) => `Save "${v}" as the note for this customer?`}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white/35">Orders</p>
+                  <p className="mt-1 text-white/75">{selected.orders_count}</p>
+                </div>
+                <div>
+                  <p className="text-white/35">Total spent</p>
+                  <p className="mt-1 text-white/75">EGP {Number(selected.total_spent || 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+                </div>
+              </div>
+
+              <div className="mt-5 border-t border-white/[0.06] pt-5">
+                <p className="text-white/35">Note</p>
+                <div className="mt-1 text-[13px] text-white/60">
+                  <InlineEdit
+                    value={selected.note ?? ""}
+                    onSave={(v) => saveField(selected.id, "note", v)}
+                    className="w-full"
+                    confirmMessage={(v) => `Save "${v}" as the note for this customer?`}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-white/[0.06] pt-5">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Order history</p>
+                <div className="mt-3">
+                  {orders === null && <p className="text-[13px] text-white/25">Loading…</p>}
+                  {orders !== null && selectedOrders.length === 0 && (
+                    <p className="text-[13px] text-white/30">No orders on record for this customer.</p>
+                  )}
+                  {selectedOrders.map((order) => (
+                    <Link
+                      key={order.id}
+                      href="/admin/orders"
+                      className="group flex items-center justify-between gap-3 border-t border-white/[0.05] py-3 first:border-t-0"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-[13.5px] text-white/85">{order.name}</p>
+                        <p className="truncate text-[11.5px] text-white/35">{fmtDate(order.created_at)}</p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="text-[13px] font-medium text-white/80">
+                          {order.currency} {order.total_price}
+                        </span>
+                        <ArrowUpRight className="h-3.5 w-3.5 text-white/0 transition group-hover:text-white/40" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
+  );
+}
+
+export default function AdminCustomersPage() {
+  return (
+    <Suspense fallback={null}>
+      <CustomersInner />
+    </Suspense>
   );
 }

@@ -58,7 +58,7 @@ export function DocumentsList({ leadId, initialDocuments }: { leadId: string; in
           <div className="divide-y divide-white/[0.06]">
             {documents.map((doc) => (
               <div key={doc.id} className="flex items-center justify-between gap-3 p-3">
-                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-[12px] text-[#c9a961] underline decoration-white/20">
+                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-[12px] text-[#0a84ff] underline decoration-white/20">
                   {doc.label}
                 </a>
                 <button
@@ -78,19 +78,19 @@ export function DocumentsList({ leadId, initialDocuments }: { leadId: string; in
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="Label, e.g. Commercial invoice"
-            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
           />
           <input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://…"
-            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#c9a961]"
+            className="h-9 min-w-[160px] flex-1 rounded-lg border border-white/10 bg-black/30 px-2.5 text-[12px] text-white outline-none focus:border-[#0a84ff]"
           />
           <button
             type="button"
             disabled={!label.trim() || !url.trim() || adding}
             onClick={handleAdd}
-            className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#c9a961] px-4 text-[11px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-30"
+            className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-[#0a84ff] px-4 text-[11px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-30"
           >
             {adding ? "…" : "Add"}
           </button>

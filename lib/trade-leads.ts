@@ -112,6 +112,7 @@ export interface TradeLead {
   reference: string;
   submittedAt: string;
   updatedAt: string;
+  archivedAt?: string;
   source: string;
   locale: "en" | "ar";
   status: TradeLeadStatus;

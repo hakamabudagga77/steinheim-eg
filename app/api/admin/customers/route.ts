@@ -7,7 +7,9 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   if (!isAdminRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const customers = await fetchCustomers();
+    const limitParam = Number(new URL(request.url).searchParams.get("limit"));
+    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 250) : 50;
+    const customers = await fetchCustomers(limit);
     return Response.json({ customers }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Failed to fetch Shopify customers:", error);

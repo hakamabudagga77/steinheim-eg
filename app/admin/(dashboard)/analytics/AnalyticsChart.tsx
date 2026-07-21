@@ -11,7 +11,7 @@ function fmtDate(yyyymmdd: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-export function VisitorsAreaChart({ data }: { data: { date: string; users: number }[] }) {
+export function VisitorsAreaChart({ data }: { data: { date: string; users: number; sessions: number }[] }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
@@ -41,6 +41,7 @@ export function VisitorsAreaChart({ data }: { data: { date: string; users: numbe
           labelStyle={{ color: "rgba(255,255,255,0.5)" }}
         />
         <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
+        <Area type="monotone" dataKey="sessions" stroke="#a78bfa" strokeWidth={1.5} fill="transparent" />
       </AreaChart>
     </ResponsiveContainer>
   );

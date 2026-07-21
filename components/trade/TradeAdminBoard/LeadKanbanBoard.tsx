@@ -26,7 +26,7 @@ export function LeadKanbanBoard({ leads, onMove, onSelect }: { leads: TradeLead[
               if (leadId) onMove(leadId, status);
             }}
             className={`w-[220px] shrink-0 rounded-xl border p-2 transition ${
-              dragOverStatus === status ? "border-[#c9a961]/50 bg-[#c9a961]/[0.06]" : "border-white/[0.08] bg-white/[0.02]"
+              dragOverStatus === status ? "border-[#0a84ff]/50 bg-[#0a84ff]/[0.06]" : "border-white/[0.08] bg-white/[0.02]"
             }`}
           >
             <p className="mb-2 px-1 text-[10px] uppercase tracking-[0.12em] text-white/35">

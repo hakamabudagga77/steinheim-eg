@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Wallet, ShoppingBag, TrendingUp, Truck, X } from "lucide-react";
+import { Wallet, ShoppingBag, TrendingUp, Truck, X, ChevronDown } from "lucide-react";
 import type { ShopifyOrder } from "@/lib/shopify-client";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, Badge, EmptyState, ErrorState, SegmentedControl } from "@/components/admin/ui";
 
@@ -80,7 +81,7 @@ function FulfillModal({
             <input
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#0a84ff]"
               placeholder="Optional"
             />
           </div>
@@ -89,7 +90,7 @@ function FulfillModal({
             <input
               value={trackingCompany}
               onChange={(e) => setTrackingCompany(e.target.value)}
-              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#c9a961]"
+              className="w-full rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-[13px] text-white outline-none focus:border-[#0a84ff]"
               placeholder="Optional, e.g. Bosta, Aramex"
             />
           </div>
@@ -98,7 +99,7 @@ function FulfillModal({
               type="checkbox"
               checked={notifyCustomer}
               onChange={(e) => setNotifyCustomer(e.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-black/30 accent-[#c9a961]"
+              className="h-4 w-4 rounded border-white/20 bg-black/30 accent-[#0a84ff]"
             />
             Email the customer
           </label>
@@ -110,7 +111,7 @@ function FulfillModal({
           type="button"
           onClick={submit}
           disabled={saving}
-          className="mt-6 flex h-11 w-full items-center justify-center rounded-full bg-[#c9a961] text-[13px] font-medium text-black transition hover:bg-[#d8bb7a] disabled:opacity-50"
+          className="mt-6 flex h-11 w-full items-center justify-center rounded-full bg-[#0a84ff] text-[13px] font-medium text-white transition hover:bg-[#3d9dff] disabled:opacity-50"
         >
           {saving ? "Saving…" : "Confirm fulfillment"}
         </button>
@@ -145,13 +146,30 @@ function startOfDay(d: Date) {
   return copy;
 }
 
-export default function AdminOrdersPage() {
+function OrdersInner() {
+  const searchParams = useSearchParams();
+  const deepLinkId = searchParams.get("id");
   const [orders, setOrders] = useState<ShopifyOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<Timeframe>("30d");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [fulfillingOrder, setFulfillingOrder] = useState<ShopifyOrder | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const deepLinkConsumed = useRef(false);
+
+  // A search-result deep link (?id=) must be visible regardless of the
+  // default 30-day filter, so force "all time" once when it resolves.
+  useEffect(() => {
+    if (!orders || deepLinkConsumed.current) return;
+    const targetId = deepLinkId ? Number(deepLinkId) : null;
+    if (targetId && orders.some((o) => o.id === targetId)) {
+      deepLinkConsumed.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time deep-link consumption gated by a ref, depends on the async orders fetch
+      setTimeframe("all");
+      setExpandedId(targetId);
+    }
+  }, [orders, deepLinkId]);
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -322,44 +340,80 @@ export default function AdminOrdersPage() {
                 <th className="px-5 py-3 font-normal">Payment</th>
                 <th className="px-5 py-3 font-normal">Fulfillment</th>
                 <th className="px-5 py-3 font-normal" />
+                <th className="w-9 px-3 py-3 font-normal" />
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id} className="border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02]">
-                  <td className="px-5 py-3 font-medium text-white/90">{order.name}</td>
-                  <td className="px-5 py-3 text-white/70">
-                    {order.customer
-                      ? `${order.customer.first_name ?? ""} ${order.customer.last_name ?? ""}`.trim() || order.customer.email || "—"
-                      : order.email || "—"}
-                  </td>
-                  <td className="px-5 py-3 text-white/45">{fmtDate(order.created_at)}</td>
-                  <td className="px-5 py-3 text-white/45">
-                    {order.line_items.reduce((sum, item) => sum + item.quantity, 0)} units
-                  </td>
-                  <td className="px-5 py-3 font-medium text-white/90">
-                    {order.currency} {order.total_price}
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge tone={statusTone(order.financial_status)}>{order.financial_status ?? "—"}</Badge>
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge tone={statusTone(order.fulfillment_status)}>{order.fulfillment_status ?? "unfulfilled"}</Badge>
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    {order.fulfillment_status !== "fulfilled" && (
-                      <button
-                        type="button"
-                        onClick={() => setFulfillingOrder(order)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#c9a961]/50 hover:text-[#c9a961]"
-                      >
-                        <Truck className="h-3 w-3" />
-                        Fulfill
-                      </button>
+              {filteredOrders.map((order) => {
+                const expanded = expandedId === order.id;
+                return (
+                  <Fragment key={order.id}>
+                    <tr
+                      onClick={() => setExpandedId(expanded ? null : order.id)}
+                      className={`cursor-pointer border-b border-white/[0.04] last:border-b-0 hover:bg-white/[0.02] ${expanded ? "bg-white/[0.02]" : ""}`}
+                    >
+                      <td className="px-5 py-3 font-medium text-white/90">{order.name}</td>
+                      <td className="px-5 py-3 text-white/70">
+                        {order.customer
+                          ? `${order.customer.first_name ?? ""} ${order.customer.last_name ?? ""}`.trim() || order.customer.email || "—"
+                          : order.email || "—"}
+                      </td>
+                      <td className="px-5 py-3 text-white/45">{fmtDate(order.created_at)}</td>
+                      <td className="px-5 py-3 text-white/45">
+                        {order.line_items.reduce((sum, item) => sum + item.quantity, 0)} units
+                      </td>
+                      <td className="px-5 py-3 font-medium text-white/90">
+                        {order.currency} {order.total_price}
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge tone={statusTone(order.financial_status)}>{order.financial_status ?? "—"}</Badge>
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge tone={statusTone(order.fulfillment_status)}>{order.fulfillment_status ?? "unfulfilled"}</Badge>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        {order.fulfillment_status !== "fulfilled" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFulfillingOrder(order);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1 text-[11px] text-white/60 transition hover:border-[#0a84ff]/50 hover:text-[#0a84ff]"
+                          >
+                            <Truck className="h-3 w-3" />
+                            Fulfill
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <ChevronDown className={`ml-auto h-3.5 w-3.5 text-white/25 transition ${expanded ? "rotate-180" : ""}`} />
+                      </td>
+                    </tr>
+                    {expanded && (
+                      <tr className="border-b border-white/[0.04] bg-black/20 last:border-b-0">
+                        <td colSpan={9} className="px-5 py-4">
+                          <p className="text-[11px] uppercase tracking-[0.15em] text-white/30">Line items</p>
+                          <div className="mt-2 space-y-1.5">
+                            {order.line_items.map((item, i) => (
+                              <div key={i} className="flex items-center justify-between text-[13px]">
+                                <span className="text-white/70">{item.title}</span>
+                                <span className="text-white/40">× {item.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {order.referring_site || order.landing_site ? (
+                            <p className="mt-3 truncate text-[11px] text-white/25">
+                              Source: {order.source_name ?? "web"}
+                              {order.referring_site ? ` · from ${order.referring_site}` : ""}
+                            </p>
+                          ) : null}
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                </tr>
-              ))}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </Panel>
@@ -379,5 +433,13 @@ export default function AdminOrdersPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={null}>
+      <OrdersInner />
+    </Suspense>
   );
 }
