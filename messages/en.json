@@ -6,6 +6,7 @@
   "nav": {
     "collections": "Collections",
     "allProducts": "All products",
+    "bestSellers": "Best Sellers",
     "catalogue": "Interactive Catalogue",
     "assistant": "Concierge",
     "finishes": "Finishes",
@@ -899,6 +900,13 @@
     },
     "back": "Back",
     "continue": "Continue"
+  },
+  "bestSellers": {
+    "breadcrumb": { "home": "Home", "bestSellers": "Best Sellers" },
+    "eyebrow": "Most requested",
+    "heading": "Best sellers.",
+    "description": "The products our customers choose most, ranked by real sales.",
+    "empty": "Best sellers will appear here once sales data is available."
   },
   "products": {
     "breadcrumb": { "home": "Home", "allProducts": "All products" },
