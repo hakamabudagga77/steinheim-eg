@@ -9,6 +9,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
 import ProductReviews from "@/components/product/ProductReviews";
+import TrustBadges from "@/components/product/TrustBadges";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
@@ -424,6 +425,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       )}
                     </AnimatePresence>
                   </button>
+                  <TrustBadges />
                 </div>
 
                 <div className="mt-10 hidden border-t border-black/10 pt-6 text-start sm:block">
