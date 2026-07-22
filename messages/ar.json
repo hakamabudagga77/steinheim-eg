@@ -386,6 +386,7 @@
     "soundOff": "كتم صوت الفيديو"
   },
   "productPage": {
+    "breadcrumb": { "home": "الرئيسية", "collections": "المجموعات" },
     "collectionLabel": "مجموعة {series}",
     "outOfStock": "غير متوفر حاليًا",
     "addToCart": "أضِف إلى السلة",
@@ -900,6 +901,7 @@
     "continue": "متابعة"
   },
   "products": {
+    "breadcrumb": { "home": "الرئيسية", "allProducts": "كل المنتجات" },
     "eyebrow": "التشكيلة الكاملة",
     "heading": "كل المنتجات.",
     "description": "كل مجموعة، بكل درجات التشطيب، في مكان واحد — {count, plural, zero {لا منتجات} one {منتج واحد} two {منتجان} few {# منتجات} many {# منتجًا} other {# منتج}} من Joy وUp وArt وQuatro.",

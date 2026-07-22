@@ -386,6 +386,7 @@
     "soundOff": "Mute video"
   },
   "productPage": {
+    "breadcrumb": { "home": "Home", "collections": "Collections" },
     "collectionLabel": "{series} Collection",
     "outOfStock": "Out of stock",
     "addToCart": "Add to Cart",
@@ -900,6 +901,7 @@
     "continue": "Continue"
   },
   "products": {
+    "breadcrumb": { "home": "Home", "allProducts": "All products" },
     "eyebrow": "Full range",
     "heading": "All products.",
     "description": "Every collection, every finish, in one place — {count, plural, one {# product} other {# products}} across Joy, Up, Art, and Quatro.",

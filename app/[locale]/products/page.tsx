@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import PageTransition from "@/components/layout/PageTransition";
 import { getFinishDiscImage } from "@/data/images";
@@ -153,7 +154,15 @@ export default function AllProductsPage() {
     <PageTransition>
       <div className="min-h-screen bg-[#ece9e2] px-5 pb-24 pt-32 text-[#0a0a0a] sm:px-8 lg:px-16 lg:pt-40">
         <div className="mx-auto max-w-[1780px]">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+          <p className="text-[12px] text-black/40">
+            <Link href="/" className="transition hover:text-black">
+              {t("breadcrumb.home")}
+            </Link>
+            {" / "}
+            <span className="text-black/60">{t("breadcrumb.allProducts")}</span>
+          </p>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="mt-4">
             <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("eyebrow")}</p>
             <h1 className="mt-4 max-w-3xl font-heading text-[clamp(2.6rem,6vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
               {t("heading")}

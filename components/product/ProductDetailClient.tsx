@@ -127,14 +127,26 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   return (
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
-        <div className="hidden bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:block sm:px-8 lg:px-16">
+        <div className="bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:px-8 lg:px-16">
           <div className="mx-auto max-w-[1780px]">
-            <p className="text-[12px] text-black/40">
+            <p className="truncate text-[12px] text-black/40">
+              <Link href="/" className="transition hover:text-black">
+                {t("breadcrumb.home")}
+              </Link>
+              {" / "}
+              <Link href="/collections" className="transition hover:text-black">
+                {t("breadcrumb.collections")}
+              </Link>
+              {" / "}
               <Link href={`/collections/${product.series}`} className="transition hover:text-black">
                 {seriesName}
               </Link>
-              {" · "}
-              <span className="text-black/60">{variant.model}</span>
+              {" / "}
+              <span className="text-black/60">{product.name}</span>
+              <span className="hidden sm:inline">
+                {" · "}
+                {variant.model}
+              </span>
             </p>
           </div>
         </div>
