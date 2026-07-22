@@ -1328,7 +1328,10 @@
     "noSpecificRoom": "No specific room",
     "availableFinishes": "Available finishes",
     "showFinish": "Show {name}",
-    "wishlistToggle": "Save to wishlist"
+    "wishlistToggle": "Save to wishlist",
+    "quickView": "Quick view",
+    "quickViewClose": "Close quick view",
+    "viewFullDetails": "View full details"
   },
   "menu": {
     "forYourProject": "For your project",

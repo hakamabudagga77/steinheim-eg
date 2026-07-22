@@ -1328,7 +1328,10 @@
     "noSpecificRoom": "بدون غرفة محددة",
     "availableFinishes": "التشطيبات المتاحة",
     "showFinish": "عرض تشطيب {name}",
-    "wishlistToggle": "أضِف إلى المفضّلة"
+    "wishlistToggle": "أضِف إلى المفضّلة",
+    "quickView": "عرض سريع",
+    "quickViewClose": "إغلاق العرض السريع",
+    "viewFullDetails": "عرض كل التفاصيل"
   },
   "menu": {
     "forYourProject": "لمشروعك",
