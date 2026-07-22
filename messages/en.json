@@ -1344,6 +1344,20 @@
     "selectedCount": "{count, plural, one {# product selected} other {# products selected}}",
     "compareNow": "Compare"
   },
+  "reviews": {
+    "title": "Customer reviews",
+    "empty": "No reviews yet — be the first to share your experience.",
+    "averageSummary": "{average} out of 5 · {count, plural, one {# review} other {# reviews}}",
+    "writeReview": "Write a review",
+    "ratingLabel": "Your rating",
+    "starLabel": "{n} star{n, plural, one {} other {s}}",
+    "nameLabel": "Your name",
+    "bodyLabel": "Your review",
+    "submit": "Submit review",
+    "submitting": "Submitting…",
+    "cancel": "Cancel",
+    "submittedMessage": "Thanks — your review has been submitted and will appear once approved."
+  },
   "menu": {
     "forYourProject": "For your project",
     "shopFor": "Shop for {name}",
