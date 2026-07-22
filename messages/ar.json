@@ -1366,6 +1366,11 @@
     "cancel": "إلغاء",
     "submittedMessage": "شكرًا — تم إرسال تقييمك وسيظهر بعد المراجعة."
   },
+  "trustBadges": {
+    "warranty": "ضمان الشركة المصنّعة على كل منتج",
+    "authentic": "منتج أصلي 100% — مباشرة من شتاينهايم",
+    "securePayment": "دفع آمن مع كل طلب"
+  },
   "menu": {
     "forYourProject": "لمشروعك",
     "shopFor": "تسوّق لـ {name}",

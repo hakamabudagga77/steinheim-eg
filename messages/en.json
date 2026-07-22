@@ -1366,6 +1366,11 @@
     "cancel": "Cancel",
     "submittedMessage": "Thanks — your review has been submitted and will appear once approved."
   },
+  "trustBadges": {
+    "warranty": "Manufacturer warranty on every product",
+    "authentic": "100% authentic — sourced directly from Steinheim",
+    "securePayment": "Secure checkout, every order"
+  },
   "menu": {
     "forYourProject": "For your project",
     "shopFor": "Shop for {name}",
