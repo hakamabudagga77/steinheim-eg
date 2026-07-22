@@ -9,6 +9,7 @@ import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
+import QuickViewModal from "@/components/product/QuickViewModal";
 import type { RoomGroup } from "@/lib/trade-project";
 
 type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
@@ -41,6 +42,7 @@ function ProductCard({
   const [quantity, setQuantity] = useState(1);
   const [roomOpen, setRoomOpen] = useState(false);
   const [scopeChoice, setScopeChoice] = useState(roomOptions?.[0]?.scopeId ?? "");
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
 
@@ -98,6 +100,21 @@ function ProductCard({
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
       </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          setQuickViewOpen(true);
+        }}
+        aria-label={t("quickView")}
+        className="absolute bottom-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+      <QuickViewModal product={product} liveVariants={liveVariants} open={quickViewOpen} onClose={() => setQuickViewOpen(false)} />
       <Link
         href={`/products/${product.slug}`}
         className="group block"
