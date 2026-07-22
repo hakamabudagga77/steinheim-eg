@@ -1344,6 +1344,20 @@
     "selectedCount": "{count, plural, zero {لا منتجات محددة} one {منتج واحد محدد} two {منتجان محددان} few {# منتجات محددة} many {# منتجًا محددًا} other {# منتج محدد}}",
     "compareNow": "قارِن"
   },
+  "reviews": {
+    "title": "تقييمات العملاء",
+    "empty": "لا توجد تقييمات بعد — كن أول من يشارك تجربته.",
+    "averageSummary": "{average} من 5 · {count, plural, zero {لا تقييمات} one {تقييم واحد} two {تقييمان} few {# تقييمات} many {# تقييمًا} other {# تقييم}}",
+    "writeReview": "أضِف تقييمك",
+    "ratingLabel": "تقييمك",
+    "starLabel": "{n} نجوم",
+    "nameLabel": "اسمك",
+    "bodyLabel": "رأيك",
+    "submit": "إرسال التقييم",
+    "submitting": "جارٍ الإرسال…",
+    "cancel": "إلغاء",
+    "submittedMessage": "شكرًا — تم إرسال تقييمك وسيظهر بعد المراجعة."
+  },
   "menu": {
     "forYourProject": "لمشروعك",
     "shopFor": "تسوّق لـ {name}",

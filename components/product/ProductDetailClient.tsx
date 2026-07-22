@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
+import ProductReviews from "@/components/product/ProductReviews";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
@@ -546,6 +547,12 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 )}
               </motion.div>
             </AnimatePresence>
+          </div>
+        </section>
+
+        <section className="px-5 py-16 sm:px-8 lg:px-16">
+          <div className="mx-auto max-w-[1780px]">
+            <ProductReviews productSlug={product.slug} />
           </div>
         </section>
 
