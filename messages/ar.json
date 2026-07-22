@@ -1331,7 +1331,18 @@
     "wishlistToggle": "أضِف إلى المفضّلة",
     "quickView": "عرض سريع",
     "quickViewClose": "إغلاق العرض السريع",
-    "viewFullDetails": "عرض كل التفاصيل"
+    "viewFullDetails": "عرض كل التفاصيل",
+    "compareToggle": "أضِف للمقارنة"
+  },
+  "compare": {
+    "title": "قارن المنتجات",
+    "close": "إغلاق",
+    "clearAll": "امسح الكل",
+    "empty": "لا توجد منتجات محددة للمقارنة.",
+    "remove": "إزالة {name} من المقارنة",
+    "viewDetails": "عرض التفاصيل",
+    "selectedCount": "{count, plural, zero {لا منتجات محددة} one {منتج واحد محدد} two {منتجان محددان} few {# منتجات محددة} many {# منتجًا محددًا} other {# منتج محدد}}",
+    "compareNow": "قارِن"
   },
   "menu": {
     "forYourProject": "لمشروعك",

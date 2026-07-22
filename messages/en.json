@@ -1331,7 +1331,18 @@
     "wishlistToggle": "Save to wishlist",
     "quickView": "Quick view",
     "quickViewClose": "Close quick view",
-    "viewFullDetails": "View full details"
+    "viewFullDetails": "View full details",
+    "compareToggle": "Add to compare"
+  },
+  "compare": {
+    "title": "Compare products",
+    "close": "Close",
+    "clearAll": "Clear all",
+    "empty": "No products selected to compare.",
+    "remove": "Remove {name} from comparison",
+    "viewDetails": "View details",
+    "selectedCount": "{count, plural, one {# product selected} other {# products selected}}",
+    "compareNow": "Compare"
   },
   "menu": {
     "forYourProject": "For your project",

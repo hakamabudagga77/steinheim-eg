@@ -9,6 +9,7 @@ import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
+import { useComparison } from "@/components/comparison/ComparisonContext";
 import QuickViewModal from "@/components/product/QuickViewModal";
 import type { RoomGroup } from "@/lib/trade-project";
 
@@ -45,6 +46,7 @@ function ProductCard({
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
+  const { toggleItem: toggleComparison, isInComparison, atMax } = useComparison();
 
   const displayVariants =
     visibleFinishes && visibleFinishes.length > 0
@@ -86,6 +88,7 @@ function ProductCard({
   const selectedFinishName = getFinishById(variant.finish)?.name;
 
   const inWishlist = isInWishlist(product.slug, variant.finish);
+  const inComparison = isInComparison(product.slug, variant.finish);
 
   return (
     <article className="relative">
@@ -98,6 +101,21 @@ function ProductCard({
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        onClick={() => toggleComparison(product.slug, variant.finish)}
+        disabled={atMax && !inComparison}
+        aria-label={t("compareToggle")}
+        aria-pressed={inComparison}
+        className={`absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
+          inComparison ? "bg-black text-white" : "bg-white/85 text-black/45 hover:text-black"
+        }`}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="3" y="3" width="11" height="11" rx="2" />
+          <rect x="10" y="10" width="11" height="11" rx="2" />
         </svg>
       </button>
       <button
