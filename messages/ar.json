@@ -1352,6 +1352,9 @@
     "selectedCount": "{count, plural, zero {لا منتجات محددة} one {منتج واحد محدد} two {منتجان محددان} few {# منتجات محددة} many {# منتجًا محددًا} other {# منتج محدد}}",
     "compareNow": "قارِن"
   },
+  "recentlyViewed": {
+    "eyebrow": "شوفته قريب"
+  },
   "reviews": {
     "title": "تقييمات العملاء",
     "empty": "لا توجد تقييمات بعد — كن أول من يشارك تجربته.",

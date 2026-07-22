@@ -10,6 +10,8 @@ import ProductCard from "@/components/product/ProductCard";
 import SpecTable from "@/components/product/SpecTable";
 import ProductReviews from "@/components/product/ProductReviews";
 import TrustBadges from "@/components/product/TrustBadges";
+import RecentlyViewedStrip from "@/components/product/RecentlyViewedStrip";
+import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
@@ -23,6 +25,7 @@ const productInfoTabs = ["description", "detail", "downloads"] as const;
 export default function ProductDetailClient({ slug, liveData = null }: { slug: string; liveData?: LiveProductData }) {
   const t = useTranslations("productPage");
   const product = getProductBySlug(slug)!;
+  useRecordProductView(product.slug);
   const [selectedFinish, setSelectedFinish] = useState(product.variants[0].finish);
   const [finishOpen, setFinishOpen] = useState(false);
   const [roomOpen, setRoomOpen] = useState(false);
@@ -557,6 +560,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
             <ProductReviews productSlug={product.slug} />
           </div>
         </section>
+
+        <RecentlyViewedStrip excludeSlug={product.slug} />
 
         {contextImage && (
           <section className="px-5 py-20 text-start sm:px-8 lg:px-16 lg:py-28">
