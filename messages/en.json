@@ -1374,6 +1374,30 @@
     "authentic": "100% authentic — sourced directly from Steinheim",
     "securePayment": "Secure checkout, every order"
   },
+  "productFaq": {
+    "title": "Frequently asked questions",
+    "installation": {
+      "question": "How is this installed?",
+      "unspecified": "standard",
+      "mixer": "This mixer uses a {connectionSize} connection. We recommend installation by a licensed plumber to ensure a secure, leak-free fit and to keep your warranty valid.",
+      "shower": "This shower system has a {mountingAperture} mounting aperture and a {connectionSize} connection. Professional installation is recommended, ideally coordinated during the rough-in plumbing stage.",
+      "accessory": "This accessory installs directly using a {connectionSize} connection — no specialist tools required for most homes, though a plumber can assist if needed."
+    },
+    "care": {
+      "question": "How do I care for the finish?",
+      "answer": "Wipe clean with a soft, damp cloth. Avoid abrasive cleaners, bleach, or descaling agents on PVD and finished surfaces, as these can damage the coating. For Chrome and Brushed Nickel finishes, a mild soap solution is safe for routine cleaning."
+    },
+    "warranty": {
+      "question": "What warranty is included?",
+      "answer": "Every Steinheim product is backed by tiered coverage: a lifetime warranty on Sedal cartridges, 5 years on Neoperl aerators and brass bodies, 10 years on Chrome and Brushed Nickel finishes, and 3 years on PVD finishes (Matte Black, Metal Gun, Brushed Gold, Coffee Gold). See our full warranty page for coverage details and how to file a claim."
+    },
+    "shipping": {
+      "question": "What are the shipping and return terms?",
+      "answer": "Free delivery within Greater Cairo on orders above LE 15,000 (a flat LE 250 fee applies below that; shipping outside Greater Cairo is calculated by destination). Returns are accepted within 14 days of delivery for unused, uninstalled products in original packaging. See our shipping and returns pages for full details."
+    },
+    "moreQuestions": "Have another question?",
+    "contactUs": "Contact us"
+  },
   "menu": {
     "forYourProject": "For your project",
     "shopFor": "Shop for {name}",
