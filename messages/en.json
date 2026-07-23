@@ -1352,6 +1352,9 @@
     "selectedCount": "{count, plural, one {# product selected} other {# products selected}}",
     "compareNow": "Compare"
   },
+  "recentlyViewed": {
+    "eyebrow": "Recently viewed"
+  },
   "reviews": {
     "title": "Customer reviews",
     "empty": "No reviews yet — be the first to share your experience.",
