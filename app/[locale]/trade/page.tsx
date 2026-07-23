@@ -7,6 +7,7 @@ import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 import ProjectBoardShowcase from "@/components/trade/ProjectBoardShowcase";
+import GetProjectLinkButton from "@/components/trade/GetProjectLinkButton";
 
 const stepKeys = ["intro", "rooms", "needs", "shop"] as const;
 const boardItemKeys = ["track", "message", "quote", "documents", "samples"] as const;
@@ -48,6 +49,9 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                   {t("setupProperty")}
                 </a>
                 <TradeOpenButton variant="outline-light" />
+              </div>
+              <div className="mt-6 text-[13px] text-white/45">
+                {t("getLinkPrompt")} <GetProjectLinkButton variant="light" />
               </div>
             </ScrollReveal>
           </div>

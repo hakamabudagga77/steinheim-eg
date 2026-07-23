@@ -826,6 +826,7 @@
     "headline": "Specify by room, not by cart.",
     "body": "Set your rooms once, shop exactly what each one needs, then follow the project through to delivery — quotes, messages, and status, all against one record.",
     "setupProperty": "Set up your property",
+    "getLinkPrompt": "Already started a project?",
     "howItWorks": "How it works",
     "howHeadline": "One project. Every step.",
     "howBody": "Tell us your rooms, mark what each one needs, then shop real products against exactly that list — nothing generic, nothing irrelevant.",
@@ -888,6 +889,18 @@
   "tradeOpenButton": {
     "openBoard": "Open project board",
     "setupProject": "Set up your project"
+  },
+  "getProjectLinkModal": {
+    "trigger": "Get your link",
+    "title": "Get your project link",
+    "body": "Enter the email you used when you submitted your project, and we'll send the link to access it again — on this device or any other.",
+    "emailPlaceholder": "you@company.com",
+    "submit": "Send my link",
+    "sending": "Sending…",
+    "successTitle": "Check your inbox",
+    "successBody": "If we found a project for that email, we've just sent the link to access it.",
+    "errorInvalidEmail": "Enter a valid email address.",
+    "close": "Close"
   },
   "tradeLeadPopup": {
     "eyebrow": "For professionals",
