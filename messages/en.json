@@ -1394,6 +1394,12 @@
     "authentic": "100% authentic — sourced directly from Steinheim",
     "securePayment": "Secure checkout, every order"
   },
+  "restockAlert": {
+    "emailPlaceholder": "Your email",
+    "notifyMe": "Notify me",
+    "submitting": "Saving…",
+    "submittedMessage": "You're on the list — we'll email you if it's back in stock or the price drops."
+  },
   "productFaq": {
     "title": "Frequently asked questions",
     "installation": {
