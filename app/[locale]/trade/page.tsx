@@ -8,6 +8,7 @@ import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 
 const stepKeys = ["setRooms", "assign", "editAnytime", "submit"] as const;
+const benefitKeys = ["pricing", "support", "scheduling", "access"] as const;
 
 export default async function TradePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -70,6 +71,39 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                   <p className="text-[14px] leading-[1.75] text-black/50">{t(`steps.${key}.body`)}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Trade partner benefits */}
+        <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
+          <div className="mx-auto max-w-[1780px]">
+            <ScrollReveal>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("benefits.eyebrow")}</p>
+              <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
+                {t("benefits.headline")}
+              </h2>
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
+                {t("benefits.body")}
+              </p>
+            </ScrollReveal>
+
+            <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {benefitKeys.map((key) => (
+                <div key={key} className="border-t border-black/10 pt-6">
+                  <h3 className="font-heading text-[18px]" style={{ fontStyle: "italic" }}>{t(`benefits.items.${key}.title`)}</h3>
+                  <p className="mt-2 text-[13.5px] leading-[1.7] text-black/50">{t(`benefits.items.${key}.body`)}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-14">
+              <Link
+                href="/contact"
+                className="inline-flex rounded-full border border-black/25 px-9 py-4 text-[13px] font-medium transition hover:bg-black hover:text-white"
+              >
+                {t("benefits.cta")}
+              </Link>
             </div>
           </div>
         </section>
