@@ -60,7 +60,7 @@ const menuProductImages: Record<string, string> = {
   "up-shower-column": "/images/nav-menu/products/up-shower-column.png",
   "up-free-standing-bath-mixer": "/images/nav-menu/products/up-free-standing-bath-mixer.png",
   "art-basin-mixer": "/images/nav-menu/products/art-basin-mixer-v2.png",
-  "art-tall-basin-mixer": "/images/nav-menu/products/art-tall-basin-mixer.png",
+  "art-tall-basin-mixer": "/images/nav-menu/products/art-basin-mixer-v2.png",
   "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer-v2.png",
   "art-concealed-shower": "/images/nav-menu/products/art-concealed-shower.png",
   "art-free-standing-bath-mixer": "/images/nav-menu/products/art-free-standing-bath-mixer.png",
@@ -72,7 +72,7 @@ const menuProductImages: Record<string, string> = {
 
 const navMenuSlugs: Record<string, string[]> = {
   up: ["up-basin-mixer", "up-wall-mounted-basin-mixer", "up-shower-column", "up-free-standing-bath-mixer"],
-  art: ["art-basin-mixer", "art-wall-mounted-basin-mixer", "art-concealed-shower", "art-free-standing-bath-mixer"],
+  art: ["art-tall-basin-mixer", "art-wall-mounted-basin-mixer", "art-concealed-shower", "art-free-standing-bath-mixer"],
 };
 
 export default function Navigation({ locale }: { locale: string }) {
