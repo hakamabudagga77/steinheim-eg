@@ -824,16 +824,16 @@
   "tradePage": {
     "eyebrow": "For professionals",
     "headline": "Specify by room, not by cart.",
-    "body": "Set your property's room composition once, then assign a collection to each room group — mix collections freely — and combine everything into one Steinheim Egypt RFQ.",
+    "body": "Set your property's room composition once, then shop real products for exactly what each room needs — across any collection — and combine it all into one Steinheim Egypt RFQ.",
     "setupProperty": "Set up your property",
     "howItWorks": "How it works",
-    "howHeadline": "One property, one setup, any mix of collections.",
-    "howBody": "Each room group can carry its own collection, finish, and even mix products across collections. Reassigning a group updates it in place — nothing to delete by hand.",
+    "howHeadline": "Set up once. Shop exactly what you need.",
+    "howBody": "Tell us your rooms and what each one needs, then shop real products for just those categories — across any collection — and add it all straight to your project board.",
     "steps": {
-      "setRooms": { "title": "Set your rooms", "body": "Enter your property once — master, standard, powder, suite, and how many of each." },
-      "assign": { "title": "Assign per group", "body": "Pick a collection and finish for each room group, or hand-pick exact products across collections." },
-      "editAnytime": { "title": "Edit anytime", "body": "Reopen any group to change its collection — it replaces that group cleanly, nothing to delete by hand." },
-      "submit": { "title": "Submit one RFQ", "body": "The board combines every group into one Steinheim Egypt trade request." }
+      "intro": { "title": "You & your project", "body": "Tell us who you are and a little about the project — takes a minute." },
+      "rooms": { "title": "Rooms", "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own." },
+      "needs": { "title": "What's needed", "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities." },
+      "shop": { "title": "Shop products", "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board." }
     },
     "alreadyKnow": "Already know what you need?",
     "browseHeadline": "Browse products directly and build your board.",

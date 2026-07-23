@@ -7,7 +7,7 @@ import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 
-const stepKeys = ["setRooms", "assign", "editAnytime", "submit"] as const;
+const stepKeys = ["intro", "rooms", "needs", "shop"] as const;
 const benefitKeys = ["pricing", "support", "scheduling", "access"] as const;
 
 export default async function TradePage({ params }: { params: Promise<{ locale: string }> }) {
