@@ -1394,6 +1394,12 @@
     "authentic": "منتج أصلي 100% — مباشرة من شتاينهايم",
     "securePayment": "دفع آمن مع كل طلب"
   },
+  "restockAlert": {
+    "emailPlaceholder": "بريدك الإلكتروني",
+    "notifyMe": "أبلغني",
+    "submitting": "جارٍ الحفظ…",
+    "submittedMessage": "تم — هنبعتلك إيميل لو المنتج رجع متوفر أو نزل سعره."
+  },
   "productFaq": {
     "title": "الأسئلة الشائعة",
     "installation": {
