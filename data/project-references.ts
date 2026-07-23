@@ -17,7 +17,7 @@ export type ProjectReference = {
 };
 
 const projectEvidenceNote =
-  "Exact model, finish, quantity, installation area, and project date are not publicly published. The collection shown reflects Steinheim Egypt's internal project categorization.";
+  "Exact model, finish, quantity, and installation details for this project are not publicly published. Confirm with the Steinheim Egypt trade team.";
 
 export const projectReferences: ProjectReference[] = [
   {
@@ -36,7 +36,7 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/the-100-meydan-atmosphere.webp",
     ],
     intro:
-      "Refined urban living, specified for the long term — Steinheim's Up collection at The 100 in Meydan.",
+      "Refined urban living, specified for the long term, at The 100 in Meydan.",
     body:
       "At The 100, Steinheim's bathroom systems support a residential development built around performance and restraint. The direction here is calm and timeless: fittings chosen to hold up under daily use without ever feeling decorative.",
     note: projectEvidenceNote,
@@ -58,9 +58,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/one-yard-jvc-atmosphere.webp",
     ],
     intro:
-      "A branded residence in Jumeirah Village Circle, where Steinheim's Joy collection sits quietly inside a modern luxury interior.",
+      "A branded residence in Jumeirah Village Circle, where Steinheim sits quietly inside a modern luxury interior.",
     body:
-      "One Yard JVC pairs Steinheim's Joy systems with contemporary interiors built for precision and restraint — bathroom fittings engineered to support the space, not compete with it.",
+      "One Yard JVC pairs Steinheim's bathroom systems with contemporary interiors built for precision and restraint — fittings engineered to support the space, not compete with it.",
     note: projectEvidenceNote,
   },
   {
@@ -79,9 +79,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/dubai-creek-residence-atmosphere.webp",
     ],
     intro:
-      "A Dubai Creek residence built around material-led luxury, with Steinheim's Art collection as part of the architectural language.",
+      "A Dubai Creek residence built around material-led luxury, with Steinheim as part of the architectural language.",
     body:
-      "Dubai Creek Residence pairs Steinheim's Art systems with a refined, material-rich interior — fittings built for seamless performance and a visual language meant to last.",
+      "Dubai Creek Residence pairs Steinheim's bathroom systems with a refined, material-rich interior — fittings built for seamless performance and a visual language meant to last.",
     note: projectEvidenceNote,
   },
   {
@@ -100,9 +100,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/flamingo-city-sharjah-atmosphere.webp",
     ],
     intro:
-      "A Sharjah residential development where Steinheim's Quatro collection supports practical design, elevated.",
+      "A Sharjah residential development where Steinheim supports practical design, elevated.",
     body:
-      "Flamingo City relies on Steinheim's Quatro systems for consistency across a large residential footprint — durable, refined fittings built to perform the same way in every unit.",
+      "Flamingo City relies on Steinheim's bathroom systems for consistency across a large residential footprint — durable, refined fittings built to perform the same way in every unit.",
     note: projectEvidenceNote,
   },
 ];

@@ -737,9 +737,9 @@
     "breadcrumb": { "home": "Home", "projects": "Projects", "references": "References" },
     "sector": "Sector",
     "collection": "Steinheim collection",
-    "publishedEvidence": "Published evidence",
-    "publishedNote": "Published reference note",
-    "disclaimer": "Project visual shown from Steinheim Egypt's public project references. Specification details should be confirmed directly with the Steinheim Egypt trade team.",
+    "publishedEvidence": "Specification note",
+    "publishedNote": "About this project",
+    "disclaimer": "This visual is shown from Steinheim Egypt's public project references, not a documentary installation photo.",
     "gallery": "Gallery",
     "backToAll": "Back to all projects",
     "buildSchedule": "Build a project schedule"
