@@ -824,16 +824,35 @@
   "tradePage": {
     "eyebrow": "For professionals",
     "headline": "Specify by room, not by cart.",
-    "body": "Set your property's room composition once, then shop real products for exactly what each room needs — across any collection — and combine it all into one Steinheim Egypt RFQ.",
+    "body": "Set your rooms once, shop exactly what each one needs, then follow the project through to delivery — quotes, messages, and status, all against one record.",
     "setupProperty": "Set up your property",
     "howItWorks": "How it works",
-    "howHeadline": "Set up once. Shop exactly what you need.",
-    "howBody": "Tell us your rooms and what each one needs, then shop real products for just those categories — across any collection — and add it all straight to your project board.",
+    "howHeadline": "One project. Every step.",
+    "howBody": "Tell us your rooms, mark what each one needs, then shop real products against exactly that list — nothing generic, nothing irrelevant.",
     "steps": {
       "intro": { "title": "You & your project", "body": "Tell us who you are and a little about the project — takes a minute." },
       "rooms": { "title": "Rooms", "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own." },
       "needs": { "title": "What's needed", "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities." },
       "shop": { "title": "Shop products", "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board." }
+    },
+    "projectBoard": {
+      "eyebrow": "Beyond the quote",
+      "headline": "Submit once. Watch it through to delivery.",
+      "body": "Most bathroom suppliers end at the RFQ. Steinheim doesn't — your project stays live: a status you can check, a quote you can accept, a team you can message, samples you can request, all against one record until the last item is delivered.",
+      "items": {
+        "track": { "title": "Track", "body": "A live status through every stage — received, reviewed, contacted, quoted, confirmed, sourced, shipped, delivered." },
+        "message": { "title": "Message", "body": "A direct line to the Steinheim trade team, inside your project — no email chains." },
+        "quote": { "title": "Quote", "body": "Review your commercial quote and accept it in place." },
+        "documents": { "title": "Documents", "body": "Invoices and paperwork collected against the project record." },
+        "samples": { "title": "Samples", "body": "Request finish samples or book a showroom visit without leaving your board." }
+      },
+      "previewLabel": "Illustrative preview of a project board",
+      "mock": {
+        "messageSteinheim1": "Your quote is ready — 42 units, matte black throughout.",
+        "messageCustomer": "Approved. Can we lock delivery for the week of the 14th?",
+        "messageSteinheim2": "Confirmed — scheduling now.",
+        "document": "Invoice TR-0842.pdf"
+      }
     },
     "alreadyKnow": "Already know what you need?",
     "browseHeadline": "Browse products directly and build your board.",
