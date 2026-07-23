@@ -69,7 +69,7 @@ export const collectionMoodImages: Record<string, string> = {
 };
 
 export const collectionLandingImages: Record<string, string> = {
-  joy: "/images/steinheim/karim-2026/landing-joy.webp",
+  joy: "/images/steinheim/karim-2026/banner-joy-card.webp",
   up: "/images/steinheim/karim-2026/landing-up.webp",
   art: "/images/steinheim/karim-2026/landing-art.webp",
   quatro: "/images/steinheim/karim-2026/landing-quatro.webp",

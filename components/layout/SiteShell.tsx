@@ -20,6 +20,10 @@ const TradeSetupOverlay = dynamic(
   () => import("@/components/trade/TradeSetupOverlay"),
   { ssr: false }
 );
+const TradeLeadPopup = dynamic(
+  () => import("@/components/trade/TradeLeadPopup"),
+  { ssr: false }
+);
 const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"), {
   ssr: false,
 });
@@ -56,6 +60,7 @@ export default function SiteShell({
             <ConditionalFooter />
             <TradeProjectDrawer locale={locale} />
             <TradeSetupOverlay locale={locale} />
+            <TradeLeadPopup />
             <CartDrawer locale={locale} />
             <WishlistDrawer locale={locale} />
             <FloatingRoomProgress locale={locale} />

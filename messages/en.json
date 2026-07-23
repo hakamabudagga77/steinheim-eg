@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Steinheim | Premium German Bathroom Fixtures in Egypt",
-    "description": "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG."
+    "description": "Discover Steinheim's premium German-engineered bathroom mixers, showers, and accessories — 6 finishes, exclusive to Egypt through SIG."
   },
   "nav": {
     "collections": "Collections",
@@ -319,15 +319,10 @@
     "tagline": "Premium German bathroom systems",
     "distributor": "Exclusive distributor: El Sharbatly International Group",
     "rights": "All rights reserved",
-    "assistance": { "label": "Assistance", "desc": "Do you need assistance or would you like to request information?" },
-    "news": { "label": "News & Events", "desc": "News, insights and must-see moments." },
-    "catalogues": { "label": "Catalogues", "desc": "Flip through the catalogs to find the newest collections." },
-    "discoverMore": "Discover more",
-    "links": {
-      "collections": "Collections",
-      "ourWorld": "Our World",
-      "help": "Do You Need Help?",
-      "newsletter": "Newsletter"
+    "columns": {
+      "shop": "Shop",
+      "company": "Company",
+      "support": "Support"
     },
     "localeLabel": "Egypt / EN"
   },
@@ -380,10 +375,10 @@
       "visit": "Visit Trade Studio"
     }
   },
-  "showroom": {
-    "eyebrow": "Inside Steinheim",
-    "headline": "The showroom, as it is.",
-    "body": "Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms, and the space where clients specify a complete bathroom in person.",
+  "events": {
+    "eyebrow": "On location",
+    "headline": "Steinheim, on exhibition.",
+    "body": "Unfiltered footage from Le Marché and Ceramica Market — the exhibitions where Steinheim met Cairo in person.",
     "soundOn": "Turn video sound on",
     "soundOff": "Mute video"
   },
@@ -437,7 +432,6 @@
   "aboutPage": {
     "breadcrumb": { "home": "Home", "world": "Our World", "company": "The Company" },
     "hero": { "eyebrow": "Steinheim Egypt", "headline": "A premium bathroom language for Egypt." },
-    "tabs": { "intro": "Intro", "identity": "Identity", "quality": "Quality", "finishes": "Finishes", "trade": "Trade" },
     "world": {
       "eyebrow": "Our World",
       "headline": "The bathroom, treated as architecture.",
@@ -862,6 +856,18 @@
   "tradeOpenButton": {
     "openBoard": "Open project board",
     "setupProject": "Set up your project"
+  },
+  "tradeLeadPopup": {
+    "eyebrow": "For professionals",
+    "headline": "Specifying for a project?",
+    "body": "Tell us about your project and start building your specification in the Steinheim Trade Studio.",
+    "features": [
+      "Track your review status",
+      "Message our team directly",
+      "Receive your quote — all in one place"
+    ],
+    "notNow": "Not now",
+    "dismiss": "Dismiss"
   },
   "smartRoomCalculator": {
     "eyebrow": "Steinheim Trade Studio",

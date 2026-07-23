@@ -2,36 +2,74 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import Logo from "@/components/ui/Logo";
 
 export default function Footer({ dark = true }: { dark?: boolean }) {
   const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
+  const tWarranty = useTranslations("warranty");
+  const tShipping = useTranslations("shippingPage");
+  const tReturns = useTranslations("returnsPage");
+  const tPrivacy = useTranslations("privacyPage");
 
   const borderClass = dark ? "border-white/6" : "border-black/8";
-  const itemHoverClass = dark ? "hover:bg-white/[0.02]" : "hover:bg-black/[0.025]";
-  const primaryTextClass = dark ? "text-white/70 group-hover:text-white" : "text-black/70 group-hover:text-black";
+  const headingClass = dark ? "text-white/30" : "text-black/35";
+  const linkClass = dark ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black";
   const mutedTextClass = dark ? "text-white/25" : "text-black/45";
-  const linkClass = dark ? "text-white/20 hover:text-white/45" : "text-black/40 hover:text-black/70";
+
+  const columns: { heading: string; links: { label: string; href: string }[] }[] = [
+    {
+      heading: t("columns.shop"),
+      links: [
+        { label: tNav("collections"), href: "/collections" },
+        { label: tNav("allProducts"), href: "/products" },
+        { label: tNav("bestSellers"), href: "/best-sellers" },
+        { label: tNav("wishlist"), href: "/wishlist" },
+      ],
+    },
+    {
+      heading: t("columns.company"),
+      links: [
+        { label: tNav("about"), href: "/about" },
+        { label: tNav("projects"), href: "/projects" },
+        { label: tNav("trade"), href: "/trade" },
+      ],
+    },
+    {
+      heading: t("columns.support"),
+      links: [
+        { label: tNav("contact"), href: "/contact" },
+        { label: tWarranty("title"), href: "/warranty" },
+        { label: tShipping("title"), href: "/shipping" },
+        { label: tReturns("title"), href: "/returns" },
+        { label: tPrivacy("title"), href: "/privacy" },
+      ],
+    },
+  ];
 
   return (
     <footer className={dark ? "bg-[#0a0a0a] text-white" : "bg-[#ece9e2] text-black"}>
-      <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
-        <div className={`grid border-b sm:grid-cols-3 ${borderClass}`}>
-          {([
-            { key: "assistance", href: "/contact" },
-            { key: "news", href: "/about" },
-            { key: "catalogues", href: "/collections" },
-          ] as const).map((item) => (
-            <Link
-              key={item.key}
-              href={item.href}
-              className={`group flex flex-col border-b py-8 transition sm:border-b-0 sm:border-r sm:px-6 sm:last:border-r-0 lg:px-10 lg:py-12 ${borderClass} ${itemHoverClass}`}
-            >
-              <p className={`text-[14px] font-medium transition ${primaryTextClass}`}>{t(`${item.key}.label`)}</p>
-              <p className={`mt-2 text-[12px] leading-[1.65] ${mutedTextClass}`}>{t(`${item.key}.desc`)}</p>
-              <span className={`mt-4 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.12em] transition ${linkClass}`}>
-                {t("discoverMore")} <span className="inline-block rtl:rotate-180">→</span>
-              </span>
-            </Link>
+      <div className={`border-b ${borderClass}`}>
+        <div className="mx-auto grid max-w-[1780px] gap-x-8 gap-y-12 px-5 py-16 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-[1.3fr_1fr_1fr_1fr] lg:px-16">
+          <div>
+            <Logo color={dark ? "light" : "dark"} size="sm" />
+            <p className={`mt-5 max-w-xs text-[13px] leading-[1.7] ${mutedTextClass}`}>{t("tagline")}</p>
+            <p className={`mt-3 text-[11px] uppercase tracking-[0.12em] ${mutedTextClass}`}>{t("distributor")}</p>
+          </div>
+
+          {columns.map((column) => (
+            <div key={column.heading}>
+              <p className={`text-[11px] font-medium uppercase tracking-[0.15em] ${headingClass}`}>{column.heading}</p>
+              <ul className="mt-5 space-y-3">
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className={`text-[13px] transition ${linkClass}`}>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </div>
       </div>
@@ -52,12 +90,6 @@ export default function Footer({ dark = true }: { dark?: boolean }) {
               <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
             </svg>
             <p className={`text-[10px] uppercase tracking-[0.12em] ${dark ? "text-white/25" : "text-black/45"}`}>{t("localeLabel")}</p>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-5">
-            <Link href="/collections" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.collections")}</Link>
-            <Link href="/about" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.ourWorld")}</Link>
-            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.help")}</Link>
-            <Link href="/contact" className={`text-[10px] uppercase tracking-[0.08em] transition ${linkClass}`}>{t("links.newsletter")}</Link>
           </div>
           <p className={`text-[10px] tracking-[0.08em] ${dark ? "text-white/15" : "text-black/35"}`}>
             &copy; {new Date().getFullYear()} Steinheim. {t("rights")}.

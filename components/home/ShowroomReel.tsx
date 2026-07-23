@@ -1,16 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimationControls, useScroll, useTransform } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 
 const events: Array<{ name: string; tag: string; logo: string; width: number; height: number }> = [
-  { name: "Le Marché", tag: "Furniture exhibition", logo: "/images/events/le-marche-logo.png", width: 308, height: 84 },
-  { name: "Ceramica Market", tag: "Ceramics & bath market", logo: "/images/events/ceramica-market-logo.png", width: 1054, height: 864 },
+  { name: "Le Marché", tag: "Furniture exhibition", logo: "/images/events/le-marche-logo.webp", width: 308, height: 84 },
+  { name: "Ceramica Market", tag: "Ceramics & bath market", logo: "/images/events/ceramica-market-logo.webp", width: 1054, height: 864 },
 ];
 
 function EventLogo({ event, index }: { event: (typeof events)[number]; index: number }) {
+  const shimmerControls = useAnimationControls();
+
+  const playShimmer = useCallback(() => {
+    shimmerControls
+      .start({ left: "130%", transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] } })
+      .then(() => shimmerControls.set({ left: "-60%" }));
+  }, [shimmerControls]);
+
   const maskStyle = {
     WebkitMaskImage: `url(${event.logo})`,
     maskImage: `url(${event.logo})`,
@@ -28,7 +36,10 @@ function EventLogo({ event, index }: { event: (typeof events)[number]; index: nu
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.7, delay: 0.15 + index * 0.14, ease: [0.16, 1, 0.3, 1] }}
-      whileHover="hover"
+      onViewportEnter={() => {
+        window.setTimeout(playShimmer, 550 + index * 150);
+      }}
+      onHoverStart={playShimmer}
       className="relative h-16 sm:h-20"
       style={{ aspectRatio: `${event.width} / ${event.height}` }}
     >
@@ -37,16 +48,15 @@ function EventLogo({ event, index }: { event: (typeof events)[number]; index: nu
         alt={event.name}
         className="h-full w-full object-contain"
         initial={{ opacity: 0.82 }}
-        variants={{ hover: { opacity: 1, scale: 1.04 } }}
+        whileHover={{ opacity: 1, scale: 1.04 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       />
-      {/* Shimmer sweep, clipped to the logo's own silhouette via mask-image */}
+      {/* Shimmer sweep, clipped to the logo's own silhouette via mask-image — plays once on scroll-into-view, replays on hover */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" style={maskStyle}>
         <motion.div
           className="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/90 to-transparent"
           initial={{ left: "-60%" }}
-          variants={{ hover: { left: "130%" } }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+          animate={shimmerControls}
         />
       </div>
     </motion.div>
@@ -74,7 +84,7 @@ function ReelVideo({
   poster: string;
   active: boolean;
 }) {
-  const t = useTranslations("showroom");
+  const t = useTranslations("events");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   useAutoplayVideo(videoRef, src);
@@ -90,9 +100,12 @@ function ReelVideo({
 
   return (
     <>
+      {/* No native autoplay attribute: with 3x-duplicated clips in the marquee track,
+          autoplay would start a real fetch for all 15 copies on mount. useAutoplayVideo
+          already gates .play() behind an IntersectionObserver, so only clips actually
+          near the visible scroll window ever trigger a network fetch. */}
       <video
         ref={videoRef}
-        autoPlay
         muted={muted}
         loop
         playsInline
@@ -133,8 +146,11 @@ function ReelVideo({
 }
 
 export default function ShowroomReel() {
-  const t = useTranslations("showroom");
+  const t = useTranslations("events");
+  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const headerY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
   const pausedRef = useRef(false);
   const hoverPausedRef = useRef(false);
   const touchPausedRef = useRef(false);
@@ -251,7 +267,7 @@ export default function ShowroomReel() {
   const activeIndex = hoveredIndex ?? centeredIndex;
 
   return (
-    <section className="overflow-hidden bg-black py-24 text-white sm:py-32">
+    <section ref={sectionRef} className="overflow-hidden bg-black py-24 text-white sm:py-32">
       <div className="mx-auto max-w-[1780px] px-5 sm:px-8 lg:px-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -260,7 +276,7 @@ export default function ShowroomReel() {
           transition={{ duration: 0.8 }}
           className="mb-12 flex flex-wrap items-center justify-between gap-x-10 gap-y-8"
         >
-          <div>
+          <motion.div style={{ y: headerY }}>
             <p className="text-[12px] uppercase tracking-[0.34em] text-white/45">{t("eyebrow")}</p>
             <h2 className="mt-4 max-w-2xl font-heading text-[clamp(2.6rem,5.5vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
               {t("headline")}
@@ -268,7 +284,7 @@ export default function ShowroomReel() {
             <p className="mt-5 max-w-md text-[15px] leading-[1.75] text-white/60">
               {t("body")}
             </p>
-          </div>
+          </motion.div>
 
           <div className="ml-auto flex items-center gap-10">
             {events.map((event, index) => (

@@ -12,11 +12,9 @@ import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
 import { projectReferences, type ProjectReference } from "@/data/project-references";
 
-const heroVideo =
-  "https://steinheim-eg.com/cdn/shop/videos/c/vp/85071c8806704603be22828dee32397c/85071c8806704603be22828dee32397c.HD-1080p-7.2Mbps-77449179.mp4?v=0";
+const heroVideo = "/videos/home-hero.mp4";
 
-const ritualVideo =
-  "https://steinheim-eg.com/cdn/shop/videos/c/vp/2d4afb58a5b949a39d20cb5b3fd5e5d5/2d4afb58a5b949a39d20cb5b3fd5e5d5.HD-1080p-7.2Mbps-79305891.mp4?v=0";
+const ritualVideo = "/videos/home-ritual.mp4";
 
 const collections = [
   {
@@ -224,7 +222,7 @@ export default function GessiInspiredHome() {
             loop
             playsInline
             preload="auto"
-            poster="/images/lifestyle/hero.png"
+            poster="/images/lifestyle/hero.webp"
             className="h-full w-full object-cover"
           >
             <source src={heroVideo} type="video/mp4" />
@@ -307,7 +305,7 @@ export default function GessiInspiredHome() {
       </section>
 
       <section className="relative min-h-[760px] overflow-hidden bg-black text-white">
-        <AutoplayVideo src={ritualVideo} poster="/images/steinheim/final/about-hero.jpg" className="absolute inset-0 h-full w-full object-cover" />
+        <AutoplayVideo src={ritualVideo} poster="/images/steinheim/final/about-hero.webp" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/45" />
         <div className="relative z-10 grid min-h-[760px] items-center gap-12 px-6 py-28 sm:px-10 lg:grid-cols-2 lg:px-24">
           <h2
