@@ -148,7 +148,7 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 flex shrink-0 -translate-x-1/2 -translate-y-1/2 items-center gap-2.5"
             aria-label="Steinheim home"
           >
-            <Logo color={useWhite ? "light" : "dark"} size="md" showWave={false} />
+            <Logo color={useWhite ? "light" : "dark"} size="md" />
             {showShopByNeed && (
               <span
                 className={`hidden whitespace-nowrap font-heading text-[39px] tracking-[-0.06em] lg:inline ${
