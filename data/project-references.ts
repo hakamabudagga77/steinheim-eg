@@ -36,9 +36,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/the-100-meydan-atmosphere.webp",
     ],
     intro:
-      "A published Steinheim project reference in Meydan, Dubai, positioned around refined urban living and long-term architectural value.",
+      "Refined urban living, specified for the long term — Steinheim's Up collection at The 100 in Meydan.",
     body:
-      "Steinheim's official project reference presents The 100, Meydan as a residential development where Steinheim bathroom systems were supplied to complement the architectural direction of the project. The published positioning focuses on performance, durability, and a timeless design language rather than decorative excess.",
+      "At The 100, Steinheim's bathroom systems support a residential development built around performance and restraint. The direction here is calm and timeless: fittings chosen to hold up under daily use without ever feeling decorative.",
     note: projectEvidenceNote,
   },
   {
@@ -58,9 +58,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/one-yard-jvc-atmosphere.webp",
     ],
     intro:
-      "A branded-residence reference in Jumeirah Village Circle, Dubai, where Steinheim is presented as part of a modern luxury interior direction.",
+      "A branded residence in Jumeirah Village Circle, where Steinheim's Joy collection sits quietly inside a modern luxury interior.",
     body:
-      "For One Yard JVC Residences by Park Hyatt, Steinheim's official reference describes engineered bathroom solutions integrated into contemporary interiors. The public story is about precision, restraint, and understated design: bathroom systems that support the living environment without making the space feel overdesigned.",
+      "One Yard JVC pairs Steinheim's Joy systems with contemporary interiors built for precision and restraint — bathroom fittings engineered to support the space, not compete with it.",
     note: projectEvidenceNote,
   },
   {
@@ -79,9 +79,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/dubai-creek-residence-atmosphere.webp",
     ],
     intro:
-      "A Dubai Creek branded-residence reference built around material-led luxury, refined bathroom systems, and long-term visual relevance.",
+      "A Dubai Creek residence built around material-led luxury, with Steinheim's Art collection as part of the architectural language.",
     body:
-      "Steinheim's official project reference presents Dubai Creek Residence by Park Hyatt as a refined, material-rich environment where the bathroom systems are part of a broader architectural experience. The public description emphasizes seamless performance and a visual language intended to remain relevant over time.",
+      "Dubai Creek Residence pairs Steinheim's Art systems with a refined, material-rich interior — fittings built for seamless performance and a visual language meant to last.",
     note: projectEvidenceNote,
   },
   {
@@ -100,9 +100,9 @@ export const projectReferences: ProjectReference[] = [
       "/images/projects/flamingo-city-sharjah-atmosphere.webp",
     ],
     intro:
-      "A Sharjah residential development reference where Steinheim's public project story centers on consistency, durability, and refined simplicity.",
+      "A Sharjah residential development where Steinheim's Quatro collection supports practical design, elevated.",
     body:
-      "Flamingo City, Sharjah is published by Steinheim Egypt as a residential development reference. The stated emphasis is practical design elevated through consistency, durability, and a refined bathroom language that can support repeated residential applications.",
+      "Flamingo City relies on Steinheim's Quatro systems for consistency across a large residential footprint — durable, refined fittings built to perform the same way in every unit.",
     note: projectEvidenceNote,
   },
 ];
