@@ -8,7 +8,15 @@ import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 
 const DISMISSED_KEY = "steinheim-trade-popup-dismissed";
 const DELAY_MS = 10_000;
-const EXCLUDED_PREFIXES = ["/trade", "/admin"];
+const EXCLUDED_PREFIXES = ["/trade", "/admin", "/contact"];
+
+function readDismissed() {
+  try {
+    return window.localStorage.getItem(DISMISSED_KEY) === "1";
+  } catch {
+    return false; // storage unavailable — just don't persist the dismissal
+  }
+}
 
 export default function TradeLeadPopup() {
   const t = useTranslations("tradeLeadPopup");
@@ -18,8 +26,9 @@ export default function TradeLeadPopup() {
   const { setSetupOpen, open, setupOpen, project } = useTradeProject();
   const [visible, setVisible] = useState(false);
   // This component is mounted via next/dynamic(..., { ssr: false }), so it never
-  // renders on the server — reading localStorage in the initializer is safe here.
-  const [dismissed, setDismissed] = useState(() => window.localStorage.getItem(DISMISSED_KEY) === "1");
+  // renders on the server — window is always defined here. localStorage access
+  // itself can still throw (blocked site data, sandboxed iframes), hence the guard.
+  const [dismissed, setDismissed] = useState(readDismissed);
 
   const path = pathname.replace(/^\/(en|ar)(?=\/|$)/, "") || "/";
   const excluded = EXCLUDED_PREFIXES.some((prefix) => path.startsWith(prefix));
@@ -34,7 +43,11 @@ export default function TradeLeadPopup() {
   function dismiss() {
     setVisible(false);
     setDismissed(true);
-    window.localStorage.setItem(DISMISSED_KEY, "1");
+    try {
+      window.localStorage.setItem(DISMISSED_KEY, "1");
+    } catch {
+      // Storage unavailable — the dismissal just won't persist across visits.
+    }
   }
 
   function openSetup() {
@@ -50,7 +63,7 @@ export default function TradeLeadPopup() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.96 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          role="dialog"
+          role="complementary"
           aria-label={t("headline")}
           className="fixed bottom-6 left-6 z-50 w-[calc(100vw-3rem)] max-w-[400px] border border-white/10 bg-[#0a0a0a] p-7 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
         >
