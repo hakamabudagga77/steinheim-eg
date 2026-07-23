@@ -844,7 +844,19 @@
     },
     "alreadyKnow": "Already know what you need?",
     "browseHeadline": "Browse products directly and build your board.",
-    "browseCollections": "Browse collections"
+    "browseCollections": "Browse collections",
+    "benefits": {
+      "eyebrow": "For trade & project partners",
+      "headline": "Built for teams doing this repeatedly.",
+      "body": "Working across multiple units, a hospitality rollout, or a developer schedule? Our trade team supports project-scale work directly.",
+      "items": {
+        "pricing": { "title": "Project pricing", "body": "Volume-based pricing conversations for multi-unit and project-scale orders." },
+        "support": { "title": "Dedicated support", "body": "A direct point of contact for specification questions, substitutions, and lead times." },
+        "scheduling": { "title": "Priority scheduling", "body": "Coordinated delivery scheduling to match your site's construction or fit-out timeline." },
+        "access": { "title": "Early access", "body": "First look at new collections and finishes ahead of general release." }
+      },
+      "cta": "Talk to our trade team"
+    }
   },
   "tradeOpenButton": {
     "openBoard": "Open project board",
