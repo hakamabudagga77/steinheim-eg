@@ -398,6 +398,22 @@ export default function Navigation({ locale }: { locale: string }) {
                         {t("bestSellers")}
                       </Link>
                     </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.14, duration: 0.5, ease: [0.22, 0.76, 0.2, 1] }}
+                    >
+                      <Link
+                        href="/shop-the-look"
+                        onClick={handleNavigate}
+                        onMouseEnter={() => setActivePanel("collections")}
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/45 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                          pathname === "/shop-the-look" ? "text-black" : ""
+                        }`}
+                      >
+                        {t("shopTheLook")}
+                      </Link>
+                    </motion.div>
                     {collections.map((collection, index) => (
                       <motion.div
                         key={collection.id}
