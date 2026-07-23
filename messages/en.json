@@ -848,10 +848,27 @@
       },
       "previewLabel": "Illustrative preview of a project board",
       "mock": {
+        "overviewRoom1": "Master ensuite — Art collection",
+        "overviewRoom1Count": "6 units",
+        "overviewRoom2": "Standard bathrooms — Art collection",
+        "overviewRoom2Count": "24 units",
+        "overviewRoom3": "Powder rooms — Art collection",
+        "overviewRoom3Count": "12 units",
+        "overviewTotalLabel": "Total",
+        "overviewTotal": "42 units · 3 rooms",
+        "quoteLabel": "Quote ready",
+        "quoteAmount": "EGP 1,284,000",
+        "quoteView": "View quote",
+        "quoteAccept": "Accept quote",
         "messageSteinheim1": "Your quote is ready — 42 units, matte black throughout.",
         "messageCustomer": "Approved. Can we lock delivery for the week of the 14th?",
         "messageSteinheim2": "Confirmed — scheduling now.",
-        "document": "Invoice TR-0842.pdf"
+        "documentInvoice": "Invoice TR-0842.pdf",
+        "documentAgreement": "Trade agreement.pdf",
+        "sampleNote": "Matte black — finish sample",
+        "sampleAddress": "New Cairo showroom pickup",
+        "sampleDate": "12 Aug",
+        "sampleStatus": "Requested"
       }
     },
     "alreadyKnow": "Already know what you need?",

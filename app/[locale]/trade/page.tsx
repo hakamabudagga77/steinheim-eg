@@ -6,7 +6,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
-import TradeStageTimeline from "@/components/trade/TradeStageTimeline";
+import ProjectBoardShowcase from "@/components/trade/ProjectBoardShowcase";
 
 const stepKeys = ["intro", "rooms", "needs", "shop"] as const;
 const boardItemKeys = ["track", "message", "quote", "documents", "samples"] as const;
@@ -101,27 +101,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
               </ScrollReveal>
 
               <ScrollReveal>
-                <div className="mx-auto max-w-[420px]">
-                  <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-black/30">{t("projectBoard.previewLabel")}</p>
-                  <div className="rounded-[4px] border border-black/10 bg-white p-5 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)]">
-                    <TradeStageTimeline status="in_production" />
-                    <div className="mt-4 space-y-2">
-                      <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
-                        {t("projectBoard.mock.messageSteinheim1")}
-                      </div>
-                      <div className="ms-auto max-w-[85%] bg-charcoal px-4 py-2.5 text-end text-[12.5px] leading-[1.5] text-white">
-                        {t("projectBoard.mock.messageCustomer")}
-                      </div>
-                      <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
-                        {t("projectBoard.mock.messageSteinheim2")}
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center justify-between border-t border-black/8 pt-4">
-                      <span className="text-[11px] text-black/50">{t("projectBoard.mock.document")}</span>
-                      <span className="text-[10px] uppercase tracking-[0.15em] text-black/30">PDF</span>
-                    </div>
-                  </div>
-                </div>
+                <ProjectBoardShowcase />
               </ScrollReveal>
             </div>
           </div>

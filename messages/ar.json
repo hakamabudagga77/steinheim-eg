@@ -848,10 +848,27 @@
       },
       "previewLabel": "معاينة توضيحية للوحة مشروع",
       "mock": {
+        "overviewRoom1": "الجناح الرئيسي — مجموعة آرت",
+        "overviewRoom1Count": "6 وحدات",
+        "overviewRoom2": "الحمّامات القياسية — مجموعة آرت",
+        "overviewRoom2Count": "24 وحدة",
+        "overviewRoom3": "دورات مياه الضيوف — مجموعة آرت",
+        "overviewRoom3Count": "12 وحدة",
+        "overviewTotalLabel": "الإجمالي",
+        "overviewTotal": "42 وحدة · 3 غرف",
+        "quoteLabel": "عرض السعر جاهز",
+        "quoteAmount": "1,284,000 جنيه مصري",
+        "quoteView": "عرض عرض السعر",
+        "quoteAccept": "قبول عرض السعر",
         "messageSteinheim1": "عرض السعر جاهز — 42 وحدة، أسود مطفي بالكامل.",
         "messageCustomer": "موافَق عليه. هل يمكننا تثبيت التسليم في أسبوع الرابع عشر؟",
         "messageSteinheim2": "تم التأكيد — جارٍ الجدولة الآن.",
-        "document": "فاتورة TR-0842.pdf"
+        "documentInvoice": "فاتورة TR-0842.pdf",
+        "documentAgreement": "اتفاقية التريد.pdf",
+        "sampleNote": "أسود مطفي — عينة تشطيب",
+        "sampleAddress": "استلام من صالة عرض القاهرة الجديدة",
+        "sampleDate": "12 أغسطس",
+        "sampleStatus": "قيد الطلب"
       }
     },
     "alreadyKnow": "تعرف بالفعل ما تحتاجه؟",
