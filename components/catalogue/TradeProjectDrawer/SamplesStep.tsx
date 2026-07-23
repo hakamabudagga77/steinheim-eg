@@ -3,13 +3,10 @@
 import type { Dispatch, SetStateAction } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import ScheduleCallModal from "@/components/trade/ScheduleCallModal";
-import { formatSampleDate, type DrawerStep, type LeadOverview } from "./shared";
+import { formatSampleDate, type LeadOverview } from "./shared";
 
 export default function SamplesStep({
   t,
-  showroomOpen,
-  setShowroomOpen,
   sampleNote,
   setSampleNote,
   sampleAddress,
@@ -18,11 +15,8 @@ export default function SamplesStep({
   sampleSending,
   onRequestSamples,
   leadOverview,
-  setStep,
 }: {
   t: ReturnType<typeof useTranslations>;
-  showroomOpen: boolean;
-  setShowroomOpen: Dispatch<SetStateAction<boolean>>;
   sampleNote: string;
   setSampleNote: Dispatch<SetStateAction<string>>;
   sampleAddress: string;
@@ -31,7 +25,6 @@ export default function SamplesStep({
   sampleSending: boolean;
   onRequestSamples: () => void;
   leadOverview: LeadOverview | null;
-  setStep: (step: DrawerStep) => void;
 }) {
   return (
     <motion.div
@@ -42,14 +35,6 @@ export default function SamplesStep({
       transition={{ duration: 0.2 }}
       className="px-7 py-5"
     >
-      <button
-        type="button"
-        onClick={() => setShowroomOpen(true)}
-        className="mb-5 flex h-[46px] w-full items-center justify-center border border-charcoal/15 bg-white text-[9px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
-      >
-        {t("samples.bookShowroom")}
-      </button>
-
       <div className="border border-charcoal/10 bg-white p-4">
         <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-warm-gray">
           {t("samples.requestSamples")}
@@ -108,15 +93,6 @@ export default function SamplesStep({
           ))}
         </div>
       )}
-
-      <ScheduleCallModal
-        open={showroomOpen}
-        onClose={() => setShowroomOpen(false)}
-        onRequestByMessage={() => setStep("messages")}
-        title={t("samples.showroomTitle")}
-        fallbackCopy={t("samples.showroomFallback")}
-        ctaLabel={t("samples.showroomCta")}
-      />
     </motion.div>
   );
 }

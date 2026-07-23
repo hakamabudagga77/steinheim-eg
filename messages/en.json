@@ -844,7 +844,7 @@
         "message": { "title": "Message", "body": "A direct line to the Steinheim trade team, inside your project — no email chains." },
         "quote": { "title": "Quote", "body": "Review your commercial quote and accept it in place." },
         "documents": { "title": "Documents", "body": "Invoices and paperwork collected against the project record." },
-        "samples": { "title": "Samples", "body": "Request finish samples or book a showroom visit without leaving your board." }
+        "samples": { "title": "Samples", "body": "Request finish samples, delivered straight to your site, without leaving your board." }
       },
       "previewLabel": "Illustrative preview of a project board",
       "mock": {
@@ -858,8 +858,6 @@
         "overviewTotal": "42 units · 3 rooms",
         "quoteLabel": "Quote ready",
         "quoteAmount": "EGP 1,284,000",
-        "quoteView": "View quote",
-        "quoteAccept": "Accept quote",
         "messageSteinheim1": "Your quote is ready — 42 units, matte black throughout.",
         "messageCustomer": "Approved. Can we lock delivery for the week of the 14th?",
         "messageSteinheim2": "Confirmed — scheduling now.",
@@ -1244,7 +1242,6 @@
       "warrantyNote": "Keep this reference for any warranty claim. Request a technician anytime from the Messages tab."
     },
     "samples": {
-      "bookShowroom": "Book a showroom visit",
       "requestSamples": "Request samples",
       "intro": "Tell us which finishes or products you'd like to see in person before committing.",
       "notePlaceholder": "e.g. Chrome and Brushed Nickel finish for the Up Shower Column",
@@ -1254,10 +1251,7 @@
       "requestError": "Could not send the request. Please try again.",
       "yourRequests": "Your requests",
       "fulfilled": "Fulfilled",
-      "requested": "Requested",
-      "showroomTitle": "Book a showroom visit",
-      "showroomFallback": "Live booking isn't set up yet — send Steinheim a message with a few times that work for you to visit the showroom, and the team will confirm one directly in the Messages tab.",
-      "showroomCta": "Request a visit by message"
+      "requested": "Requested"
     },
     "sent": {
       "title": "Sent to Steinheim",
