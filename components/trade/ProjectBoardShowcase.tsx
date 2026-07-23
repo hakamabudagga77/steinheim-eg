@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import TradeStageTimeline from "@/components/trade/TradeStageTimeline";
+import { TRADE_LEAD_JOURNEY_STAGES } from "@/lib/trade-leads";
 
 const SCREEN_KEYS = ["overview", "status", "quote", "documents", "samples", "messages"] as const;
 type ScreenKey = (typeof SCREEN_KEYS)[number];
@@ -27,7 +28,87 @@ const TITLE_KEY: Record<ScreenKey, string> = {
   messages: "titles.messages",
 };
 
-const INTERVAL_MS = 4000;
+const SCREEN_INTERVAL_MS = 4000;
+const STATUS_STEP_MS = 450;
+
+function TypingDots({ dark }: { dark: boolean }) {
+  return (
+    <div className={`flex w-fit items-center gap-1 px-4 py-3 ${dark ? "ms-auto bg-charcoal" : "border border-charcoal/10 bg-[#ece9e2]"}`}>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className={`h-1.5 w-1.5 animate-bounce rounded-full ${dark ? "bg-white/70" : "bg-charcoal/40"}`}
+          style={{ animationDelay: `${i * 120}ms` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// A fresh mount (courtesy of AnimatePresence swapping screens) is what resets this
+// to step 0 each time — no effect-driven state reset needed.
+function StatusScreen() {
+  const [statusIndex, setStatusIndex] = useState(0);
+
+  useEffect(() => {
+    let step = 0;
+    const id = window.setInterval(() => {
+      step += 1;
+      if (step >= TRADE_LEAD_JOURNEY_STAGES.length) {
+        window.clearInterval(id);
+        return;
+      }
+      setStatusIndex(step);
+    }, STATUS_STEP_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return <TradeStageTimeline status={TRADE_LEAD_JOURNEY_STAGES[statusIndex]} />;
+}
+
+// Same remount-resets-state approach: plays a typing/reply exchange once per mount.
+function MessagesScreen() {
+  const t = useTranslations("tradePage.projectBoard");
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [typingWho, setTypingWho] = useState<"steinheim" | "customer" | null>("steinheim");
+
+  useEffect(() => {
+    const timers = [
+      window.setTimeout(() => { setVisibleCount(1); setTypingWho("customer"); }, 700),
+      window.setTimeout(() => { setVisibleCount(2); setTypingWho("steinheim"); }, 1300),
+      window.setTimeout(() => { setVisibleCount(3); setTypingWho(null); }, 1900),
+    ];
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      {visibleCount >= 1 ? (
+        <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
+          {t("mock.messageSteinheim1")}
+        </div>
+      ) : typingWho === "steinheim" ? (
+        <TypingDots dark={false} />
+      ) : null}
+
+      {visibleCount >= 2 ? (
+        <div className="ms-auto max-w-[85%] bg-charcoal px-4 py-2.5 text-end text-[12.5px] leading-[1.5] text-white">
+          {t("mock.messageCustomer")}
+        </div>
+      ) : typingWho === "customer" ? (
+        <TypingDots dark />
+      ) : null}
+
+      {visibleCount >= 3 ? (
+        <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
+          {t("mock.messageSteinheim2")}
+        </div>
+      ) : visibleCount >= 2 && typingWho === "steinheim" ? (
+        <TypingDots dark={false} />
+      ) : null}
+    </div>
+  );
+}
 
 export default function ProjectBoardShowcase() {
   const t = useTranslations("tradePage.projectBoard");
@@ -39,7 +120,7 @@ export default function ProjectBoardShowcase() {
     if (paused) return;
     const id = window.setInterval(() => {
       setIndex((current) => (current + 1) % SCREEN_KEYS.length);
-    }, INTERVAL_MS);
+    }, SCREEN_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [paused]);
 
@@ -56,7 +137,7 @@ export default function ProjectBoardShowcase() {
         <div className="border-b border-charcoal/8 px-6 pt-5">
           <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">{td("brand")}</p>
           <h3 className="mt-1 font-heading text-[22px] leading-tight text-charcoal">{td(TITLE_KEY[screen])}</h3>
-          <div className="mt-4 flex gap-4 overflow-x-auto">
+          <div className="mt-4 flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SCREEN_KEYS.map((key, i) => (
               <button
                 key={key}
@@ -109,7 +190,7 @@ export default function ProjectBoardShowcase() {
                 exit={{ opacity: 0, x: -16 }}
                 transition={{ duration: 0.3 }}
               >
-                <TradeStageTimeline status="in_production" />
+                <StatusScreen />
               </motion.div>
             )}
             {screen === "quote" && (
@@ -182,17 +263,8 @@ export default function ProjectBoardShowcase() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-2"
               >
-                <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
-                  {t("mock.messageSteinheim1")}
-                </div>
-                <div className="ms-auto max-w-[85%] bg-charcoal px-4 py-2.5 text-end text-[12.5px] leading-[1.5] text-white">
-                  {t("mock.messageCustomer")}
-                </div>
-                <div className="max-w-[85%] border border-charcoal/10 bg-[#ece9e2] px-4 py-2.5 text-[12.5px] leading-[1.5] text-charcoal">
-                  {t("mock.messageSteinheim2")}
-                </div>
+                <MessagesScreen />
               </motion.div>
             )}
           </AnimatePresence>
