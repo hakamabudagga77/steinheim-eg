@@ -7,6 +7,7 @@
     "collections": "Collections",
     "allProducts": "All products",
     "bestSellers": "Best Sellers",
+    "shopTheLook": "Shop the Look",
     "catalogue": "Interactive Catalogue",
     "assistant": "Concierge",
     "finishes": "Finishes",
@@ -919,6 +920,13 @@
     "heading": "Best sellers.",
     "description": "The products our customers choose most, ranked by real sales.",
     "empty": "Best sellers will appear here once sales data is available."
+  },
+  "shopTheLook": {
+    "breadcrumb": { "home": "Home", "shopTheLook": "Shop the Look" },
+    "eyebrow": "Shop the look",
+    "heading": "Real rooms, real products.",
+    "description": "Every collection shown the way it lives in a finished bathroom — pick the pieces that build the look.",
+    "viewCollection": "View full collection"
   },
   "products": {
     "breadcrumb": { "home": "Home", "allProducts": "All products" },
