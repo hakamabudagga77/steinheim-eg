@@ -3,8 +3,18 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import { projectReferences } from "@/data/project-references";
+import { getStaticPageMetadata } from "@/lib/seo";
 
 const pillarKeys = ["visual", "collection", "schedule"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/projects", "projects");
+}
 
 export default async function ProjectsPage({
   params,

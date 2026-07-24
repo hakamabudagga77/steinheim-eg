@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import Logo from "@/components/ui/Logo";
 import ShowroomReel from "@/components/home/ShowroomReel";
 import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
@@ -159,8 +158,9 @@ export default function GessiInspiredHome() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
   const [heroPaused, setHeroPaused] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
-  useAutoplayVideo(heroVideoRef, heroVideo);
+  const [loadHeroVideo, setLoadHeroVideo] = useState(false);
+  const [heroVideoVisible, setHeroVideoVisible] = useState(false);
+  useAutoplayVideo(heroVideoRef, loadHeroVideo ? heroVideo : "");
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroSectionRef,
@@ -173,7 +173,9 @@ export default function GessiInspiredHome() {
   const heroTextOpacity = useTransform(heroProgressSmooth, [0, 0.7], [1, 0]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setShowIntro(false), 950);
+    // Let the responsive poster and hero copy paint before the decorative
+    // video competes for bandwidth. This is especially important on mobile.
+    const timer = window.setTimeout(() => setLoadHeroVideo(true), 900);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -194,39 +196,30 @@ export default function GessiInspiredHome() {
 
   return (
     <div className="bg-[#ece9e2] text-[#0a0a0a] text-start">
-      <AnimatePresence>
-        {showIntro && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.55, ease: [0.22, 0.76, 0.2, 1] }}
-            className="fixed inset-0 z-[90] flex items-center justify-center bg-[#ece9e2]"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.7, ease: [0.22, 0.76, 0.2, 1] }}
-            >
-              <Logo color="dark" size="sm" showWave={false} />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <section ref={heroSectionRef} className="relative h-svh min-h-[760px] overflow-hidden bg-black text-white">
         <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+          <Image
+            src="/images/lifestyle/hero.webp"
+            alt=""
+            fill
+            preload
+            sizes="100vw"
+            quality={75}
+            className="object-cover"
+          />
           <video
             ref={heroVideoRef}
             autoPlay
             muted
             loop
             playsInline
-            preload="auto"
-            poster="/images/lifestyle/hero.webp"
-            className="h-full w-full object-cover"
-          >
-            <source src={heroVideo} type="video/mp4" />
-          </video>
+            preload="none"
+            src={loadHeroVideo ? heroVideo : undefined}
+            onCanPlay={() => setHeroVideoVisible(true)}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+              heroVideoVisible ? "opacity-100" : "opacity-0"
+            }`}
+          />
         </motion.div>
         <div className="absolute inset-0 bg-black/35" />
         <motion.div
@@ -241,14 +234,9 @@ export default function GessiInspiredHome() {
           >
             {t("hero.eyebrow")}
           </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.38 }}
-            className="mt-5 font-heading text-[clamp(3.4rem,9vw,8.8rem)] leading-[0.9] tracking-[-0.045em]"
-          >
+          <h1 className="mt-5 font-heading text-[clamp(3.4rem,9vw,8.8rem)] leading-[0.9] tracking-[-0.045em]">
             {t("hero.headline")}
-          </motion.h1>
+          </h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -281,9 +269,19 @@ export default function GessiInspiredHome() {
           type="button"
           onClick={toggleHeroVideo}
           aria-label={heroPaused ? t("hero.play") : t("hero.pause")}
-          className="absolute bottom-8 right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/45 text-[11px] uppercase tracking-[0.18em] text-white/80 transition duration-500 hover:bg-white hover:text-black"
+          className={`absolute bottom-8 right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/45 text-white/80 transition duration-500 hover:bg-white hover:text-black ${
+            heroVideoVisible ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
         >
-          {heroPaused ? t("hero.playShort") : "II"}
+          {heroPaused ? (
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4 2.8v10.4L13 8 4 2.8Z" />
+            </svg>
+          ) : (
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z" />
+            </svg>
+          )}
         </button>
         <ScrollCue label={t("hero.scroll")} />
       </section>

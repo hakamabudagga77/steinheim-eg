@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageTransition from "@/components/layout/PageTransition";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Privacy Policy | Steinheim Egypt",
-  description:
-    "How Steinheim Egypt collects, uses, and protects your personal information when you use our website and services.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/privacy", "privacy");
+}
 
 type ContentBlock = { type: "p"; text: string } | { type: "ul"; items: string[] };
 

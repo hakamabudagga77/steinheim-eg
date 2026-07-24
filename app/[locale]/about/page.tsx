@@ -5,10 +5,20 @@ import PageTransition from "@/components/layout/PageTransition";
 import WorldCard from "@/components/about/WorldCard";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { Link } from "@/i18n/navigation";
+import { getStaticPageMetadata } from "@/lib/seo";
 
 const heroVideo = "/videos/joy-shower-macro.mp4";
 
 const craftVideo = "/videos/art-hero.mp4";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/about", "about");
+}
 
 const worldCardMeta = [
   {

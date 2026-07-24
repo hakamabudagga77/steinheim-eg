@@ -836,6 +836,30 @@
       "needs": { "title": "ما هو مطلوب", "body": "لكل غرفة، حدِّد أنواع المنتجات التي تحتاجها — خلاطات مغاسل، دُش، والمزيد — مع الكميات." },
       "shop": { "title": "تسوَّق المنتجات", "body": "تصفَّح منتجات حقيقية مُفلترة بالضبط لِما حدَّدته كمطلوب، اختر التشطيبات والكميات، وأضِف كل شيء إلى لوحة مشروعك." }
     },
+    "howShowcase": {
+      "previewLabel": "معاينة توضيحية لحاسبة الغرف",
+      "mock": {
+        "introPersona": "الفنادق والضيافة",
+        "introName": "ليلى حسن",
+        "introEmail": "layla@grandnile-hotels.com",
+        "roomsMaster": "الحمّامات الرئيسية",
+        "roomsMasterCount": "2",
+        "roomsStandard": "الحمّامات القياسية",
+        "roomsStandardCount": "4",
+        "roomsPowder": "دورات مياه الضيوف",
+        "roomsPowderCount": "1",
+        "needsBasin": "خلاط مغسلة",
+        "needsBasinQty": "الكمية 2",
+        "needsShower": "دُش مدمج",
+        "needsShowerQty": "الكمية 2",
+        "needsWallMounted": "خلاط مغسلة حائطي",
+        "shopProduct1": "خلاط مغسلة آرت",
+        "shopProduct1Meta": "أسود مطفي · الكمية 2",
+        "shopProduct2": "دُش آرت المدمج",
+        "shopProduct2Meta": "أسود مطفي · الكمية 2",
+        "shopCta": "أضِف إلى لوحة المشروع"
+      }
+    },
     "projectBoard": {
       "eyebrow": "أبعد من عرض السعر",
       "headline": "قدِّمه مرة واحدة. تابعه حتى التسليم.",

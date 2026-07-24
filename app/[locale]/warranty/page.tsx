@@ -4,6 +4,16 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
+import { getStaticPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/warranty", "warranty");
+}
 
 export default async function WarrantyPage({
   params,

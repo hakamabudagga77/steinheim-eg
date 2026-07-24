@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useAnimationControls, useScroll, useTransform } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
@@ -43,14 +44,21 @@ function EventLogo({ event, index }: { event: (typeof events)[number]; index: nu
       className="relative h-16 sm:h-20"
       style={{ aspectRatio: `${event.width} / ${event.height}` }}
     >
-      <motion.img
-        src={event.logo}
-        alt={event.name}
-        className="h-full w-full object-contain"
+      <motion.div
+        className="relative h-full w-full"
         initial={{ opacity: 0.82 }}
         whileHover={{ opacity: 1, scale: 1.04 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      />
+      >
+        <Image
+          src={event.logo}
+          alt={event.name}
+          fill
+          sizes="(max-width: 640px) 140px, 180px"
+          quality={75}
+          className="object-contain"
+        />
+      </motion.div>
       {/* Shimmer sweep, clipped to the logo's own silhouette via mask-image — plays once on scroll-into-view, replays on hover */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" style={maskStyle}>
         <motion.div
@@ -68,11 +76,11 @@ const clips: Array<{
   poster: string;
   orientation: "portrait" | "landscape";
 }> = [
-  { src: "/videos/showroom/showroom-1.mp4", poster: "/images/showroom-1-poster.jpg", orientation: "portrait" },
-  { src: "/videos/showroom/showroom-2.mp4", poster: "/images/showroom-2-poster.jpg", orientation: "landscape" },
-  { src: "/videos/showroom/showroom-3.mp4", poster: "/images/showroom-3-poster.jpg", orientation: "portrait" },
-  { src: "/videos/showroom/showroom-4.mp4", poster: "/images/showroom-4-poster.jpg", orientation: "portrait" },
-  { src: "/videos/showroom/showroom-5.mp4", poster: "/images/showroom-5-poster.jpg", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-1.mp4", poster: "/images/showroom-1-poster.webp", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-2.mp4", poster: "/images/showroom-2-poster.webp", orientation: "landscape" },
+  { src: "/videos/showroom/showroom-3.mp4", poster: "/images/showroom-3-poster.webp", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-4.mp4", poster: "/images/showroom-4-poster.webp", orientation: "portrait" },
+  { src: "/videos/showroom/showroom-5.mp4", poster: "/images/showroom-5-poster.webp", orientation: "portrait" },
 ];
 
 function ReelVideo({
@@ -87,7 +95,29 @@ function ReelVideo({
   const t = useTranslations("events");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
-  useAutoplayVideo(videoRef, src);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  useAutoplayVideo(videoRef, shouldLoad ? src : "");
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || shouldLoad) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      const timer = window.setTimeout(() => setShouldLoad(true), 0);
+      return () => window.clearTimeout(timer);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldLoad(true);
+        observer.disconnect();
+      },
+      { rootMargin: "320px" }
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -100,21 +130,19 @@ function ReelVideo({
 
   return (
     <>
-      {/* No native autoplay attribute: with 3x-duplicated clips in the marquee track,
-          autoplay would start a real fetch for all 15 copies on mount. useAutoplayVideo
-          already gates .play() behind an IntersectionObserver, so only clips actually
-          near the visible scroll window ever trigger a network fetch. */}
+      {/* The source is attached only near the viewport. Merely using preload="metadata"
+          still downloads entire files when an MP4's metadata sits at the end, and the
+          marquee intentionally contains three visual copies of every clip. */}
       <video
         ref={videoRef}
         muted={muted}
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         poster={poster}
+        src={shouldLoad ? src : undefined}
         className="h-full w-full object-cover"
-      >
-        <source src={src} type="video/mp4" />
-      </video>
+      />
       <button
         type="button"
         onClick={(event) => {
