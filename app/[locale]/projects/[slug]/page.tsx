@@ -106,10 +106,6 @@ export default async function ProjectReferencePage({
                 <p className="mt-3 text-white/72">{project.sector}</p>
               </div>
               <div>
-                <p className="text-[15px] font-semibold">{t("designer")}</p>
-                <p className="mt-3 text-white/72">{project.designer}</p>
-              </div>
-              <div>
                 <p className="text-[15px] font-semibold">{t("collection")}</p>
                 <Link
                   href={`/collections/${project.collectionSlug}`}
@@ -117,10 +113,6 @@ export default async function ProjectReferencePage({
                 >
                   {project.collection}
                 </Link>
-              </div>
-              <div>
-                <p className="text-[15px] font-semibold">{t("finishDirection")}</p>
-                <p className="mt-3 text-white/72">{project.finish}</p>
               </div>
               <div className="border-t border-white/12 pt-8">
                 <p className="text-[15px] font-semibold">{t("publishedEvidence")}</p>

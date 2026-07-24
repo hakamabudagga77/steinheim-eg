@@ -52,21 +52,13 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     href: meta.href,
   }));
 
-  const tabs = [
-    [t("tabs.intro"), "#intro"],
-    [t("tabs.identity"), "#identity"],
-    [t("tabs.quality"), "#quality"],
-    [t("tabs.finishes"), "#finishes"],
-    [t("tabs.trade"), "#trade"],
-  ];
-
   return (
     <PageTransition>
       <main className="bg-[#ece9e2] text-[#0a0a0a] text-start">
         <section id="intro" className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-black text-white">
           <AutoplayVideo
             src={heroVideo}
-            poster="/images/steinheim/final/about-hero.jpg"
+            poster="/images/steinheim/final/about-hero.webp"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-black/35" />
@@ -83,22 +75,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           <div className="relative z-10 mx-auto w-full max-w-[1500px] px-5 text-center sm:px-8 lg:px-16">
             <ScrollReveal>
               <p className="text-[12px] uppercase tracking-[0.45em] text-white/70">{t("hero.eyebrow")}</p>
-              <h1 className="mx-auto mt-8 max-w-6xl text-[clamp(3.7rem,8vw,9rem)] font-light leading-[0.96] tracking-[-0.065em]">
+              <h1 className="mx-auto mt-8 max-w-4xl text-[clamp(2.6rem,5.2vw,5.8rem)] font-light leading-[1.05] tracking-[-0.055em]">
                 {t("hero.headline")}
               </h1>
             </ScrollReveal>
-          </div>
-
-          <div className="pointer-events-auto absolute bottom-7 start-1/2 z-20 hidden -translate-x-1/2 rtl:translate-x-1/2 rounded-full bg-[#ece9e2]/86 p-1.5 text-[13px] shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-md md:flex">
-            {tabs.map(([label, href], index) => (
-              <a
-                key={label}
-                href={href}
-                className={`rounded-full px-6 py-3 transition hover:bg-white ${index === 0 ? "bg-white" : "text-black/70"}`}
-              >
-                {label}
-              </a>
-            ))}
           </div>
         </section>
 

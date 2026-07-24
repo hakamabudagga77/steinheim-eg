@@ -4,10 +4,8 @@ export type ProjectReference = {
   location: string;
   country: string;
   sector: string;
-  designer: string;
   collection: string;
   collectionSlug: "joy" | "up" | "art" | "quatro";
-  finish: string;
   positioning: string;
   heroImage: string;
   heroVideo?: string;
@@ -19,7 +17,7 @@ export type ProjectReference = {
 };
 
 const projectEvidenceNote =
-  "Exact model, finish, quantity, installation area, project date, and designer are not publicly published. The collection shown reflects Steinheim Egypt's internal project categorization.";
+  "Exact model, finish, quantity, and installation details for this project are not publicly published. Confirm with the Steinheim Egypt trade team.";
 
 export const projectReferences: ProjectReference[] = [
   {
@@ -28,24 +26,19 @@ export const projectReferences: ProjectReference[] = [
     location: "Meydan, Dubai",
     country: "UAE",
     sector: "Residential development",
-    designer: "Not publicly published",
     collection: "Up",
     collectionSlug: "up",
-    finish: "Not publicly published",
     positioning: "Refined urban living",
-    heroImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790117748.png?v=1776254023&width=1600",
-    cardImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790117748.png?v=1776254023&width=1200",
+    heroImage: "/images/projects/the-100-meydan.webp",
+    cardImage: "/images/projects/the-100-meydan.webp",
     gallery: [
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790117748.png?v=1776254023&width=1600",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790117748.png?v=1776254023&width=1200",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790117748.png?v=1776254023&width=900",
+      "/images/projects/the-100-meydan-detail.webp",
+      "/images/projects/the-100-meydan-atmosphere.webp",
     ],
     intro:
-      "A published Steinheim project reference in Meydan, Dubai, positioned around refined urban living and long-term architectural value.",
+      "Refined urban living, specified for the long term, at The 100 in Meydan.",
     body:
-      "Steinheim's official project reference presents The 100, Meydan as a residential development where Steinheim bathroom systems were supplied to complement the architectural direction of the project. The published positioning focuses on performance, durability, and a timeless design language rather than decorative excess.",
+      "At The 100, Steinheim's bathroom systems support a residential development built around performance and restraint. The direction here is calm and timeless: fittings chosen to hold up under daily use without ever feeling decorative.",
     note: projectEvidenceNote,
   },
   {
@@ -54,25 +47,20 @@ export const projectReferences: ProjectReference[] = [
     location: "Jumeirah Village Circle, Dubai",
     country: "UAE",
     sector: "Branded residences",
-    designer: "Not publicly published",
     collection: "Joy",
     collectionSlug: "joy",
-    finish: "Not publicly published",
     positioning: "Modern luxury",
-    heroImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790157926.png?v=1776254196&width=1600",
+    heroImage: "/images/projects/one-yard-jvc.webp",
     heroVideo: "/videos/one-yard-jvc-hero.mp4",
-    cardImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790157926.png?v=1776254196&width=1200",
+    cardImage: "/images/projects/one-yard-jvc.webp",
     gallery: [
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790157926.png?v=1776254196&width=1600",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790157926.png?v=1776254196&width=1200",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790157926.png?v=1776254196&width=900",
+      "/images/projects/one-yard-jvc-detail.webp",
+      "/images/projects/one-yard-jvc-atmosphere.webp",
     ],
     intro:
-      "A branded-residence reference in Jumeirah Village Circle, Dubai, where Steinheim is presented as part of a modern luxury interior direction.",
+      "A branded residence in Jumeirah Village Circle, where Steinheim sits quietly inside a modern luxury interior.",
     body:
-      "For One Yard JVC Residences by Park Hyatt, Steinheim's official reference describes engineered bathroom solutions integrated into contemporary interiors. The public story is about precision, restraint, and understated design: bathroom systems that support the living environment without making the space feel overdesigned.",
+      "One Yard JVC pairs Steinheim's bathroom systems with contemporary interiors built for precision and restraint — fittings engineered to support the space, not compete with it.",
     note: projectEvidenceNote,
   },
   {
@@ -81,24 +69,19 @@ export const projectReferences: ProjectReference[] = [
     location: "Dubai Creek, Dubai",
     country: "UAE",
     sector: "Branded residences",
-    designer: "Not publicly published",
     collection: "Art",
     collectionSlug: "art",
-    finish: "Not publicly published",
     positioning: "Material-led luxury",
-    heroImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790261733.png?v=1776254907&width=1600",
-    cardImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790261733.png?v=1776254907&width=1200",
+    heroImage: "/images/projects/dubai-creek-residence.webp",
+    cardImage: "/images/projects/dubai-creek-residence.webp",
     gallery: [
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790261733.png?v=1776254907&width=1600",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790261733.png?v=1776254907&width=1200",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790261733.png?v=1776254907&width=900",
+      "/images/projects/dubai-creek-residence-detail.webp",
+      "/images/projects/dubai-creek-residence-atmosphere.webp",
     ],
     intro:
-      "A Dubai Creek branded-residence reference built around material-led luxury, refined bathroom systems, and long-term visual relevance.",
+      "A Dubai Creek residence built around material-led luxury, with Steinheim as part of the architectural language.",
     body:
-      "Steinheim's official project reference presents Dubai Creek Residence by Park Hyatt as a refined, material-rich environment where the bathroom systems are part of a broader architectural experience. The public description emphasizes seamless performance and a visual language intended to remain relevant over time.",
+      "Dubai Creek Residence pairs Steinheim's bathroom systems with a refined, material-rich interior — fittings built for seamless performance and a visual language meant to last.",
     note: projectEvidenceNote,
   },
   {
@@ -107,24 +90,19 @@ export const projectReferences: ProjectReference[] = [
     location: "Sharjah",
     country: "UAE",
     sector: "Residential development",
-    designer: "Not publicly published",
     collection: "Quatro",
     collectionSlug: "quatro",
-    finish: "Not publicly published",
     positioning: "Practical design, elevated",
-    heroImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790282757.png?v=1776255067&width=1600",
-    cardImage:
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790282757.png?v=1776255067&width=1200",
+    heroImage: "/images/projects/flamingo-city-sharjah.webp",
+    cardImage: "/images/projects/flamingo-city-sharjah.webp",
     gallery: [
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790282757.png?v=1776255067&width=1600",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790282757.png?v=1776255067&width=1200",
-      "https://steinheim-eg.com/cdn/shop/files/freepik_regenerate-this-image-hig_2790282757.png?v=1776255067&width=900",
+      "/images/projects/flamingo-city-sharjah-detail.webp",
+      "/images/projects/flamingo-city-sharjah-atmosphere.webp",
     ],
     intro:
-      "A Sharjah residential development reference where Steinheim's public project story centers on consistency, durability, and refined simplicity.",
+      "A Sharjah residential development where Steinheim supports practical design, elevated.",
     body:
-      "Flamingo City, Sharjah is published by Steinheim Egypt as a residential development reference. The stated emphasis is practical design elevated through consistency, durability, and a refined bathroom language that can support repeated residential applications.",
+      "Flamingo City relies on Steinheim's bathroom systems for consistency across a large residential footprint — durable, refined fittings built to perform the same way in every unit.",
     note: projectEvidenceNote,
   },
 ];

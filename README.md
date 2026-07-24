@@ -179,9 +179,8 @@ steinheim-eg/
 │   │   ├── trade/restore/[id]/   # resumable trade project links
 │   │   ├── wishlist/             # shared-wishlist landing (?items=... deep link)
 │   │   ├── assistant/            # AI concierge full-page experience
-│   │   ├── 3d-lab/ · 3d-showcase/# interactive product model viewers
+│   │   ├── 3d-showcase/           # interactive product model viewer
 │   │   ├── shop-by-need/         # room-driven product discovery
-│   │   ├── trade-admin/          # trade lead management (authenticated)
 │   │   └── about · projects · contact · warranty · shipping · returns · privacy
 │   ├── admin/                    # full back-office: orders, customers, analytics, content
 │   ├── api/

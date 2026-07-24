@@ -21,8 +21,8 @@ import {
   roomConfig,
   type RoomKey,
 } from "@/lib/trade-schedule";
-import { getRepresentativeProductForType } from "@/lib/utils";
-import { getProductDefaultImage } from "@/data/images";
+import { getVariantMosaicForType } from "@/lib/utils";
+import { getProductImage, getProductDefaultImage } from "@/data/images";
 import ShopProductsStep from "@/components/trade/ShopProductsStep";
 import { useRoomSetupState } from "@/components/trade/useRoomSetupState";
 
@@ -443,8 +443,9 @@ export default function SmartRoomCalculator() {
                             {candidateTypes.map((type) => {
                               const existing = needs.find((n) => n.type === type);
                               const checked = Boolean(existing);
-                              const repProduct = getRepresentativeProductForType(type);
-                              const img = repProduct ? getProductDefaultImage(repProduct.slug) : null;
+                              const mosaic = getVariantMosaicForType(type);
+                              const mosaicCols = Math.min(mosaic.length, 2) || 1;
+                              const mosaicRows = mosaic.length > 2 ? 2 : 1;
                               return (
                                 <StaggerItem key={type}>
                                 <div className="group">
@@ -456,15 +457,29 @@ export default function SmartRoomCalculator() {
                                     <div className={`relative aspect-square overflow-hidden bg-[#ece9e2] transition ${
                                       checked ? "ring-2 ring-charcoal ring-offset-4 ring-offset-[#ece9e2]" : "ring-1 ring-charcoal/8 ring-offset-4 ring-offset-[#ece9e2] group-hover:ring-charcoal/30"
                                     }`}>
-                                      {img && (
-                                        <Image
-                                          src={img}
-                                          alt={REQUIREMENT_TYPE_LABELS[type]}
-                                          fill
-                                          sizes="(max-width: 768px) 50vw, 25vw"
-                                          className={`object-contain p-[16%] transition-opacity ${checked ? "opacity-100" : "opacity-60 group-hover:opacity-90"}`}
-                                        />
-                                      )}
+                                      <div
+                                        className={`grid h-full w-full gap-px transition-opacity ${checked ? "opacity-100" : "opacity-60 group-hover:opacity-90"}`}
+                                        style={{
+                                          gridTemplateColumns: `repeat(${mosaicCols}, 1fr)`,
+                                          gridTemplateRows: `repeat(${mosaicRows}, 1fr)`,
+                                        }}
+                                      >
+                                        {mosaic.map(({ product, finish }) => {
+                                          const cellImg = getProductImage(product.slug, finish) ?? getProductDefaultImage(product.slug);
+                                          if (!cellImg) return null;
+                                          return (
+                                            <div key={product.slug} className="relative">
+                                              <Image
+                                                src={cellImg}
+                                                alt={REQUIREMENT_TYPE_LABELS[type]}
+                                                fill
+                                                sizes={mosaic.length > 1 ? "(max-width: 768px) 25vw, 12vw" : "(max-width: 768px) 50vw, 25vw"}
+                                                className={mosaic.length > 1 ? "object-contain p-[10%]" : "object-contain p-[16%]"}
+                                              />
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
                                       {checked && (
                                         <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-charcoal text-white">
                                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">

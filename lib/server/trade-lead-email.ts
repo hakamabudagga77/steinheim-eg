@@ -165,6 +165,42 @@ export async function sendTradeLeadConfirmationEmail(lead: TradeLead) {
   });
 }
 
+function buildLinkReminderEmailHtml(lead: TradeLead, restoreLink: string): string {
+  const d = lead.project.details;
+  return `
+  <div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;">
+    <div style="background:#141414;padding:20px 24px;">
+      <p style="margin:0;color:#a8a8a4;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;">Steinheim Trade Studio</p>
+      <h1 style="margin:6px 0 0;color:#fff;font-size:22px;font-weight:600;">Here's your project link</h1>
+    </div>
+    <div style="padding:20px 24px;background:#fafaf8;">
+      <p style="margin:0 0 18px;font-size:14px;line-height:1.6;color:#1a1a1a;">
+        As requested, here's the link back to <strong>${escapeHtml(d.projectName || "your project")}</strong> — status, quotes, documents, and your message thread with Steinheim.
+      </p>
+      <a href="${restoreLink}" style="display:inline-block;background:#141414;color:#fff;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;">
+        Open your project
+      </a>
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid #e8e6e0;">
+      <p style="margin:0;font-size:11px;color:#6b6b66;">Reference ${escapeHtml(lead.reference)}</p>
+    </div>
+  </div>`;
+}
+
+export async function sendTradeLeadLinkReminderEmail(lead: TradeLead) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !lead.project.details.email) return;
+
+  const resend = new Resend(apiKey);
+  const restoreLink = `${SITE_URL}/${lead.locale}/trade/restore/${lead.id}`;
+  await resend.emails.send({
+    from: NOTIFY_FROM,
+    to: lead.project.details.email,
+    subject: `Your Steinheim project link — ${lead.project.details.projectName || "Steinheim"}`,
+    html: buildLinkReminderEmailHtml(lead, restoreLink),
+  });
+}
+
 function buildMessageEmailHtml(lead: TradeLead, message: TradeLeadMessage): string {
   const projectName = lead.project.details.projectName || "Untitled project";
   const senderLabel = message.from === "customer" ? (lead.project.details.contactName || "The client") : "Steinheim";

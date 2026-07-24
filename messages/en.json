@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Steinheim | Premium German Bathroom Fixtures in Egypt",
-    "description": "Discover Steinheim's premium bathroom mixers, shower systems, and accessories. German-engineered with Sedal cartridges and Neoperl aerators. Available in 6 finishes. Exclusive to Egypt through SIG."
+    "description": "Discover Steinheim's premium German-engineered bathroom mixers, showers, and accessories — 6 finishes, exclusive to Egypt through SIG."
   },
   "nav": {
     "collections": "Collections",
@@ -319,15 +319,10 @@
     "tagline": "Premium German bathroom systems",
     "distributor": "Exclusive distributor: El Sharbatly International Group",
     "rights": "All rights reserved",
-    "assistance": { "label": "Assistance", "desc": "Do you need assistance or would you like to request information?" },
-    "news": { "label": "News & Events", "desc": "News, insights and must-see moments." },
-    "catalogues": { "label": "Catalogues", "desc": "Flip through the catalogs to find the newest collections." },
-    "discoverMore": "Discover more",
-    "links": {
-      "collections": "Collections",
-      "ourWorld": "Our World",
-      "help": "Do You Need Help?",
-      "newsletter": "Newsletter"
+    "columns": {
+      "shop": "Shop",
+      "company": "Company",
+      "support": "Support"
     },
     "localeLabel": "Egypt / EN"
   },
@@ -380,10 +375,10 @@
       "visit": "Visit Trade Studio"
     }
   },
-  "showroom": {
-    "eyebrow": "Inside Steinheim",
-    "headline": "The showroom, as it is.",
-    "body": "Unfiltered footage from our Cairo showroom floor — the finishes, the mechanisms, and the space where clients specify a complete bathroom in person.",
+  "events": {
+    "eyebrow": "On location",
+    "headline": "Steinheim, on exhibition.",
+    "body": "Unfiltered footage from Le Marché and Ceramica Market — the exhibitions where Steinheim met Cairo in person.",
     "soundOn": "Turn video sound on",
     "soundOff": "Mute video"
   },
@@ -437,7 +432,6 @@
   "aboutPage": {
     "breadcrumb": { "home": "Home", "world": "Our World", "company": "The Company" },
     "hero": { "eyebrow": "Steinheim Egypt", "headline": "A premium bathroom language for Egypt." },
-    "tabs": { "intro": "Intro", "identity": "Identity", "quality": "Quality", "finishes": "Finishes", "trade": "Trade" },
     "world": {
       "eyebrow": "Our World",
       "headline": "The bathroom, treated as architecture.",
@@ -742,12 +736,10 @@
   "projectDetail": {
     "breadcrumb": { "home": "Home", "projects": "Projects", "references": "References" },
     "sector": "Sector",
-    "designer": "Designer",
     "collection": "Steinheim collection",
-    "finishDirection": "Finish direction",
-    "publishedEvidence": "Published evidence",
-    "publishedNote": "Published reference note",
-    "disclaimer": "Project visual shown from Steinheim Egypt's public project references. Specification details should be confirmed directly with the Steinheim Egypt trade team.",
+    "publishedEvidence": "Specification note",
+    "publishedNote": "About this project",
+    "disclaimer": "This visual is shown from Steinheim Egypt's public project references, not a documentary installation photo.",
     "gallery": "Gallery",
     "backToAll": "Back to all projects",
     "buildSchedule": "Build a project schedule"
@@ -832,16 +824,51 @@
   "tradePage": {
     "eyebrow": "For professionals",
     "headline": "Specify by room, not by cart.",
-    "body": "Set your property's room composition once, then assign a collection to each room group — mix collections freely — and combine everything into one Steinheim Egypt RFQ.",
+    "body": "Set your rooms once, shop exactly what each one needs, then follow the project through to delivery — quotes, messages, and status, all against one record.",
     "setupProperty": "Set up your property",
+    "getLinkPrompt": "Already started a project?",
     "howItWorks": "How it works",
-    "howHeadline": "One property, one setup, any mix of collections.",
-    "howBody": "Each room group can carry its own collection, finish, and even mix products across collections. Reassigning a group updates it in place — nothing to delete by hand.",
+    "howHeadline": "One project. Every step.",
+    "howBody": "Tell us your rooms, mark what each one needs, then shop real products against exactly that list — nothing generic, nothing irrelevant.",
     "steps": {
-      "setRooms": { "title": "Set your rooms", "body": "Enter your property once — master, standard, powder, suite, and how many of each." },
-      "assign": { "title": "Assign per group", "body": "Pick a collection and finish for each room group, or hand-pick exact products across collections." },
-      "editAnytime": { "title": "Edit anytime", "body": "Reopen any group to change its collection — it replaces that group cleanly, nothing to delete by hand." },
-      "submit": { "title": "Submit one RFQ", "body": "The board combines every group into one Steinheim Egypt trade request." }
+      "intro": { "title": "You & your project", "body": "Tell us who you are and a little about the project — takes a minute." },
+      "rooms": { "title": "Rooms", "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own." },
+      "needs": { "title": "What's needed", "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities." },
+      "shop": { "title": "Shop products", "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board." }
+    },
+    "projectBoard": {
+      "eyebrow": "Beyond the quote",
+      "headline": "Submit once. Watch it through to delivery.",
+      "body": "Most bathroom suppliers end at the RFQ. Steinheim doesn't — your project stays live: a status you can check, a quote you can accept, a team you can message, samples you can request, all against one record until the last item is delivered.",
+      "items": {
+        "track": { "title": "Track", "body": "A live status through every stage — received, reviewed, contacted, quoted, confirmed, sourced, shipped, delivered." },
+        "message": { "title": "Message", "body": "A direct line to the Steinheim trade team, inside your project — no email chains." },
+        "quote": { "title": "Quote", "body": "Review your commercial quote and accept it in place." },
+        "documents": { "title": "Documents", "body": "Invoices and paperwork collected against the project record." },
+        "samples": { "title": "Samples", "body": "Request finish samples, delivered straight to your site, without leaving your board." }
+      },
+      "previewLabel": "Illustrative preview of a project board",
+      "mock": {
+        "overviewRoom1": "Master ensuite — Art collection",
+        "overviewRoom1Count": "6 units",
+        "overviewRoom2": "Standard bathrooms — Art collection",
+        "overviewRoom2Count": "24 units",
+        "overviewRoom3": "Powder rooms — Art collection",
+        "overviewRoom3Count": "12 units",
+        "overviewTotalLabel": "Total",
+        "overviewTotal": "42 units · 3 rooms",
+        "quoteLabel": "Quote ready",
+        "quoteAmount": "EGP 1,284,000",
+        "messageSteinheim1": "Your quote is ready — 42 units, matte black throughout.",
+        "messageCustomer": "Approved. Can we lock delivery for the week of the 14th?",
+        "messageSteinheim2": "Confirmed — scheduling now.",
+        "documentInvoice": "Invoice TR-0842.pdf",
+        "documentAgreement": "Trade agreement.pdf",
+        "sampleNote": "Matte black — finish sample",
+        "sampleAddress": "Courier delivery — New Cairo site",
+        "sampleDate": "12 Aug",
+        "sampleStatus": "Requested"
+      }
     },
     "alreadyKnow": "Already know what you need?",
     "browseHeadline": "Browse products directly and build your board.",
@@ -862,6 +889,30 @@
   "tradeOpenButton": {
     "openBoard": "Open project board",
     "setupProject": "Set up your project"
+  },
+  "getProjectLinkModal": {
+    "trigger": "Get your link",
+    "title": "Get your project link",
+    "body": "Enter the email you used when you submitted your project, and we'll send the link to access it again — on this device or any other.",
+    "emailPlaceholder": "you@company.com",
+    "submit": "Send my link",
+    "sending": "Sending…",
+    "successTitle": "Check your inbox",
+    "successBody": "If we found a project for that email, we've just sent the link to access it.",
+    "errorInvalidEmail": "Enter a valid email address.",
+    "close": "Close"
+  },
+  "tradeLeadPopup": {
+    "eyebrow": "For professionals",
+    "headline": "Specifying for a project?",
+    "body": "Tell us about your project and start building your specification in the Steinheim Trade Studio.",
+    "features": [
+      "Track your review status",
+      "Message our team directly",
+      "Receive your quote — all in one place"
+    ],
+    "notNow": "Not now",
+    "dismiss": "Dismiss"
   },
   "smartRoomCalculator": {
     "eyebrow": "Steinheim Trade Studio",
@@ -1204,7 +1255,6 @@
       "warrantyNote": "Keep this reference for any warranty claim. Request a technician anytime from the Messages tab."
     },
     "samples": {
-      "bookShowroom": "Book a showroom visit",
       "requestSamples": "Request samples",
       "intro": "Tell us which finishes or products you'd like to see in person before committing.",
       "notePlaceholder": "e.g. Chrome and Brushed Nickel finish for the Up Shower Column",
@@ -1214,10 +1264,7 @@
       "requestError": "Could not send the request. Please try again.",
       "yourRequests": "Your requests",
       "fulfilled": "Fulfilled",
-      "requested": "Requested",
-      "showroomTitle": "Book a showroom visit",
-      "showroomFallback": "Live booking isn't set up yet — send Steinheim a message with a few times that work for you to visit the showroom, and the team will confirm one directly in the Messages tab.",
-      "showroomCta": "Request a visit by message"
+      "requested": "Requested"
     },
     "sent": {
       "title": "Sent to Steinheim",

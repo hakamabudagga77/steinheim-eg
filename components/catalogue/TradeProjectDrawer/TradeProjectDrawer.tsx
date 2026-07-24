@@ -55,7 +55,6 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
   const [sampleAddress, setSampleAddress] = useState("");
   const [sampleSending, setSampleSending] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
-  const [showroomOpen, setShowroomOpen] = useState(false);
   const [deliveryContactName, setDeliveryContactName] = useState("");
   const [deliveryContactPhone, setDeliveryContactPhone] = useState("");
   const [deliveryAccessNotes, setDeliveryAccessNotes] = useState("");
@@ -467,8 +466,6 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                   <SamplesStep
                     key="samples"
                     t={t}
-                    showroomOpen={showroomOpen}
-                    setShowroomOpen={setShowroomOpen}
                     sampleNote={sampleNote}
                     setSampleNote={setSampleNote}
                     sampleAddress={sampleAddress}
@@ -477,7 +474,6 @@ export default function TradeProjectDrawer({ locale }: { locale: string }) {
                     sampleSending={sampleSending}
                     onRequestSamples={handleRequestSamples}
                     leadOverview={leadOverview}
-                    setStep={setStep}
                   />
                 ) : step === "messages" && project.submittedLeadId ? (
                   <MessagesStep key="messages" leadId={project.submittedLeadId} />

@@ -45,6 +45,7 @@ const worldLinks = [
     eyebrowKey: "world.tradeStudioEyebrow" as const,
     href: "/trade",
     image: "/images/generated/gessi/steinheim-wellness-architecture.png",
+    objectPosition: "80% center",
   },
 ];
 
@@ -60,7 +61,7 @@ const menuProductImages: Record<string, string> = {
   "up-shower-column": "/images/nav-menu/products/up-shower-column.png",
   "up-free-standing-bath-mixer": "/images/nav-menu/products/up-free-standing-bath-mixer.png",
   "art-basin-mixer": "/images/nav-menu/products/art-basin-mixer-v2.png",
-  "art-tall-basin-mixer": "/images/nav-menu/products/art-tall-basin-mixer.png",
+  "art-tall-basin-mixer": "/images/nav-menu/products/art-basin-mixer-v2.png",
   "art-wall-mounted-basin-mixer": "/images/nav-menu/products/art-wall-mounted-basin-mixer-v2.png",
   "art-concealed-shower": "/images/nav-menu/products/art-concealed-shower.png",
   "art-free-standing-bath-mixer": "/images/nav-menu/products/art-free-standing-bath-mixer.png",
@@ -72,7 +73,7 @@ const menuProductImages: Record<string, string> = {
 
 const navMenuSlugs: Record<string, string[]> = {
   up: ["up-basin-mixer", "up-wall-mounted-basin-mixer", "up-shower-column", "up-free-standing-bath-mixer"],
-  art: ["art-basin-mixer", "art-wall-mounted-basin-mixer", "art-concealed-shower", "art-free-standing-bath-mixer"],
+  art: ["art-tall-basin-mixer", "art-wall-mounted-basin-mixer", "art-concealed-shower", "art-free-standing-bath-mixer"],
 };
 
 export default function Navigation({ locale }: { locale: string }) {
@@ -83,6 +84,7 @@ export default function Navigation({ locale }: { locale: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"collections" | "world">("collections");
   const [hoveredCollection, setHoveredCollection] = useState<string | null>(null);
+  const [hoveredWorldLink, setHoveredWorldLink] = useState<string | null>(null);
   const { itemCount, setOpen: setCartOpen, cartIconRef, bump } = useCart();
   const { itemCount: wishlistCount, setOpen: setWishlistOpen } = useWishlist();
   const {
@@ -116,10 +118,12 @@ export default function Navigation({ locale }: { locale: string }) {
   const handleNavigate = useCallback(() => {
     setMenuOpen(false);
     setHoveredCollection(null);
+    setHoveredWorldLink(null);
     setActivePanel("collections");
   }, []);
 
   const activeCollection = hoveredCollection ?? "joy";
+  const activeWorldItem = worldLinks.find((item) => item.labelKey === hoveredWorldLink) ?? worldLinks[0];
   const curatedSlugs = navMenuSlugs[activeCollection];
   const activeProducts = curatedSlugs
     ? curatedSlugs.map((slug) => getProductBySlug(slug)).filter((product): product is NonNullable<typeof product> => Boolean(product))
@@ -148,7 +152,7 @@ export default function Navigation({ locale }: { locale: string }) {
             className="absolute left-1/2 top-1/2 flex shrink-0 -translate-x-1/2 -translate-y-1/2 items-center gap-2.5"
             aria-label="Steinheim home"
           >
-            <Logo color={useWhite ? "light" : "dark"} size="md" showWave={false} />
+            <Logo color={useWhite ? "light" : "dark"} size="md" />
             {showShopByNeed && (
               <span
                 className={`hidden whitespace-nowrap font-heading text-[39px] tracking-[-0.06em] lg:inline ${
@@ -501,9 +505,12 @@ export default function Navigation({ locale }: { locale: string }) {
                         <Link
                           href={link.href}
                           onClick={handleNavigate}
-                          onMouseEnter={() => setActivePanel("world")}
+                          onMouseEnter={() => {
+                            setActivePanel("world");
+                            setHoveredWorldLink(link.labelKey);
+                          }}
                           className={`block py-1.5 text-[18px] leading-tight transition-all duration-300 ${
-                            activePanel === "world"
+                            activePanel === "world" && activeWorldItem.labelKey === link.labelKey
                               ? "text-black"
                               : "text-black/50 hover:translate-x-2 hover:text-black"
                           }`}
@@ -579,48 +586,37 @@ export default function Navigation({ locale }: { locale: string }) {
                   <AnimatePresence mode="wait">
                     {activePanel === "world" ? (
                       <motion.div
-                        key="world"
+                        key={activeWorldItem.labelKey}
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
                         className="flex h-full flex-col"
                       >
-                        <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">
-                          {worldLinks.map((item, index) => (
-                            <motion.div
-                              key={item.labelKey}
-                              initial={{ opacity: 0, y: 14 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.045, duration: 0.38, ease: [0.22, 0.76, 0.2, 1] }}
-                              className="h-full"
-                            >
-                              <Link
-                                href={item.href}
-                                onClick={handleNavigate}
-                                className="group relative block h-full overflow-hidden bg-black"
-                              >
-                                <Image
-                                  src={item.image}
-                                  alt={tm(item.labelKey)}
-                                  fill
-                                  sizes="32vw"
-                                  className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
-                                  priority={index < 2}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/62 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
-                                <div className="absolute inset-x-0 bottom-0 px-4 pb-2 pt-8 text-white">
-                                  <p className="text-[10px] uppercase tracking-[0.28em] text-white/62">
-                                    {tm(item.eyebrowKey)}
-                                  </p>
-                                  <p className="mt-2 text-[24px] leading-none tracking-[-0.04em]">
-                                    {tm(item.labelKey)}
-                                  </p>
-                                </div>
-                              </Link>
-                            </motion.div>
-                          ))}
-                        </div>
+                        <Link
+                          href={activeWorldItem.href}
+                          onClick={handleNavigate}
+                          className="group relative block h-full flex-1 overflow-hidden bg-black"
+                        >
+                          <Image
+                            src={activeWorldItem.image}
+                            alt={tm(activeWorldItem.labelKey)}
+                            fill
+                            sizes="(max-width: 1023px) 0px, 62vw"
+                            style={{ objectPosition: activeWorldItem.objectPosition ?? "center" }}
+                            className="object-cover transition duration-[1200ms] group-hover:scale-[1.05]"
+                            priority
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
+                          <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-10 text-white">
+                            <p className="text-[11px] uppercase tracking-[0.3em] text-white/62">
+                              {tm(activeWorldItem.eyebrowKey)}
+                            </p>
+                            <p className="mt-3 text-[32px] leading-none tracking-[-0.04em]">
+                              {tm(activeWorldItem.labelKey)}
+                            </p>
+                          </div>
+                        </Link>
                       </motion.div>
                     ) : (
                       <motion.div
