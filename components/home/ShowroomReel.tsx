@@ -113,7 +113,7 @@ function ReelVideo({
         setShouldLoad(true);
         observer.disconnect();
       },
-      { rootMargin: "320px" }
+      { rootMargin: "100px" }
     );
     observer.observe(video);
     return () => observer.disconnect();
