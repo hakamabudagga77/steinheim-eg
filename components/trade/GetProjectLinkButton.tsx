@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -9,6 +9,7 @@ export default function GetProjectLinkButton({ variant = "light" }: { variant?: 
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "invalid">("idle");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function handleClose() {
     setOpen(false);
@@ -17,6 +18,20 @@ export default function GetProjectLinkButton({ variant = "light" }: { variant?: 
       setStatus("idle");
     }, 300);
   }
+
+  // Escape closes; move focus into the email field when the form opens so the
+  // dialog is keyboard-operable from the moment it appears.
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") handleClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    inputRef.current?.focus();
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // Keyed on `open` only — re-running on every render would re-focus the
+    // input mid-typing.
+  }, [open]);
 
   async function handleSubmit() {
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
@@ -65,6 +80,9 @@ export default function GetProjectLinkButton({ variant = "light" }: { variant?: 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 12 }}
               transition={{ duration: 0.3, ease: [0.22, 0.76, 0.2, 1] }}
+              role="dialog"
+              aria-modal="true"
+              aria-label={t("title")}
               className="fixed inset-x-4 top-1/2 z-[91] mx-auto max-w-[420px] -translate-y-1/2 bg-white sm:inset-x-auto"
             >
               <div className="flex items-center justify-between border-b border-charcoal/8 px-6 py-5">
@@ -91,6 +109,7 @@ export default function GetProjectLinkButton({ variant = "light" }: { variant?: 
                   <>
                     <p className="text-[13px] leading-relaxed text-warm-gray">{t("body")}</p>
                     <input
+                      ref={inputRef}
                       type="email"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); if (status === "invalid") setStatus("idle"); }}

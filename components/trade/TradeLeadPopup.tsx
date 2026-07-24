@@ -40,6 +40,16 @@ export default function TradeLeadPopup() {
     return () => window.clearTimeout(timer);
   }, [excluded, hasEngaged, dismissed]);
 
+  // Escape dismisses the popup while it is showing, as expected for role="dialog".
+  useEffect(() => {
+    if (!visible) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") dismiss();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [visible]);
+
   function dismiss() {
     setVisible(false);
     setDismissed(true);
