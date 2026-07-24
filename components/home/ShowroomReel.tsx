@@ -139,7 +139,7 @@ function ReelVideo({
         loop
         playsInline
         preload="none"
-        poster={poster}
+        poster={shouldLoad ? poster : undefined}
         src={shouldLoad ? src : undefined}
         className="h-full w-full object-cover"
       />

@@ -241,7 +241,7 @@ function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTrans
             </div>
             {i < SCREEN_KEYS.length - 1 && <div className={`h-[2px] flex-1 transition-colors duration-300 ${i < activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />}
           </div>
-          <span className={`hidden text-[8px] font-medium uppercase tracking-[0.1em] transition-colors sm:block ${i <= activeIndex ? "text-charcoal" : "text-warm-gray/50"}`}>
+          <span className={`hidden text-[8px] font-medium uppercase tracking-[0.1em] transition-colors sm:block ${i <= activeIndex ? "text-charcoal" : "text-charcoal/65"}`}>
             {tc(`steps.${key}`)}
           </span>
         </button>

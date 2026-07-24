@@ -5,6 +5,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
 import { getCollectionContextImage } from "@/data/images";
 import { getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { getStaticPageMetadata } from "@/lib/seo";
 
 // Each look pairs a series' real, already-published lifestyle context image
 // (see collectionContextImages in data/images.ts) with that series' real
@@ -17,6 +18,15 @@ const LOOKS = [
   { series: "art", leadType: "free-standing" },
   { series: "quatro", leadType: "wall-mounted" },
 ] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/shop-the-look", "shopTheLook");
+}
 
 export default async function ShopTheLookPage({
   params,
@@ -42,7 +52,7 @@ export default async function ShopTheLookPage({
     <PageTransition>
       <div className="min-h-screen bg-[#ece9e2] px-5 pb-24 pt-32 text-[#0a0a0a] sm:px-8 lg:px-16 lg:pt-40">
         <div className="mx-auto max-w-[1780px]">
-          <p className="text-[12px] text-black/40">
+          <p className="text-[12px] text-black/65">
             <Link href="/" className="transition hover:text-black">
               {t("breadcrumb.home")}
             </Link>
@@ -51,7 +61,7 @@ export default async function ShopTheLookPage({
           </p>
 
           <div className="mt-4">
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("eyebrow")}</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("eyebrow")}</p>
             <h1 className="mt-4 max-w-3xl font-heading text-[clamp(2.6rem,6vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
               {t("heading")}
             </h1>
@@ -72,7 +82,7 @@ export default async function ShopTheLookPage({
                   />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-black/35" style={{ fontStyle: "italic" }}>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-black/65" style={{ fontStyle: "italic" }}>
                     {seriesInfo.name}
                   </p>
                   <h2 className="mt-2 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal leading-[1.05] tracking-[-0.03em]">
@@ -80,7 +90,7 @@ export default async function ShopTheLookPage({
                   </h2>
                   <Link
                     href={`/collections/${series}`}
-                    className="mt-4 inline-flex text-[13px] text-black/50 underline decoration-black/20 hover:text-black"
+                    className="mt-4 inline-flex text-[13px] text-black/65 underline decoration-black/20 hover:text-black"
                   >
                     {t("viewCollection")}
                   </Link>

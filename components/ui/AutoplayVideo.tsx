@@ -44,7 +44,10 @@ export default function AutoplayVideo({
       loop
       playsInline
       preload="none"
-      poster={poster}
+      // A poster on a <video> downloads eagerly even when the video itself is
+      // far below the fold. Attach both poster and source only when the shared
+      // observer says this media is close enough to be useful.
+      poster={shouldLoad ? poster : undefined}
       src={shouldLoad ? src : undefined}
       className={className}
     />

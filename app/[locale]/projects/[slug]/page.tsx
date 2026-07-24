@@ -162,11 +162,11 @@ export default async function ProjectReferencePage({
               />
             </div>
             <div className="lg:pt-16">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/45">{t("publishedNote")}</p>
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/70">{t("publishedNote")}</p>
               <p className="mt-8 max-w-3xl text-[20px] leading-[1.75] text-white/78">
                 {project.body}
               </p>
-              <p className="mt-8 max-w-2xl text-[14px] leading-[1.7] text-white/42">
+              <p className="mt-8 max-w-2xl text-[14px] leading-[1.7] text-white/70">
                 {t("disclaimer")}
               </p>
             </div>

@@ -64,7 +64,7 @@ export default async function ProjectsPage({
         <section id="all-projects" className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-[1780px]">
             <div className="mx-auto max-w-4xl text-center">
-              <p className="text-[13px] uppercase tracking-[0.34em] text-white/55">{t("allProjects")}</p>
+              <p className="text-[13px] uppercase tracking-[0.34em] text-white/70">{t("allProjects")}</p>
               <h2 className="mt-7 text-[clamp(2.8rem,6vw,6.2rem)] font-light leading-[0.94] tracking-[-0.055em]">
                 {t("officialHeadline")}
               </h2>
@@ -89,14 +89,14 @@ export default async function ProjectsPage({
                       <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-75" />
                     </div>
                     <div className="pt-7">
-                      <div className="flex items-center justify-between gap-5 text-[13px] text-white/55">
+                      <div className="flex items-center justify-between gap-5 text-[13px] text-white/70">
                         <span>{project.location} - {project.country}</span>
                         <span>{project.sector}</span>
                       </div>
                       <h3 className="mt-4 text-[28px] font-medium leading-[1.05] tracking-[-0.035em]">
                         {project.name}
                       </h3>
-                      <p className="mt-3 max-w-md text-[15px] leading-[1.7] text-white/55">
+                      <p className="mt-3 max-w-md text-[15px] leading-[1.7] text-white/70">
                         {project.intro}
                       </p>
                     </div>

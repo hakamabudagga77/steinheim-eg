@@ -45,7 +45,7 @@ function anyInStock(product: Product, liveData: LiveData): boolean {
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="border-b border-black/8 py-6">
-      <p className="text-[11px] uppercase tracking-[0.25em] text-black/40">{title}</p>
+      <p className="text-[11px] uppercase tracking-[0.25em] text-black/65">{title}</p>
       <div className="mt-4">{children}</div>
     </div>
   );
@@ -154,7 +154,7 @@ export default function AllProductsPage() {
     <PageTransition>
       <div className="min-h-screen bg-[#ece9e2] px-5 pb-24 pt-32 text-[#0a0a0a] sm:px-8 lg:px-16 lg:pt-40">
         <div className="mx-auto max-w-[1780px]">
-          <p className="text-[12px] text-black/40">
+          <p className="text-[12px] text-black/65">
             <Link href="/" className="transition hover:text-black">
               {t("breadcrumb.home")}
             </Link>
@@ -163,11 +163,11 @@ export default function AllProductsPage() {
           </p>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="mt-4">
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("eyebrow")}</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("eyebrow")}</p>
             <h1 className="mt-4 max-w-3xl font-heading text-[clamp(2.6rem,6vw,5.4rem)] font-normal leading-[0.95] tracking-[-0.05em]">
               {t("heading")}
             </h1>
-            <p className="mt-5 max-w-xl text-[15px] leading-[1.75] text-black/55">
+            <p className="mt-5 max-w-xl text-[15px] leading-[1.75] text-black/65">
               {t("description", { count: allProducts.length })}
             </p>
           </motion.div>
@@ -190,6 +190,7 @@ export default function AllProductsPage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortOption)}
+              aria-label={t("sort.label", { label: t(`sort.${SORT_KEYS[sort]}`) })}
               className="border border-black/15 bg-transparent px-4 py-2.5 text-[13px] outline-none"
             >
               {SORT_OPTIONS.map((opt) => (
@@ -212,7 +213,7 @@ export default function AllProductsPage() {
               )}
             </button>
 
-            <p className="ml-auto shrink-0 text-[13px] text-black/40">{t("resultCount", { count: sorted.length })}</p>
+            <p className="ml-auto shrink-0 text-[13px] text-black/65">{t("resultCount", { count: sorted.length })}</p>
           </div>
 
           {/* Grid */}
@@ -319,7 +320,7 @@ export default function AllProductsPage() {
                               <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />
                             )}
                           </span>
-                          <span className={`text-[10px] uppercase tracking-[0.08em] ${active ? "font-medium text-black" : "text-black/40"}`}>
+                          <span className={`text-[10px] uppercase tracking-[0.08em] ${active ? "font-medium text-black" : "text-black/65"}`}>
                             {finish.name}
                           </span>
                         </button>

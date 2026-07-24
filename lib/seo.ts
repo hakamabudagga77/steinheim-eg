@@ -4,6 +4,7 @@ export type SupportedLocale = "en" | "ar";
 
 type StaticPageKey =
   | "about"
+  | "assistant"
   | "bestSellers"
   | "collections"
   | "contact"
@@ -12,7 +13,11 @@ type StaticPageKey =
   | "projects"
   | "returns"
   | "shipping"
+  | "shopByNeed"
+  | "shopTheLook"
+  | "threeDShowcase"
   | "trade"
+  | "tradeRestore"
   | "warranty"
   | "wishlist";
 
@@ -32,6 +37,18 @@ const staticPageCopy: Record<StaticPageKey, Record<SupportedLocale, SeoCopy>> = 
       title: "عن شتاينهايم | هندسة ألمانية للحمامات في مصر",
       description:
         "تعرّف على أنظمة حمامات شتاينهايم المصممة في ألمانيا، ومجموعاتها المتناسقة، ومعاييرها التقنية، وشراكتها الحصرية في مصر.",
+    },
+  },
+  assistant: {
+    en: {
+      title: "Bathroom Product Assistant | Steinheim Egypt",
+      description:
+        "Use the Steinheim catalogue assistant to explore bathroom collections, finishes, product specifications, and project options.",
+    },
+    ar: {
+      title: "مساعد اختيار منتجات الحمام | شتاينهايم مصر",
+      description:
+        "استخدم مساعد كتالوج شتاينهايم لاستكشاف مجموعات الحمامات والتشطيبات ومواصفات المنتجات وخيارات المشروعات.",
     },
   },
   bestSellers: {
@@ -130,6 +147,40 @@ const staticPageCopy: Record<StaticPageKey, Record<SupportedLocale, SeoCopy>> = 
         "تعرّف على مناطق التوصيل وتكاليف الشحن ومدة التجهيز وتتبع الطلب وإرشادات الاستلام لطلبات شتاينهايم في مصر.",
     },
   },
+  shopByNeed: {
+    en: {
+      title: "Shop Bathroom Fixtures by Need | Steinheim Egypt",
+      description:
+        "Plan each room and browse Steinheim basin mixers, shower systems, accessories, and coordinated finishes matched to your project requirements.",
+    },
+    ar: {
+      title: "تسوق تجهيزات الحمام حسب احتياجاتك | شتاينهايم مصر",
+      description:
+        "خطط لكل غرفة وتصفح خلاطات الأحواض وأنظمة الدُش والإكسسوارات والتشطيبات المتناسقة من شتاينهايم حسب احتياجات مشروعك.",
+    },
+  },
+  shopTheLook: {
+    en: {
+      title: "Shop Complete Bathroom Looks | Steinheim Egypt",
+      description:
+        "Discover coordinated Steinheim bathroom looks and shop matching mixers, showers, accessories, collections, and premium finishes.",
+    },
+    ar: {
+      title: "تسوق إطلالات حمامات متكاملة | شتاينهايم مصر",
+      description:
+        "اكتشف إطلالات حمامات شتاينهايم المتناسقة وتسوق الخلاطات والدُش والإكسسوارات والمجموعات والتشطيبات الفاخرة المتطابقة.",
+    },
+  },
+  threeDShowcase: {
+    en: {
+      title: "3D Product Showcase | Steinheim Egypt",
+      description: "Preview Steinheim bathroom products in an experimental interactive 3D environment.",
+    },
+    ar: {
+      title: "عرض المنتجات ثلاثي الأبعاد | شتاينهايم مصر",
+      description: "استعرض منتجات حمامات شتاينهايم في تجربة تفاعلية ثلاثية الأبعاد.",
+    },
+  },
   trade: {
     en: {
       title: "Trade Studio for Architects & Designers | Steinheim Egypt",
@@ -140,6 +191,16 @@ const staticPageCopy: Record<StaticPageKey, Record<SupportedLocale, SeoCopy>> = 
       title: "استوديو المحترفين للمعماريين والمصممين | شتاينهايم مصر",
       description:
         "أنشئ جداول الغرف ونسّق التشطيبات واطلب الأسعار وأدر مواصفات حمامات شتاينهايم للمشروعات السكنية.",
+    },
+  },
+  tradeRestore: {
+    en: {
+      title: "Restore Trade Project | Steinheim Egypt",
+      description: "Securely restore a saved Steinheim Trade Studio project.",
+    },
+    ar: {
+      title: "استعادة مشروع المحترفين | شتاينهايم مصر",
+      description: "استعد مشروعًا محفوظًا في استوديو شتاينهايم للمحترفين بأمان.",
     },
   },
   warranty: {

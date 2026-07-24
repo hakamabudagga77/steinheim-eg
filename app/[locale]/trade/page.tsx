@@ -72,11 +72,11 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           <div className="mx-auto max-w-[1780px]">
             <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <ScrollReveal>
-                <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("howItWorks")}</p>
+                <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("howItWorks")}</p>
                 <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                   {t("howHeadline")}
                 </h2>
-                <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
+                <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/65">
                   {t("howBody")}
                 </p>
               </ScrollReveal>
@@ -97,11 +97,11 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
               </ScrollReveal>
 
               <ScrollReveal className="lg:order-2">
-                <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("projectBoard.eyebrow")}</p>
+                <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("projectBoard.eyebrow")}</p>
                 <h2 className="mt-4 max-w-xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                   {t("projectBoard.headline")}
                 </h2>
-                <p className="mt-5 max-w-lg text-[15px] leading-[1.85] text-black/50">
+                <p className="mt-5 max-w-lg text-[15px] leading-[1.85] text-black/65">
                   {t("projectBoard.body")}
                 </p>
 
@@ -109,7 +109,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                   {boardItemKeys.map((key) => (
                     <div key={key} className="border-t border-black/10 pt-5">
                       <h3 className="font-heading text-[16px]" style={{ fontStyle: "italic" }}>{t(`projectBoard.items.${key}.title`)}</h3>
-                      <p className="mt-2 text-[13px] leading-[1.7] text-black/50">{t(`projectBoard.items.${key}.body`)}</p>
+                      <p className="mt-2 text-[13px] leading-[1.7] text-black/65">{t(`projectBoard.items.${key}.body`)}</p>
                     </div>
                   ))}
                 </div>
@@ -122,11 +122,11 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
             <ScrollReveal>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("benefits.eyebrow")}</p>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("benefits.eyebrow")}</p>
               <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                 {t("benefits.headline")}
               </h2>
-              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/65">
                 {t("benefits.body")}
               </p>
             </ScrollReveal>
@@ -135,7 +135,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
               {benefitKeys.map((key) => (
                 <div key={key} className="border-t border-black/10 pt-6">
                   <h3 className="font-heading text-[18px]" style={{ fontStyle: "italic" }}>{t(`benefits.items.${key}.title`)}</h3>
-                  <p className="mt-2 text-[13.5px] leading-[1.7] text-black/50">{t(`benefits.items.${key}.body`)}</p>
+                  <p className="mt-2 text-[13.5px] leading-[1.7] text-black/65">{t(`benefits.items.${key}.body`)}</p>
                 </div>
               ))}
             </div>
@@ -160,7 +160,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           <div className="mx-auto max-w-[1780px]">
             <div className="grid items-center gap-10 rounded-[22px] bg-black p-8 text-white sm:p-12 lg:grid-cols-[1.2fr_0.8fr] lg:p-16">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.4em] text-white/35">{t("alreadyKnow")}</p>
+                <p className="text-[11px] uppercase tracking-[0.4em] text-white/70">{t("alreadyKnow")}</p>
                 <h2 className="mt-4 text-[clamp(2rem,4.5vw,4.4rem)] leading-[0.95] tracking-[-0.03em]" style={{ fontStyle: "italic" }}>
                   {t("browseHeadline")}
                 </h2>
