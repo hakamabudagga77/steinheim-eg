@@ -209,19 +209,32 @@ export default function ShowroomReel() {
     let lastCenterCheck = 0;
     let lastTimestamp: number | null = null;
     const pixelsPerSecond = 34;
+    // element.scrollLeft rounds to the nearest integer pixel on *read*, so
+    // recomputing the next position from track.scrollLeft each frame loses
+    // any sub-pixel progress. At high refresh rates the per-frame increment
+    // (pixelsPerSecond / fps) drops below 0.5px and every frame rounds back
+    // down to the same value forever - the marquee never visibly moves.
+    // Tracking position at full precision here, independent of the DOM's
+    // rounded read-back, is what actually lets it accumulate.
+    let position = track.scrollWidth / 3;
 
     const step = (timestamp: number) => {
       if (!running) return;
       const delta = lastTimestamp === null ? 16.67 : Math.min(timestamp - lastTimestamp, 80);
       lastTimestamp = timestamp;
 
-      if (!pausedRef.current) {
+      if (pausedRef.current) {
+        // The user may be manually dragging the track while paused - stay
+        // synced so resuming continues from their position, not a stale one.
+        position = track.scrollLeft;
+      } else {
         const singleSetWidth = track.scrollWidth / 3;
-        if (singleSetWidth > 0 && track.scrollLeft < singleSetWidth * 0.5) {
-          track.scrollLeft += singleSetWidth;
+        if (singleSetWidth > 0 && position < singleSetWidth * 0.5) {
+          position += singleSetWidth;
         }
-        const next = track.scrollLeft + (pixelsPerSecond * delta) / 1000;
-        track.scrollLeft = next >= singleSetWidth * 2 ? next - singleSetWidth : next;
+        const next = position + (pixelsPerSecond * delta) / 1000;
+        position = next >= singleSetWidth * 2 ? next - singleSetWidth : next;
+        track.scrollLeft = position;
       }
 
       if (timestamp - lastCenterCheck > 120) {
@@ -325,6 +338,7 @@ export default function ShowroomReel() {
       <div className="overflow-hidden">
         <div
           ref={trackRef}
+          data-lenis-prevent
           onPointerEnter={(e) => {
             if (e.pointerType === "mouse") setHoverPaused(true);
           }}
