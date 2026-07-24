@@ -214,11 +214,30 @@ function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTrans
                     : "border border-charcoal/15 text-warm-gray"
               }`}
             >
-              {i < activeIndex ? (
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-              ) : (
-                i + 1
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                {i < activeIndex ? (
+                  <motion.svg
+                    key="check"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ duration: 0.2 }}
+                    width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </motion.svg>
+                ) : (
+                  <motion.span
+                    key="digit"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {i + 1}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </div>
             {i < SCREEN_KEYS.length - 1 && <div className={`h-[2px] flex-1 transition-colors duration-300 ${i < activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />}
           </div>
