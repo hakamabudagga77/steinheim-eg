@@ -14,57 +14,142 @@ const HEADLINE_KEY: Record<(typeof SCREEN_KEYS)[number], string> = {
 
 const SCREEN_INTERVAL_MS = 4000;
 
+// Reveals `text` one character at a time starting after `startDelay`, with a
+// blinking caret while still typing. A fresh mount (screen change) is what
+// resets it - no effect-driven state reset needed.
+function TypewriterText({ text, startDelay = 0, speed = 40 }: { text: string; startDelay?: number; speed?: number }) {
+  const [length, setLength] = useState(0);
+
+  useEffect(() => {
+    let i = 0;
+    let intervalId: number | undefined;
+    const startId = window.setTimeout(() => {
+      intervalId = window.setInterval(() => {
+        i += 1;
+        setLength(i);
+        if (i >= text.length && intervalId) window.clearInterval(intervalId);
+      }, speed);
+    }, startDelay);
+    return () => {
+      window.clearTimeout(startId);
+      if (intervalId) window.clearInterval(intervalId);
+    };
+  }, [text, startDelay, speed]);
+
+  const done = length >= text.length;
+  return (
+    <>
+      {text.slice(0, length)}
+      {!done && <span className="animate-pulse">|</span>}
+    </>
+  );
+}
+
 function IntroScreen() {
   const t = useTranslations("tradePage.howShowcase.mock");
+  const name = t("introName");
   return (
     <div className="space-y-3">
       <div className="border border-charcoal bg-charcoal px-4 py-3 text-[12px] font-medium text-white">
         {t("introPersona")}
       </div>
-      <div className="border border-charcoal/10 bg-white px-4 py-3 text-[13px] text-charcoal">{t("introName")}</div>
-      <div className="border border-charcoal/10 bg-white px-4 py-3 text-[13px] text-warm-gray">{t("introEmail")}</div>
+      <div className="border border-charcoal/10 bg-white px-4 py-3 text-[13px] text-charcoal">
+        <TypewriterText text={name} startDelay={300} />
+      </div>
+      <div className="border border-charcoal/10 bg-white px-4 py-3 text-[13px] text-warm-gray">
+        <TypewriterText text={t("introEmail")} startDelay={300 + name.length * 40 + 200} />
+      </div>
     </div>
   );
 }
 
 function RoomsScreen() {
   const t = useTranslations("tradePage.howShowcase.mock");
-  const rows: Array<[string, string]> = [
-    [t("roomsMaster"), t("roomsMasterCount")],
-    [t("roomsStandard"), t("roomsStandardCount")],
-    [t("roomsPowder"), t("roomsPowderCount")],
+  const rows: Array<[string, number, number]> = [
+    [t("roomsMaster"), Number(t("roomsMasterCount")), 0],
+    [t("roomsStandard"), Number(t("roomsStandardCount")), 300],
+    [t("roomsPowder"), Number(t("roomsPowderCount")), 600],
   ];
   return (
     <div className="space-y-2">
-      {rows.map(([label, count]) => (
-        <div key={label} className="flex items-center justify-between gap-3 border border-charcoal/10 bg-white px-4 py-3">
-          <p className="text-[13px] text-charcoal">{label}</p>
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center border border-charcoal/15 text-[11px] text-charcoal">{count}</span>
-        </div>
+      {rows.map(([label, target, delay]) => (
+        <RoomCountRow key={label} label={label} target={target} delay={delay} />
       ))}
+    </div>
+  );
+}
+
+function RoomCountRow({ label, target, delay }: { label: string; target: number; delay: number }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let n = 0;
+    let intervalId: number | undefined;
+    const startId = window.setTimeout(() => {
+      intervalId = window.setInterval(() => {
+        n += 1;
+        setCount(n);
+        if (n >= target && intervalId) window.clearInterval(intervalId);
+      }, 180);
+    }, delay);
+    return () => {
+      window.clearTimeout(startId);
+      if (intervalId) window.clearInterval(intervalId);
+    };
+  }, [target, delay]);
+
+  return (
+    <div className="flex items-center justify-between gap-3 border border-charcoal/10 bg-white px-4 py-3">
+      <p className="text-[13px] text-charcoal">{label}</p>
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center border border-charcoal/15 text-[11px] text-charcoal">{count}</span>
     </div>
   );
 }
 
 function NeedsScreen() {
   const t = useTranslations("tradePage.howShowcase.mock");
-  const checkedRows: Array<[string, string]> = [
+  const [selected, setSelected] = useState(0);
+  const rows: Array<[string, string]> = [
     [t("needsBasin"), t("needsBasinQty")],
     [t("needsShower"), t("needsShowerQty")],
   ];
+
+  useEffect(() => {
+    const timers = [
+      window.setTimeout(() => setSelected(1), 500),
+      window.setTimeout(() => setSelected(2), 1300),
+    ];
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, []);
+
   return (
     <div className="space-y-2">
-      {checkedRows.map(([label, qty]) => (
-        <div key={label} className="flex items-center justify-between gap-3 border border-charcoal bg-white px-4 py-3">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-charcoal text-white">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-            </span>
-            <p className="text-[13px] text-charcoal">{label}</p>
+      {rows.map(([label, qty], i) => {
+        const checked = selected > i;
+        return (
+          <div key={label} className={`flex items-center justify-between gap-3 border bg-white px-4 py-3 transition-colors ${checked ? "border-charcoal" : "border-charcoal/10"}`}>
+            <div className="flex items-center gap-2.5">
+              <AnimatePresence mode="wait">
+                {checked ? (
+                  <motion.span
+                    key="checked"
+                    initial={{ scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-charcoal text-white"
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                  </motion.span>
+                ) : (
+                  <span key="unchecked" className="h-5 w-5 shrink-0 rounded-full border border-charcoal/25" />
+                )}
+              </AnimatePresence>
+              <p className="text-[13px] text-charcoal">{label}</p>
+            </div>
+            {checked && <span className="text-[11px] text-warm-gray">{qty}</span>}
           </div>
-          <span className="text-[11px] text-warm-gray">{qty}</span>
-        </div>
-      ))}
+        );
+      })}
       <div className="flex items-center gap-2.5 border border-charcoal/10 bg-white px-4 py-3 opacity-50">
         <span className="h-5 w-5 shrink-0 rounded-full border border-charcoal/25" />
         <p className="text-[13px] text-charcoal">{t("needsWallMounted")}</p>
@@ -75,10 +160,17 @@ function NeedsScreen() {
 
 function ShopScreen() {
   const t = useTranslations("tradePage.howShowcase.mock");
+  const [pressed, setPressed] = useState(false);
   const rows: Array<[string, string]> = [
     [t("shopProduct1"), t("shopProduct1Meta")],
     [t("shopProduct2"), t("shopProduct2Meta")],
   ];
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setPressed(true), 1700);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <div className="space-y-2">
       {rows.map(([label, meta]) => (
@@ -87,9 +179,13 @@ function ShopScreen() {
           <p className="mt-0.5 text-[11px] text-warm-gray">{meta}</p>
         </div>
       ))}
-      <div className="flex h-[42px] items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white">
+      <motion.div
+        animate={pressed ? { scale: [1, 0.96, 1] } : {}}
+        transition={{ duration: 0.25 }}
+        className="flex h-[42px] items-center justify-center bg-charcoal text-[9px] font-medium uppercase tracking-[0.15em] text-white"
+      >
         {t("shopCta")}
-      </div>
+      </motion.div>
     </div>
   );
 }
