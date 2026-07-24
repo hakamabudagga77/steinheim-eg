@@ -9,9 +9,19 @@ import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 import ProjectBoardShowcase from "@/components/trade/ProjectBoardShowcase";
 import TradeStudioShowcase from "@/components/trade/TradeStudioShowcase";
 import GetProjectLinkButton from "@/components/trade/GetProjectLinkButton";
+import { getStaticPageMetadata } from "@/lib/seo";
 
 const boardItemKeys = ["track", "message", "quote", "documents", "samples"] as const;
 const benefitKeys = ["pricing", "support", "scheduling", "access"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/trade", "trade");
+}
 
 export default async function TradePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageTransition from "@/components/layout/PageTransition";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Returns & Exchange Policy | Steinheim Egypt",
-  description:
-    "Return and exchange policy for Steinheim premium bathroom fixtures. 14-day return window for unused products in original packaging.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/returns", "returns");
+}
 
 const sectionKeys = [
   "eligibility",

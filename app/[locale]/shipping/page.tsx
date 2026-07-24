@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageTransition from "@/components/layout/PageTransition";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Shipping Policy | Steinheim Egypt",
-  description:
-    "Delivery information for Steinheim premium bathroom fixtures across Egypt. Free shipping on orders above LE 15,000 within Greater Cairo.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/shipping", "shipping");
+}
 
 const sectionKeys = [
   "deliveryAreas",

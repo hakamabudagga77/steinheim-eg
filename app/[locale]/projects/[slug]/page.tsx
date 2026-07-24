@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import PageTransition from "@/components/layout/PageTransition";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { getProjectReference, projectReferences } from "@/data/project-references";
+import { createLocalizedMetadata, normalizeLocale } from "@/lib/seo";
 
 export function generateStaticParams() {
   return projectReferences.map((project) => ({ slug: project.slug }));
@@ -13,19 +14,29 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const project = getProjectReference(slug);
 
   if (!project) {
     return { title: "Project Not Found | Steinheim Egypt" };
   }
 
-  return {
-    title: `${project.name} | Projects | Steinheim Egypt`,
-    description: project.intro || `Discover our luxury project reference: ${project.name}`,
-  };
+  const normalizedLocale = normalizeLocale(locale);
+  return createLocalizedMetadata({
+    locale,
+    path: `/projects/${slug}`,
+    title:
+      normalizedLocale === "ar"
+        ? `${project.name} | مشروعات شتاينهايم`
+        : `${project.name} | Steinheim Project Reference`,
+    description:
+      project.intro ||
+      (normalizedLocale === "ar"
+        ? `اكتشف مشروع ${project.name} السكني الفاخر مع أنظمة حمامات شتاينهايم.`
+        : `Discover the ${project.name} luxury residential project reference with Steinheim bathroom systems.`),
+  });
 }
 
 export default async function ProjectReferencePage({

@@ -4,8 +4,18 @@ import PageTransition from "@/components/layout/PageTransition";
 import ProductCard from "@/components/product/ProductCard";
 import { computeBestSellers } from "@/lib/best-sellers";
 import { fetchOrders } from "@/lib/shopify-client";
+import { getStaticPageMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/best-sellers", "bestSellers");
+}
 
 async function getBestSellers() {
   try {
