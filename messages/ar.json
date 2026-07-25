@@ -382,6 +382,17 @@
     "soundOn": "تشغيل صوت الفيديو",
     "soundOff": "كتم صوت الفيديو"
   },
+  "catalogue3d": {
+    "eyebrow": "المجموعة الكاملة",
+    "headline": "كل صفحة في مكان واحد.",
+    "body": "استكشف كتالوج شتاينهايم الكامل — تصفحه كما تفعل في النسخة المطبوعة، هنا مباشرة.",
+    "openHint": "اضغط لفتح الكتالوج",
+    "openCta": "افتح الكتالوج",
+    "closeLabel": "إغلاق الكتالوج",
+    "loading": "جارٍ تحميل الكتالوج…",
+    "pageOf": "صفحة {current} من {total}",
+    "downloadPdf": "تنزيل ملف PDF بدلاً من ذلك"
+  },
   "productPage": {
     "breadcrumb": { "home": "الرئيسية", "collections": "المجموعات" },
     "collectionLabel": "مجموعة {series}",

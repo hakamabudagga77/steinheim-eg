@@ -6,6 +6,7 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import ShowroomReel from "@/components/home/ShowroomReel";
+import CatalogueShowcase from "@/components/home/CatalogueShowcase";
 import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
@@ -382,6 +383,7 @@ export default function GessiInspiredHome() {
       </section>
 
       <ShowroomReel />
+      <CatalogueShowcase />
     </div>
   );
 }

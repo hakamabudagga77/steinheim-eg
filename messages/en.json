@@ -382,6 +382,17 @@
     "soundOn": "Turn video sound on",
     "soundOff": "Mute video"
   },
+  "catalogue3d": {
+    "eyebrow": "The full collection",
+    "headline": "Every page, in one place.",
+    "body": "Explore the complete Steinheim catalogue — turn through it the way you would in print, right here.",
+    "openHint": "Tap to open the catalogue",
+    "openCta": "Open the catalogue",
+    "closeLabel": "Close catalogue",
+    "loading": "Loading catalogue…",
+    "pageOf": "Page {current} of {total}",
+    "downloadPdf": "Download the PDF instead"
+  },
   "productPage": {
     "breadcrumb": { "home": "Home", "collections": "Collections" },
     "collectionLabel": "{series} Collection",
