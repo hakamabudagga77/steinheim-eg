@@ -63,7 +63,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated.current) return;
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    try {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    } catch {
+      // Ignore write failures (private mode, quota exceeded, storage disabled).
+    }
   }, [cart]);
 
   useEffect(() => {

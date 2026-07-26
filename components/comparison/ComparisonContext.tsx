@@ -51,7 +51,11 @@ export function ComparisonProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!hydrated.current) return;
-    window.localStorage.setItem(COMPARISON_STORAGE_KEY, JSON.stringify(comparison));
+    try {
+      window.localStorage.setItem(COMPARISON_STORAGE_KEY, JSON.stringify(comparison));
+    } catch {
+      // Ignore write failures (private mode, quota exceeded, storage disabled).
+    }
   }, [comparison]);
 
   useEffect(() => {

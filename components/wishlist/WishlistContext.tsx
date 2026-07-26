@@ -49,7 +49,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated.current) return;
-    window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
+    try {
+      window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
+    } catch {
+      // Ignore write failures (private mode, quota exceeded, storage disabled).
+    }
   }, [wishlist]);
 
   useEffect(() => {
