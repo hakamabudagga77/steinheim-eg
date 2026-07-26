@@ -308,6 +308,7 @@ export default function CommandPalette() {
                 <Search className="h-4 w-4 shrink-0 text-white/30" />
                 <input
                   ref={inputRef}
+                  aria-label="Search orders, customers, leads, products"
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);

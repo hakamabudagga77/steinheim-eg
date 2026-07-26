@@ -70,7 +70,7 @@ function FulfillModal({
       >
         <div className="flex items-center justify-between">
           <p className="text-[15px] font-medium text-white">Mark {order.name} fulfilled</p>
-          <button type="button" onClick={onClose} className="text-white/40 hover:text-white/80">
+          <button type="button" aria-label="Close" onClick={onClose} className="text-white/40 hover:text-white/80">
             <X className="h-4 w-4" />
           </button>
         </div>
