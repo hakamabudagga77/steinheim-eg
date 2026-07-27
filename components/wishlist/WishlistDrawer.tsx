@@ -10,6 +10,7 @@ import { getProductImage } from "@/data/images";
 import { encodeWishlistItems } from "@/lib/wishlist";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useCart } from "@/components/cart/CartContext";
+import Modal from "@/components/ui/Modal";
 
 export default function WishlistDrawer({ locale }: { locale: string }) {
   const t = useTranslations("wishlistDrawer");
@@ -44,24 +45,25 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
     }];
   });
 
-  // Not wrapped in AnimatePresence: several rows above navigate via next-intl
-  // Link while also calling setOpen(false) in the same click, and Framer
-  // Motion's exit lifecycle can be interrupted by that concurrent route
-  // change, leaving an invisible-but-clickable backdrop stuck over the page.
-  // A plain conditional render unmounts synchronously and can never get stuck.
-  if (!open) return null;
-
+  // Wrapped in the shared Modal primitive (centered={false} → it renders the
+  // backdrop and this panel as siblings), which gives this drawer the dialog
+  // a11y it was missing: focus moves in on open, Tab/Shift+Tab are trapped,
+  // Escape closes, and focus is restored on close. Modal also deliberately has
+  // no exit animation, which matches this drawer's synchronous unmount — rows
+  // above navigate via next-intl Link while calling setOpen(false) in the same
+  // click, and a Framer exit interrupted by that navigation would leave an
+  // invisible-but-clickable backdrop stuck over the page.
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
-        onClick={() => setOpen(false)}
-      />
-
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      backdropClassName="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
+      backdropTransition={{ duration: 0.3 }}
+    >
       <motion.aside
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wishlist-drawer-title"
         initial={{ x: isArabic ? "-100%" : "100%" }}
         animate={{ x: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 0.76, 0.2, 1] }}
@@ -71,7 +73,7 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
             <header className="shrink-0 border-b border-charcoal/8 px-5 sm:px-7 py-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-heading text-[26px] leading-tight">{t("title")}</h2>
+                  <h2 id="wishlist-drawer-title" className="font-heading text-[26px] leading-tight">{t("title")}</h2>
                   <p className="mt-0.5 text-[11px] text-warm-gray">
                     {itemCount === 0 ? t("noItems") : t("itemCount", { count: itemCount })}
                   </p>
@@ -205,6 +207,6 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
               )}
             </div>
       </motion.aside>
-    </>
+    </Modal>
   );
 }
