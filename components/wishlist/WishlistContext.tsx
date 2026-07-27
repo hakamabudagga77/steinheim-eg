@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   createEmptyWishlist,
   sanitizeWishlist,
@@ -35,26 +35,28 @@ function readStoredWishlist() {
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<Wishlist>(createEmptyWishlist);
   const [open, setOpen] = useState(false);
-  const hydrated = useRef(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const parsed = readStoredWishlist();
-      hydrated.current = true;
       if (parsed) setWishlist(parsed);
+      setHydrated(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
   }, []);
 
+  // Depends on `hydrated` (state, not a ref) so it re-runs once hydration
+  // finishes — otherwise an add that lands before hydration is never persisted.
   useEffect(() => {
-    if (!hydrated.current) return;
+    if (!hydrated) return;
     try {
       window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist));
     } catch {
       // Ignore write failures (private mode, quota exceeded, storage disabled).
     }
-  }, [wishlist]);
+  }, [wishlist, hydrated]);
 
   useEffect(() => {
     function sync(e: StorageEvent) {

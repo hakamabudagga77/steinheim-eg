@@ -39,7 +39,7 @@ function readStoredCart() {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart>(createEmptyCart);
   const [open, setOpen] = useState(false);
-  const hydrated = useRef(false);
+  const [hydrated, setHydrated] = useState(false);
   const cartIconRef = useRef<HTMLButtonElement | null>(null);
   const [bump, setBump] = useState(0);
   const { fly, FlightLayer } = useFlyAnimation(cartIconRef);
@@ -54,21 +54,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const parsed = readStoredCart();
-      hydrated.current = true;
       if (parsed) setCart(parsed);
+      setHydrated(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
   }, []);
 
+  // Depends on `hydrated` (state, not a ref) so it re-runs the moment hydration
+  // finishes — otherwise an add-to-cart that lands before hydration completes
+  // runs this effect while hydration is still false and is never persisted.
   useEffect(() => {
-    if (!hydrated.current) return;
+    if (!hydrated) return;
     try {
       window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     } catch {
       // Ignore write failures (private mode, quota exceeded, storage disabled).
     }
-  }, [cart]);
+  }, [cart, hydrated]);
 
   useEffect(() => {
     function sync(e: StorageEvent) {
