@@ -12,10 +12,10 @@ test("web vitals are reported through gtag", async ({ page }) => {
   });
 
   await page.goto("/en");
-  await page.waitForLoadState("networkidle");
 
   // TTFB/FCP report shortly after hydration; nudge the page so INP/CLS have
-  // something to observe too.
+  // something to observe too. The poll below is the real wait — no need for
+  // networkidle, which never settles on a page with autoplaying media.
   await page.mouse.click(200, 200);
 
   await expect
