@@ -13,9 +13,9 @@ export default function Footer({ dark = true }: { dark?: boolean }) {
   const tPrivacy = useTranslations("privacyPage");
 
   const borderClass = dark ? "border-white/6" : "border-black/8";
-  const headingClass = dark ? "text-white/30" : "text-black/35";
+  const headingClass = dark ? "text-white/55" : "text-black/55";
   const linkClass = dark ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black";
-  const mutedTextClass = dark ? "text-white/25" : "text-black/45";
+  const mutedTextClass = dark ? "text-white/55" : "text-black/55";
 
   const columns: { heading: string; links: { label: string; href: string }[] }[] = [
     {
@@ -84,14 +84,14 @@ export default function Footer({ dark = true }: { dark?: boolean }) {
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
-              className={dark ? "text-white/20" : "text-black/35"}
+              className={dark ? "text-white/55" : "text-black/55"}
             >
               <circle cx="12" cy="12" r="10" />
               <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
             </svg>
-            <p className={`text-[10px] uppercase tracking-[0.12em] ${dark ? "text-white/25" : "text-black/45"}`}>{t("localeLabel")}</p>
+            <p className={`text-[10px] uppercase tracking-[0.12em] ${dark ? "text-white/55" : "text-black/55"}`}>{t("localeLabel")}</p>
           </div>
-          <p className={`text-[10px] tracking-[0.08em] ${dark ? "text-white/15" : "text-black/35"}`}>
+          <p className={`text-[10px] tracking-[0.08em] ${dark ? "text-white/55" : "text-black/55"}`}>
             &copy; {new Date().getFullYear()} Steinheim. {t("rights")}.
           </p>
         </div>

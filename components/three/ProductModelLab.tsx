@@ -71,6 +71,14 @@ const models = [
     origin: "Bottom",
     note: "This one is light enough for web and could become the hero 3D product.",
   },
+  {
+    name: "Catalogue 2026 (compressed)",
+    slug: "catalogue-2026",
+    file: "/models/catalogue-2026.glb",
+    scale: "Meshy scan, gltf-transform simplify+prune (geometry only), 9.5 MB",
+    origin: "Center",
+    note: "Homepage catalogue showcase asset. Meshopt geometry compression and WebP texture re-encoding both broke texture loading in testing, so this keeps the original Meshy JPEG textures and only optimizes geometry.",
+  },
 ];
 
 const heroModel = models.find((model) => model.slug === "joy-free-standing-bath-mixer") ?? models[0];

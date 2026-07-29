@@ -22,7 +22,6 @@ import {
   type RoomKey,
 } from "@/lib/trade-schedule";
 import { getVariantMosaicForType } from "@/lib/utils";
-import { getProductImage, getProductDefaultImage } from "@/data/images";
 import ShopProductsStep from "@/components/trade/ShopProductsStep";
 import { useRoomSetupState } from "@/components/trade/useRoomSetupState";
 
@@ -145,7 +144,7 @@ export default function SmartRoomCalculator() {
                   )}
                 </div>
                 <span className={`text-[9px] font-medium uppercase tracking-[0.12em] transition-colors ${
-                  i <= step ? "text-charcoal" : "text-warm-gray/50"
+                  i <= step ? "text-charcoal" : "text-charcoal/65"
                 } hidden sm:block`}>
                   {t(`steps.${key}`)}
                 </span>
@@ -161,7 +160,7 @@ export default function SmartRoomCalculator() {
             <div>
               <div className="text-start">
                 <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step0.headline")}</h3>
-                <p className="mb-8 text-[13px] text-warm-gray">
+                <p className="mb-8 text-[13px] text-charcoal/65">
                   {t("step0.body")}
                 </p>
               </div>
@@ -266,7 +265,7 @@ export default function SmartRoomCalculator() {
             <div>
               <div className="text-start">
                 <h3 className="mb-2 font-heading text-[22px] text-charcoal">{personaConfig?.roomsTitle ?? t("step1.defaultHeadline")}</h3>
-                <p className="mb-8 text-[13px] text-warm-gray">
+                <p className="mb-8 text-[13px] text-charcoal/65">
                   {personaConfig?.roomsBody ?? t("step1.defaultBody")}
                 </p>
               </div>
@@ -414,7 +413,7 @@ export default function SmartRoomCalculator() {
             <div>
               <div className="text-start">
                 <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step2.headline")}</h3>
-                <p className="mb-8 text-[13px] text-warm-gray">
+                <p className="mb-8 text-[13px] text-charcoal/65">
                   {t("step2.body")}
                 </p>
               </div>
@@ -464,21 +463,17 @@ export default function SmartRoomCalculator() {
                                           gridTemplateRows: `repeat(${mosaicRows}, 1fr)`,
                                         }}
                                       >
-                                        {mosaic.map(({ product, finish }) => {
-                                          const cellImg = getProductImage(product.slug, finish) ?? getProductDefaultImage(product.slug);
-                                          if (!cellImg) return null;
-                                          return (
-                                            <div key={product.slug} className="relative">
-                                              <Image
-                                                src={cellImg}
-                                                alt={REQUIREMENT_TYPE_LABELS[type]}
-                                                fill
-                                                sizes={mosaic.length > 1 ? "(max-width: 768px) 25vw, 12vw" : "(max-width: 768px) 50vw, 25vw"}
-                                                className={mosaic.length > 1 ? "object-contain p-[10%]" : "object-contain p-[16%]"}
-                                              />
-                                            </div>
-                                          );
-                                        })}
+                                        {mosaic.map(({ product, image }) => (
+                                          <div key={product.slug} className="relative">
+                                            <Image
+                                              src={image}
+                                              alt={REQUIREMENT_TYPE_LABELS[type]}
+                                              fill
+                                              sizes={mosaic.length > 1 ? "(max-width: 768px) 25vw, 12vw" : "(max-width: 768px) 50vw, 25vw"}
+                                              className={mosaic.length > 1 ? "object-contain p-[10%]" : "object-contain p-[16%]"}
+                                            />
+                                          </div>
+                                        ))}
                                       </div>
                                       {checked && (
                                         <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-charcoal text-white">
@@ -548,7 +543,7 @@ export default function SmartRoomCalculator() {
             <div>
               <div className="text-start">
                 <h3 className="mb-2 font-heading text-[22px] text-charcoal">{t("step3.headline")}</h3>
-                <p className="mb-8 text-[13px] text-warm-gray">
+                <p className="mb-8 text-[13px] text-charcoal/65">
                   {t("step3.body")}
                 </p>
               </div>

@@ -382,6 +382,17 @@
     "soundOn": "تشغيل صوت الفيديو",
     "soundOff": "كتم صوت الفيديو"
   },
+  "catalogue3d": {
+    "eyebrow": "المجموعة الكاملة",
+    "headline": "كل صفحة في مكان واحد.",
+    "body": "استكشف كتالوج شتاينهايم الكامل — تصفحه كما تفعل في النسخة المطبوعة، هنا مباشرة.",
+    "openHint": "اضغط لفتح الكتالوج",
+    "openCta": "افتح الكتالوج",
+    "closeLabel": "إغلاق الكتالوج",
+    "loading": "جارٍ تحميل الكتالوج…",
+    "pageOf": "صفحة {current} من {total}",
+    "downloadPdf": "تنزيل ملف PDF بدلاً من ذلك"
+  },
   "productPage": {
     "breadcrumb": { "home": "الرئيسية", "collections": "المجموعات" },
     "collectionLabel": "مجموعة {series}",
@@ -835,6 +846,30 @@
       "rooms": { "title": "الغرف", "body": "أدخِل تكوين غرف عقارك مرة واحدة — الجناح الرئيسي، القياسي، دورة مياه الضيوف، الجناح، أو أضِف غرفك الخاصة." },
       "needs": { "title": "ما هو مطلوب", "body": "لكل غرفة، حدِّد أنواع المنتجات التي تحتاجها — خلاطات مغاسل، دُش، والمزيد — مع الكميات." },
       "shop": { "title": "تسوَّق المنتجات", "body": "تصفَّح منتجات حقيقية مُفلترة بالضبط لِما حدَّدته كمطلوب، اختر التشطيبات والكميات، وأضِف كل شيء إلى لوحة مشروعك." }
+    },
+    "howShowcase": {
+      "previewLabel": "معاينة توضيحية لحاسبة الغرف",
+      "mock": {
+        "introPersona": "الفنادق والضيافة",
+        "introName": "ليلى حسن",
+        "introEmail": "layla@grandnile-hotels.com",
+        "roomsMaster": "الحمّامات الرئيسية",
+        "roomsMasterCount": "2",
+        "roomsStandard": "الحمّامات القياسية",
+        "roomsStandardCount": "4",
+        "roomsPowder": "دورات مياه الضيوف",
+        "roomsPowderCount": "1",
+        "needsBasin": "خلاط مغسلة",
+        "needsBasinQty": "الكمية 2",
+        "needsShower": "دُش مدمج",
+        "needsShowerQty": "الكمية 2",
+        "needsWallMounted": "خلاط مغسلة حائطي",
+        "shopProduct1": "خلاط مغسلة آرت",
+        "shopProduct1Meta": "أسود مطفي · الكمية 2",
+        "shopProduct2": "دُش آرت المدمج",
+        "shopProduct2Meta": "أسود مطفي · الكمية 2",
+        "shopCta": "أضِف إلى لوحة المشروع"
+      }
     },
     "projectBoard": {
       "eyebrow": "أبعد من عرض السعر",

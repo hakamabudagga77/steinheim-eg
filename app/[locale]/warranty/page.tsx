@@ -4,6 +4,16 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import PageTransition from "@/components/layout/PageTransition";
+import { getStaticPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/warranty", "warranty");
+}
 
 export default async function WarrantyPage({
   params,
@@ -42,7 +52,7 @@ function WarrantyPageContent() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/40 to-charcoal/20" />
         <div className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-[1600px] px-5 pb-14 sm:px-8 sm:pb-20 lg:px-10">
-          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.25em] text-white/50">
+          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.25em] text-white/70">
             {t("assurance")}
           </p>
           <h1 className="max-w-3xl font-heading text-[clamp(3rem,7vw,7rem)] leading-[0.85]">
@@ -58,7 +68,7 @@ function WarrantyPageContent() {
         <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-10">
           <ScrollReveal>
             <div className="mb-14 max-w-2xl">
-              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-warm-gray">
+              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-charcoal/70">
                 {t("coverageTiers")}
               </p>
               <h2 className="mt-4 font-heading text-[clamp(2rem,4vw,3.8rem)] leading-[1] text-charcoal">
@@ -79,7 +89,7 @@ function WarrantyPageContent() {
                   </p>
                   <div className="mt-auto pt-6">
                     <div className="mb-3 h-px w-8 bg-charcoal/15" />
-                    <p className="text-[12px] leading-[1.65] text-warm-gray">
+                    <p className="text-[12px] leading-[1.65] text-charcoal/70">
                       {tier.note}
                     </p>
                   </div>
@@ -89,7 +99,7 @@ function WarrantyPageContent() {
           </div>
 
           <ScrollReveal>
-            <p className="mt-8 text-[12px] tracking-wide text-warm-gray">
+            <p className="mt-8 text-[12px] tracking-wide text-charcoal/70">
               {t("validInEgypt")}
             </p>
           </ScrollReveal>
@@ -99,7 +109,7 @@ function WarrantyPageContent() {
       <section className="bg-white py-20 sm:py-28">
         <div className="mx-auto grid max-w-[1600px] gap-10 px-5 sm:px-8 lg:grid-cols-[0.55fr_1fr] lg:gap-16 lg:px-10">
           <ScrollReveal>
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-warm-gray">
+            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-charcoal/70">
               {t("filingClaim")}
             </p>
             <h2 className="mt-4 font-heading text-[clamp(2rem,4vw,3.8rem)] leading-[1] text-charcoal">
@@ -142,7 +152,7 @@ function WarrantyPageContent() {
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-charcoal/30 to-charcoal/70" />
         <div className="relative z-10 mx-auto grid max-w-[1600px] gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_auto] lg:items-center lg:px-10">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">
+            <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/70">
               {t("needHelp")}
             </p>
             <h2 className="mt-4 max-w-3xl font-heading text-[clamp(2.2rem,4.8vw,5rem)] leading-[0.95]">

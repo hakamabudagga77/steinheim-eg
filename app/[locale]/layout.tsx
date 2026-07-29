@@ -24,6 +24,11 @@ const plexArabic = IBM_Plex_Sans_Arabic({
   weight: ["400", "500"],
   variable: "--font-arabic-body",
   display: "swap",
+  // The same dynamic layout serves English and Arabic. Preloading here makes
+  // English pages download both Arabic weights even though their unicode
+  // ranges cannot match any English text. Arabic pages still fetch the font
+  // normally as soon as the stylesheet applies it.
+  preload: false,
 });
 
 const amiri = Amiri({
@@ -31,6 +36,7 @@ const amiri = Amiri({
   weight: ["400", "700"],
   variable: "--font-arabic-heading",
   display: "swap",
+  preload: false,
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";

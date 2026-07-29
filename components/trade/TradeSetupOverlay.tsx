@@ -141,7 +141,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                         i + 1
                       )}
                     </div>
-                    <span className={`text-[9px] font-medium uppercase tracking-[0.1em] ${i <= step ? "text-charcoal" : "text-warm-gray/50"}`}>
+                    <span className={`text-[9px] font-medium uppercase tracking-[0.1em] ${i <= step ? "text-charcoal" : "text-charcoal/65"}`}>
                       {t(`steps.${key}`)}
                     </span>
                     {i < STEP_KEYS.length - 1 && <div className="h-px flex-1 bg-charcoal/10" />}

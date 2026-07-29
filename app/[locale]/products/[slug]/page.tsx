@@ -5,20 +5,37 @@ import ProductDetailClient from "@/components/product/ProductDetailClient";
 import { getProductBySlug, getSeriesById } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
 import { getLiveProductData } from "@/lib/shopify-live-data";
+import { createLocalizedMetadata, normalizeLocale } from "@/lib/seo";
 
 type ProductPageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return { title: "Product not found | Steinheim" };
   const series = getSeriesById(product.series);
+  const normalizedLocale = normalizeLocale(locale);
+  const title =
+    normalizedLocale === "ar"
+      ? `${series?.name ?? product.series} ${product.name} | شتاينهايم مصر`
+      : `${series?.name ?? product.series} ${product.name} | Steinheim Egypt`;
+  const description =
+    normalizedLocale === "ar"
+      ? `اكتشف ${product.name} من مجموعة ${series?.name ?? product.series}، مع التشطيبات وأرقام الموديلات والأسعار المرجعية والمواصفات التقنية.`
+      : `${product.name} from the Steinheim ${series?.name ?? product.series} collection. Explore verified finishes, model numbers, retail-reference prices, and technical specifications.`;
+  const baseMetadata = createLocalizedMetadata({
+    locale,
+    path: `/products/${slug}`,
+    title,
+    description,
+  });
+
   return {
-    title: `${series?.name ?? product.series} ${product.name} | Steinheim Egypt`,
-    description: `${product.name} from the Steinheim ${series?.name ?? product.series} collection. Explore verified finishes, model numbers, retail-reference prices, and technical specifications.`,
+    ...baseMetadata,
     openGraph: {
+      ...baseMetadata.openGraph,
       images: getProductImage(product.slug, product.variants[0].finish)
         ? [getProductImage(product.slug, product.variants[0].finish)!]
         : [],

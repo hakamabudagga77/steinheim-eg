@@ -14,14 +14,20 @@ const withAnalyzer = withBundleAnalyzer({ enabled: process.env.ANALYZE === "true
 
 // Known third-party origins the site actually loads: Google Analytics
 // (gtag.js + beacons), Google's <model-viewer> CDN build (used by the 3D
-// product viewers), and Shopify's checkout domain the cart hands off to.
+// product viewers), Vercel Speed Insights (rendered in app/[locale]/layout.tsx),
+// and Shopify's checkout domain the cart hands off to.
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://ajax.googleapis.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://ajax.googleapis.com https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
+  // blob: is required here (not just in img-src) because <model-viewer>'s
+  // GLTFLoader fetches embedded glTF textures via fetch() on a blob: URL it
+  // creates itself - without this, that fetch is CSP-blocked (a generic
+  // "TypeError: Failed to fetch", no console CSP warning), silently breaking
+  // textures on every 3D model on the site.
+  "connect-src 'self' blob: https://www.google-analytics.com https://region1.google-analytics.com https://*.googleapis.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com",
   "frame-src 'self' https:",
   "media-src 'self' https:",
   "object-src 'none'",
