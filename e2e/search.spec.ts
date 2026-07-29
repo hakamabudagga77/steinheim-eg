@@ -4,7 +4,6 @@ import { test, expect } from "@playwright/test";
 // data) — no backend needed.
 test("Cmd+K search finds a product and navigates to it", async ({ page }) => {
   await page.goto("/en");
-  await page.waitForLoadState("networkidle");
 
   const input = page.getByPlaceholder(/search products/i);
 
