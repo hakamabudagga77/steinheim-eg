@@ -14,6 +14,9 @@ export async function POST(request: Request) {
   if (!(await checkRateLimit(request, "contact", 5, 60 * 60))) {
     return Response.json({ error: "Too many submissions." }, { status: 429 });
   }
+  if (Number(request.headers.get("content-length") || 0) > 20_000) {
+    return Response.json({ error: "Request is too large." }, { status: 413 });
+  }
 
   const body = (await request.json().catch(() => null)) as {
     website?: unknown;
