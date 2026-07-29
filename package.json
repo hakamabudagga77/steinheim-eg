@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "eval:assistant": "node scripts/evaluate-assistant.mjs",
+    "verify:shopify-map": "node scripts/verify-shopify-map.mjs",
     "crawl:site": "node scripts/crawl-site.mjs",
     "loadtest": "k6 run load-tests/storefront.js",
     "test": "vitest run",
