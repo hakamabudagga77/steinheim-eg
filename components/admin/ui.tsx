@@ -245,6 +245,7 @@ export function InlineEdit({
     <span className={`inline-flex items-center gap-1 ${align === "right" ? "flex-row-reverse" : ""}`}>
       <input
         autoFocus
+        aria-label="Edit value"
         type={type}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -259,10 +260,10 @@ export function InlineEdit({
         <Loader2 className="h-3.5 w-3.5 animate-spin text-white/40" />
       ) : (
         <>
-          <button type="button" onClick={commit} className="text-emerald-400 hover:text-emerald-300">
+          <button type="button" aria-label="Save" onClick={commit} className="text-emerald-400 hover:text-emerald-300">
             <Check className="h-3.5 w-3.5" />
           </button>
-          <button type="button" onClick={cancel} className="text-white/30 hover:text-white/60">
+          <button type="button" aria-label="Cancel" onClick={cancel} className="text-white/30 hover:text-white/60">
             <X className="h-3.5 w-3.5" />
           </button>
         </>

@@ -13,7 +13,8 @@ import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { getProductBySlug, getProductsBySeries } from "@/lib/utils";
 
-const LIGHT_TOP_PATTERN = /^\/products(\/|$)/;
+const LIGHT_TOP_PATTERN =
+  /^\/(?:products|best-sellers|shop-by-need|shop-the-look|assistant)(?:\/|$)/;
 
 const collections = [
   { id: "joy", href: "/collections/joy" },
@@ -292,7 +293,7 @@ export default function Navigation({ locale }: { locale: string }) {
               href={pathname}
               locale={locale === "en" ? "ar" : "en"}
               className={`hidden items-center gap-2 text-[12px] font-medium uppercase transition-colors duration-300 lg:flex ${
-                useWhite ? "text-white/70 hover:text-white" : "text-charcoal/50 hover:text-charcoal"
+                useWhite ? "text-white/70 hover:text-white" : "text-charcoal/70 hover:text-charcoal"
               }`}
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -364,7 +365,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
                         className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-normal leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
-                          pathname === "/collections" ? "text-black" : "text-black/35 hover:translate-x-2 hover:text-black"
+                          pathname === "/collections" ? "text-black" : "text-black/65 hover:translate-x-2 hover:text-black"
                         }`}
                       >
                         {t("collections")}
@@ -379,7 +380,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/products"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/45 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/products" ? "text-black" : ""
                         }`}
                       >
@@ -395,7 +396,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/best-sellers"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/45 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/best-sellers" ? "text-black" : ""
                         }`}
                       >
@@ -411,7 +412,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/shop-the-look"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/45 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/shop-the-look" ? "text-black" : ""
                         }`}
                       >
@@ -435,7 +436,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-medium leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
                             (activePanel === "collections" && activeCollection === collection.id) || pathname.includes(collection.id)
                               ? "text-black"
-                              : "text-black/50 hover:translate-x-2 hover:text-black"
+                              : "text-black/65 hover:translate-x-2 hover:text-black"
                           }`}
                         >
                           {tc(`${collection.id}.name`)}
@@ -491,7 +492,7 @@ export default function Navigation({ locale }: { locale: string }) {
                 />
 
                 <div className="mb-8 lg:mb-10">
-                  <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/35">
+                  <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-black/65">
                     {tm("ourWorld")}
                   </p>
                   <div className="space-y-1">
@@ -512,7 +513,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           className={`block py-1.5 text-[18px] leading-tight transition-all duration-300 ${
                             activePanel === "world" && activeWorldItem.labelKey === link.labelKey
                               ? "text-black"
-                              : "text-black/50 hover:translate-x-2 hover:text-black"
+                              : "text-black/65 hover:translate-x-2 hover:text-black"
                           }`}
                         >
                           {tm(link.labelKey)}
@@ -536,7 +537,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         className={`block py-2 text-[13px] font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
                           pathname === link.href
                             ? "text-black"
-                            : "text-black/42 hover:text-black hover:tracking-[0.25em]"
+                            : "text-black/65 hover:text-black hover:tracking-[0.25em]"
                         }`}
                       >
                         {t(link.key)}
@@ -559,7 +560,7 @@ export default function Navigation({ locale }: { locale: string }) {
                     href={pathname}
                     locale={locale === "en" ? "ar" : "en"}
                     onClick={handleNavigate}
-                    className="flex items-center gap-2.5 py-2 text-[14px] font-medium text-black/50 transition-colors duration-300 hover:text-black"
+                    className="flex items-center gap-2.5 py-2 text-[14px] font-medium text-black/65 transition-colors duration-300 hover:text-black"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <circle cx="12" cy="12" r="10" />
@@ -575,7 +576,7 @@ export default function Navigation({ locale }: { locale: string }) {
                   transition={{ delay: 0.8, duration: 0.5 }}
                   className="mt-8 lg:mt-16"
                 >
-                  <p className="text-[11px] tracking-[0.1em] text-black/30">
+                  <p className="text-[11px] tracking-[0.1em] text-black/65">
                     inquiries@steinheim-eg.com
                   </p>
                 </motion.div>

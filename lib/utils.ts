@@ -1,5 +1,6 @@
 import productsData from "@/data/products.json";
 import finishesData from "@/data/finishes.json";
+import { getProductDefaultImage, getProductImage } from "@/data/images";
 
 export type Finish = (typeof finishesData)[number];
 export type Series = (typeof productsData.series)[number];
@@ -58,24 +59,21 @@ export function getRepresentativeProductForType(type: string): Product | undefin
   return candidates[0];
 }
 
-// Fixed collection -> finish pairing so the "what's needed" mosaic always
-// shows the same four looks for a given type, rather than a random pick each
-// render. Each finish is one this series actually has photographed (Art has
-// no gold finish, Quatro has no nickel/gunmetal/coffee-gold, etc.).
+// Every collection's product shown in the "what's needed" mosaic, always in
+// matte black - keeps every card's photography visually consistent instead
+// of mixing finishes.
 const MOSAIC_SERIES_ORDER = ["joy", "up", "art", "quatro"];
-const MOSAIC_FINISH_BY_SERIES: Record<string, string> = {
-  joy: "coffee-gold",
-  up: "metal-gun",
-  art: "brushed-nickel",
-  quatro: "brushed-gold",
-};
+const MOSAIC_FINISH = "matte-black";
 
-export function getVariantMosaicForType(type: string): Array<{ product: Product; finish: string }> {
+export function getVariantMosaicForType(type: string): Array<{ product: Product; image: string }> {
   const candidates = getProductsByType(type);
-  const entries: Array<{ product: Product; finish: string }> = [];
+  const entries: Array<{ product: Product; image: string }> = [];
   for (const seriesId of MOSAIC_SERIES_ORDER) {
     const product = candidates.find((p) => p.series === seriesId);
-    if (product) entries.push({ product, finish: MOSAIC_FINISH_BY_SERIES[seriesId] });
+    if (!product) continue;
+    const image = getProductImage(product.slug, MOSAIC_FINISH) ?? getProductDefaultImage(product.slug);
+    if (!image) continue;
+    entries.push({ product, image });
   }
   return entries;
 }

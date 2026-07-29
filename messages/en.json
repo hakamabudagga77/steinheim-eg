@@ -382,6 +382,17 @@
     "soundOn": "Turn video sound on",
     "soundOff": "Mute video"
   },
+  "catalogue3d": {
+    "eyebrow": "The full collection",
+    "headline": "Every page, in one place.",
+    "body": "Explore the complete Steinheim catalogue — turn through it the way you would in print, right here.",
+    "openHint": "Tap to open the catalogue",
+    "openCta": "Open the catalogue",
+    "closeLabel": "Close catalogue",
+    "loading": "Loading catalogue…",
+    "pageOf": "Page {current} of {total}",
+    "downloadPdf": "Download the PDF instead"
+  },
   "productPage": {
     "breadcrumb": { "home": "Home", "collections": "Collections" },
     "collectionLabel": "{series} Collection",
@@ -835,6 +846,30 @@
       "rooms": { "title": "Rooms", "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own." },
       "needs": { "title": "What's needed", "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities." },
       "shop": { "title": "Shop products", "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board." }
+    },
+    "howShowcase": {
+      "previewLabel": "Illustrative preview of the room calculator",
+      "mock": {
+        "introPersona": "Hotel & Hospitality",
+        "introName": "Layla Hassan",
+        "introEmail": "layla@grandnile-hotels.com",
+        "roomsMaster": "Master bathrooms",
+        "roomsMasterCount": "2",
+        "roomsStandard": "Standard bathrooms",
+        "roomsStandardCount": "4",
+        "roomsPowder": "Powder rooms",
+        "roomsPowderCount": "1",
+        "needsBasin": "Basin mixer",
+        "needsBasinQty": "Qty 2",
+        "needsShower": "Concealed shower",
+        "needsShowerQty": "Qty 2",
+        "needsWallMounted": "Wall-mounted basin mixer",
+        "shopProduct1": "Art Basin Mixer",
+        "shopProduct1Meta": "Matte Black · Qty 2",
+        "shopProduct2": "Art Concealed Shower",
+        "shopProduct2Meta": "Matte Black · Qty 2",
+        "shopCta": "Add to project board"
+      }
     },
     "projectBoard": {
       "eyebrow": "Beyond the quote",

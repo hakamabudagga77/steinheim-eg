@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageTransition from "@/components/layout/PageTransition";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Shipping Policy | Steinheim Egypt",
-  description:
-    "Delivery information for Steinheim premium bathroom fixtures across Egypt. Free shipping on orders above LE 15,000 within Greater Cairo.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/shipping", "shipping");
+}
 
 const sectionKeys = [
   "deliveryAreas",
@@ -39,7 +43,7 @@ export default async function ShippingPage({
       <section className="bg-charcoal pt-[124px]">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
           <div className="py-16 sm:py-20 lg:py-28">
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/30">
+            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/70">
               {tc("policy")}
             </p>
             <h1 className="mt-5 max-w-2xl font-heading text-[clamp(2.4rem,5vw,4.2rem)] leading-[1.05] text-white">
@@ -61,7 +65,7 @@ export default async function ShippingPage({
                   {section.content.map((paragraph, j) => (
                     <p
                       key={j}
-                      className="text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
+                      className="text-[14px] leading-[1.8] text-charcoal/70 sm:text-[15px]"
                     >
                       {paragraph}
                     </p>
@@ -72,7 +76,7 @@ export default async function ShippingPage({
           ))}
 
           <div className="mt-16 border-t border-charcoal/8 pt-8">
-            <p className="text-[11px] text-warm-gray/50">
+            <p className="text-[11px] text-white/65">
               {tc("lastUpdated")}
             </p>
           </div>

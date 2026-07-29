@@ -68,14 +68,14 @@ export default function ShopByNeedClient() {
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <div className="px-5 pb-4 pt-[124px] sm:px-8 lg:px-16 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("forProject", { name: displayName })}</p>
+            <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("forProject", { name: displayName })}</p>
             <h1
               className="mt-4 max-w-3xl font-heading text-[clamp(2.4rem,5.5vw,5.6rem)] font-light leading-[0.92] tracking-[-0.045em]"
               style={{ fontStyle: "italic" }}
             >
               {t("headline")}
             </h1>
-            <p className="mt-5 max-w-xl text-[15px] leading-[1.85] text-black/50">
+            <p className="mt-5 max-w-xl text-[15px] leading-[1.85] text-black/65">
               {t("body", { name: displayName })}
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function ShopByNeedClient() {
                 <p className="font-heading text-[22px] leading-tight text-black" style={{ fontStyle: "italic" }}>
                   {t("setupFirst")}
                 </p>
-                <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-black/50">
+                <p className="mx-auto mt-3 max-w-md text-[13px] leading-[1.7] text-black/65">
                   {t("setupFirstBody")}
                 </p>
                 <div className="mt-6 flex justify-center">
@@ -109,7 +109,7 @@ export default function ShopByNeedClient() {
               >
                 <div className="mx-auto max-w-[1780px]">
                   <div className="mb-16 text-center">
-                    <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("shop")}</p>
+                    <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("shop")}</p>
                     <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
                       {REQUIREMENT_TYPE_LABELS[type]}
                     </h2>

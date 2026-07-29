@@ -37,6 +37,7 @@ export function ScopeStatusList({ leadId, lead }: { leadId: string; lead: TradeL
             <div key={scope.scopeId} className="flex items-center justify-between gap-3 p-3">
               <p className="min-w-0 truncate text-[12px] text-white/80">{scope.scopeName}</p>
               <select
+                aria-label={`Status for ${scope.scopeName}`}
                 value={current}
                 disabled={savingId === scope.scopeId}
                 onChange={(e) => handleChange(scope.scopeId, e.target.value as TradeLeadStatus)}

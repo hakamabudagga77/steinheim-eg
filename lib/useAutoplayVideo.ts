@@ -3,7 +3,7 @@ import { useEffect, type RefObject } from "react";
 export function useAutoplayVideo(ref: RefObject<HTMLVideoElement | null>, src: string) {
   useEffect(() => {
     const video = ref.current;
-    if (!video) return;
+    if (!video || !src) return;
 
     video.muted = true;
     video.playsInline = true;

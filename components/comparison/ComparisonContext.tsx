@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   COMPARISON_MAX_ITEMS,
   COMPARISON_STORAGE_KEY,
@@ -37,22 +37,28 @@ function readStoredComparison() {
 export function ComparisonProvider({ children }: { children: React.ReactNode }) {
   const [comparison, setComparison] = useState<Comparison>(createEmptyComparison);
   const [open, setOpen] = useState(false);
-  const hydrated = useRef(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const parsed = readStoredComparison();
-      hydrated.current = true;
       if (parsed) setComparison(parsed);
+      setHydrated(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
   }, []);
 
+  // Depends on `hydrated` (state, not a ref) so it re-runs once hydration
+  // finishes — otherwise an add that lands before hydration is never persisted.
   useEffect(() => {
-    if (!hydrated.current) return;
-    window.localStorage.setItem(COMPARISON_STORAGE_KEY, JSON.stringify(comparison));
-  }, [comparison]);
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(COMPARISON_STORAGE_KEY, JSON.stringify(comparison));
+    } catch {
+      // Ignore write failures (private mode, quota exceeded, storage disabled).
+    }
+  }, [comparison, hydrated]);
 
   useEffect(() => {
     function sync(e: StorageEvent) {
