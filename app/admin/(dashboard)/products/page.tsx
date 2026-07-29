@@ -52,7 +52,7 @@ function ProductDrawer({
               <img src={product.image.src} alt="" className="h-full w-full object-cover" />
             )}
           </div>
-          <button type="button" onClick={onClose} className="text-white/40 hover:text-white/80">
+          <button type="button" aria-label="Close" onClick={onClose} className="text-white/40 hover:text-white/80">
             <X className="h-5 w-5" />
           </button>
         </div>

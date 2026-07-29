@@ -136,7 +136,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <div className="bg-[#ece9e2] px-5 pb-4 pt-[124px] sm:px-8 lg:px-16">
           <div className="mx-auto max-w-[1780px]">
-            <p className="truncate text-[12px] text-black/40">
+            <p className="truncate text-[12px] text-black/65">
               <Link href="/" className="transition hover:text-black">
                 {t("breadcrumb.home")}
               </Link>
@@ -377,7 +377,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                     {group.roomLabel}
                                   </span>
                                   {needsThis && (
-                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/40">{t("needsThis")}</span>
+                                    <span className="text-[10px] uppercase tracking-[0.08em] text-black/65">{t("needsThis")}</span>
                                   )}
                                 </button>
                               );
@@ -388,7 +388,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 setScopeChoice("");
                                 setRoomOpen(false);
                               }}
-                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-start text-[14px] text-black/45 transition hover:bg-black/[0.035]"
+                              className="flex w-full cursor-pointer items-center border-t border-black/6 px-5 py-4 text-start text-[14px] text-black/65 transition hover:bg-black/[0.035]"
                             >
                               {t("noRoomManual")}
                             </button>
@@ -403,7 +403,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     <button
                       type="button"
                       onClick={() => setSetupOpen(true)}
-                      className="mt-3 flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-black/12 text-[11px] font-medium text-black/50 transition hover:border-black/30 hover:text-black"
+                      className="mt-3 flex h-10 w-full cursor-pointer items-center justify-center rounded-full border border-black/12 text-[11px] font-medium text-black/65 transition hover:border-black/30 hover:text-black"
                     >
                       {t("setupRoomCta")}
                     </button>
@@ -414,7 +414,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     className={
                       isTradeCustomer
                         ? "mt-3 flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
-                        : "mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/45 transition hover:bg-white/55 hover:text-black"
+                        : "mt-3 flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-[13px] font-medium text-black/65 transition hover:bg-white/55 hover:text-black"
                     }
                   >
                     <AnimatePresence mode="wait" initial={false}>
@@ -437,7 +437,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </div>
 
                 <div className="mt-10 hidden border-t border-black/10 pt-6 text-start sm:block">
-                  <p className="text-[13px] leading-[1.8] text-black/45">
+                  <p className="text-[13px] leading-[1.8] text-black/65">
                     {t("infoNote")}
                   </p>
                 </div>
@@ -456,7 +456,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     type="button"
                     onClick={() => setActiveInfoTab(tab)}
                     className={`relative px-1 py-3 text-center text-[12px] font-semibold leading-tight tracking-[-0.02em] transition sm:px-2 sm:py-5 sm:text-[20px] sm:tracking-[-0.04em] lg:text-[27px] ${
-                      activeInfoTab === tab ? "text-black" : "text-black/42 hover:text-black/70"
+                      activeInfoTab === tab ? "text-black" : "text-black/65 hover:text-black/80"
                     }`}
                   >
                     {t(`tabs.${tab}`)}
@@ -531,7 +531,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                           finish: finish?.name ?? variant.finish,
                         })}
                       </p>
-                      <p className="mt-5 max-w-xl text-[14px] leading-[1.85] text-black/45">
+                      <p className="mt-5 max-w-xl text-[14px] leading-[1.85] text-black/65">
                         {t("downloadsNote")}
                       </p>
                     </div>
@@ -589,7 +589,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   />
                 </div>
                 <div className="max-w-lg">
-                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("context.eyebrow")}</p>
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("context.eyebrow")}</p>
                   <h2 className="mt-4 font-heading text-[clamp(2.4rem,4.6vw,4.4rem)] font-light leading-[0.92] tracking-[-0.055em]">
                     {t("context.headline")}
                   </h2>
@@ -613,7 +613,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
             <div className="mx-auto max-w-[1780px]">
               <div className="mb-14 flex items-end justify-between">
                 <div>
-                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("related.eyebrow")}</p>
+                  <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("related.eyebrow")}</p>
                   <h2 className="mt-3 font-heading text-[clamp(2.4rem,4.5vw,4.6rem)] font-light leading-[0.92] tracking-[-0.055em]">
                     {t("related.headline", { series: seriesName })}
                   </h2>

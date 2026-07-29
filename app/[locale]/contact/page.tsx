@@ -29,7 +29,7 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.6 }}
-                className="text-[11px] uppercase tracking-[0.45em] text-white/40"
+                className="text-[11px] uppercase tracking-[0.45em] text-white/75"
               >
                 {t("hero.eyebrow")}
               </motion.p>
@@ -46,7 +46,7 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35, duration: 0.6 }}
-                className="mt-6 max-w-lg text-[16px] leading-[1.85] text-white/40"
+                className="mt-6 max-w-lg text-[16px] leading-[1.85] text-white/75"
               >
                 {t("hero.body")}
               </motion.p>
@@ -72,7 +72,7 @@ export default function ContactPage() {
                       </svg>
                     </div>
                     <h2 className="mt-8 font-heading text-[36px] tracking-[-0.03em]">{t("successTitle")}</h2>
-                    <p className="mt-4 max-w-sm text-[15px] leading-[1.75] text-black/50">
+                    <p className="mt-4 max-w-sm text-[15px] leading-[1.75] text-black/65">
                       {t("successBody")}
                     </p>
                   </motion.div>
@@ -125,7 +125,7 @@ export default function ContactPage() {
 
                     {/* Enquiry type */}
                     <div className="mb-10">
-                      <p className="text-[11px] uppercase tracking-[0.3em] text-black/35">{t("iAm")}</p>
+                      <p className="text-[11px] uppercase tracking-[0.3em] text-black/65">{t("iAm")}</p>
                       <div className="mt-4 flex flex-wrap gap-2">
                         {enquiryTypeIds.map((id) => (
                           <button
@@ -142,29 +142,29 @@ export default function ContactPage() {
                           </button>
                         ))}
                       </div>
-                      <p className="mt-3 text-[12px] text-black/35">
+                      <p className="mt-3 text-[12px] text-black/65">
                         {t(`enquiryTypes.${enquiryType}.desc`)}
                       </p>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.name")}</label>
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.name")}</label>
                         <input type="text" name="name" autoComplete="name" placeholder={t("fields.namePlaceholder")} className={inputBase} required />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.email")}</label>
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.email")}</label>
                         <input type="email" name="email" autoComplete="email" placeholder={t("fields.emailPlaceholder")} className={inputBase} required />
                       </div>
                     </div>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.phone")}</label>
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.phone")}</label>
                         <input type="tel" name="phone" autoComplete="tel" placeholder={t("fields.phonePlaceholder")} className={inputBase} />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">
+                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">
                           {enquiryType === "homeowner" ? t("fields.city") : t("fields.company")}
                         </label>
                         <input
@@ -178,12 +178,12 @@ export default function ContactPage() {
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.subject")}</label>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.subject")}</label>
                       <input type="text" name="subject" placeholder={t("fields.subjectPlaceholder")} className={inputBase} />
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/35">{t("fields.message")}</label>
+                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.message")}</label>
                       <textarea rows={4} name="message" placeholder={t("fields.messagePlaceholder")} className={`${inputBase} resize-none`} required />
                     </div>
 
@@ -208,7 +208,7 @@ export default function ContactPage() {
                   { label: t("info.whatsapp.label"), lines: ["+20 122 399 8124"], href: "https://wa.me/201223998124" },
                 ].map((block) => (
                   <div key={block.label} className="rounded-[12px] bg-white p-6">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{block.label}</p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-black/65">{block.label}</p>
                     {block.lines.map((line) =>
                       block.href ? (
                         <a key={line} href={block.href} target={block.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="mt-3 block text-[15px] transition hover:text-black/60">
@@ -222,9 +222,9 @@ export default function ContactPage() {
                 ))}
 
                 <div className="rounded-[12px] border border-black/6 bg-white p-6">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-black/30">{t("info.responseTime.label")}</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-black/65">{t("info.responseTime.label")}</p>
                   <p className="mt-3 font-heading text-[24px]">{t("info.responseTime.value")}</p>
-                  <p className="mt-2 text-[13px] leading-[1.7] text-black/45">
+                  <p className="mt-2 text-[13px] leading-[1.7] text-black/65">
                     {t("info.responseTime.note")}
                   </p>
                 </div>

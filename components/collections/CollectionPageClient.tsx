@@ -191,7 +191,7 @@ export default function CollectionPageClient({
         <section id="products" className="scroll-mt-[140px] border-t border-black/8 px-5 py-16 sm:px-8 lg:px-16 lg:py-20">
           <div className="mx-auto max-w-[1780px]">
             <div className="mb-16 text-center">
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("chooseFinish")}</p>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("chooseFinish")}</p>
               <h2 className="mt-4 font-heading text-[clamp(1.8rem,3vw,2.6rem)] font-normal tracking-[-0.03em]">
                 {t("seeRange", { series: series.name })}
               </h2>
@@ -216,7 +216,7 @@ export default function CollectionPageClient({
                       >
                         {disc ? <Image src={disc} alt="" fill sizes="64px" className="object-cover" /> : <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />}
                       </span>
-                      <span className={`hidden text-[11px] uppercase tracking-[0.12em] transition-colors sm:block ${active ? "text-black font-medium" : "text-black/45 group-hover:text-black/70"}`}>
+                      <span className={`hidden text-[11px] uppercase tracking-[0.12em] transition-colors sm:block ${active ? "text-black font-medium" : "text-black/65 group-hover:text-black/80"}`}>
                         {finish.name}
                       </span>
                     </button>
@@ -250,7 +250,7 @@ export default function CollectionPageClient({
         <section id="setup" className="scroll-mt-[140px] border-t border-black/8 px-5 py-24 sm:px-8 lg:px-16 lg:py-32">
           <div className="mx-auto grid max-w-[1780px] items-center gap-16 lg:grid-cols-2">
             <div>
-              <p className="text-[18px] uppercase tracking-[0.3em] text-black/45">{t("setupEyebrow")}</p>
+              <p className="text-[18px] uppercase tracking-[0.3em] text-black/65">{t("setupEyebrow")}</p>
               <h2 className="mt-8 max-w-3xl text-[clamp(3rem,6vw,6rem)] font-normal leading-[0.98] tracking-[-0.06em]">
                 {t("setupHeadline")}
               </h2>
@@ -294,7 +294,7 @@ export default function CollectionPageClient({
               >
                 <span>
                   <span className="block text-[20px] font-medium">{title}</span>
-                  <span className="mt-3 block max-w-sm text-[14px] leading-[1.65] text-black/50">{body}</span>
+                  <span className="mt-3 block max-w-sm text-[14px] leading-[1.65] text-black/65">{body}</span>
                 </span>
                 <span className="text-[32px] text-black/25 transition group-hover:translate-x-2 group-hover:text-black">→</span>
               </Link>

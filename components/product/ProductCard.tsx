@@ -150,7 +150,7 @@ function ProductCard({
           </AnimatePresence>
         </div>
         <div className="pt-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-black/35" style={{ fontStyle: "italic" }}>{seriesName}</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-black/65" style={{ fontStyle: "italic" }}>{seriesName}</p>
           <p className="mt-1 text-[15px] font-medium text-black">{product.name}</p>
           {!hidePrice && (
             <div className="mt-2 flex items-center gap-2">
@@ -169,7 +169,7 @@ function ProductCard({
       {onAdd ? (
         <div className="mt-3 space-y-2.5">
           {displayVariants.length > 1 && (
-            <p className="text-[10px] uppercase tracking-[0.15em] text-black/40">{selectedFinishName}</p>
+            <p className="text-[10px] uppercase tracking-[0.15em] text-black/65">{selectedFinishName}</p>
           )}
           <div className="flex flex-wrap items-center gap-1.5" aria-label="Available finishes">
             {displayVariants.map((entry) => {
@@ -280,7 +280,7 @@ function ProductCard({
       ) : (
         <div className="mt-3">
           {displayVariants.length > 1 && (
-            <p className="mb-1.5 text-[10px] uppercase tracking-[0.15em] text-black/40">{selectedFinishName}</p>
+            <p className="mb-1.5 text-[10px] uppercase tracking-[0.15em] text-black/65">{selectedFinishName}</p>
           )}
           <div className="flex items-center justify-between gap-1.5 sm:gap-2">
             <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5" aria-label="Available finishes">

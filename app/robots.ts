@@ -7,7 +7,14 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/"],
+      disallow: [
+        "/api/",
+        "/admin/",
+        "/en/trade/restore/",
+        "/ar/trade/restore/",
+        "/en/sentry-example-page/",
+        "/ar/sentry-example-page/",
+      ],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,
   };

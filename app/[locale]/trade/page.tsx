@@ -7,11 +7,21 @@ import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import TradeOpenButton from "@/components/trade/TradeOpenButton";
 import SmartRoomCalculator from "@/components/trade/SmartRoomCalculator";
 import ProjectBoardShowcase from "@/components/trade/ProjectBoardShowcase";
+import TradeStudioShowcase from "@/components/trade/TradeStudioShowcase";
 import GetProjectLinkButton from "@/components/trade/GetProjectLinkButton";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-const stepKeys = ["intro", "rooms", "needs", "shop"] as const;
 const boardItemKeys = ["track", "message", "quote", "documents", "samples"] as const;
 const benefitKeys = ["pricing", "support", "scheduling", "access"] as const;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/trade", "trade");
+}
 
 export default async function TradePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -57,26 +67,23 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        {/* How it works — Gessi editorial: horizontal dividers, italic serif titles */}
+        {/* How it works — live preview of the actual room calculator below */}
         <section className="px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <ScrollReveal>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("howItWorks")}</p>
-              <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
-                {t("howHeadline")}
-              </h2>
-              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
-                {t("howBody")}
-              </p>
-            </ScrollReveal>
+            <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <ScrollReveal>
+                <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("howItWorks")}</p>
+                <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
+                  {t("howHeadline")}
+                </h2>
+                <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/65">
+                  {t("howBody")}
+                </p>
+              </ScrollReveal>
 
-            <div className="mt-16 border-t border-black/10">
-              {stepKeys.map((key) => (
-                <div key={key} className="flex flex-col gap-2 border-b border-black/8 py-8 sm:flex-row sm:items-start sm:gap-12">
-                  <h3 className="shrink-0 font-heading text-[20px] sm:w-[220px]" style={{ fontStyle: "italic" }}>{t(`steps.${key}.title`)}</h3>
-                  <p className="text-[14px] leading-[1.75] text-black/50">{t(`steps.${key}.body`)}</p>
-                </div>
-              ))}
+              <ScrollReveal>
+                <TradeStudioShowcase />
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -84,13 +91,17 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
         {/* Beyond the quote — the real post-submission project board */}
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-              <ScrollReveal>
-                <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("projectBoard.eyebrow")}</p>
+            <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <ScrollReveal className="lg:order-1">
+                <ProjectBoardShowcase />
+              </ScrollReveal>
+
+              <ScrollReveal className="lg:order-2">
+                <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("projectBoard.eyebrow")}</p>
                 <h2 className="mt-4 max-w-xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                   {t("projectBoard.headline")}
                 </h2>
-                <p className="mt-5 max-w-lg text-[15px] leading-[1.85] text-black/50">
+                <p className="mt-5 max-w-lg text-[15px] leading-[1.85] text-black/65">
                   {t("projectBoard.body")}
                 </p>
 
@@ -98,14 +109,10 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                   {boardItemKeys.map((key) => (
                     <div key={key} className="border-t border-black/10 pt-5">
                       <h3 className="font-heading text-[16px]" style={{ fontStyle: "italic" }}>{t(`projectBoard.items.${key}.title`)}</h3>
-                      <p className="mt-2 text-[13px] leading-[1.7] text-black/50">{t(`projectBoard.items.${key}.body`)}</p>
+                      <p className="mt-2 text-[13px] leading-[1.7] text-black/65">{t(`projectBoard.items.${key}.body`)}</p>
                     </div>
                   ))}
                 </div>
-              </ScrollReveal>
-
-              <ScrollReveal>
-                <ProjectBoardShowcase />
               </ScrollReveal>
             </div>
           </div>
@@ -115,11 +122,11 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
             <ScrollReveal>
-              <p className="text-[12px] uppercase tracking-[0.34em] text-black/40">{t("benefits.eyebrow")}</p>
+              <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("benefits.eyebrow")}</p>
               <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                 {t("benefits.headline")}
               </h2>
-              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/50">
+              <p className="mt-5 max-w-2xl text-[15px] leading-[1.85] text-black/65">
                 {t("benefits.body")}
               </p>
             </ScrollReveal>
@@ -128,7 +135,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
               {benefitKeys.map((key) => (
                 <div key={key} className="border-t border-black/10 pt-6">
                   <h3 className="font-heading text-[18px]" style={{ fontStyle: "italic" }}>{t(`benefits.items.${key}.title`)}</h3>
-                  <p className="mt-2 text-[13.5px] leading-[1.7] text-black/50">{t(`benefits.items.${key}.body`)}</p>
+                  <p className="mt-2 text-[13.5px] leading-[1.7] text-black/65">{t(`benefits.items.${key}.body`)}</p>
                 </div>
               ))}
             </div>
@@ -153,7 +160,7 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           <div className="mx-auto max-w-[1780px]">
             <div className="grid items-center gap-10 rounded-[22px] bg-black p-8 text-white sm:p-12 lg:grid-cols-[1.2fr_0.8fr] lg:p-16">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.4em] text-white/35">{t("alreadyKnow")}</p>
+                <p className="text-[11px] uppercase tracking-[0.4em] text-white/70">{t("alreadyKnow")}</p>
                 <h2 className="mt-4 text-[clamp(2rem,4.5vw,4.4rem)] leading-[0.95] tracking-[-0.03em]" style={{ fontStyle: "italic" }}>
                   {t("browseHeadline")}
                 </h2>

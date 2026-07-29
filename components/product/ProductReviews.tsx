@@ -102,7 +102,7 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
     <div className="border-t border-black/8 pt-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">{t("title")}</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-black/65">{t("title")}</p>
           {reviews && reviews.length > 0 ? (
             <div className="mt-2 flex items-center gap-2">
               <StarRow rating={Math.round(average)} size={16} />
@@ -111,7 +111,7 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
               </p>
             </div>
           ) : (
-            <p className="mt-2 text-[13px] text-black/45">{t("empty")}</p>
+            <p className="mt-2 text-[13px] text-black/65">{t("empty")}</p>
           )}
         </div>
         {!formOpen && !submitted && (
@@ -130,11 +130,11 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
       {formOpen && (
         <div className="mt-5 max-w-lg rounded-xl border border-black/8 bg-white/40 p-5">
           <div className="mb-3">
-            <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-black/40">{t("ratingLabel")}</p>
+            <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-black/65">{t("ratingLabel")}</p>
             <StarPicker value={rating} onChange={setRating} />
           </div>
           <div className="mb-3">
-            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-black/40" htmlFor="review-author">
+            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-black/65" htmlFor="review-author">
               {t("nameLabel")}
             </label>
             <input
@@ -145,7 +145,7 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
             />
           </div>
           <div className="mb-4">
-            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-black/40" htmlFor="review-body">
+            <label className="mb-1.5 block text-[11px] uppercase tracking-[0.15em] text-black/65" htmlFor="review-body">
               {t("bodyLabel")}
             </label>
             <textarea
@@ -183,7 +183,7 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
             <div key={review.id} className="border-t border-black/6 pt-5 first:border-t-0 first:pt-0">
               <div className="flex items-center justify-between gap-3">
                 <StarRow rating={review.rating} />
-                <p className="text-[11px] text-black/35">{fmtDate(review.submittedAt)}</p>
+                <p className="text-[11px] text-black/65">{fmtDate(review.submittedAt)}</p>
               </div>
               <p className="mt-2 text-[13px] font-medium text-black/85">{review.authorName}</p>
               <p className="mt-1 whitespace-pre-wrap text-[13px] leading-[1.65] text-black/65">{review.body}</p>

@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import PageTransition from "@/components/layout/PageTransition";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { getStaticPageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Privacy Policy | Steinheim Egypt",
-  description:
-    "How Steinheim Egypt collects, uses, and protects your personal information when you use our website and services.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return getStaticPageMetadata(locale, "/privacy", "privacy");
+}
 
 type ContentBlock = { type: "p"; text: string } | { type: "ul"; items: string[] };
 
@@ -59,7 +63,7 @@ export default async function PrivacyPage({
       <section className="bg-charcoal pt-[124px]">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
           <div className="py-16 sm:py-20 lg:py-28">
-            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/30">
+            <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/70">
               {tc("policy")}
             </p>
             <h1 className="mt-5 max-w-2xl font-heading text-[clamp(2.4rem,5vw,4.2rem)] leading-[1.05] text-white">
@@ -82,14 +86,14 @@ export default async function PrivacyPage({
                     block.type === "p" ? (
                       <p
                         key={`${section.key}-p-${j}`}
-                        className="text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
+                        className="text-[14px] leading-[1.8] text-charcoal/70 sm:text-[15px]"
                       >
                         {block.text}
                       </p>
                     ) : (
                       <ul
                         key={`${section.key}-ul-${j}`}
-                        className="list-disc space-y-1.5 ps-5 text-[14px] leading-[1.8] text-warm-gray sm:text-[15px]"
+                        className="list-disc space-y-1.5 ps-5 text-[14px] leading-[1.8] text-charcoal/70 sm:text-[15px]"
                       >
                         {block.items.map((item, k) => (
                           <li key={`${section.key}-li-${j}-${k}`}>{item}</li>
@@ -103,7 +107,7 @@ export default async function PrivacyPage({
           ))}
 
           <div className="mt-16 border-t border-charcoal/8 pt-8">
-            <p className="text-[11px] text-warm-gray/50">
+            <p className="text-[11px] text-white/65">
               {t("lastUpdated")}
             </p>
           </div>

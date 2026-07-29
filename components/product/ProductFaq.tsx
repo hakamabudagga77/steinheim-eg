@@ -49,7 +49,7 @@ export default function ProductFaq({ product }: { product: Product }) {
 
   return (
     <div className="border-t border-black/8 pt-8">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-black/40">{t("title")}</p>
+      <p className="text-[11px] uppercase tracking-[0.2em] text-black/65">{t("title")}</p>
       <div className="mt-4 divide-y divide-black/6 border-y border-black/8">
         {entries.map((entry) => {
           const open = openKey === entry.key;
@@ -83,7 +83,7 @@ export default function ProductFaq({ product }: { product: Product }) {
           );
         })}
       </div>
-      <p className="mt-3 text-[12px] text-black/40">
+      <p className="mt-3 text-[12px] text-black/65">
         {t("moreQuestions")}{" "}
         <Link href="/contact" className="underline decoration-black/25 hover:text-black">
           {t("contactUs")}
