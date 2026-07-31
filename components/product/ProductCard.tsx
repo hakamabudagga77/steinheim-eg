@@ -92,78 +92,87 @@ function ProductCard({
 
   return (
     <article className="relative">
-      <button
-        type="button"
-        onClick={() => toggleItem(product.slug, variant.finish)}
-        aria-label={t("wishlistToggle")}
-        aria-pressed={inWishlist}
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        onClick={() => toggleComparison(product.slug, variant.finish)}
-        disabled={atMax && !inComparison}
-        aria-label={t("compareToggle")}
-        aria-pressed={inComparison}
-        className={`absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
-          inComparison ? "bg-black text-white" : "bg-white/85 text-black/45 hover:text-black"
-        }`}
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <rect x="3" y="3" width="11" height="11" rx="2" />
-          <rect x="10" y="10" width="11" height="11" rx="2" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          setQuickViewOpen(true);
-        }}
-        aria-label={t("quickView")}
-        className="absolute bottom-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
-      </button>
-      <QuickViewModal product={product} liveVariants={liveVariants} open={quickViewOpen} onClose={() => setQuickViewOpen(false)} />
+      {/* Media box: the overlay controls are positioned relative to THIS
+          wrapper (the image), not the whole <article>, so the quick-view eye
+          sits on the image and never overlaps the price/finish row below. */}
+      <div className="relative">
+        <Link
+          href={`/products/${product.slug}`}
+          className="group block"
+          {...(onAdd ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        >
+          <div className="relative aspect-square overflow-hidden bg-[#ece9e2]">
+            <AnimatePresence mode="wait">
+              <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
+                {imageUrl ? (
+                  <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${getFinishById(variant.finish)?.name ?? variant.finish}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
+                ) : (
+                  <div className="flex h-full items-center justify-center px-5 text-center font-heading text-xl text-black/20">{product.name}</div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </Link>
+        <button
+          type="button"
+          onClick={() => toggleItem(product.slug, variant.finish)}
+          aria-label={t("wishlistToggle")}
+          aria-pressed={inWishlist}
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill={inWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => toggleComparison(product.slug, variant.finish)}
+          disabled={atMax && !inComparison}
+          aria-label={t("compareToggle")}
+          aria-pressed={inComparison}
+          className={`absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 ${
+            inComparison ? "bg-black text-white" : "bg-white/85 text-black/45 hover:text-black"
+          }`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="3" width="11" height="11" rx="2" />
+            <rect x="10" y="10" width="11" height="11" rx="2" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            setQuickViewOpen(true);
+          }}
+          aria-label={t("quickView")}
+          className="absolute bottom-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-black/45 backdrop-blur-sm transition hover:text-black cursor-pointer"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+        <QuickViewModal product={product} liveVariants={liveVariants} open={quickViewOpen} onClose={() => setQuickViewOpen(false)} />
+      </div>
       <Link
         href={`/products/${product.slug}`}
-        className="group block"
+        className="block pt-4"
         {...(onAdd ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
-        <div className="relative aspect-square overflow-hidden bg-[#ece9e2]">
-          <AnimatePresence mode="wait">
-            <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
-              {imageUrl ? (
-                <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${getFinishById(variant.finish)?.name ?? variant.finish}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
-              ) : (
-                <div className="flex h-full items-center justify-center px-5 text-center font-heading text-xl text-black/20">{product.name}</div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="pt-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-black/65" style={{ fontStyle: "italic" }}>{seriesName}</p>
-          <p className="mt-1 text-[15px] font-medium text-black">{product.name}</p>
-          {!hidePrice && (
-            <div className="mt-2 flex items-center gap-2">
-              <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
-              {liveVariant && (
-                <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
-                  <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
-                  {liveVariant.inStock ? t("inStock") : t("outOfStock")}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-black/65" style={{ fontStyle: "italic" }}>{seriesName}</p>
+        <p className="mt-1 text-[15px] font-medium text-black">{product.name}</p>
+        {!hidePrice && (
+          <div className="mt-2 flex items-center gap-2">
+            <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+            {liveVariant && (
+              <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
+                <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
+                {liveVariant.inStock ? t("inStock") : t("outOfStock")}
+              </span>
+            )}
+          </div>
+        )}
       </Link>
 
       {onAdd ? (
