@@ -66,18 +66,22 @@ export async function generateMetadata({
         "x-default": "/en",
       },
     },
+    // The OG/Twitter share copy is deliberately more marketing-led than the
+    // <title>/description above (which stay keyword-focused for search) — it
+    // targets the trade audience (finishing engineers, contractors, design
+    // firms) when the link is shared on WhatsApp/social.
     openGraph: {
       type: "website",
       siteName: "Steinheim Egypt",
       locale: locale === "ar" ? "ar_EG" : "en_US",
-      title: t("title"),
-      description: t("description"),
+      title: t("shareTitle"),
+      description: t("shareDescription"),
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Steinheim Egypt" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: t("title"),
-      description: t("description"),
+      title: t("shareTitle"),
+      description: t("shareDescription"),
       images: ["/og-image.png"],
     },
   };
