@@ -8,6 +8,7 @@ type StaticPageKey =
   | "bestSellers"
   | "collections"
   | "contact"
+  | "finishes"
   | "privacy"
   | "products"
   | "projects"
@@ -85,6 +86,18 @@ const staticPageCopy: Record<StaticPageKey, Record<SupportedLocale, SeoCopy>> = 
       title: "تواصل مع شتاينهايم مصر | استفسارات المنتجات والمشروعات",
       description:
         "تواصل مع شتاينهايم مصر لمعرفة توافر المنتجات والمعلومات التقنية ودعم المشروعات واستفسارات الشراء والتجارة.",
+    },
+  },
+  finishes: {
+    en: {
+      title: "Bathroom Fixture Finishes | Chrome, Matte Black & PVD Gold | Steinheim Egypt",
+      description:
+        "Compare Steinheim's six bathroom finishes — chrome, brushed nickel, matte black, brushed gold, coffee gold and metal gun — with care guidance and the collections each is available in.",
+    },
+    ar: {
+      title: "تشطيبات تجهيزات الحمامات | كروم وأسود مطفي وذهبي PVD | شتاينهايم مصر",
+      description:
+        "قارن تشطيبات شتاينهايم الستة — كروم، نيكل مصقول، أسود مطفي، ذهبي مصقول، ذهبي بُني، ورمادي معدني — مع إرشادات العناية والمجموعات المتاح بها كل تشطيب.",
     },
   },
   privacy: {
