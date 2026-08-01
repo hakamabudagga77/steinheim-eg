@@ -49,9 +49,18 @@
       "eyebrow": "The Steinheim philosophy",
       "headline": "A bathroom is not a collection of objects. It is one complete language.",
       "body": "Steinheim brings products, finishes, and technical choices into a coordinated system—giving homeowners, designers, and project teams a clearer way to create spaces that feel intentional from every angle.",
-      "collections": { "value": "04", "label": "Coordinated collections" },
-      "finishes": { "value": "06", "label": "Finish families" },
-      "catalogue": { "value": "26", "label": "Verified catalogue products" }
+      "collections": {
+        "value": "04",
+        "label": "Coordinated collections"
+      },
+      "finishes": {
+        "value": "06",
+        "label": "Finish families"
+      },
+      "catalogue": {
+        "value": "26",
+        "label": "Verified catalogue products"
+      }
     },
     "collections": {
       "eyebrow": "The collections",
@@ -90,20 +99,52 @@
       "body": "A Steinheim bathroom is built from coordinated collections, verified model references, finish rules, and technical details that project teams can trust.",
       "scroll": "Scroll",
       "cta": "Explore the collections",
-      "foundation": { "label": "Collection", "spec": "Joy · Up · Art · Quatro", "detail": "Four Egypt collections with distinct design languages." },
-      "structure": { "label": "Components", "spec": "Sedal · Neoperl", "detail": "Published technical data lists 35mm Sedal cartridges and Neoperl aerators where specified." },
-      "control": { "label": "Installation", "spec": "1/2 inch · 0.5-5 bar", "detail": "Common mixer specifications support standard Egyptian project planning." },
-      "flow": { "label": "Finishes", "spec": "Six finish families", "detail": "Availability is verified by exact product and collection, not assumed globally." },
-      "complete": { "label": "Proposal", "spec": "Models · quantities · RFQ", "detail": "Every visible choice can become a structured trade schedule." }
+      "foundation": {
+        "label": "Collection",
+        "spec": "Joy · Up · Art · Quatro",
+        "detail": "Four Egypt collections with distinct design languages."
+      },
+      "structure": {
+        "label": "Components",
+        "spec": "Sedal · Neoperl",
+        "detail": "Published technical data lists 35mm Sedal cartridges and Neoperl aerators where specified."
+      },
+      "control": {
+        "label": "Installation",
+        "spec": "1/2 inch · 0.5-5 bar",
+        "detail": "Common mixer specifications support standard Egyptian project planning."
+      },
+      "flow": {
+        "label": "Finishes",
+        "spec": "Six finish families",
+        "detail": "Availability is verified by exact product and collection, not assumed globally."
+      },
+      "complete": {
+        "label": "Proposal",
+        "spec": "Models · quantities · RFQ",
+        "detail": "Every visible choice can become a structured trade schedule."
+      }
     },
     "precision": {
       "eyebrow": "Engineered to perform",
       "headline": "Precision you can feel.",
       "body": "Every Steinheim fixture is built around components that outlast trends — Sedal cartridges, Neoperl aerators, and PVD surfaces engineered for decades of daily use.",
-      "flow": { "label": "Laminar flow rate", "detail": "Neoperl aerator, splash-free" },
-      "temp": { "label": "Temperature accuracy", "detail": "Sedal ceramic disc control" },
-      "cycles": { "label": "Cartridge lifespan", "detail": "Open-close cycles, lifetime warranty" },
-      "finishes": { "label": "PVD & standard finishes", "detail": "Coordinated across all collections" }
+      "flow": {
+        "label": "Laminar flow rate",
+        "detail": "Neoperl aerator, splash-free"
+      },
+      "temp": {
+        "label": "Temperature accuracy",
+        "detail": "Sedal ceramic disc control"
+      },
+      "cycles": {
+        "label": "Cartridge lifespan",
+        "detail": "Open-close cycles, lifetime warranty"
+      },
+      "finishes": {
+        "label": "PVD & standard finishes",
+        "detail": "Coordinated across all collections"
+      }
     },
     "finishMorph": {
       "eyebrow": "One shape. Six identities.",
@@ -118,9 +159,18 @@
       "body": "Explore the catalogue, ask the AI advisor, assemble exact products and quantities, then create one structured brief for the Steinheim trade team.",
       "primaryCta": "Open interactive catalogue",
       "secondaryCta": "For professionals",
-      "discover": { "title": "Discover", "body": "Move through collections, products, finishes, and project imagery at your own pace—or let the AI guide the route." },
-      "specify": { "title": "Specify", "body": "Choose exact finishes, model references, and quantities while keeping the project schedule in one place." },
-      "propose": { "title": "Propose", "body": "Generate a clean RFQ document for commercial pricing, stock, lead-time, and project-team review." }
+      "discover": {
+        "title": "Discover",
+        "body": "Move through collections, products, finishes, and project imagery at your own pace—or let the AI guide the route."
+      },
+      "specify": {
+        "title": "Specify",
+        "body": "Choose exact finishes, model references, and quantities while keeping the project schedule in one place."
+      },
+      "propose": {
+        "title": "Propose",
+        "body": "Generate a clean RFQ document for commercial pricing, stock, lead-time, and project-team review."
+      }
     }
   },
   "collections": {
@@ -154,31 +204,42 @@
     "heroHeadline": "Six finishes. One philosophy.",
     "chrome": {
       "name": "Chrome",
-      "description": "A timeless mirror finish that reflects light and complements any bathroom palette. The most versatile choice for both classic and modern interiors."
+      "description": "A timeless mirror finish that reflects light and complements any bathroom palette. The most versatile choice for both classic and modern interiors.",
+      "care": "Clean with a soft damp cloth and mild soap. Dry immediately to prevent water spots. Avoid abrasive cleaners or scouring pads."
     },
     "brushedNickel": {
       "name": "Brushed Nickel",
-      "description": "A soft satin finish with understated warmth. Resists fingerprints and water spots, making it ideal for high-traffic bathrooms."
+      "description": "A soft satin finish with understated warmth. Resists fingerprints and water spots, making it ideal for high-traffic bathrooms.",
+      "care": "Wipe with a soft cloth and warm water. For stubborn marks, use a mild non-abrasive cleaner. The brushed texture naturally resists fingerprints."
     },
     "matteBlack": {
       "name": "Matte Black",
-      "description": "A bold, light-absorbing surface that creates dramatic contrast. The defining fixture finish of contemporary design."
+      "description": "A bold, light-absorbing surface that creates dramatic contrast. The defining fixture finish of contemporary design.",
+      "care": "Clean with a soft damp cloth only. Avoid acidic or abrasive cleaners. PVD coating is durable but can be scratched by harsh chemicals."
     },
     "brushedGold": {
       "name": "Brushed Gold",
-      "description": "A warm rose-gold tone achieved through PVD coating. Fingerprint-resistant. Ideal for contemporary spaces with warm material palettes."
+      "description": "A warm rose-gold tone achieved through PVD coating. Fingerprint-resistant. Ideal for contemporary spaces with warm material palettes.",
+      "care": "Gently wipe with a soft damp cloth. Avoid vinegar, bleach, and abrasive pads. PVD coating provides fingerprint resistance and long-lasting lustre."
     },
     "coffeeGold": {
       "name": "Coffee Gold",
-      "description": "A deep, burnished gold with brown undertones. PVD-coated for durability. Pairs beautifully with dark stone and timber."
+      "description": "A deep, burnished gold with brown undertones. PVD-coated for durability. Pairs beautifully with dark stone and timber.",
+      "care": "Clean with a soft cloth and warm water. Avoid harsh chemicals and abrasive materials. PVD coating ensures durability and colour retention."
     },
     "metalGun": {
       "name": "Metal Gun",
-      "description": "A dark gunmetal grey with industrial character. PVD-coated for lasting performance. Suits minimalist and industrial-inspired spaces."
+      "description": "A dark gunmetal grey with industrial character. PVD-coated for lasting performance. Suits minimalist and industrial-inspired spaces.",
+      "care": "Wipe with a soft damp cloth. Avoid acidic cleaners and abrasive pads. The PVD gunmetal coating is scratch-resistant under normal use."
     },
     "compare": "Compare finishes",
     "availableIn": "Available in",
-    "careInstructions": "Care instructions"
+    "careInstructions": "Care instructions",
+    "heroBody": "Every Steinheim fixture is offered in a coordinated palette of six finishes — two standard and four PVD-coated for lasting durability. Each carries its own catalogue code and its own reason to be specified.",
+    "pvd": "PVD coated",
+    "standard": "Standard finish",
+    "code": "Finish code",
+    "viewProducts": "View products in this finish"
   },
   "product": {
     "addToCart": "Add to cart",
@@ -250,10 +311,22 @@
       "other": "Other"
     },
     "benefits": {
-      "pricing": { "title": "Project pricing", "description": "Competitive volume-based pricing for trade projects" },
-      "samples": { "title": "Sample units", "description": "Physical samples for client presentations and mood boards" },
-      "specs": { "title": "Spec sheets", "description": "Complete technical documentation and CAD files" },
-      "support": { "title": "Dedicated support", "description": "Direct line to our trade team for project consultation" }
+      "pricing": {
+        "title": "Project pricing",
+        "description": "Competitive volume-based pricing for trade projects"
+      },
+      "samples": {
+        "title": "Sample units",
+        "description": "Physical samples for client presentations and mood boards"
+      },
+      "specs": {
+        "title": "Spec sheets",
+        "description": "Complete technical documentation and CAD files"
+      },
+      "support": {
+        "title": "Dedicated support",
+        "description": "Direct line to our trade team for project consultation"
+      }
     }
   },
   "about": {
@@ -396,7 +469,10 @@
     "downloadPdf": "Download the PDF instead"
   },
   "productPage": {
-    "breadcrumb": { "home": "Home", "collections": "Collections" },
+    "breadcrumb": {
+      "home": "Home",
+      "collections": "Collections"
+    },
     "collectionLabel": "{series} Collection",
     "outOfStock": "Out of stock",
     "addToCart": "Add to Cart",
@@ -443,16 +519,35 @@
     }
   },
   "aboutPage": {
-    "breadcrumb": { "home": "Home", "world": "Our World", "company": "The Company" },
-    "hero": { "eyebrow": "Steinheim Egypt", "headline": "A premium bathroom language for Egypt." },
+    "breadcrumb": {
+      "home": "Home",
+      "world": "Our World",
+      "company": "The Company"
+    },
+    "hero": {
+      "eyebrow": "Steinheim Egypt",
+      "headline": "A premium bathroom language for Egypt."
+    },
     "world": {
       "eyebrow": "Our World",
       "headline": "The bathroom, treated as architecture.",
       "cards": {
-        "company": { "eyebrow": "Company", "title": "The Steinheim standard" },
-        "collections": { "eyebrow": "Collections", "title": "Four bathroom languages" },
-        "finishes": { "eyebrow": "Finishes", "title": "Surfaces with presence" },
-        "trade": { "eyebrow": "Trade", "title": "Built for specification" }
+        "company": {
+          "eyebrow": "Company",
+          "title": "The Steinheim standard"
+        },
+        "collections": {
+          "eyebrow": "Collections",
+          "title": "Four bathroom languages"
+        },
+        "finishes": {
+          "eyebrow": "Finishes",
+          "title": "Surfaces with presence"
+        },
+        "trade": {
+          "eyebrow": "Trade",
+          "title": "Built for specification"
+        }
       }
     },
     "identity": {
@@ -474,10 +569,22 @@
       "headline": "Quality",
       "body": "Quality is not a claim on the surface. It is the practical discipline behind every recommendation, product schedule, finish choice, and installation conversation.",
       "items": {
-        "reliability": { "title": "Product reliability", "body": "Steinheim products are selected for long-term daily use across homes, hotels, villas, and developer projects in Egypt." },
-        "finish": { "title": "Finish discipline", "body": "Chrome and PVD finishes are treated as part of the design language, not as an afterthought. Every finish must support the room visually and practically." },
-        "specification": { "title": "Specification clarity", "body": "For trade clients, Steinheim works around clear product schedules, collection logic, finish direction, quantities, and project review." },
-        "support": { "title": "Egypt support", "body": "The website guides customers toward the right direction, while final pricing, availability, and project conditions are confirmed by Steinheim Egypt." }
+        "reliability": {
+          "title": "Product reliability",
+          "body": "Steinheim products are selected for long-term daily use across homes, hotels, villas, and developer projects in Egypt."
+        },
+        "finish": {
+          "title": "Finish discipline",
+          "body": "Chrome and PVD finishes are treated as part of the design language, not as an afterthought. Every finish must support the room visually and practically."
+        },
+        "specification": {
+          "title": "Specification clarity",
+          "body": "For trade clients, Steinheim works around clear product schedules, collection logic, finish direction, quantities, and project review."
+        },
+        "support": {
+          "title": "Egypt support",
+          "body": "The website guides customers toward the right direction, while final pricing, availability, and project conditions are confirmed by Steinheim Egypt."
+        }
       }
     },
     "finishes": {
@@ -500,9 +607,18 @@
       "body": "Whether you're designing a single bathroom or specifying for a 200-unit development, we respond within 24 hours."
     },
     "enquiryTypes": {
-      "homeowner": { "label": "Homeowner", "desc": "Product enquiry or order support" },
-      "trade": { "label": "Trade / Professional", "desc": "Project specification or bulk pricing" },
-      "general": { "label": "General", "desc": "Press, partnerships, or other" }
+      "homeowner": {
+        "label": "Homeowner",
+        "desc": "Product enquiry or order support"
+      },
+      "trade": {
+        "label": "Trade / Professional",
+        "desc": "Project specification or bulk pricing"
+      },
+      "general": {
+        "label": "General",
+        "desc": "Press, partnerships, or other"
+      }
     },
     "iAm": "I am a",
     "fields": {
@@ -526,10 +642,24 @@
     "successTitle": "Message received.",
     "successBody": "Thank you for reaching out. Our team will review your enquiry and respond within one business day.",
     "info": {
-      "showroom": { "label": "Showroom", "lines": ["El Sharbatly International Group", "Cairo, Egypt"] },
-      "email": { "label": "Email" },
-      "whatsapp": { "label": "WhatsApp" },
-      "responseTime": { "label": "Response time", "value": "Under 24 hours", "note": "Trade enquiries receive a detailed quote with pricing, availability, and lead times." }
+      "showroom": {
+        "label": "Showroom",
+        "lines": [
+          "El Sharbatly International Group",
+          "Cairo, Egypt"
+        ]
+      },
+      "email": {
+        "label": "Email"
+      },
+      "whatsapp": {
+        "label": "WhatsApp"
+      },
+      "responseTime": {
+        "label": "Response time",
+        "value": "Under 24 hours",
+        "note": "Trade enquiries receive a detailed quote with pricing, availability, and lead times."
+      }
     }
   },
   "policyCommon": {
@@ -747,7 +877,11 @@
     "openTradeStudio": "Open trade studio"
   },
   "projectDetail": {
-    "breadcrumb": { "home": "Home", "projects": "Projects", "references": "References" },
+    "breadcrumb": {
+      "home": "Home",
+      "projects": "Projects",
+      "references": "References"
+    },
     "sector": "Sector",
     "collection": "Steinheim collection",
     "publishedEvidence": "Specification note",
@@ -758,7 +892,10 @@
     "buildSchedule": "Build a project schedule"
   },
   "collectionsLanding": {
-    "breadcrumb": { "home": "Home", "collections": "Collections" },
+    "breadcrumb": {
+      "home": "Home",
+      "collections": "Collections"
+    },
     "eyebrow": "Collections",
     "headline": "Four systems.",
     "pause": "Pause background video",
@@ -775,14 +912,27 @@
     }
   },
   "collectionPage": {
-    "breadcrumb": { "home": "Home", "collections": "Collections" },
-    "nav": { "overview": "Overview", "setup": "Set-up", "products": "Products" },
+    "breadcrumb": {
+      "home": "Home",
+      "collections": "Collections"
+    },
+    "nav": {
+      "overview": "Overview",
+      "setup": "Set-up",
+      "products": "Products"
+    },
     "chooseFinish": "Choose a finish",
     "seeRange": "See the entire {series} range in one finish.",
     "setupEyebrow": "Set-up",
     "setupHeadline": "How this collection belongs in a project.",
-    "backToOverview": { "title": "Back to overview", "body": "Return to the story and design direction of the collection." },
-    "tradeStudio": { "title": "Trade studio", "body": "Build a project scope and prepare a Steinheim specification." },
+    "backToOverview": {
+      "title": "Back to overview",
+      "body": "Return to the story and design direction of the collection."
+    },
+    "tradeStudio": {
+      "title": "Trade studio",
+      "body": "Build a project scope and prepare a Steinheim specification."
+    },
     "viewProducts": "View products",
     "viewSetup": "View set-up",
     "close": "Close",
@@ -794,9 +944,21 @@
         "description": "Joy is the Steinheim collection for warm private bathrooms, hospitality rooms, and projects where the fittings should feel elevated without becoming loud.",
         "setup": "Use Joy for guest bathrooms, master bathrooms, hotel rooms, and premium apartments where consistency and calm design matter.",
         "cards": {
-          "intro": { "eyebrow": "Intro", "title": "Soft Minimal", "body": "Rounded forms and quiet proportions for spaces that need warmth." },
-          "concept": { "eyebrow": "Concept", "title": "Everyday Premium", "body": "A practical collection that still feels considered and complete." },
-          "design": { "eyebrow": "Design", "title": "Warm Precision", "body": "Suitable for villas, hotel rooms, and repeatable premium bathrooms." }
+          "intro": {
+            "eyebrow": "Intro",
+            "title": "Soft Minimal",
+            "body": "Rounded forms and quiet proportions for spaces that need warmth."
+          },
+          "concept": {
+            "eyebrow": "Concept",
+            "title": "Everyday Premium",
+            "body": "A practical collection that still feels considered and complete."
+          },
+          "design": {
+            "eyebrow": "Design",
+            "title": "Warm Precision",
+            "body": "Suitable for villas, hotel rooms, and repeatable premium bathrooms."
+          }
         }
       },
       "up": {
@@ -805,9 +967,21 @@
         "description": "Up gives the bathroom a cleaner, more dynamic silhouette while staying practical for larger schedules, designers, and developers.",
         "setup": "Use Up when the project needs a sharper modern look, efficient specification, and a collection that can repeat across many units.",
         "cards": {
-          "intro": { "eyebrow": "Intro", "title": "Fluid Modern", "body": "Slimmer lines and an easy contemporary silhouette." },
-          "concept": { "eyebrow": "Concept", "title": "Project Ready", "body": "Built for apartments, developments, and modern hospitality scopes." },
-          "design": { "eyebrow": "Design", "title": "Clean Momentum", "body": "A directional collection without unnecessary visual noise." }
+          "intro": {
+            "eyebrow": "Intro",
+            "title": "Fluid Modern",
+            "body": "Slimmer lines and an easy contemporary silhouette."
+          },
+          "concept": {
+            "eyebrow": "Concept",
+            "title": "Project Ready",
+            "body": "Built for apartments, developments, and modern hospitality scopes."
+          },
+          "design": {
+            "eyebrow": "Design",
+            "title": "Clean Momentum",
+            "body": "A directional collection without unnecessary visual noise."
+          }
         }
       },
       "art": {
@@ -816,9 +990,21 @@
         "description": "Art is for spaces where the fitting should feel intentional, sculptural, and closely connected to the architecture of the room.",
         "setup": "Use Art for statement suites, villas, show bathrooms, and projects where the specification should feel more expressive.",
         "cards": {
-          "intro": { "eyebrow": "Intro", "title": "Sculptural Precision", "body": "A more architectural language for statement bathrooms." },
-          "concept": { "eyebrow": "Concept", "title": "Design-Led", "body": "For clients who want the fixture to be part of the room identity." },
-          "design": { "eyebrow": "Design", "title": "Confident Lines", "body": "Premium, controlled, and visually memorable." }
+          "intro": {
+            "eyebrow": "Intro",
+            "title": "Sculptural Precision",
+            "body": "A more architectural language for statement bathrooms."
+          },
+          "concept": {
+            "eyebrow": "Concept",
+            "title": "Design-Led",
+            "body": "For clients who want the fixture to be part of the room identity."
+          },
+          "design": {
+            "eyebrow": "Design",
+            "title": "Confident Lines",
+            "body": "Premium, controlled, and visually memorable."
+          }
         }
       },
       "quatro": {
@@ -827,9 +1013,21 @@
         "description": "Quatro brings defined edges, clean planes, and a more graphic silhouette to modern homes, offices, and developer schemes.",
         "setup": "Use Quatro where the architecture is sharper: modern apartments, office washrooms, show units, and contemporary villas.",
         "cards": {
-          "intro": { "eyebrow": "Intro", "title": "Geometric Calm", "body": "Crisp geometry with controlled visual tension." },
-          "concept": { "eyebrow": "Concept", "title": "Sharp Modern", "body": "A clean-edged collection for confident interiors." },
-          "design": { "eyebrow": "Design", "title": "Defined Planes", "body": "For bathrooms that need structure and architectural clarity." }
+          "intro": {
+            "eyebrow": "Intro",
+            "title": "Geometric Calm",
+            "body": "Crisp geometry with controlled visual tension."
+          },
+          "concept": {
+            "eyebrow": "Concept",
+            "title": "Sharp Modern",
+            "body": "A clean-edged collection for confident interiors."
+          },
+          "design": {
+            "eyebrow": "Design",
+            "title": "Defined Planes",
+            "body": "For bathrooms that need structure and architectural clarity."
+          }
         }
       }
     }
@@ -844,10 +1042,22 @@
     "howHeadline": "One project. Every step.",
     "howBody": "Tell us your rooms, mark what each one needs, then shop real products against exactly that list — nothing generic, nothing irrelevant.",
     "steps": {
-      "intro": { "title": "You & your project", "body": "Tell us who you are and a little about the project — takes a minute." },
-      "rooms": { "title": "Rooms", "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own." },
-      "needs": { "title": "What's needed", "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities." },
-      "shop": { "title": "Shop products", "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board." }
+      "intro": {
+        "title": "You & your project",
+        "body": "Tell us who you are and a little about the project — takes a minute."
+      },
+      "rooms": {
+        "title": "Rooms",
+        "body": "Enter your property's room composition once — master, standard, powder, suite, or add your own."
+      },
+      "needs": {
+        "title": "What's needed",
+        "body": "For each room, mark which product types you need — basin mixers, showers, and more — with quantities."
+      },
+      "shop": {
+        "title": "Shop products",
+        "body": "Browse real products filtered to exactly what you marked as needed, pick finishes and quantities, and add it all to your project board."
+      }
     },
     "howShowcase": {
       "previewLabel": "Illustrative preview of the room calculator",
@@ -878,11 +1088,26 @@
       "headline": "Submit once. Watch it through to delivery.",
       "body": "Most bathroom suppliers end at the RFQ. Steinheim doesn't — your project stays live: a status you can check, a quote you can accept, a team you can message, samples you can request, all against one record until the last item is delivered.",
       "items": {
-        "track": { "title": "Track", "body": "A live status through every stage — received, reviewed, contacted, quoted, confirmed, sourced, shipped, delivered." },
-        "message": { "title": "Message", "body": "A direct line to the Steinheim trade team, inside your project — no email chains." },
-        "quote": { "title": "Quote", "body": "Review your commercial quote and accept it in place." },
-        "documents": { "title": "Documents", "body": "Invoices and paperwork collected against the project record." },
-        "samples": { "title": "Samples", "body": "Request finish samples, delivered straight to your site, without leaving your board." }
+        "track": {
+          "title": "Track",
+          "body": "A live status through every stage — received, reviewed, contacted, quoted, confirmed, sourced, shipped, delivered."
+        },
+        "message": {
+          "title": "Message",
+          "body": "A direct line to the Steinheim trade team, inside your project — no email chains."
+        },
+        "quote": {
+          "title": "Quote",
+          "body": "Review your commercial quote and accept it in place."
+        },
+        "documents": {
+          "title": "Documents",
+          "body": "Invoices and paperwork collected against the project record."
+        },
+        "samples": {
+          "title": "Samples",
+          "body": "Request finish samples, delivered straight to your site, without leaving your board."
+        }
       },
       "previewLabel": "Illustrative preview of a project board",
       "mock": {
@@ -915,10 +1140,22 @@
       "headline": "Built for teams doing this repeatedly.",
       "body": "Working across multiple units, a hospitality rollout, or a developer schedule? Our trade team supports project-scale work directly.",
       "items": {
-        "pricing": { "title": "Project pricing", "body": "Volume-based pricing conversations for multi-unit and project-scale orders." },
-        "support": { "title": "Dedicated support", "body": "A direct point of contact for specification questions, substitutions, and lead times." },
-        "scheduling": { "title": "Priority scheduling", "body": "Coordinated delivery scheduling to match your site's construction or fit-out timeline." },
-        "access": { "title": "Early access", "body": "First look at new collections and finishes ahead of general release." }
+        "pricing": {
+          "title": "Project pricing",
+          "body": "Volume-based pricing conversations for multi-unit and project-scale orders."
+        },
+        "support": {
+          "title": "Dedicated support",
+          "body": "A direct point of contact for specification questions, substitutions, and lead times."
+        },
+        "scheduling": {
+          "title": "Priority scheduling",
+          "body": "Coordinated delivery scheduling to match your site's construction or fit-out timeline."
+        },
+        "access": {
+          "title": "Early access",
+          "body": "First look at new collections and finishes ahead of general release."
+        }
       },
       "cta": "Talk to our trade team"
     }
@@ -955,7 +1192,12 @@
     "eyebrow": "Steinheim Trade Studio",
     "headline": "Tell us your property, once",
     "body": "Set your room composition, then assign real products to each room — right here on this page. Everything you pick is saved to your project board as you go.",
-    "steps": { "intro": "You & your project", "rooms": "Rooms", "needs": "What's needed", "shop": "Shop products" },
+    "steps": {
+      "intro": "You & your project",
+      "rooms": "Rooms",
+      "needs": "What's needed",
+      "shop": "Shop products"
+    },
     "step0": {
       "headline": "What kind of project is this?",
       "body": "Pick the closest match — it shapes what we ask next. You can always adjust details later.",
@@ -1003,21 +1245,30 @@
     "continue": "Continue"
   },
   "bestSellers": {
-    "breadcrumb": { "home": "Home", "bestSellers": "Best Sellers" },
+    "breadcrumb": {
+      "home": "Home",
+      "bestSellers": "Best Sellers"
+    },
     "eyebrow": "Most requested",
     "heading": "Best sellers.",
     "description": "The products our customers choose most, ranked by real sales.",
     "empty": "Best sellers will appear here once sales data is available."
   },
   "shopTheLook": {
-    "breadcrumb": { "home": "Home", "shopTheLook": "Shop the Look" },
+    "breadcrumb": {
+      "home": "Home",
+      "shopTheLook": "Shop the Look"
+    },
     "eyebrow": "Shop the look",
     "heading": "Real rooms, real products.",
     "description": "Every collection shown the way it lives in a finished bathroom — pick the pieces that build the look.",
     "viewCollection": "View full collection"
   },
   "products": {
-    "breadcrumb": { "home": "Home", "allProducts": "All products" },
+    "breadcrumb": {
+      "home": "Home",
+      "allProducts": "All products"
+    },
     "eyebrow": "Full range",
     "heading": "All products.",
     "description": "Every collection, every finish, in one place — {count, plural, one {# product} other {# products}} across Joy, Up, Art, and Quatro.",
@@ -1133,12 +1384,20 @@
     "studioLabel": "Steinheim Trade Studio",
     "headline": "Set up your project",
     "close": "Close",
-    "steps": { "intro": "You & your project", "rooms": "Rooms", "needs": "What's needed" },
+    "steps": {
+      "intro": "You & your project",
+      "rooms": "Rooms",
+      "needs": "What's needed"
+    },
     "step0": {
       "headline": "What kind of project is this?",
       "body": "Pick the closest match — it shapes what we ask next.",
       "reachTitle": "Who should we reach?",
-      "fields": { "name": "Your name *", "email": "Email *", "projectName": "Business or project name *" }
+      "fields": {
+        "name": "Your name *",
+        "email": "Email *",
+        "projectName": "Business or project name *"
+      }
     },
     "step1": {
       "defaultHeadline": "How many rooms in total?",

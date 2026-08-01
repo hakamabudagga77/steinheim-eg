@@ -42,7 +42,7 @@ const worldLinks = [
   {
     labelKey: "world.finishes" as const,
     eyebrowKey: "world.finishesEyebrow" as const,
-    href: "/about#finishes",
+    href: "/finishes",
     image: "/images/generated/gessi/steinheim-finish-stack.png",
   },
   {
