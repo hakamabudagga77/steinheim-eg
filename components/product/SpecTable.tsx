@@ -3,9 +3,19 @@ import type { Product } from "@/lib/utils";
 
 export default function SpecTable({ product }: { product: Product }) {
   const t = useTranslations("specs");
+  const tv = useTranslations("specValues");
+
+  // Spec values live in data/products.json in English. Only the material
+  // names are words rather than measurements or brand names — "16 bar",
+  // "90°C", "35mm Sedal" and "Neoperl" read natively in Arabic technical
+  // writing, so they are deliberately passed through untouched.
+  const translateValue = (value?: string) => {
+    if (!value) return value;
+    return tv.has(value) ? tv(value) : value;
+  };
 
   const specs: [string, string | undefined][] = [
-    [t("material"), product.material],
+    [t("material"), translateValue(product.material)],
     [t("cartridge"), product.cartridge],
     [t("aerator"), product.aerator],
     [t("inletPipe"), product.inletPipe],

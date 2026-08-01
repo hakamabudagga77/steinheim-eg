@@ -1784,5 +1784,11 @@
       "tradeStudio": "Trade Studio",
       "tradeStudioEyebrow": "Projects"
     }
+  },
+  "specValues": {
+    "Brass body": "Brass body",
+    "Brass": "Brass",
+    "Stainless steel": "Stainless steel",
+    "Stainless steel body": "Stainless steel body"
   }
 }

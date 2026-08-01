@@ -25,6 +25,9 @@ const SPEC_FIELDS: Array<{ key: keyof Product; labelKey: string }> = [
 export default function CompareModal() {
   const t = useTranslations("compare");
   const tSpecs = useTranslations("specs");
+  // Material names are the only spec values that are words; measurements and
+  // brand names pass through untouched. See SpecTable for the same guard.
+  const tSpecValues = useTranslations("specValues");
   const { comparison, open, setOpen, removeItem, clearComparison } = useComparison();
 
   const columns = comparison.items.flatMap((item) => {
@@ -132,11 +135,14 @@ export default function CompareModal() {
                   style={{ gridTemplateColumns: `180px repeat(${columns.length}, minmax(180px, 1fr))` }}
                 >
                   <p className="text-[12px] text-black/45">{tSpecs(field.labelKey)}</p>
-                  {columns.map((col) => (
-                    <p key={col.product.slug} className="text-[12px] text-black/80">
-                      {(col.product[field.key] as string | undefined) ?? "—"}
-                    </p>
-                  ))}
+                  {columns.map((col) => {
+                    const value = col.product[field.key] as string | undefined;
+                    return (
+                      <p key={col.product.slug} className="text-[12px] text-black/80">
+                        {value ? (tSpecValues.has(value) ? tSpecValues(value) : value) : "—"}
+                      </p>
+                    );
+                  })}
                 </div>
               ))}
             </div>

@@ -257,18 +257,18 @@
     "series": "Series"
   },
   "specs": {
-    "installationType": "Installation type",
-    "material": "Material",
-    "cartridge": "Cartridge",
-    "aerator": "Aerator",
-    "dimensions": "Dimensions",
-    "pressureRange": "Pressure range",
-    "maxPressure": "Max pressure",
-    "maxTemperature": "Max hot water temperature",
-    "operatingTemperature": "Recommended operating temperature",
-    "connectionSize": "Connection size",
-    "mountingAperture": "Mounting aperture",
-    "inletPipe": "Inlet pipe"
+    "installationType": "نوع التركيب",
+    "material": "الخامة",
+    "cartridge": "الخرطوشة",
+    "aerator": "المهوّي",
+    "dimensions": "الأبعاد",
+    "pressureRange": "نطاق الضغط",
+    "maxPressure": "أقصى ضغط",
+    "maxTemperature": "أقصى درجة حرارة للماء الساخن",
+    "operatingTemperature": "درجة حرارة التشغيل الموصى بها",
+    "connectionSize": "مقاس الوصلة",
+    "mountingAperture": "فتحة التثبيت",
+    "inletPipe": "ماسورة الإمداد"
   },
   "brandPillars": {
     "sedal": {
@@ -1784,5 +1784,11 @@
       "tradeStudio": "استوديو المشروعات",
       "tradeStudioEyebrow": "المشروعات"
     }
+  },
+  "specValues": {
+    "Brass body": "جسم نحاسي",
+    "Brass": "نحاس",
+    "Stainless steel": "صلب مقاوم للصدأ",
+    "Stainless steel body": "جسم من الصلب المقاوم للصدأ"
   }
 }
