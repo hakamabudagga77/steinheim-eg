@@ -14,14 +14,17 @@ export async function POST(request: Request) {
     const shopifyProducts = await fetchAllProducts();
 
     const checkoutItems: Array<{ variantId: number; quantity: number }> = [];
-    const unmapped: string[] = [];
+    // Structured rather than a display string: the cart drawer resolves these
+    // back to product/finish names so the shopper is told exactly which lines
+    // cannot be ordered online, instead of them vanishing from the order.
+    const unmapped: Array<{ slug: string; finish: string }> = [];
 
     for (const item of items) {
       const variantId = resolveVariantId(item.slug, item.finish, shopifyProducts);
       if (variantId) {
         checkoutItems.push({ variantId, quantity: item.quantity });
       } else {
-        unmapped.push(`${item.slug} (${item.finish})`);
+        unmapped.push({ slug: item.slug, finish: item.finish });
       }
     }
 

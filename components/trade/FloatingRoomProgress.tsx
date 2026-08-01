@@ -6,7 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import RoomProgressPanel from "@/components/trade/RoomProgressPanel";
 import { hasActiveRoomNeeds, type RequirementType } from "@/lib/trade-project";
-import { getProductBySlug } from "@/lib/utils";
+import { projectCoverage } from "@/lib/trade-quantities";
 
 export default function FloatingRoomProgress({ locale }: { locale: string }) {
   const t = useTranslations("floatingRoomProgress");
@@ -15,24 +15,8 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
 
   if (!hasActiveRoomNeeds(project)) return null;
 
-  const activeRooms = (project.roomPlan?.groups ?? []).filter(
-    (group) => group.count > 0 && group.productNeeds.some((need) => need.quantity > 0)
-  );
-
-  let totalNeeded = 0;
-  let totalSelected = 0;
-  for (const room of activeRooms) {
-    for (const need of room.productNeeds) {
-      if (need.quantity <= 0) continue;
-      totalNeeded += need.quantity;
-      const selected = project.items
-        .filter((item) => item.scopeId === room.scopeId && getProductBySlug(item.slug)?.type === need.type)
-        .reduce((sum, item) => sum + item.quantity, 0);
-      totalSelected += Math.min(selected, need.quantity);
-    }
-  }
-  const remaining = Math.max(0, totalNeeded - totalSelected);
-  const progressPct = totalNeeded > 0 ? Math.round((totalSelected / totalNeeded) * 100) : 0;
+  // Coverage counts rooms × units-per-room; see lib/trade-quantities.ts.
+  const { needed: totalNeeded, selected: totalSelected, remaining, percent: progressPct } = projectCoverage(project);
 
   // Deep-links straight to the exact room + product type in the shop step,
   // instead of dropping the shopper at the top of the calculator to re-find it.

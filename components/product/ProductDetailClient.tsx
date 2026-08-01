@@ -292,6 +292,14 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
 
                 <div className={isTradeCustomer ? "mt-3" : "mt-8 sm:mt-20 lg:mt-28"}>
                   {!isTradeCustomer && (
+                    <div className="flex items-center gap-3">
+                    {/* Retail buyers have no room plan, so roomOptions is empty
+                        and the stepper rendered alongside the room dropdown
+                        below never appears for them. Without this, every
+                        add-to-cart was locked to a quantity of one. */}
+                    <div className="flex h-[58px] shrink-0 items-center rounded-full bg-white px-1 shadow-[0_18px_55px_rgba(0,0,0,0.055)]">
+                      {quantityStepper}
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
@@ -300,7 +308,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         setCartAdded(true);
                         setTimeout(() => setCartAdded(false), 2200);
                       }}
-                      className="flex h-[58px] w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
+                      className="flex h-[58px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-black text-[15px] font-medium tracking-[0.02em] text-white transition hover:bg-black/85"
                     >
                       <AnimatePresence mode="wait" initial={false}>
                         {cartAdded ? (
@@ -330,6 +338,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                         )}
                       </AnimatePresence>
                     </button>
+                    </div>
                   )}
                   {roomOptions.length > 0 && (
                     <div className={`flex items-center gap-3 ${isTradeCustomer ? "" : "mt-3"}`}>

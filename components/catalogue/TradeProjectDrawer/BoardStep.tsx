@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/utils";
 import { RoomBasketCard, ProjectItemRow } from "@/components/trade/RoomBasketCard";
 import { TRADE_LEAD_STATUS_LABELS } from "@/lib/trade-leads";
 import type { RoomGroup, TradeProject, TradeProjectRoomPlan } from "@/lib/trade-project";
+import { requiredUnitsForGroup } from "@/lib/trade-quantities";
 import type { LeadOverview, Row, ScopeGroup } from "./shared";
 
 export default function BoardStep({
@@ -151,7 +152,9 @@ export default function BoardStep({
           <StaggerContainer className="space-y-5">
             {activeRoomGroups.map((group) => {
               const basketRows = rows.filter((row) => row.item.scopeId === group.scopeId);
-              const neededTotal = group.productNeeds.reduce((sum, need) => sum + need.quantity, 0);
+              // rooms × units-per-room — the room count was collected and
+              // displayed but never multiplied in. See lib/trade-quantities.ts.
+              const neededTotal = requiredUnitsForGroup(group);
               const selectedTotal = basketRows.reduce((sum, row) => sum + row.item.quantity, 0);
               const stillNeeds = neededTotal > 0 && selectedTotal < neededTotal;
 

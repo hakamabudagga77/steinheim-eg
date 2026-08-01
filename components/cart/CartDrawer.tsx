@@ -18,6 +18,11 @@ export default function CartDrawer({ locale }: { locale: string }) {
   const { cart, open, setOpen, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const finishes = useMemo(() => getAllFinishes(), []);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(false);
+  // Lines Shopify cannot fulfil online. Held in state so the shopper decides
+  // what happens to them, rather than the old behaviour of quietly checking
+  // out with fewer items than they picked.
+  const [blocked, setBlocked] = useState<Array<{ slug: string; finish: string }>>([]);
   const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>>({});
 
   useEffect(() => {
@@ -69,7 +74,69 @@ export default function CartDrawer({ locale }: { locale: string }) {
 
   function handleCheckoutWhatsApp() {
     const msg = buildWhatsAppOrder();
+    // Synchronous inside the click handler, so this window.open is never
+    // popup-blocked (unlike one issued after an await).
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  function titleCaseSlug(slug: string) {
+    return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  function describeLine(line: { slug: string; finish: string }) {
+    const product = getProductBySlug(line.slug);
+    const finish = finishes.find((f) => f.id === line.finish);
+    const series = product ? getSeriesById(product.series) : undefined;
+    // A slug with no catalogue entry can't normally reach the cart, but never
+    // show the shopper a raw slug if one ever does.
+    const name = product ? `${series?.name ?? product.series} ${product.name}` : titleCaseSlug(line.slug);
+    return `${name} — ${finish?.name ?? titleCaseSlug(line.finish)}`;
+  }
+
+  // `force` is the shopper's explicit "continue with the rest" after being
+  // shown which lines cannot be ordered online.
+  async function startCheckout(force = false) {
+    setCheckingOut(true);
+    setCheckoutError(false);
+    if (force) setBlocked([]);
+    try {
+      const res = await fetch("/api/shopify/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.items.map((i) => ({
+            slug: i.slug,
+            finish: i.finish,
+            quantity: i.quantity,
+          })),
+        }),
+      });
+      const data = await res.json();
+      const unmapped: Array<{ slug: string; finish: string }> = Array.isArray(data.unmapped) ? data.unmapped : [];
+
+      if (!res.ok || !data.checkoutUrl) {
+        setBlocked(unmapped);
+        setCheckoutError(true);
+        return;
+      }
+
+      // Stop and explain rather than silently dropping the line. The shopper
+      // can then continue without it or send the whole order over WhatsApp.
+      if (unmapped.length > 0 && !force) {
+        setBlocked(unmapped);
+        return;
+      }
+
+      // Same-tab navigation: a window.open issued after an await sits outside
+      // the user-gesture window and is blocked outright by iOS Safari, which
+      // is most of this store's traffic. It also preserves the referrer so the
+      // Shopify session stays attributable.
+      window.location.assign(data.checkoutUrl);
+    } catch {
+      setCheckoutError(true);
+    } finally {
+      setCheckingOut(false);
+    }
   }
 
   // Wrapped in the shared Modal primitive (centered={false} → it renders the
@@ -271,33 +338,42 @@ export default function CartDrawer({ locale }: { locale: string }) {
                   {t("shippingNote")}
                 </p>
 
+                {blocked.length > 0 && (
+                  <div role="alert" className="mb-4 border border-charcoal/15 bg-[#faf8f4] p-4">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-charcoal">
+                      {t("unavailableTitle")}
+                    </p>
+                    <ul className="mt-2 space-y-1">
+                      {blocked.map((line) => (
+                        <li key={`${line.slug}-${line.finish}`} className="text-[12px] leading-relaxed text-warm-gray">
+                          {describeLine(line)}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 text-[11px] leading-relaxed text-warm-gray/80">
+                      {t("unavailableBody")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => startCheckout(true)}
+                      disabled={checkingOut}
+                      className="mt-3 text-[10px] font-medium uppercase tracking-[0.12em] text-charcoal underline underline-offset-4 transition hover:opacity-70 disabled:opacity-50"
+                    >
+                      {t("continueWithout")}
+                    </button>
+                  </div>
+                )}
+
+                {checkoutError && (
+                  <p role="alert" className="mb-3 text-[11px] leading-relaxed text-charcoal">
+                    {t("checkoutFailed")}
+                  </p>
+                )}
+
                 <button
                   type="button"
                   disabled={checkingOut}
-                  onClick={async () => {
-                    setCheckingOut(true);
-                    try {
-                      const res = await fetch("/api/shopify/checkout", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          items: cart.items.map((i) => ({
-                            slug: i.slug,
-                            finish: i.finish,
-                            quantity: i.quantity,
-                          })),
-                        }),
-                      });
-                      const data = await res.json();
-                      if (data.checkoutUrl) {
-                        window.open(data.checkoutUrl, "_blank");
-                      }
-                    } catch {
-                      // fall through
-                    } finally {
-                      setCheckingOut(false);
-                    }
-                  }}
+                  onClick={() => startCheckout()}
                   className="flex h-[50px] w-full items-center justify-center gap-2 bg-charcoal text-[10px] font-medium uppercase tracking-[0.15em] text-white transition hover:bg-black disabled:opacity-50"
                 >
                   {checkingOut ? t("preparingCheckout") : t("checkout")}

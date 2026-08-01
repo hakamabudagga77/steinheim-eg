@@ -1402,6 +1402,10 @@
     "shippingNote": "Shipping and taxes calculated at checkout. Free delivery within Greater Cairo for orders above LE 15,000.",
     "checkout": "Checkout",
     "preparingCheckout": "Preparing checkout…",
+    "checkoutFailed": "We couldn't reach the payment page. Please try again, or send your order via WhatsApp below.",
+    "unavailableTitle": "Some items need a WhatsApp order",
+    "unavailableBody": "These aren't available through online checkout yet. Send the full order via WhatsApp below, or continue with the remaining items.",
+    "continueWithout": "Continue with the other items",
     "whatsappEnquire": "Or enquire via WhatsApp",
     "secureNote": "Checkout goes to Steinheim Egypt's secure payment page"
   },
