@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { REQUIREMENT_TYPE_LABELS, type RequirementType } from "@/lib/trade-project";
-import { getProductBySlug } from "@/lib/utils";
+import { requiredUnitsFor, selectedUnitsFor } from "@/lib/trade-quantities";
 
 export default function RoomProgressPanel({
   onSelectNeed,
@@ -17,9 +17,7 @@ export default function RoomProgressPanel({
   );
 
   function selectedFor(scopeId: string, type: RequirementType) {
-    return project.items
-      .filter((item) => item.scopeId === scopeId && getProductBySlug(item.slug)?.type === type)
-      .reduce((sum, item) => sum + item.quantity, 0);
+    return selectedUnitsFor(project, scopeId, type);
   }
 
   if (activeRooms.length === 0) return null;
@@ -34,8 +32,11 @@ export default function RoomProgressPanel({
           </div>
           <div className="divide-y divide-black/8 bg-white">
             {room.productNeeds.filter((need) => need.quantity > 0).map((need) => {
+              // Rooms × units-per-room. Comparing against need.quantity alone
+              // marked a 40-room floor complete after a single unit.
+              const needed = requiredUnitsFor(room, need);
               const selected = selectedFor(room.scopeId, need.type);
-              const met = selected >= need.quantity;
+              const met = selected >= needed;
               return (
                 <button
                   key={need.type}
@@ -45,7 +46,7 @@ export default function RoomProgressPanel({
                 >
                   <span className="text-[12px] text-black/75">{REQUIREMENT_TYPE_LABELS[need.type]}</span>
                   <span className={`flex shrink-0 items-center gap-1.5 text-[11px] font-medium ${met ? "text-black" : "text-black/35"}`}>
-                    {t("selectedOfNeeded", { selected, needed: need.quantity })}
+                    {t("selectedOfNeeded", { selected, needed })}
                     {met && (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                         <polyline points="20 6 9 17 4 12" />
