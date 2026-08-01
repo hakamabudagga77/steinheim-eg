@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
 import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
+import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import Modal from "@/components/ui/Modal";
 
 const WHATSAPP_NUMBER = "201223998124";
@@ -31,6 +32,13 @@ export default function CartDrawer({ locale }: { locale: string }) {
       .then((r) => r.ok ? r.json() : {})
       .then(setLiveData)
       .catch(() => {});
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || cart.items.length === 0) return;
+    trackViewCart(cart.items);
+    // Once per opening — not on every cart edit while the drawer is open.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const rows = cart.items.flatMap((item) => {
@@ -73,6 +81,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
   }
 
   function handleCheckoutWhatsApp() {
+    trackBeginCheckout(cart.items, "whatsapp");
     const msg = buildWhatsAppOrder();
     // Synchronous inside the click handler, so this window.open is never
     // popup-blocked (unlike one issued after an await).
@@ -126,6 +135,8 @@ export default function CartDrawer({ locale }: { locale: string }) {
         setBlocked(unmapped);
         return;
       }
+
+      trackBeginCheckout(cart.items, "shopify");
 
       // Same-tab navigation: a window.open issued after an await sits outside
       // the user-gesture window and is blocked outright by iOS Safari, which

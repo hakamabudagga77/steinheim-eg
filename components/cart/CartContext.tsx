@@ -8,6 +8,7 @@ import {
   type Cart,
   type CartItem,
 } from "@/lib/cart";
+import { trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
 import { useFlyAnimation } from "@/components/ui/useFlyAnimation";
 
 interface CartContextValue {
@@ -105,6 +106,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
         return [...items, { slug, finish, quantity: Math.max(1, quantity) }];
       });
+      // Tracked here rather than at each button: the PDP, the card quick-add,
+      // the quick-view modal and the wishlist all funnel through addItem, so
+      // one call site covers every path into the cart.
+      trackAddToCart({ slug, finish, quantity: Math.max(1, quantity) });
       setOpen(true);
     },
     [update]
@@ -125,7 +130,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeItem = useCallback(
     (slug: string, finish: string) => {
-      update((items) => items.filter((i) => !(i.slug === slug && i.finish === finish)));
+      update((items) => {
+        const removed = items.find((i) => i.slug === slug && i.finish === finish);
+        if (removed) trackRemoveFromCart(removed);
+        return items.filter((i) => !(i.slug === slug && i.finish === finish));
+      });
     },
     [update]
   );

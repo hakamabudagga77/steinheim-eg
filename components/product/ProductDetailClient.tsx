@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -19,6 +19,7 @@ import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
+import { trackViewItem } from "@/lib/analytics";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
@@ -43,6 +44,12 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const seriesName = series?.name ?? product.series;
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const liveVariant = liveData?.variants.find((entry) => entry.finish === variant.finish);
+
+  // Re-fires on finish change on purpose: which finish a shopper lands on and
+  // which one they leave with is the decision that drives price here.
+  useEffect(() => {
+    trackViewItem({ slug: product.slug, finish: variant.finish, quantity: 1 }, liveVariant?.price);
+  }, [product.slug, variant.finish, liveVariant?.price]);
   const finish = getFinishById(variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
   const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
