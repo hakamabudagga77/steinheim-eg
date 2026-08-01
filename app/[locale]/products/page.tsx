@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "framer-motion";
@@ -314,8 +315,11 @@ export default function AllProductsPage() {
                             }`}
                           >
                             {disc ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={disc} alt="" className="h-full w-full object-cover" />
+                              // Every other finish swatch on the site goes
+                              // through next/image; this raw <img> was the one
+                              // that didn't, so opening this drawer pulled all
+                              // six source PNGs (~10.6 MB) to paint 44px discs.
+                              <Image src={disc} alt="" fill sizes="44px" className="object-cover" />
                             ) : (
                               <span className="absolute inset-0" style={{ backgroundColor: finish.hex }} />
                             )}
