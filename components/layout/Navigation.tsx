@@ -24,6 +24,10 @@ const collections = [
 ];
 
 const menuLinks = [
+  // The concierge is a fully built, catalogue-grounded assistant that nothing
+  // on the site linked to, so no visitor could reach it. `nav.assistant` was
+  // already written and translated in both message files.
+  { key: "assistant", href: "/assistant" },
   { key: "projects", href: "/projects" },
   { key: "contact", href: "/contact" },
 ];
