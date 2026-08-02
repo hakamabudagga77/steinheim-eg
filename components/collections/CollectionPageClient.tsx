@@ -107,7 +107,14 @@ export default function CollectionPageClient({
             media always covers. Must stay in sync with the -mt below.
           */}
           <div className="sticky top-0 h-lvh min-h-[86svh] overflow-hidden">
-            <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+            {/*
+              Bleed is biased upward because the parallax only ever drifts
+              down. With a symmetric 8% the media ran out of cover partway
+              through the scroll — measured 30px of black at the top by 600px
+              of scroll, 62px by 800 — while 395px of bleed sat unused at the
+              bottom. Top bleed absorbs the drift; bottom stays at 8%.
+            */}
+            <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[24%] h-[132%] origin-center">
               {collectionHeroVideos[series.id] ? (
                 <AutoplayVideo
                   src={collectionHeroVideos[series.id]}

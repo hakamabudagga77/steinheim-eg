@@ -54,7 +54,8 @@ export default function CollectionsLanding() {
           -mt below, and with CollectionPageClient so the two heroes align.
         */}
         <div className="sticky top-0 h-lvh min-h-[760px] overflow-hidden">
-          <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+          {/* Bleed biased upward — see CollectionPageClient for the numbers. */}
+          <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[24%] h-[132%] origin-center">
             <video
               ref={videoRef}
               autoPlay
