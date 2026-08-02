@@ -20,6 +20,7 @@ import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "
 import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { trackViewItem } from "@/lib/analytics";
+import { cacheLivePrices } from "@/lib/live-prices";
 
 type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
@@ -44,6 +45,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   const seriesName = series?.name ?? product.series;
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const liveVariant = liveData?.variants.find((entry) => entry.finish === variant.finish);
+
+  // Seeds the shared price cache so CartContext can price add_to_cart with
+  // what this page is showing. Live data arrives server-side, so this costs
+  // nothing. See lib/live-prices.ts.
+  cacheLivePrices(product.slug, liveData?.variants);
 
   // Re-fires on finish change on purpose: which finish a shopper lands on and
   // which one they leave with is the decision that drives price here.

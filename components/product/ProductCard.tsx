@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
+import { cacheLivePrices } from "@/lib/live-prices";
 import { useCart } from "@/components/cart/CartContext";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useComparison } from "@/components/comparison/ComparisonContext";
@@ -81,6 +82,8 @@ function ProductCard({
 
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? displayVariants[0] ?? product.variants[0];
   const liveVariant = liveVariants?.find((v) => v.finish === variant.finish);
+  // Seeds the shared price cache for the quick-add path; see lib/live-prices.
+  cacheLivePrices(product.slug, liveVariants);
   const imageUrl = getProductImage(product.slug, variant.finish);
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
