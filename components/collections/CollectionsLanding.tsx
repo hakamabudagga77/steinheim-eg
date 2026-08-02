@@ -46,7 +46,14 @@ export default function CollectionsLanding() {
   return (
     <main className="bg-[#ece9e2] text-[#0a0a0a] text-start">
       <section ref={heroSectionRef} className="relative bg-black text-white">
-        <div className="sticky top-0 h-svh min-h-[760px] overflow-hidden">
+        {/*
+          lvh, not svh — same reason as the individual collection hero: svh is
+          the viewport with the mobile address bar showing, the bar retracts on
+          scroll, and a sticky element locked to svh stops short of the bottom,
+          exposing this section's black background. Must stay in sync with the
+          -mt below, and with CollectionPageClient so the two heroes align.
+        */}
+        <div className="sticky top-0 h-lvh min-h-[760px] overflow-hidden">
           <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
             <video
               ref={videoRef}
@@ -72,7 +79,8 @@ export default function CollectionsLanding() {
           </button>
         </div>
 
-        <div className="relative z-10 -mt-[100svh]">
+        {/* Pulls the content up over the sticky media above — same unit. */}
+        <div className="relative z-10 -mt-[100lvh]">
           <section className="relative flex h-svh min-h-[760px] items-center justify-center px-6 text-center">
             <div className="absolute left-0 right-0 top-[124px] px-6 text-left sm:px-10 lg:px-16">
               <div className="mx-auto max-w-[1780px]">
