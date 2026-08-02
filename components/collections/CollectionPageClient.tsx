@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
+import CollectionConciergePanel from "@/components/collections/CollectionConciergePanel";
 import ProjectsCarousel from "@/components/collections/ProjectsCarousel";
 import OverviewCardsSpread from "@/components/collections/OverviewCardsSpread";
 import PageTransition from "@/components/layout/PageTransition";
@@ -64,7 +65,18 @@ export default function CollectionPageClient({
   liveData: LiveData;
 }) {
   const t = useTranslations("collectionPage");
+  const locale = useLocale();
   const [globalFinish, setGlobalFinish] = useState<string | null>(finishes[0]?.id ?? null);
+
+  // Flattened `${slug}::${finish}` view of the live Shopify data, so the
+  // starter package quotes the same prices the cards above it show.
+  const livePrices = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const [slug, entry] of Object.entries(liveData)) {
+      for (const variant of entry.variants) map[`${slug}::${variant.finish}`] = variant.price;
+    }
+    return map;
+  }, [liveData]);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -278,6 +290,18 @@ export default function CollectionPageClient({
             ) : null}
           </div>
         </section>
+
+        {/* Placed straight after the finish selector: the visitor has just
+            chosen a finish, which is exactly the point where "is this the
+            right collection?" and "what do I actually order first?" get asked. */}
+        {globalFinish && (
+          <CollectionConciergePanel
+            series={series}
+            finish={globalFinish}
+            livePrices={livePrices}
+            locale={locale}
+          />
+        )}
 
         <ProjectsCarousel collectionSlug={series.id as "joy" | "up" | "art" | "quatro"} collectionName={series.name} />
 
