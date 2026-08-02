@@ -9,6 +9,7 @@ import {
   type CartItem,
 } from "@/lib/cart";
 import { trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
+import { getLivePrice } from "@/lib/live-prices";
 import { useFlyAnimation } from "@/components/ui/useFlyAnimation";
 
 interface CartContextValue {
@@ -109,7 +110,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       // Tracked here rather than at each button: the PDP, the card quick-add,
       // the quick-view modal and the wishlist all funnel through addItem, so
       // one call site covers every path into the cart.
-      trackAddToCart({ slug, finish, quantity: Math.max(1, quantity) });
+      // Live price, not the catalogue one — the two differ (chrome basin mixer
+      // is 4,350 live vs 4,950 in the catalogue) and reporting the wrong one
+      // made add_to_cart disagree with view_item on the same product.
+      trackAddToCart(
+        { slug, finish, quantity: Math.max(1, quantity) },
+        getLivePrice(slug, finish)
+      );
       setOpen(true);
     },
     [update]
@@ -132,7 +139,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     (slug: string, finish: string) => {
       update((items) => {
         const removed = items.find((i) => i.slug === slug && i.finish === finish);
-        if (removed) trackRemoveFromCart(removed);
+        if (removed) trackRemoveFromCart(removed, getLivePrice(slug, finish));
         return items.filter((i) => !(i.slug === slug && i.finish === finish));
       });
     },

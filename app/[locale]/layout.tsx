@@ -6,8 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
-import AttributionCapture from "@/components/analytics/AttributionCapture";
 import WebVitals from "@/components/analytics/WebVitals";
+import AttributionCapture from "@/components/analytics/AttributionCapture";
 import "../globals.css";
 
 const inter = Inter({

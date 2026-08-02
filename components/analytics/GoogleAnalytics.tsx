@@ -6,7 +6,14 @@ export default function GoogleAnalytics() {
   const productionHostname = new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com"
   ).hostname.replace(/^www\./, "");
-  const analyticsConfig = JSON.stringify({ gaId, productionHostname });
+  // Optional: when the store domain is exposed, GA4 decorates anchor clicks
+  // and form submits to it with the `_gl` linker parameter so the Shopify
+  // checkout continues the same GA4 session. Programmatic navigations are not
+  // decorated by gtag, so campaign attribution to Shopify is handled
+  // separately and reliably in lib/checkout-attribution.ts.
+  const storeDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+  const linkerDomains = storeDomain ? [productionHostname, storeDomain] : null;
+  const analyticsConfig = JSON.stringify({ gaId, productionHostname, linkerDomains });
 
   return (
     <Script id="ga4-init" strategy="afterInteractive">
@@ -19,7 +26,9 @@ export default function GoogleAnalytics() {
           window.dataLayer = window.dataLayer || [];
           window.gtag = function gtag(){window.dataLayer.push(arguments);}
           window.gtag('js', new Date());
-          window.gtag('config', config.gaId);
+          window.gtag('config', config.gaId, config.linkerDomains
+            ? { linker: { domains: config.linkerDomains } }
+            : {});
 
           const script = document.createElement('script');
           script.async = true;
