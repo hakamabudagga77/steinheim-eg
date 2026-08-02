@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
-import { captureAttribution } from "@/lib/attribution";
+import { usePathname } from "next/navigation";
+import { captureAttribution } from "@/lib/checkout-attribution";
 
 /**
- * Records the campaign parameters of the landing URL so they can be re-attached
- * to the Shopify checkout handoff later. Without this the ad that produced a
- * sale is lost the moment the visitor leaves the storefront — see
- * lib/attribution.ts.
+ * Records which channel brought the shopper here, so the cart drawer can
+ * re-attach it to the Shopify checkout link. Renders nothing.
  *
- * Runs once per page load rather than on every route change: campaign
- * parameters only ever appear on the entry URL.
+ * Re-runs on navigation because the ad click may land on any page, and an
+ * App Router route change does not remount this component.
  */
 export default function AttributionCapture() {
+  const pathname = usePathname();
+
   useEffect(() => {
-    captureAttribution(window.location.search);
-  }, []);
+    captureAttribution();
+  }, [pathname]);
 
   return null;
 }

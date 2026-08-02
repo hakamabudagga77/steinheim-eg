@@ -1,5 +1,21 @@
 import type { ShopifyOrder } from "@/lib/shopify-client";
 
+// Our own domains. A referrer pointing at one of these is the checkout handoff,
+// not a traffic source. Derived from the configured site URL so a domain change
+// does not silently reintroduce the self-referral bucket.
+const OWN_HOSTS = new Set(
+  [
+    (() => {
+      try {
+        return new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com").hostname;
+      } catch {
+        return "steinheim-eg.com";
+      }
+    })(),
+    "steinheim-eg.com",
+  ].map((host) => host.replace(/^www\./, ""))
+);
+
 export type ChannelPlatform = "facebook" | "instagram" | "meta" | "google" | "direct" | "other";
 export type ChannelType = "Paid" | "Organic" | "Direct";
 
@@ -25,6 +41,7 @@ export function classifyOrderChannel(order: ShopifyOrder): ChannelInfo {
   let utmSource: string | null = null;
   let utmMedium: string | null = null;
   let hasClickId = false;
+  let forwardedRefHost: string | null = null;
 
   if (order.landing_site) {
     try {
@@ -32,6 +49,9 @@ export function classifyOrderChannel(order: ShopifyOrder): ChannelInfo {
       utmSource = url.searchParams.get("utm_source");
       utmMedium = url.searchParams.get("utm_medium");
       hasClickId = url.searchParams.has("fbclid") || url.searchParams.has("gclid") || url.searchParams.has("igshid");
+      // Written onto the cart link by lib/checkout-attribution.ts: the
+      // referrer the shopper actually arrived from, before we became it.
+      forwardedRefHost = url.searchParams.get("ref_host");
     } catch {
       // malformed landing_site — fall through with no utm signal
     }
@@ -45,6 +65,15 @@ export function classifyOrderChannel(order: ShopifyOrder): ChannelInfo {
       referHost = order.referring_site;
     }
   }
+
+  // Since the storefront moved off Shopify, the shopper always reaches the
+  // cart permalink from us, so referring_site is our own domain on every
+  // order — a value that names no channel and would otherwise bucket every
+  // sale under "steinheim-eg.com (Organic)". The real referrer is forwarded on
+  // the checkout link instead (lib/checkout-attribution.ts), so prefer that
+  // and discard a self-referral.
+  if (referHost && OWN_HOSTS.has(referHost)) referHost = null;
+  if (forwardedRefHost) referHost = forwardedRefHost;
 
   const hasSignal = Boolean(utmSource || utmMedium || hasClickId || referHost);
   if (!hasSignal) return { key: "Direct", platform: "direct", type: "Direct" };

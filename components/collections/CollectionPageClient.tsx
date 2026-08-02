@@ -110,8 +110,23 @@ export default function CollectionPageClient({
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <section className="relative bg-black text-white">
-          <div className="sticky top-0 h-svh min-h-[86svh] overflow-hidden">
-            <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
+          {/*
+            lvh, not svh: svh is the viewport with the mobile address bar
+            showing. The bar retracts as soon as the page scrolls, the viewport
+            grows, and a sticky element locked to svh no longer reaches the
+            bottom — leaving a black band of this section's own background
+            under the video. lvh is the height with the bar hidden, so the
+            media always covers. Must stay in sync with the -mt below.
+          */}
+          <div className="sticky top-0 h-lvh min-h-[86svh] overflow-hidden">
+            {/*
+              Bleed is biased upward because the parallax only ever drifts
+              down. With a symmetric 8% the media ran out of cover partway
+              through the scroll — measured 30px of black at the top by 600px
+              of scroll, 62px by 800 — while 395px of bleed sat unused at the
+              bottom. Top bleed absorbs the drift; bottom stays at 8%.
+            */}
+            <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[24%] h-[132%] origin-center">
               {collectionHeroVideos[series.id] ? (
                 <AutoplayVideo
                   src={collectionHeroVideos[series.id]}
@@ -133,7 +148,8 @@ export default function CollectionPageClient({
             <div className="absolute inset-0 bg-black/24" />
           </div>
 
-          <div className="relative z-10 -mt-[100svh]">
+          {/* Pulls the content up over the sticky media above — same unit. */}
+          <div className="relative z-10 -mt-[100lvh]">
             <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center px-6">
               <div className="absolute left-0 right-0 top-[124px] px-6 sm:px-10 lg:px-16">
                 <div className="mx-auto max-w-[1780px]">
@@ -152,7 +168,16 @@ export default function CollectionPageClient({
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
-                  className="font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
+                  /*
+                    The 5.6rem floor was sized for the short collection names.
+                    It is a hard minimum, so on a narrow screen the word cannot
+                    shrink to fit: "Quatro" renders 380px wide and was clipped
+                    at both ends below roughly 380px of viewport — 360px being
+                    the most common Android width. 4rem lets every name fit
+                    down to 320px, and stops the next long name reintroducing
+                    it. Larger screens are unaffected; 14vw still governs there.
+                  */
+                  className="font-heading text-[clamp(4rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
                 >
                   {series.name}
                 </motion.h1>
@@ -340,7 +365,17 @@ export default function CollectionPageClient({
                 initial={{ opacity: 0, y: 24, scale: 0.985 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
-                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-hidden rounded-[8px] bg-[#ece9e2] text-black lg:grid-cols-2"
+                /*
+                  Scrollable, because below lg the image and copy stack instead
+                  of sitting side by side and the panel is far taller than the
+                  92svh cap — with overflow-hidden everything past the cap was
+                  simply unreachable, cutting the body copy off mid-sentence.
+                  overflow-x is pinned explicitly: setting only overflow-y
+                  makes the browser compute overflow-x as auto, which would add
+                  a sideways scrollbar. overscroll-contain keeps the scroll from
+                  chaining to the page behind once the panel bottoms out.
+                */
+                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-y-auto overflow-x-hidden overscroll-contain rounded-[8px] bg-[#ece9e2] text-black lg:grid-cols-2"
                 onClick={(event) => event.stopPropagation()}
               >
                 <button

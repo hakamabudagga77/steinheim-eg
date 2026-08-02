@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { buildCheckoutUrl, fetchAllProducts } from "@/lib/shopify-client";
 import { resolveVariantId } from "@/lib/shopify-product-map";
+import { sanitizeAttribution, type Attribution } from "@/lib/checkout-attribution";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const items: Array<{ slug: string; finish: string; quantity: number }> = body.items;
+    // Sent by the cart drawer from what it recorded on arrival. Sanitized
+    // rather than trusted: it is client-supplied and ends up in a URL.
+    const attribution: Attribution | null = sanitizeAttribution(body.attribution);
 
     if (!items?.length) {
       return NextResponse.json({ error: "No items provided" }, { status: 400 });
@@ -35,7 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const checkoutUrl = buildCheckoutUrl(checkoutItems);
+    const checkoutUrl = buildCheckoutUrl(checkoutItems, attribution);
 
     return NextResponse.json({ checkoutUrl, unmapped });
   } catch (error) {

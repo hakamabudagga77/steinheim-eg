@@ -89,4 +89,55 @@ describe("classifyOrderChannel", () => {
     expect(result.platform).toBe("other");
     expect(result.type).toBe("Organic");
   });
+
+  // Since the storefront moved off Shopify, every order arrives at the cart
+  // permalink from our own domain. Without discarding that self-referral each
+  // sale was bucketed as "steinheim-eg.com (Organic)", which is what made the
+  // paid channels look dead in the admin report.
+  describe("after the storefront moved off Shopify", () => {
+    it("does not treat our own domain as a traffic source", () => {
+      expect(classifyOrderChannel(order({ referring_site: "https://steinheim-eg.com/en/cart" }))).toEqual({
+        key: "Direct",
+        platform: "direct",
+        type: "Direct",
+      });
+      expect(classifyOrderChannel(order({ referring_site: "https://www.steinheim-eg.com/" })).platform).toBe(
+        "direct"
+      );
+    });
+
+    it("uses the forwarded referrer when we are the referring site", () => {
+      const result = classifyOrderChannel(
+        order({
+          referring_site: "https://steinheim-eg.com/en/products/joy-basin-mixer",
+          landing_site: "/cart/123:1?ref_host=instagram.com",
+        })
+      );
+      expect(result.platform).toBe("instagram");
+    });
+
+    it("credits the paid channel that started the visit", () => {
+      const result = classifyOrderChannel(
+        order({
+          referring_site: "https://steinheim-eg.com/en",
+          landing_site: "/cart/123:1?utm_source=facebook&utm_medium=paid&fbclid=abc&ref_host=instagram.com",
+        })
+      );
+      // ref_host separates the placement: Meta stamps utm_source=facebook on
+      // Instagram ads too, so the referrer is what tells them apart.
+      expect(result.platform).toBe("instagram");
+      expect(result.type).toBe("Paid");
+      expect(result.key).toBe("Instagram (Paid)");
+    });
+
+    it("falls back to Meta Ads when the placement is unknowable", () => {
+      const result = classifyOrderChannel(
+        order({
+          referring_site: "https://steinheim-eg.com/en",
+          landing_site: "/cart/123:1?utm_source=facebook&utm_medium=paid",
+        })
+      );
+      expect(result.key).toBe("Meta Ads (Paid)");
+    });
+  });
 });

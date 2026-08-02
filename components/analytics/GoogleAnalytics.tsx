@@ -10,7 +10,7 @@ export default function GoogleAnalytics() {
   // and form submits to it with the `_gl` linker parameter so the Shopify
   // checkout continues the same GA4 session. Programmatic navigations are not
   // decorated by gtag, so campaign attribution to Shopify is handled
-  // separately and reliably in lib/attribution.ts.
+  // separately and reliably in lib/checkout-attribution.ts.
   const storeDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
   const linkerDomains = storeDomain ? [productionHostname, storeDomain] : null;
   const analyticsConfig = JSON.stringify({ gaId, productionHostname, linkerDomains });

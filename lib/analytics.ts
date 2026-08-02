@@ -121,6 +121,6 @@ export function trackBeginCheckout(
  * it is not what makes the checkout attributable.
  *
  * Campaign attribution to Shopify is handled properly and independently of GA4
- * in lib/attribution.ts, which re-attaches the visitor's utm/click parameters
+ * in lib/checkout-attribution.ts, which re-attaches the visitor's utm/click parameters
  * to the cart permalink so Shopify records them as order.landing_site.
  */

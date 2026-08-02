@@ -10,7 +10,7 @@ import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
 import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { cacheLivePricesBulk, livePriceKey } from "@/lib/live-prices";
-import { decorateCheckoutUrl, getStoredAttribution } from "@/lib/attribution";
+import { readAttribution } from "@/lib/checkout-attribution";
 import Modal from "@/components/ui/Modal";
 
 const WHATSAPP_NUMBER = "201223998124";
@@ -144,6 +144,9 @@ export default function CartDrawer({ locale }: { locale: string }) {
             finish: i.finish,
             quantity: i.quantity,
           })),
+          // Re-attached to the Shopify cart link so the order still names the
+          // channel that brought them — the referrer is us from here on.
+          attribution: readAttribution(),
         }),
       });
       const data = await res.json();
@@ -164,17 +167,15 @@ export default function CartDrawer({ locale }: { locale: string }) {
 
       trackBeginCheckout(cart.items, "shopify", livePrices);
 
-      // The cart permalink is the first Shopify URL the customer ever touches,
-      // so it becomes order.landing_site. Re-attaching the campaign here is
-      // what gives classifyOrderChannel — and Shopify's own reporting — a real
-      // source instead of classifying every order as Direct.
-      const target = decorateCheckoutUrl(data.checkoutUrl, getStoredAttribution());
-
+      // The permalink already carries the campaign: `attribution` went up with
+      // the request and buildCheckoutUrl appended it server-side, so the URL
+      // arriving here is the final one.
+      //
       // Same-tab navigation: a window.open issued after an await sits outside
       // the user-gesture window and is blocked outright by iOS Safari, which
       // is most of this store's traffic. It also preserves the referrer so the
       // Shopify session stays attributable.
-      window.location.assign(target);
+      window.location.assign(data.checkoutUrl);
     } catch {
       setCheckoutError(true);
     } finally {
