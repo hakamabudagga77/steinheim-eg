@@ -98,7 +98,15 @@ export default function CollectionPageClient({
     <PageTransition>
       <div className="bg-[#ece9e2] text-[#0a0a0a]">
         <section className="relative bg-black text-white">
-          <div className="sticky top-0 h-svh min-h-[86svh] overflow-hidden">
+          {/*
+            lvh, not svh: svh is the viewport with the mobile address bar
+            showing. The bar retracts as soon as the page scrolls, the viewport
+            grows, and a sticky element locked to svh no longer reaches the
+            bottom — leaving a black band of this section's own background
+            under the video. lvh is the height with the bar hidden, so the
+            media always covers. Must stay in sync with the -mt below.
+          */}
+          <div className="sticky top-0 h-lvh min-h-[86svh] overflow-hidden">
             <motion.div style={{ y: heroMediaY, scale: heroMediaScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
               {collectionHeroVideos[series.id] ? (
                 <AutoplayVideo
@@ -121,7 +129,8 @@ export default function CollectionPageClient({
             <div className="absolute inset-0 bg-black/24" />
           </div>
 
-          <div className="relative z-10 -mt-[100svh]">
+          {/* Pulls the content up over the sticky media above — same unit. */}
+          <div className="relative z-10 -mt-[100lvh]">
             <section ref={heroSectionRef} className="relative flex min-h-[86svh] items-center justify-center px-6">
               <div className="absolute left-0 right-0 top-[124px] px-6 sm:px-10 lg:px-16">
                 <div className="mx-auto max-w-[1780px]">
@@ -316,7 +325,17 @@ export default function CollectionPageClient({
                 initial={{ opacity: 0, y: 24, scale: 0.985 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.42, ease: [0.22, 0.76, 0.2, 1] }}
-                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-hidden rounded-[8px] bg-[#ece9e2] text-black lg:grid-cols-2"
+                /*
+                  Scrollable, because below lg the image and copy stack instead
+                  of sitting side by side and the panel is far taller than the
+                  92svh cap — with overflow-hidden everything past the cap was
+                  simply unreachable, cutting the body copy off mid-sentence.
+                  overflow-x is pinned explicitly: setting only overflow-y
+                  makes the browser compute overflow-x as auto, which would add
+                  a sideways scrollbar. overscroll-contain keeps the scroll from
+                  chaining to the page behind once the panel bottoms out.
+                */
+                className="relative grid max-h-[92svh] w-full max-w-[1760px] overflow-y-auto overflow-x-hidden overscroll-contain rounded-[8px] bg-[#ece9e2] text-black lg:grid-cols-2"
                 onClick={(event) => event.stopPropagation()}
               >
                 <button
