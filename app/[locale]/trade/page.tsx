@@ -81,7 +81,8 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                 </p>
               </ScrollReveal>
 
-              <ScrollReveal>
+              {/* Same guard: this column carries the room calculator preview. */}
+              <ScrollReveal className="min-w-0">
                 <TradeStudioShowcase />
               </ScrollReveal>
             </div>
@@ -92,11 +93,20 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
             <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-              <ScrollReveal className="lg:order-1">
+              {/*
+                min-w-0: grid items default to min-width:auto, so they refuse
+                to shrink below their content's intrinsic width. The project
+                board's tab strip is wider than a phone, which forced the
+                single mobile column to 440px inside a 335px container and
+                pushed the whole page 85px past the viewport — the seam of
+                bare background down the right edge. With the track free to
+                shrink, the strip scrolls inside the card as it was built to.
+              */}
+              <ScrollReveal className="min-w-0 lg:order-1">
                 <ProjectBoardShowcase />
               </ScrollReveal>
 
-              <ScrollReveal className="lg:order-2">
+              <ScrollReveal className="min-w-0 lg:order-2">
                 <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("projectBoard.eyebrow")}</p>
                 <h2 className="mt-4 max-w-xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
                   {t("projectBoard.headline")}
