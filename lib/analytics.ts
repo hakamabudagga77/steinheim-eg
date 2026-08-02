@@ -112,12 +112,15 @@ export function trackBeginCheckout(
 }
 
 /**
- * Cross-domain note: stitching the Shopify purchase back to this session is a
- * separate job and is NOT done here. GA4 links domains via the `_gl` linker
- * parameter, which gtag only writes onto anchor clicks and form submits to a
- * configured domain — the checkout handoff is a programmatic navigation, so it
- * is not decorated. (Appending `_ga=<client_id>` would be the old Universal
- * Analytics convention; GA4 ignores it.) Doing it properly needs the store
- * domain exposed as a NEXT_PUBLIC_ variable plus the matching setting on the
- * Shopify side, so it is deliberately left out rather than faked.
+ * Cross-domain note. GA4 links domains via the `_gl` linker parameter, which
+ * gtag only writes onto anchor clicks and form submits to a configured domain.
+ * The checkout handoff is a programmatic navigation, so it is never decorated,
+ * and `_ga=<client_id>` is the old Universal Analytics convention that GA4
+ * ignores. GoogleAnalytics.tsx therefore configures `linker.domains` only when
+ * NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN is set — that covers real link clicks, but
+ * it is not what makes the checkout attributable.
+ *
+ * Campaign attribution to Shopify is handled properly and independently of GA4
+ * in lib/attribution.ts, which re-attaches the visitor's utm/click parameters
+ * to the cart permalink so Shopify records them as order.landing_site.
  */

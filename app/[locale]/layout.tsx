@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import WebVitals from "@/components/analytics/WebVitals";
+import AttributionCapture from "@/components/analytics/AttributionCapture";
 import "../globals.css";
 
 const inter = Inter({
@@ -128,6 +129,7 @@ export default async function LocaleLayout({
         />
         <GoogleAnalytics />
         <WebVitals />
+        <AttributionCapture />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell locale={locale}>{children}</SiteShell>
         </NextIntlClientProvider>
