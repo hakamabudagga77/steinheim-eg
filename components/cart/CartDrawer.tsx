@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -9,6 +9,7 @@ import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/
 import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
 import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
+import { cacheLivePricesBulk, livePriceKey } from "@/lib/live-prices";
 import { decorateCheckoutUrl, getStoredAttribution } from "@/lib/attribution";
 import Modal from "@/components/ui/Modal";
 
@@ -25,29 +26,53 @@ export default function CartDrawer({ locale }: { locale: string }) {
   // what happens to them, rather than the old behaviour of quietly checking
   // out with fewer items than they picked.
   const [blocked, setBlocked] = useState<Array<{ slug: string; finish: string }>>([]);
-  const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>>({});
+  // null until the price fetch settles, so view_cart can wait for real prices
+  // without a second state flag. An empty object means "fetched, nothing
+  // returned" — the event still fires, on catalogue prices.
+  const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }> | null>(null);
 
   useEffect(() => {
     if (!open) return;
     fetch("/api/shopify/prices")
       .then((r) => r.ok ? r.json() : {})
-      .then(setLiveData)
-      .catch(() => {});
+      .then((data) => {
+        setLiveData(data);
+        // Shared so CartContext can price its own events; see lib/live-prices.
+        cacheLivePricesBulk(data);
+      })
+      .catch(() => setLiveData({}));
   }, [open]);
 
+  // `${slug}::${finish}` view of the live data, for the analytics helpers.
+  const livePrices = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const [slug, entry] of Object.entries(liveData ?? {})) {
+      for (const variant of entry.variants) map[livePriceKey(slug, variant.finish)] = variant.price;
+    }
+    return map;
+  }, [liveData]);
+
+  // Exactly one view_cart per opening. The effect re-runs when live prices
+  // land so the event carries the price the shopper actually sees, and the ref
+  // stops that second run from firing a duplicate.
+  const viewCartSentRef = useRef(false);
   useEffect(() => {
-    if (!open || cart.items.length === 0) return;
-    trackViewCart(cart.items);
-    // Once per opening — not on every cart edit while the drawer is open.
+    if (!open) {
+      viewCartSentRef.current = false;
+      return;
+    }
+    if (viewCartSentRef.current || cart.items.length === 0 || liveData === null) return;
+    viewCartSentRef.current = true;
+    trackViewCart(cart.items, livePrices);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, liveData, livePrices]);
 
   const rows = cart.items.flatMap((item) => {
     const product = getProductBySlug(item.slug);
     const variant = product?.variants.find((v) => v.finish === item.finish);
     if (!product || !variant) return [];
     const series = getSeriesById(product.series);
-    const live = liveData[item.slug]?.variants.find((v) => v.finish === item.finish);
+    const live = liveData?.[item.slug]?.variants.find((v) => v.finish === item.finish);
     return [{
       item,
       product,
@@ -82,7 +107,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
   }
 
   function handleCheckoutWhatsApp() {
-    trackBeginCheckout(cart.items, "whatsapp");
+    trackBeginCheckout(cart.items, "whatsapp", livePrices);
     const msg = buildWhatsAppOrder();
     // Synchronous inside the click handler, so this window.open is never
     // popup-blocked (unlike one issued after an await).
@@ -137,7 +162,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
         return;
       }
 
-      trackBeginCheckout(cart.items, "shopify");
+      trackBeginCheckout(cart.items, "shopify", livePrices);
 
       // The cart permalink is the first Shopify URL the customer ever touches,
       // so it becomes order.landing_site. Re-attaching the campaign here is
