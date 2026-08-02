@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import AttributionCapture from "@/components/analytics/AttributionCapture";
 import WebVitals from "@/components/analytics/WebVitals";
 import "../globals.css";
 
@@ -128,6 +129,7 @@ export default async function LocaleLayout({
         />
         <GoogleAnalytics />
         <WebVitals />
+        <AttributionCapture />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell locale={locale}>{children}</SiteShell>
         </NextIntlClientProvider>

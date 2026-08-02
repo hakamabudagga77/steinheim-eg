@@ -9,6 +9,7 @@ import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/
 import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
 import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
+import { readAttribution } from "@/lib/checkout-attribution";
 import Modal from "@/components/ui/Modal";
 
 const WHATSAPP_NUMBER = "201223998124";
@@ -118,6 +119,9 @@ export default function CartDrawer({ locale }: { locale: string }) {
             finish: i.finish,
             quantity: i.quantity,
           })),
+          // Re-attached to the Shopify cart link so the order still names the
+          // channel that brought them — the referrer is us from here on.
+          attribution: readAttribution(),
         }),
       });
       const data = await res.json();

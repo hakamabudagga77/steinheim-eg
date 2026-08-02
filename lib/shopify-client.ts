@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { appendAttribution, type Attribution } from "@/lib/checkout-attribution";
 
 const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN ?? "steinheim.myshopify.com";
 const CLIENT_ID = process.env.SHOPIFY_CLIENT_ID ?? "";
@@ -145,9 +146,18 @@ export async function setInventoryLevel(
   });
 }
 
-export function buildCheckoutUrl(items: Array<{ variantId: number; quantity: number }>): string {
+/**
+ * `attribution` re-attaches the source that brought the shopper here. Shopify
+ * records the full landing URL against the order, so these parameters are what
+ * lets classifyOrderChannel still name the channel after the handoff — see
+ * lib/checkout-attribution.ts.
+ */
+export function buildCheckoutUrl(
+  items: Array<{ variantId: number; quantity: number }>,
+  attribution?: Attribution | null
+): string {
   const lines = items.map((i) => `${i.variantId}:${i.quantity}`).join(",");
-  return `https://${STORE_DOMAIN}/cart/${lines}`;
+  return appendAttribution(`https://${STORE_DOMAIN}/cart/${lines}`, attribution);
 }
 
 export interface ShopifyOrder {
