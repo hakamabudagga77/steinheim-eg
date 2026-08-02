@@ -128,7 +128,15 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        {/* Trade partner benefits */}
+        <Suspense fallback={null}>
+          <SmartRoomCalculator />
+        </Suspense>
+
+        {/*
+          Sits after the room calculator: the benefits are the pitch for
+          project-scale work, which only lands once you have seen what setting
+          up a project actually involves.
+        */}
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
             <ScrollReveal>
@@ -160,10 +168,6 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
             </div>
           </div>
         </section>
-
-        <Suspense fallback={null}>
-          <SmartRoomCalculator />
-        </Suspense>
 
         {/* Browse CTA */}
         <section className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32 text-start">
