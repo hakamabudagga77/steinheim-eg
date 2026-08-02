@@ -156,7 +156,16 @@ export default function CollectionPageClient({
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 0.76, 0.2, 1] }}
-                  className="font-heading text-[clamp(5.6rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
+                  /*
+                    The 5.6rem floor was sized for the short collection names.
+                    It is a hard minimum, so on a narrow screen the word cannot
+                    shrink to fit: "Quatro" renders 380px wide and was clipped
+                    at both ends below roughly 380px of viewport — 360px being
+                    the most common Android width. 4rem lets every name fit
+                    down to 320px, and stops the next long name reintroducing
+                    it. Larger screens are unaffected; 14vw still governs there.
+                  */
+                  className="font-heading text-[clamp(4rem,14vw,14rem)] uppercase leading-[0.82] tracking-[-0.045em]"
                 >
                   {series.name}
                 </motion.h1>
