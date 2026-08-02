@@ -193,9 +193,15 @@ function ShopScreen() {
 // Mirrors SmartRoomCalculator's own numbered-circle progress stepper
 // (same markup/classes) so this preview reads as the real thing, not a
 // separately-styled mockup.
+// items-start, not items-center: the labels below the circles wrap to
+// different line counts ("You & your project" takes two, "Rooms" one), so
+// centring lets the taller buttons lift their circle row above the shorter
+// ones — measured 6.8px, which reads as the connecting line stepping
+// vertically between 1 and 2. Top-aligning puts every circle row on one line
+// and lets the labels hang to different depths.
 function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTranslations>; activeIndex: number; onSelect: (i: number) => void }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-start justify-between">
       {SCREEN_KEYS.map((key, i) => (
         <button
           key={key}

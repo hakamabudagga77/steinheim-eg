@@ -108,7 +108,13 @@ export default function SmartRoomCalculator() {
 
         {/* Progress stepper */}
         <div className="mb-10">
-          <div className="flex items-center justify-between">
+          {/*
+            items-start so the circle rows stay on one line: the labels wrap to
+            different line counts, and centring lets a taller button lift its
+            circle above the others, breaking the connecting line. Same as
+            TradeStudioShowcase, which mirrors this stepper.
+          */}
+          <div className="flex items-start justify-between">
             {STEP_KEYS.map((key, i) => (
               <button
                 key={key}
