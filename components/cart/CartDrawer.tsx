@@ -9,6 +9,7 @@ import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/
 import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
 import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
+import { decorateCheckoutUrl, getStoredAttribution } from "@/lib/attribution";
 import Modal from "@/components/ui/Modal";
 
 const WHATSAPP_NUMBER = "201223998124";
@@ -138,11 +139,17 @@ export default function CartDrawer({ locale }: { locale: string }) {
 
       trackBeginCheckout(cart.items, "shopify");
 
+      // The cart permalink is the first Shopify URL the customer ever touches,
+      // so it becomes order.landing_site. Re-attaching the campaign here is
+      // what gives classifyOrderChannel — and Shopify's own reporting — a real
+      // source instead of classifying every order as Direct.
+      const target = decorateCheckoutUrl(data.checkoutUrl, getStoredAttribution());
+
       // Same-tab navigation: a window.open issued after an await sits outside
       // the user-gesture window and is blocked outright by iOS Safari, which
       // is most of this store's traffic. It also preserves the referrer so the
       // Shopify session stays attributable.
-      window.location.assign(data.checkoutUrl);
+      window.location.assign(target);
     } catch {
       setCheckoutError(true);
     } finally {
