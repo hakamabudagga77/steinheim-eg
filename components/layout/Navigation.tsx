@@ -610,7 +610,6 @@ export default function Navigation({ locale }: { locale: string }) {
                             sizes="(max-width: 1023px) 0px, 62vw"
                             style={{ objectPosition: activeWorldItem.objectPosition ?? "center" }}
                             className="object-cover transition duration-[1200ms] group-hover:scale-[1.05]"
-                            priority
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent transition duration-500 group-hover:from-black/78 group-hover:via-black/25" />
                           <div className="absolute inset-x-0 bottom-0 px-6 pb-6 pt-10 text-white">
@@ -656,7 +655,6 @@ export default function Navigation({ locale }: { locale: string }) {
                                       fill
                                       sizes="32vw"
                                       className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
-                                      priority={index < 2}
                                     />
                                   ) : null}
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/8 to-transparent transition duration-500 group-hover:from-black/88 group-hover:via-black/25" />

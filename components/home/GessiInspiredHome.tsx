@@ -16,6 +16,11 @@ const heroVideo = "/videos/home-hero.mp4";
 
 const ritualVideo = "/videos/home-ritual.mp4";
 
+// 1×1 transparent GIF — keeps the hover <Image> mounted (so the crossfade
+// transition still plays) without triggering a real network fetch.
+const TRANSPARENT_GIF =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 const collections = [
   {
     name: "Joy",
@@ -58,6 +63,25 @@ function ScrollCue({ label }: { label: string }) {
 function CollectionCard({ item, index }: { item: (typeof collections)[number]; index: number }) {
   const t = useTranslations("landing.collections");
   const [hovered, setHovered] = useState(false);
+  const hoverPrefetched = useRef(false);
+
+  // The lifestyle (hover) frame is fetched only on the first hover; a
+  // transparent 1x1 keeps the element mounted so the CSS crossfade still
+  // plays on unhover, and touch users who never hover download nothing.
+  const hoverSrc = hovered ? item.hoverImage : TRANSPARENT_GIF;
+
+  function handleMouseEnter() {
+    if (!hoverPrefetched.current) {
+      hoverPrefetched.current = true;
+      const img = new window.Image();
+      img.src = item.hoverImage;
+    }
+    setHovered(true);
+  }
+
+  function handleMouseLeave() {
+    setHovered(false);
+  }
 
   return (
     <motion.article
@@ -69,8 +93,8 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
       <Link
         href={item.href}
         className="group block"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="relative aspect-[4/5] overflow-hidden bg-black shadow-[0_24px_70px_rgba(0,0,0,0.08)] transition duration-[900ms] ease-[cubic-bezier(0.22,0.76,0.2,1)] group-hover:-translate-y-1 group-hover:shadow-[0_34px_90px_rgba(0,0,0,0.14)]">
           <Image
@@ -83,7 +107,7 @@ function CollectionCard({ item, index }: { item: (typeof collections)[number]; i
             }`}
           />
           <Image
-            src={item.hoverImage}
+            src={hoverSrc}
             alt={`${item.name} collection lifestyle`}
             fill
             sizes="(max-width: 768px) 100vw, 25vw"
