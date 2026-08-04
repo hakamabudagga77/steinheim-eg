@@ -115,7 +115,7 @@ function ProjectCard({ project, index }: { project: ProjectReference; index: num
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 0.76, 0.2, 1] }}
-      className="w-[82vw] shrink-0 sm:w-[420px] lg:w-[480px]"
+      className="w-[70vw] shrink-0 sm:w-[420px] lg:w-[480px]"
     >
       <Link
         href={`/projects/${project.slug}`}
