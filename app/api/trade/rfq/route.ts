@@ -4,6 +4,7 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import productsData from "@/data/products.json";
 import finishesData from "@/data/finishes.json";
 import { sanitizeTradeProject, type TradeProject } from "@/lib/trade-project";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -653,6 +654,10 @@ async function buildPremiumPdf(project: TradeProject, includePrices: boolean, in
 }
 
 export async function POST(request: Request) {
+  if (!(await checkRateLimit(request, "trade-rfq", 5, 60 * 60))) {
+    return Response.json({ error: "Too many requests. Try again later." }, { status: 429 });
+  }
+
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (contentLength > 100_000) {
     return Response.json({ error: "Request is too large." }, { status: 413 });

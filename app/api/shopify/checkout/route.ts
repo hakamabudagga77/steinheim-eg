@@ -2,18 +2,25 @@ import { NextResponse } from "next/server";
 import { buildCheckoutUrl, fetchAllProducts } from "@/lib/shopify-client";
 import { resolveVariantId } from "@/lib/shopify-product-map";
 import { sanitizeAttribution, type Attribution } from "@/lib/checkout-attribution";
+import { normalizeCheckoutItems } from "@/lib/cart";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    if (!(await checkRateLimit(request, "shopify-checkout", 30, 60))) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+    }
+
     const body = await request.json();
-    const items: Array<{ slug: string; finish: string; quantity: number }> = body.items;
     // Sent by the cart drawer from what it recorded on arrival. Sanitized
     // rather than trusted: it is client-supplied and ends up in a URL.
     const attribution: Attribution | null = sanitizeAttribution(body.attribution);
 
-    if (!items?.length) {
-      return NextResponse.json({ error: "No items provided" }, { status: 400 });
+    const normalized = normalizeCheckoutItems(body.items);
+    if (!normalized.ok) {
+      return NextResponse.json({ error: normalized.error }, { status: 400 });
     }
+    const items = normalized.items;
 
     const shopifyProducts = await fetchAllProducts();
 

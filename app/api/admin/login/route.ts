@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { ADMIN_SESSION_COOKIE, createSessionToken } from "@/lib/server/admin-session";
-import { checkRateLimit } from "@/lib/server/rate-limit";
+import { checkRateLimit, clientIp } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,10 +12,6 @@ function safeEqual(a: string, b: string) {
   const bufB = Buffer.from(b);
   if (bufA.length !== bufB.length) return false;
   return timingSafeEqual(bufA, bufB);
-}
-
-function clientIp(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 }
 
 export async function POST(request: Request) {

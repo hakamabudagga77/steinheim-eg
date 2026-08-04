@@ -2,17 +2,10 @@ import "server-only";
 
 import { Resend } from "resend";
 import type { ContactLead } from "@/lib/contact-leads";
+import { escapeHtml } from "@/lib/server/escape-html";
 
 const NOTIFY_TO = process.env.TRADE_LEAD_NOTIFY_EMAIL || "inquiries@steinheim-eg.com";
 const NOTIFY_FROM = process.env.TRADE_LEAD_NOTIFY_FROM || "Steinheim Egypt <onboarding@resend.dev>";
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export async function sendContactLeadNotification(lead: ContactLead) {
   const apiKey = process.env.RESEND_API_KEY;

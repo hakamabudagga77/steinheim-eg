@@ -5,6 +5,7 @@ import { fetchOrders, fetchAllProducts } from "@/lib/shopify-client";
 import { listContactLeads } from "@/lib/server/contact-lead-store";
 import { listTradeLeads } from "@/lib/server/trade-lead-store";
 import { fetchGA4Summary } from "@/lib/server/ga4-client";
+import { escapeHtml } from "@/lib/server/escape-html";
 
 const NOTIFY_TO = process.env.DIGEST_NOTIFY_EMAIL || process.env.TRADE_LEAD_NOTIFY_EMAIL || "inquiries@steinheim-eg.com";
 const NOTIFY_FROM = process.env.TRADE_LEAD_NOTIFY_FROM || "Steinheim Admin <onboarding@resend.dev>";
@@ -57,9 +58,9 @@ export async function buildAndSendDailyDigest(): Promise<{ sent: boolean; reason
     .slice(0, 5)
     .map(
       (lead) =>
-        `<tr><td style="padding:8px 16px;border-bottom:1px solid #e8e6e0;font-size:13px;color:#1a1a1a;">${
+        `<tr><td style="padding:8px 16px;border-bottom:1px solid #e8e6e0;font-size:13px;color:#1a1a1a;">${escapeHtml(
           lead.project.details.projectName || "Untitled"
-        } — ${lead.project.details.company || "—"}</td><td style="padding:8px 16px;border-bottom:1px solid #e8e6e0;font-size:12px;color:#6b6b66;text-align:right;text-transform:uppercase;">${lead.priority}</td></tr>`
+        )} — ${escapeHtml(lead.project.details.company || "—")}</td><td style="padding:8px 16px;border-bottom:1px solid #e8e6e0;font-size:12px;color:#6b6b66;text-align:right;text-transform:uppercase;">${escapeHtml(lead.priority)}</td></tr>`
     )
     .join("");
 

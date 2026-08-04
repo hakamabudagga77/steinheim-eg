@@ -3,18 +3,11 @@ import "server-only";
 import { Resend } from "resend";
 import { TRADE_LEAD_STATUS_COPY, TRADE_LEAD_STATUS_LABELS, type TradeLead, type TradeLeadDeliveryDetails, type TradeLeadMessage, type TradeLeadSampleRequest, type TradeLeadStatus } from "@/lib/trade-leads";
 import { TRADE_PERSONA_LABELS } from "@/lib/trade-project";
+import { escapeHtml } from "@/lib/server/escape-html";
 
 const NOTIFY_TO = process.env.TRADE_LEAD_NOTIFY_EMAIL || "inquiries@steinheim-eg.com";
 const NOTIFY_FROM = process.env.TRADE_LEAD_NOTIFY_FROM || "Steinheim Trade Studio <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 function fmtCurrency(value: number) {
   return `LE ${Math.round(value).toLocaleString("en-US")}`;
