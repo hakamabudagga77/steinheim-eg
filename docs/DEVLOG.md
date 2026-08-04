@@ -194,4 +194,4 @@ identity — it makes the experience underneath it sharper.
   decorative text where it is.
 
 _Last verified: 2026-08-04 — all checks green on `main` at
-`d4d5bdf`._
+`2f27ba1` (after PR #93)._
