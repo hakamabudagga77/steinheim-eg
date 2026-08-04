@@ -136,7 +136,10 @@ export default function CatalogueShowcase() {
               </>
             )}
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center px-6 py-8">
+            {/* Static, below the model on mobile — the book fills too much of the
+                box at narrow widths for an overlaid button to sit cleanly. From
+                sm: up there's enough clearance to overlay it at the bottom again. */}
+            <div className="pointer-events-none flex items-center justify-center px-6 pt-8 sm:absolute sm:inset-x-0 sm:bottom-0 sm:pt-0 sm:py-8">
               <button
                 type="button"
                 onClick={(event) => handleOpen(event.clientX, event.clientY)}
