@@ -71,10 +71,42 @@ export default function SmartRoomCalculator() {
   // precise one, and this parent effect runs after the child's and would undo
   // it. With no plan the child has nothing to scroll to, so the calculator
   // anchor is still the right destination rather than the top of the page.
+  // Aligning once at mount is not enough: media above this section is still
+  // resolving, so the target moves afterwards and the first alignment lands in
+  // the wrong place — on production it overshot by 1,560px and left the
+  // visitor at the bottom of the page. So re-align once the document has
+  // finished loading, and give up the moment the visitor scrolls themselves
+  // rather than yanking the page back under them.
   useEffect(() => {
     if (focusKey && hasActiveRoomNeeds(project)) return;
     if (window.location.hash !== "#smart-room-calculator") return;
-    document.getElementById("smart-room-calculator")?.scrollIntoView({ block: "start" });
+
+    let cancelled = false;
+    const align = () => {
+      if (cancelled) return;
+      document.getElementById("smart-room-calculator")?.scrollIntoView({ block: "start" });
+    };
+    const release = () => {
+      cancelled = true;
+    };
+
+    align();
+
+    window.addEventListener("wheel", release, { once: true, passive: true });
+    window.addEventListener("touchstart", release, { once: true, passive: true });
+    window.addEventListener("keydown", release, { once: true });
+
+    const onLoad = () => requestAnimationFrame(align);
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad, { once: true });
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("wheel", release);
+      window.removeEventListener("touchstart", release);
+      window.removeEventListener("keydown", release);
+      window.removeEventListener("load", onLoad);
+    };
     // Mount only: a later hash change is an ordinary same-page anchor and the
     // browser already handles it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
