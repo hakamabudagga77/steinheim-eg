@@ -345,7 +345,7 @@ export default function CollectionPageClient({
                   <span className="block text-[20px] font-medium">{title}</span>
                   <span className="mt-3 block max-w-sm text-[14px] leading-[1.65] text-black/65">{body}</span>
                 </span>
-                <span className="text-[32px] text-black/25 transition group-hover:translate-x-2 group-hover:text-black">→</span>
+                <span className="text-[32px] text-black/25 transition group-hover:translate-x-2 group-hover:text-black rtl:rotate-180 rtl:group-hover:-translate-x-2">→</span>
               </Link>
             ))}
           </div>

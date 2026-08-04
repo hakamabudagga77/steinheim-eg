@@ -153,15 +153,15 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
               <Link href="/" className="transition hover:text-black">
                 {t("breadcrumb.home")}
               </Link>
-              {" / "}
+              <span aria-hidden="true" className="rtl:rotate-180"> / </span>
               <Link href="/collections" className="transition hover:text-black">
                 {t("breadcrumb.collections")}
               </Link>
-              {" / "}
+              <span aria-hidden="true" className="rtl:rotate-180"> / </span>
               <Link href={`/collections/${product.series}`} className="transition hover:text-black">
                 {seriesName}
               </Link>
-              {" / "}
+              <span aria-hidden="true" className="rtl:rotate-180"> / </span>
               <span className="text-black/60">{product.name}</span>
               <span className="hidden sm:inline">
                 {" · "}
@@ -232,7 +232,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                   <button
                     type="button"
                     onClick={() => setFinishOpen((open) => !open)}
-                    className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
+                    className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 rtl:pr-4 rtl:pl-3 text-left rtl:text-right shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
                   >
                     <span className="flex min-w-0 items-center gap-3">
                       <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
@@ -359,7 +359,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       <button
                         type="button"
                         onClick={() => setRoomOpen((o) => !o)}
-                        className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 text-left shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
+                        className="flex h-[64px] w-full items-center justify-between rounded-full bg-white px-4 pr-3 rtl:pr-4 rtl:pl-3 text-left rtl:text-right shadow-[0_18px_55px_rgba(0,0,0,0.055)] transition hover:shadow-[0_22px_65px_rgba(0,0,0,0.07)] sm:h-[58px]"
                       >
                         <span className="truncate text-[19px] tracking-[-0.025em] text-black sm:text-[16px] sm:tracking-normal">
                           {selectedGroup ? selectedGroup.roomLabel : t("noSpecificRoom")}

@@ -26,7 +26,7 @@ export default function FloatingRoomProgress({ locale }: { locale: string }) {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50">
+    <div className="fixed bottom-6 left-6 rtl:left-auto rtl:right-6 z-50">
       <AnimatePresence>
         {expanded && (
           <motion.div

@@ -352,7 +352,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           onClick={handleNavigate}
                           style={{ fontStyle: "italic" }}
                           className={`block py-1 text-[clamp(2.1rem,10vw,2.8rem)] font-medium leading-[1.05] text-black transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
-                            pathname === "/shop-by-need" ? "" : "hover:translate-x-2"
+                            pathname === "/shop-by-need" ? "" : "hover:translate-x-2 rtl:hover:-translate-x-2"
                           }`}
                         >
                           {tm("shopFor", { name: projectDisplayName })}
@@ -369,7 +369,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
                         className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-normal leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
-                          pathname === "/collections" ? "text-black" : "text-black/65 hover:translate-x-2 hover:text-black"
+                          pathname === "/collections" ? "text-black" : "text-black/65 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black"
                         }`}
                       >
                         {t("collections")}
@@ -384,7 +384,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/products"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/products" ? "text-black" : ""
                         }`}
                       >
@@ -400,7 +400,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/best-sellers"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/best-sellers" ? "text-black" : ""
                         }`}
                       >
@@ -416,7 +416,7 @@ export default function Navigation({ locale }: { locale: string }) {
                         href="/shop-the-look"
                         onClick={handleNavigate}
                         onMouseEnter={() => setActivePanel("collections")}
-                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
+                        className={`block py-2 text-[clamp(1.6rem,7vw,2.1rem)] font-normal leading-[1.05] text-black/65 transition-all duration-400 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black lg:text-[clamp(1.1rem,1.7vw,2.1rem)] lg:leading-[1.15] ${
                           pathname === "/shop-the-look" ? "text-black" : ""
                         }`}
                       >
@@ -440,7 +440,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           className={`block py-2 text-[clamp(2.1rem,10vw,2.8rem)] font-medium leading-[1.05] transition-all duration-400 lg:text-[clamp(1.5rem,2.3vw,2.8rem)] lg:leading-[1.15] ${
                             (activePanel === "collections" && activeCollection === collection.id) || pathname.includes(collection.id)
                               ? "text-black"
-                              : "text-black/65 hover:translate-x-2 hover:text-black"
+                              : "text-black/65 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black"
                           }`}
                         >
                           {tc(`${collection.id}.name`)}
@@ -517,7 +517,7 @@ export default function Navigation({ locale }: { locale: string }) {
                           className={`block py-1.5 text-[18px] leading-tight transition-all duration-300 ${
                             activePanel === "world" && activeWorldItem.labelKey === link.labelKey
                               ? "text-black"
-                              : "text-black/65 hover:translate-x-2 hover:text-black"
+                              : "text-black/65 hover:translate-x-2 rtl:hover:-translate-x-2 hover:text-black"
                           }`}
                         >
                           {tm(link.labelKey)}

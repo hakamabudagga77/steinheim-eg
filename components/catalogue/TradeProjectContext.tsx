@@ -120,7 +120,11 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (!hydrated.current || !workspace.activeProjectId) return;
-    window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
+    try {
+      window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
+    } catch {
+      // Storage unavailable — the workspace just won't persist across visits.
+    }
   }, [workspace]);
 
   useEffect(() => {
@@ -180,7 +184,11 @@ export function TradeProjectProvider({ children }: { children: React.ReactNode }
 
   const markMessagesSeen = useCallback(() => {
     if (!submittedLeadId) return;
-    window.localStorage.setItem(`steinheim-lastseen-${submittedLeadId}`, String(steinheimMessageCountRef.current));
+    try {
+      window.localStorage.setItem(`steinheim-lastseen-${submittedLeadId}`, String(steinheimMessageCountRef.current));
+    } catch {
+      // Storage unavailable — the unread badge just won't persist.
+    }
     setUnreadMessageCount(0);
   }, [submittedLeadId]);
 

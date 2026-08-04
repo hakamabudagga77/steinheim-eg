@@ -151,7 +151,7 @@ function ReelVideo({
           setMuted((value) => !value);
         }}
         aria-label={muted ? t("soundOn") : t("soundOff")}
-        className={`absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-md transition duration-500 hover:bg-white hover:text-black ${
+        className={`absolute bottom-4 right-4 rtl:right-auto rtl:left-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-md transition duration-500 hover:bg-white hover:text-black ${
           active ? "opacity-100" : "opacity-70"
         }`}
       >
@@ -327,7 +327,7 @@ export default function ShowroomReel() {
             </p>
           </motion.div>
 
-          <div className="ml-auto flex items-center gap-10">
+          <div className="ms-auto flex items-center gap-10">
             {events.map((event, index) => (
               <EventLogo key={event.name} event={event} index={index} />
             ))}

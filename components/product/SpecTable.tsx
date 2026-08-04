@@ -34,7 +34,7 @@ export default function SpecTable({ product }: { product: Product }) {
       <tbody>
         {filteredSpecs.map(([label, value]) => (
           <tr key={label} className="border-b border-stone/10">
-            <td className="py-3 pr-8 text-sm text-warm-gray w-1/3">
+            <td className="py-3 pr-8 rtl:pr-0 rtl:pl-8 text-sm text-warm-gray w-1/3">
               {label}
             </td>
             <td className="py-3 text-sm text-charcoal">{value}</td>
