@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import ScrollReveal, { StaggerContainer, StaggerItem } from "@/components/ui/ScrollReveal";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import {
+  hasActiveRoomNeeds,
   isRequirementType,
   PERSONA_META,
   REQUIREMENT_TYPE_LABELS,
@@ -55,6 +56,29 @@ export default function SmartRoomCalculator() {
     setPrevFocusKey(focusKey);
     setStep(3);
   }
+
+  // This section reads useSearchParams, so it is wrapped in a Suspense
+  // boundary with a null fallback and does not exist in the server-rendered
+  // HTML. On a fresh load the browser resolves #smart-room-calculator before
+  // this element is mounted, finds nothing, and drops the scroll — so every
+  // cross-page link into the calculator (the project drawer's "continue in the
+  // room calculator", the concierge CTA) lands the visitor at the top of the
+  // trade page instead. Same-page anchor clicks are unaffected, because by
+  // then the element is already hydrated.
+  //
+  // Stands aside for a focusScope/focusType deep link, but only when there is
+  // a room plan for ShopProductsStep to scroll into — that scroll is the more
+  // precise one, and this parent effect runs after the child's and would undo
+  // it. With no plan the child has nothing to scroll to, so the calculator
+  // anchor is still the right destination rather than the top of the page.
+  useEffect(() => {
+    if (focusKey && hasActiveRoomNeeds(project)) return;
+    if (window.location.hash !== "#smart-room-calculator") return;
+    document.getElementById("smart-room-calculator")?.scrollIntoView({ block: "start" });
+    // Mount only: a later hash change is an ordinary same-page anchor and the
+    // browser already handles it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Pre-fill from an existing room plan so "Edit property composition" doesn't reset to zero.
   const {
