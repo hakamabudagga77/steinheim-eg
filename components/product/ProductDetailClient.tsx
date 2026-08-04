@@ -224,6 +224,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                     </span>
                   )}
                 </div>
+                {!liveVariant && <p className="mt-2 text-[11px] text-black/45">{t("referencePrice")}</p>}
                 {liveVariant && liveVariant.inStock === false && (
                   <RestockAlertForm productSlug={product.slug} finish={variant.finish} />
                 )}

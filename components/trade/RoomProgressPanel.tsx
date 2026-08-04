@@ -45,7 +45,7 @@ export default function RoomProgressPanel({
                   className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-start transition hover:bg-black/[0.03]"
                 >
                   <span className="text-[12px] text-black/75">{REQUIREMENT_TYPE_LABELS[need.type]}</span>
-                  <span className={`flex shrink-0 items-center gap-1.5 text-[11px] font-medium ${met ? "text-black" : "text-black/35"}`}>
+                  <span className={`flex shrink-0 items-center gap-1.5 text-[11px] font-medium ${met ? "text-black" : "text-black/45"}`}>
                     {t("selectedOfNeeded", { selected, needed })}
                     {met && (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">

@@ -97,7 +97,7 @@ function ModelViewer({
   if (!ready) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/35">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/45">
           Loading model viewer
         </p>
       </div>
@@ -140,7 +140,7 @@ export default function ProductModelLab() {
 
       <div className="mx-auto max-w-[1440px]">
         <div className="max-w-4xl">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-white/35">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-white/45">
             Steinheim 3D experiment room
           </p>
           <h1 className="mt-6 font-heading text-[clamp(3rem,7vw,7rem)] leading-[0.9] tracking-[-0.04em]">
@@ -178,7 +178,7 @@ export default function ProductModelLab() {
         </div>
 
         <div className="mt-4 border border-white/10 bg-white/[0.03] p-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/35">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/45">
             Active concept
           </p>
           <p className="mt-2 max-w-3xl text-[14px] leading-[1.8] text-white/58">
@@ -220,7 +220,7 @@ export default function ProductModelLab() {
               </div>
 
               <aside className="border-t border-white/10 bg-white px-7 py-8 text-charcoal lg:border-s lg:border-t-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-charcoal/35">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-charcoal/45">
                   Active asset
                 </p>
                 <h2 className="mt-4 font-heading text-4xl leading-none tracking-[-0.02em]">
@@ -228,15 +228,15 @@ export default function ProductModelLab() {
                 </h2>
                 <dl className="mt-8 space-y-5 text-[13px]">
                   <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/35">File</dt>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/45">File</dt>
                     <dd className="mt-1 break-all text-charcoal/70">{active.file}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/35">Scale</dt>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/45">Scale</dt>
                     <dd className="mt-1 text-charcoal/70">{active.scale}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/35">Origin</dt>
+                    <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-charcoal/45">Origin</dt>
                     <dd className="mt-1 text-charcoal/70">{active.origin}</dd>
                   </div>
                 </dl>
@@ -260,14 +260,14 @@ export default function ProductModelLab() {
                 <ModelViewer ready={viewerReady} file={heroModel.file} cameraOrbit="-26deg 64deg auto" fieldOfView="25deg" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/35">Homepage candidate</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/45">Homepage candidate</p>
                   <h2 className="mt-3 max-w-2xl font-heading text-[clamp(3rem,6vw,6rem)] leading-[0.9] tracking-[-0.04em]">
                     Joy in 3D.
                   </h2>
                 </div>
               </div>
               <div className="bg-white px-8 py-10 text-charcoal sm:px-12 lg:py-16">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-charcoal/35">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-charcoal/45">
                   Why this works
                 </p>
                 <h3 className="mt-6 font-heading text-5xl leading-none tracking-[-0.03em]">
@@ -295,7 +295,7 @@ export default function ProductModelLab() {
                 <ModelViewer ready={viewerReady} file="/models/steinheim-spec-studio.glb" cameraOrbit="-34deg 66deg 5.1m" fieldOfView="30deg" />
               </div>
               <aside className="bg-white px-8 py-10 text-charcoal lg:py-16">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-charcoal/35">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-charcoal/45">
                   Room studio test
                 </p>
                 <h3 className="mt-6 font-heading text-5xl leading-none tracking-[-0.03em]">
@@ -336,7 +336,7 @@ export default function ProductModelLab() {
                         : "border-white/12 bg-[linear-gradient(135deg,#393939,#050505,#1c1c1c)]"
                   }`} />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent p-7">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/35">Finish theatre</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/45">Finish theatre</p>
                     <h3 className="mt-3 font-heading text-4xl leading-none tracking-[-0.03em]">{name}</h3>
                     <p className="mt-4 text-[13px] leading-[1.7] text-white/45">{body}</p>
                   </div>
