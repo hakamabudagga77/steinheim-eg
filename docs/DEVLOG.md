@@ -117,6 +117,23 @@ unit suite, and the production build:
 
 ---
 
+## 2026-08-04 - UX depth & contrast delivery wave
+
+One pull request merged to `main`, green on lint, typecheck, the full unit
+suite, and the production build:
+
+- **PR #93 - UX depth & contrast.** The product page now shows a small
+  "Reference price - final price is confirmed at checkout" note (EN/AR)
+  whenever live pricing is unavailable, instead of silently falling back to
+  the catalogue price. Meaningful small labels were raised from `/25`-`/35`
+  to `/45` opacity for legibility (WCAG): the series eyebrows on the
+  quick-view and compare modals, site-search group headers and footer hints,
+  the trade "preview" labels, unmet-room milestone counts, and the 3D model
+  lab section labels. Decorative glyphs (chevrons, arrows) and the admin UI
+  were deliberately left at their original opacity.
+
+---
+
 ## Roadmap — the excellence track
 
 All work respects the brand system: cream `#ece9e2`, charcoal `#0a0a0a`,
@@ -169,10 +186,10 @@ identity — it makes the experience underneath it sharper.
 ### 6. UX depth (P2)
 - Restock alert as a real form (Enter submits, native email validation). ✅
 - "Reference price" note when live prices are unavailable instead of a
-  silent fallback.
+  silent fallback. âœ…
 - Loading skeletons for client-driven sections; richer empty states.
 
-### 7. Contrast (P2, WCAG-driven)
+### 7. Contrast (P2, WCAG-driven) - SHIPPED (PR #93)
 - Raise meaningful small labels from `/25`–`/35` opacity to ≥ `/45`, keeping
   decorative text where it is.
 
