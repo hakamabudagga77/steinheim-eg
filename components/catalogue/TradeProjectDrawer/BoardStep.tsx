@@ -217,7 +217,7 @@ export default function BoardStep({
                         {group.summary}
                       </p>
                     </div>
-                    <div className="shrink-0 text-right">
+                    <div className="shrink-0 text-end">
                       <p className="text-[11px] font-medium text-charcoal">{t("board.unitsCount", { count: group.totalUnits })}</p>
                       <p className="mt-1 text-[10px] text-warm-gray">{formatPrice(group.totalValue)}</p>
                     </div>

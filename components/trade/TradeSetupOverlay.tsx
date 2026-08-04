@@ -163,7 +163,7 @@ export default function TradeSetupOverlay({ locale }: { locale: string }) {
                         key={id}
                         type="button"
                         onClick={() => setPersona(id)}
-                        className={`flex items-center gap-3 border p-4 text-left transition ${
+                        className={`flex items-center gap-3 border p-4 text-start transition ${
                           persona === id ? "border-charcoal bg-charcoal text-white" : "border-charcoal/10 bg-white hover:border-charcoal"
                         }`}
                       >

@@ -83,7 +83,7 @@ export default function CollectionsLanding() {
         {/* Pulls the content up over the sticky media above — same unit. */}
         <div className="relative z-10 -mt-[100lvh]">
           <section className="relative flex h-svh min-h-[760px] items-center justify-center px-6 text-center">
-            <div className="absolute left-0 right-0 top-[124px] px-6 text-left sm:px-10 lg:px-16">
+            <div className="absolute left-0 right-0 top-[124px] px-6 text-start sm:px-10 lg:px-16">
               <div className="mx-auto max-w-[1780px]">
                 <p className="text-[18px] font-medium text-white">
                   <Link href="/" className="transition hover:text-white/70">{t("breadcrumb.home")}</Link>

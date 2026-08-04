@@ -209,7 +209,7 @@ function ProductCard({
               <button
                 type="button"
                 onClick={() => setRoomOpen((o) => !o)}
-                className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-black/10 pb-1.5 text-left text-[11px] text-black/55 transition hover:border-black/30 hover:text-black"
+                className="flex w-full cursor-pointer items-center justify-between gap-2 border-b border-black/10 pb-1.5 text-start text-[11px] text-black/55 transition hover:border-black/30 hover:text-black"
               >
                 <span className="truncate">{selectedRoom ? selectedRoom.roomLabel : t("noSpecificRoom")}</span>
                 <span className="shrink-0 text-[9px] text-black/35">{roomOpen ? "▲" : "▼"}</span>
@@ -231,7 +231,7 @@ function ProductCard({
                           setScopeChoice(group.scopeId);
                           setRoomOpen(false);
                         }}
-                        className={`flex w-full cursor-pointer items-center px-3 py-2 text-left text-[11px] transition hover:bg-black/[0.035] ${
+                        className={`flex w-full cursor-pointer items-center px-3 py-2 text-start text-[11px] transition hover:bg-black/[0.035] ${
                           i > 0 ? "border-t border-black/6" : ""
                         } ${group.scopeId === scopeChoice ? "font-semibold text-black" : "text-black/65"}`}
                       >

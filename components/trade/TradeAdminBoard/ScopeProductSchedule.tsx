@@ -47,7 +47,7 @@ export function ScopeProductSchedule({ lead }: { lead: TradeLead }) {
                   <p className="text-[13px] font-medium text-white/90">{scope.scopeName}</p>
                   <p className="mt-0.5 text-[10px] leading-[1.5] text-white/40">{scope.scopeSummary}</p>
                 </div>
-                <div className="shrink-0 text-right">
+                      <div className="shrink-0 text-end">
                   <p className="text-[11px] text-white/70">
                     {scope.totalUnits} units · {scope.lineCount} {scope.lineCount === 1 ? "line" : "lines"}
                   </p>
@@ -96,7 +96,7 @@ export function ScopeProductSchedule({ lead }: { lead: TradeLead }) {
                         </div>
                       </div>
 
-                      <div className="shrink-0 text-right">
+                <div className="shrink-0 text-end">
                         <p className="text-[12px] font-medium text-white/80">× {row.quantity}</p>
                         <p className="text-[10px] text-white/35">
                           {row.unitPrice ? `${formatPrice(row.lineTotal)} total` : "Price unavailable"}

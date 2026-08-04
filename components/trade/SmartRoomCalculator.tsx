@@ -235,7 +235,7 @@ export default function SmartRoomCalculator() {
                     <button
                       type="button"
                       onClick={() => setPersona(id)}
-                      className={`group flex w-full items-start gap-4 border p-6 text-left transition-all duration-200 hover:shadow-lg ${
+                      className={`group flex w-full items-start gap-4 border p-6 text-start transition-all duration-200 hover:shadow-lg ${
                         persona === id
                           ? "border-charcoal bg-charcoal text-white shadow-lg"
                           : "border-charcoal/10 bg-white hover:border-charcoal"
@@ -515,7 +515,7 @@ export default function SmartRoomCalculator() {
                                   <button
                                     type="button"
                                     onClick={() => toggleNeed(room.roomKey, type, !checked)}
-                                    className="block w-full text-left"
+                                    className="block w-full text-start"
                                   >
                                     <div className={`relative aspect-square overflow-hidden bg-[#ece9e2] transition ${
                                       checked ? "ring-2 ring-charcoal ring-offset-4 ring-offset-[#ece9e2]" : "ring-1 ring-charcoal/8 ring-offset-4 ring-offset-[#ece9e2] group-hover:ring-charcoal/30"

@@ -160,7 +160,7 @@ export default function ProductModelLab() {
                 key={entry.id}
                 type="button"
                 onClick={() => setActiveConcept(entry.id)}
-                className={`border px-5 py-5 text-left transition-colors ${
+                className={`border px-5 py-5 text-start transition-colors ${
                   isActive
                     ? "border-white bg-white text-charcoal"
                     : "border-white/10 bg-white/[0.03] text-white hover:border-white/35"
@@ -196,7 +196,7 @@ export default function ProductModelLab() {
                   key={model.slug}
                   type="button"
                   onClick={() => setActiveSlug(model.slug)}
-                  className={`w-full border px-5 py-4 text-left transition-colors ${
+                  className={`w-full border px-5 py-4 text-start transition-colors ${
                     isActive
                       ? "border-white bg-white text-charcoal"
                       : "border-white/10 bg-white/[0.03] text-white hover:border-white/35"
@@ -219,7 +219,7 @@ export default function ProductModelLab() {
                 <ModelViewer ready={viewerReady} file={active.file} />
               </div>
 
-              <aside className="border-t border-white/10 bg-white px-7 py-8 text-charcoal lg:border-l lg:border-t-0">
+              <aside className="border-t border-white/10 bg-white px-7 py-8 text-charcoal lg:border-s lg:border-t-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-charcoal/35">
                   Active asset
                 </p>

@@ -161,7 +161,7 @@ export default function TradeAdminBoard() {
                   <button
                     type="button"
                     onClick={() => setExpandedId(expanded ? null : lead.id)}
-                    className="flex w-full flex-wrap items-center justify-between gap-3 p-4 text-left"
+                    className="flex w-full flex-wrap items-center justify-between gap-3 p-4 text-start"
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -172,7 +172,7 @@ export default function TradeAdminBoard() {
                         {lead.project.details.company || "—"} · {lead.reference} · {formatDate(lead.submittedAt)}
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-4 text-right">
+                    <div className="flex shrink-0 items-center gap-4 text-end">
                       <div>
                         <p className="text-[13px] font-medium text-white/85">{lead.totalUnits} units</p>
                         <p className="text-[11px] text-white/40">{formatPrice(lead.retailReferenceTotal)}</p>

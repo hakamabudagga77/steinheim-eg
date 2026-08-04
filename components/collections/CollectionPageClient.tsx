@@ -339,7 +339,7 @@ export default function CollectionPageClient({
               <Link
                 key={title}
                 href={href}
-                className="group flex min-h-[160px] items-center justify-between gap-6 border-b border-black/8 px-6 py-8 transition hover:bg-white lg:border-b-0 lg:border-r lg:last:border-r-0 lg:px-10"
+                className="group flex min-h-[160px] items-center justify-between gap-6 border-b border-black/8 px-6 py-8 transition hover:bg-white lg:border-b-0 lg:border-e lg:last:border-e-0 lg:px-10"
               >
                 <span>
                   <span className="block text-[20px] font-medium">{title}</span>
