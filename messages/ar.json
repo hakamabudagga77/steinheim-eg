@@ -1672,7 +1672,8 @@
     },
     "shortcutHint": "للبحث",
     "closeHint": "للإغلاق",
-    "navigateHint": "للتنقل"
+    "navigateHint": "للتنقل",
+    "resultsCount": "{count, plural, zero {لا نتائج} one {نتيجة واحدة} two {نتيجتان} few {# نتائج} many {# نتيجة} other {# نتيجة}}"
   },
   "cartDrawer": {
     "title": "سلة مشترياتك",
@@ -1818,5 +1819,8 @@
     "Brass": "نحاس",
     "Stainless steel": "صلب مقاوم للصدأ",
     "Stainless steel body": "جسم من الصلب المقاوم للصدأ"
+  },
+  "a11y": {
+    "skipToContent": "تخطَّ إلى المحتوى الرئيسي"
   }
 }
