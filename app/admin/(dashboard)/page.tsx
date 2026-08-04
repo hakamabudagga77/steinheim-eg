@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
@@ -149,25 +149,43 @@ export default function AdminDashboardPage() {
   const [tradeLeads, setTradeLeads] = useState<TradeLead[] | null>(null);
   const [ga4, setGa4] = useState<GA4Summary | null>(null);
   const [ga4Error, setGa4Error] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [asOf, setAsOf] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetch("/api/admin/orders")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d) {
-          setOrders(d.orders);
-          setAsOf(Date.now());
-        }
-      });
-    fetch("/api/admin/products").then((r) => (r.ok ? r.json() : null)).then((d) => d && setProducts(d.products));
-    fetch("/api/contact").then((r) => (r.ok ? r.json() : null)).then((d) => d && setLeads(d.leads));
-    fetch("/api/trade/leads").then((r) => (r.ok ? r.json() : null)).then((d) => d && setTradeLeads(d.leads));
+  const loadData = useCallback(() => {
+    const load = (path: string, setter: (data: unknown) => void) =>
+      fetch(path)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => d && setter(d))
+        .catch(() => setLoadError(true));
+    load("/api/admin/orders", (d) => {
+      const data = d as { orders?: ShopifyOrder[] };
+      if (data.orders) {
+        setOrders(data.orders);
+        setAsOf(Date.now());
+      }
+    });
+    load("/api/admin/products", (d) => {
+      const data = d as { products?: ShopifyProduct[] };
+      if (data.products) setProducts(data.products);
+    });
+    load("/api/contact", (d) => {
+      const data = d as { leads?: ContactLead[] };
+      if (data.leads) setLeads(data.leads);
+    });
+    load("/api/trade/leads", (d) => {
+      const data = d as { leads?: TradeLead[] };
+      if (data.leads) setTradeLeads(data.leads);
+    });
     fetch("/api/admin/analytics?start=30daysAgo&end=today")
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => setGa4(d.summary))
       .catch(() => setGa4Error(true));
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const last30 = useMemo(() => {
     if (!orders || asOf === null) return null;
@@ -267,6 +285,23 @@ export default function AdminDashboardPage() {
         </div>
         <DigestTestButton />
       </div>
+
+      {/* Load failure banner — a dead endpoint shouldn't show a silent blank */}
+      {loadError && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-[13px] text-red-300">
+          <span>Some data failed to load. Retry to fetch it again.</span>
+          <button
+            type="button"
+            onClick={() => {
+              setLoadError(false);
+              loadData();
+            }}
+            className="rounded-md border border-red-400/40 px-3 py-1 text-[12px] transition hover:bg-red-500/20"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Needs attention */}
       {attentionReady && hasAttentionItems && (

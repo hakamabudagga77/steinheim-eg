@@ -1822,5 +1822,16 @@
   },
   "a11y": {
     "skipToContent": "Skip to main content"
+  },
+  "notFoundPage": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "homeButton": "Back to home",
+    "searchHint": "Try searching for a collection or product instead."
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "An unexpected error occurred. Our team has been notified — please try again.",
+    "reloadButton": "Try again"
   }
 }
