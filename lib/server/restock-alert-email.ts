@@ -3,17 +3,10 @@ import "server-only";
 import { Resend } from "resend";
 import type { RestockAlertSubscription } from "@/lib/restock-alerts";
 import { formatPrice, getFinishById, getProductBySlug, getSeriesById } from "@/lib/utils";
+import { escapeHtml } from "@/lib/server/escape-html";
 
 const NOTIFY_FROM = process.env.TRADE_LEAD_NOTIFY_FROM || "Steinheim Egypt <onboarding@resend.dev>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export async function sendRestockAlertEmail(
   subscription: RestockAlertSubscription,

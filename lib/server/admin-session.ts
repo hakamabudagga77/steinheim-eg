@@ -52,7 +52,28 @@ function readCookie(request: Request, name: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Local-development bypass, off by default. Gate on an explicit flag rather
+ * than `NODE_ENV !== "production"`: the old check opened the whole admin and
+ * cron API surface on any non-production deployment (previews, staging,
+ * self-hosted boxes) where NODE_ENV simply wasn't "production".
+ */
+const devBypassEnabled = () => process.env.ADMIN_DEV_BYPASS === "1";
+
 export function isAdminRequest(request: Request): boolean {
-  if (process.env.NODE_ENV !== "production") return true;
+  if (devBypassEnabled()) return true;
   return verifySessionToken(readCookie(request, ADMIN_SESSION_COOKIE));
+}
+
+/**
+ * Authorization for the scheduled cron endpoints. Accepts the Vercel
+ * `CRON_SECRET` bearer header or a valid admin session; the dev bypass is the
+ * same explicit flag used by isAdminRequest.
+ */
+export function isCronRequest(request: Request): boolean {
+  if (devBypassEnabled()) return true;
+  const secret = process.env.CRON_SECRET;
+  const authHeader = request.headers.get("authorization");
+  if (secret && authHeader === `Bearer ${secret}`) return true;
+  return isAdminRequest(request);
 }

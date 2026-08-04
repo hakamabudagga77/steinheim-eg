@@ -1,22 +1,14 @@
 import { listPendingRestockAlerts, saveRestockAlert } from "@/lib/server/restock-alert-store";
 import { sendRestockAlertEmail } from "@/lib/server/restock-alert-email";
 import { getLiveProductData } from "@/lib/shopify-live-data";
-import { isAdminRequest } from "@/lib/server/admin-session";
+import { isCronRequest } from "@/lib/server/admin-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-function isAuthorized(request: Request): boolean {
-  if (process.env.NODE_ENV !== "production") return true;
-  const secret = process.env.CRON_SECRET;
-  const authHeader = request.headers.get("authorization");
-  if (secret && authHeader === `Bearer ${secret}`) return true;
-  return isAdminRequest(request);
-}
-
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!isCronRequest(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const pending = await listPendingRestockAlerts();

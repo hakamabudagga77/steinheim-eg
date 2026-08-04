@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createEmptyCart, sanitizeCart } from "@/lib/cart";
+import { createEmptyCart, normalizeCheckoutItems, sanitizeCart } from "@/lib/cart";
 
 describe("createEmptyCart", () => {
   it("returns an empty item list", () => {
@@ -76,5 +76,58 @@ describe("sanitizeCart", () => {
   it("defaults updatedAt to an empty string when missing or invalid", () => {
     expect(sanitizeCart({ items: [] })?.updatedAt).toBe("");
     expect(sanitizeCart({ items: [], updatedAt: 12345 })?.updatedAt).toBe("");
+  });
+});
+
+describe("normalizeCheckoutItems", () => {
+  it("rejects a missing or empty item list", () => {
+    expect(normalizeCheckoutItems(undefined)).toEqual({ ok: false, error: "No items provided" });
+    expect(normalizeCheckoutItems([])).toEqual({ ok: false, error: "No items provided" });
+    expect(normalizeCheckoutItems("nope")).toEqual({ ok: false, error: "No items provided" });
+  });
+
+  it("returns a normalized list for valid input", () => {
+    const result = normalizeCheckoutItems([
+      { slug: "joy-basin-mixer", finish: "chrome", quantity: 2 },
+    ]);
+    expect(result).toEqual({
+      ok: true,
+      items: [{ slug: "joy-basin-mixer", finish: "chrome", quantity: 2 }],
+    });
+  });
+
+  it("rejects zero, negative, fractional and non-numeric quantities", () => {
+    const q = (quantity: unknown) =>
+      normalizeCheckoutItems([{ slug: "s", finish: "chrome", quantity }]);
+    expect(q(0).ok).toBe(false);
+    expect(q(-1).ok).toBe(false);
+    expect(q(1.5).ok).toBe(false);
+    expect(q("abc").ok).toBe(false);
+    expect(q(Number.NaN).ok).toBe(false);
+    expect(q(undefined).ok).toBe(false);
+  });
+
+  it("rejects quantities above the 99 cap", () => {
+    const result = normalizeCheckoutItems([{ slug: "s", finish: "chrome", quantity: 100 }]);
+    expect(result).toEqual({
+      ok: false,
+      error: "Quantity must be an integer between 1 and 99",
+    });
+  });
+
+  it("rejects missing slug or finish", () => {
+    expect(normalizeCheckoutItems([{ finish: "chrome", quantity: 1 }]).ok).toBe(false);
+    expect(normalizeCheckoutItems([{ slug: "s", quantity: 1 }]).ok).toBe(false);
+    expect(normalizeCheckoutItems([{ slug: "  ", finish: "chrome", quantity: 1 }]).ok).toBe(false);
+  });
+
+  it("rejects an item list larger than 50", () => {
+    const items = Array.from({ length: 51 }, (_, i) => ({
+      slug: `slug-${i}`,
+      finish: "chrome",
+      quantity: 1,
+    }));
+    const result = normalizeCheckoutItems(items);
+    expect(result).toEqual({ ok: false, error: "Cart exceeds the 50-item limit" });
   });
 });
