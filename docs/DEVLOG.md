@@ -92,6 +92,31 @@ unit suite, and the production build:
 
 ---
 
+## 2026-08-04 — Resilience & RTL completeness delivery wave
+
+Two pull requests merged to `main`, each green on lint, typecheck, the full
+unit suite, and the production build:
+
+- **PR #91 — Error paths in the brand system + admin resilience.** A
+  localized `not-found.tsx` and route-level `error.tsx` in the brand palette
+  (cream/charcoal, italic serif headings) with EN/AR copy, replacing the
+  default Next 404 and the unstyled series fallback. `global-error.tsx` was
+  recolored from an off-brand gold `#c9a961` to the cream/charcoal system and
+  made bilingual (Arabic detected from the pathname on hydration). The admin
+  dashboard's five data fetches previously failed silently; they now share a
+  `loadData()` with per-fetch `.catch()` that surfaces a red banner with a
+  Retry button instead of an eternal "…". New `notFoundPage`/`errorPage`
+  namespaces in both message files.
+- **PR #92 — RTL logical utilities.** `text-left`/`text-right` and
+  `border-l`/`border-r` are physical — they don't mirror under `dir="rtl"`.
+  Converted every occurrence in public components (assistant prompts, 3D lab,
+  collections landing + series accordion, trade drawer tabs/board/room
+  calculator/setup overlay, product cards + detail rows, trade admin board) to
+  `text-start`/`text-end` and `border-s`/`border-e`. Already-correct spots
+  (explicit `rtl:text-right` overrides) were left alone.
+
+---
+
 ## Roadmap — the excellence track
 
 All work respects the brand system: cream `#ece9e2`, charcoal `#0a0a0a`,
@@ -119,12 +144,12 @@ identity — it makes the experience underneath it sharper.
 - Suspense skeleton around the Redis-backed live-data fetch on collection
   pages so the grid paints instantly. 🔲
 
-### 3. Error handling & resilience (P1)
+### 3. Error handling & resilience (P1) — SHIPPED (PR #91)
 - Localized `not-found.tsx` and route-level `error.tsx` in the brand system
-  (replaces the default English 404, incl. the unstyled series fallback).
-- Localize `global-error.tsx`.
+  (replaces the default English 404, incl. the unstyled series fallback). ✅
+- Localize `global-error.tsx`. ✅
 - Admin dashboard: `.catch()` on the orders/products/leads fetches so a
-  network failure shows an error state + retry instead of an eternal "…".
+  network failure shows an error state + retry instead of an eternal "…". ✅
 
 ### 4. SEO & structured data (P1) — partially shipped (PR #90)
 - `CollectionPage` + `ItemList` schema on series pages; `FAQPage` on
@@ -136,10 +161,10 @@ identity — it makes the experience underneath it sharper.
   logo card (accept `ogImage` in `createLocalizedMetadata`).
   ✅ Collections. 🔲 Projects.
 
-### 5. RTL completeness (P1/P2)
-- Physical borders → inline-start in the series accordion and 3D lab.
+### 5. RTL completeness (P1/P2) — SHIPPED (PR #92)
+- Physical borders → inline-start in the series accordion and 3D lab. ✅
 - `text-left` → `text-start` in assistant, 3D lab, product filter pills,
-  collections landing, and the trade drawer header.
+  collections landing, and the trade drawer header. ✅
 
 ### 6. UX depth (P2)
 - Restock alert as a real form (Enter submits, native email validation). ✅
@@ -152,4 +177,4 @@ identity — it makes the experience underneath it sharper.
   decorative text where it is.
 
 _Last verified: 2026-08-04 — all checks green on `main` at
-`5b9d456`._
+`d4d5bdf`._
