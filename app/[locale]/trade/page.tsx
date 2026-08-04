@@ -67,10 +67,18 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        {/* How it works — live preview of the actual room calculator below */}
-        <section className="px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
+        {/*
+          How it works — live preview of the actual room calculator below.
+
+          This section and the one after it are the whole distance between the
+          hero and the form: on a 375px screen they were 2,551px of the 3,199px
+          a shopper scrolled before reaching it. Padding and the gap between the
+          text and its preview are tightened here for that reason; the copy and
+          the previews themselves are untouched.
+        */}
+        <section className="px-5 py-14 sm:px-8 lg:px-16 lg:py-20 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div className="grid gap-10 lg:gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <ScrollReveal>
                 <p className="text-[12px] uppercase tracking-[0.34em] text-black/65">{t("howItWorks")}</p>
                 <h2 className="mt-4 max-w-3xl text-[clamp(2.4rem,5vw,5.6rem)] font-normal leading-[0.92] tracking-[-0.04em]" style={{ fontStyle: "italic" }}>
@@ -90,9 +98,9 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* Beyond the quote — the real post-submission project board */}
-        <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
+        <section className="border-t border-black/6 px-5 py-14 sm:px-8 lg:px-16 lg:py-20 text-start">
           <div className="mx-auto max-w-[1780px]">
-            <div className="grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div className="grid gap-10 lg:gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               {/*
                 min-w-0: grid items default to min-width:auto, so they refuse
                 to shrink below their content's intrinsic width. The project
@@ -115,7 +123,14 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
                   {t("projectBoard.body")}
                 </p>
 
-                <div className="mt-12 grid gap-8 sm:grid-cols-2">
+                {/*
+                  Kept to one column on phones. Two columns saves 110px but
+                  leaves each about 155px wide, which breaks lines like
+                  "received, reviewed, contacted, quoted, confirmed, sourced,
+                  shipped, delivered" into a ragged stack. Tightening the row
+                  gap instead recovers 56px and costs nothing to read.
+                */}
+                <div className="mt-10 grid gap-5 sm:gap-8 sm:grid-cols-2">
                   {boardItemKeys.map((key) => (
                     <div key={key} className="border-t border-black/10 pt-5">
                       <h3 className="font-heading text-[16px]" style={{ fontStyle: "italic" }}>{t(`projectBoard.items.${key}.title`)}</h3>
@@ -128,7 +143,15 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        {/* Trade partner benefits */}
+        <Suspense fallback={null}>
+          <SmartRoomCalculator />
+        </Suspense>
+
+        {/*
+          Sits after the room calculator: the benefits are the pitch for
+          project-scale work, which only lands once you have seen what setting
+          up a project actually involves.
+        */}
         <section className="border-t border-black/6 px-5 py-24 sm:px-8 lg:px-16 lg:py-32 text-start">
           <div className="mx-auto max-w-[1780px]">
             <ScrollReveal>
@@ -160,10 +183,6 @@ export default async function TradePage({ params }: { params: Promise<{ locale: 
             </div>
           </div>
         </section>
-
-        <Suspense fallback={null}>
-          <SmartRoomCalculator />
-        </Suspense>
 
         {/* Browse CTA */}
         <section className="px-5 pb-24 sm:px-8 lg:px-16 lg:pb-32 text-start">

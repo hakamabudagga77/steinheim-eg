@@ -193,9 +193,15 @@ function ShopScreen() {
 // Mirrors SmartRoomCalculator's own numbered-circle progress stepper
 // (same markup/classes) so this preview reads as the real thing, not a
 // separately-styled mockup.
+// items-start, not items-center: the labels below the circles wrap to
+// different line counts ("You & your project" takes two, "Rooms" one), so
+// centring lets the taller buttons lift their circle row above the shorter
+// ones — measured 6.8px, which reads as the connecting line stepping
+// vertically between 1 and 2. Top-aligning puts every circle row on one line
+// and lets the labels hang to different depths.
 function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTranslations>; activeIndex: number; onSelect: (i: number) => void }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-start justify-between">
       {SCREEN_KEYS.map((key, i) => (
         <button
           key={key}
@@ -203,8 +209,15 @@ function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTrans
           onClick={() => onSelect(i)}
           className="group flex flex-1 flex-col items-center gap-2"
         >
+          {/*
+            Both connectors always render, the outer edges merely hidden, so
+            every button divides its width the same way. Omitting them left the
+            end buttons with one connector absorbing all the slack while the
+            middle buttons split theirs in two — measured 72px between steps 1
+            and 2 against 48px between 2 and 3. visibility keeps the space.
+          */}
           <div className="flex w-full items-center">
-            {i > 0 && <div className={`h-[2px] flex-1 transition-colors duration-300 ${i <= activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />}
+            <div className={`h-[2px] flex-1 transition-colors duration-300 ${i === 0 ? "invisible" : i <= activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />
             <div
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-medium transition-all duration-300 ${
                 i === activeIndex
@@ -239,7 +252,7 @@ function Stepper({ tc, activeIndex, onSelect }: { tc: ReturnType<typeof useTrans
                 )}
               </AnimatePresence>
             </div>
-            {i < SCREEN_KEYS.length - 1 && <div className={`h-[2px] flex-1 transition-colors duration-300 ${i < activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />}
+            <div className={`h-[2px] flex-1 transition-colors duration-300 ${i === SCREEN_KEYS.length - 1 ? "invisible" : i < activeIndex ? "bg-charcoal" : "bg-charcoal/10"}`} />
           </div>
           <span className={`hidden text-[8px] font-medium uppercase tracking-[0.1em] transition-colors sm:block ${i <= activeIndex ? "text-charcoal" : "text-charcoal/65"}`}>
             {tc(`steps.${key}`)}

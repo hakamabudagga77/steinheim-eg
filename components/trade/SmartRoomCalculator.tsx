@@ -108,7 +108,13 @@ export default function SmartRoomCalculator() {
 
         {/* Progress stepper */}
         <div className="mb-10">
-          <div className="flex items-center justify-between">
+          {/*
+            items-start so the circle rows stay on one line: the labels wrap to
+            different line counts, and centring lets a taller button lift its
+            circle above the others, breaking the connecting line. Same as
+            TradeStudioShowcase, which mirrors this stepper.
+          */}
+          <div className="flex items-start justify-between">
             {STEP_KEYS.map((key, i) => (
               <button
                 key={key}
@@ -118,10 +124,14 @@ export default function SmartRoomCalculator() {
                 }}
                 className="group flex flex-1 flex-col items-center gap-2"
               >
+                {/*
+                  Both connectors always render, the outer edges merely hidden,
+                  so every button divides its width the same way — otherwise the
+                  end buttons give their single connector all the slack and the
+                  gaps come out uneven. See TradeStudioShowcase, same stepper.
+                */}
                 <div className="flex w-full items-center">
-                  {i > 0 && (
-                    <div className={`h-[2px] flex-1 transition-colors duration-300 ${i <= step ? "bg-charcoal" : "bg-charcoal/10"}`} />
-                  )}
+                  <div className={`h-[2px] flex-1 transition-colors duration-300 ${i === 0 ? "invisible" : i <= step ? "bg-charcoal" : "bg-charcoal/10"}`} />
                   <div
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-medium transition-all duration-300 ${
                       i === step
@@ -139,9 +149,7 @@ export default function SmartRoomCalculator() {
                       i + 1
                     )}
                   </div>
-                  {i < STEP_KEYS.length - 1 && (
-                    <div className={`h-[2px] flex-1 transition-colors duration-300 ${i < step ? "bg-charcoal" : "bg-charcoal/10"}`} />
-                  )}
+                  <div className={`h-[2px] flex-1 transition-colors duration-300 ${i === STEP_KEYS.length - 1 ? "invisible" : i < step ? "bg-charcoal" : "bg-charcoal/10"}`} />
                 </div>
                 <span className={`text-[9px] font-medium uppercase tracking-[0.12em] transition-colors ${
                   i <= step ? "text-charcoal" : "text-charcoal/65"
