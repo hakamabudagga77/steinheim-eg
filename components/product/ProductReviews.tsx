@@ -125,7 +125,11 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
         )}
       </div>
 
-      {submitted && <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700">{t("submittedMessage")}</p>}
+      {submitted && (
+        <p role="status" className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700">
+          {t("submittedMessage")}
+        </p>
+      )}
 
       {formOpen && (
         <div className="mt-5 max-w-lg rounded-xl border border-black/8 bg-white/40 p-5">
@@ -156,7 +160,11 @@ export default function ProductReviews({ productSlug }: { productSlug: string })
               className="w-full rounded-lg border border-black/15 bg-white p-3 text-[13px] text-black outline-none focus:border-black/40"
             />
           </div>
-          {error && <p className="mb-3 text-[12px] text-red-500">{error}</p>}
+          {error && (
+            <p role="alert" className="mb-3 text-[12px] text-red-500">
+              {error}
+            </p>
+          )}
           <div className="flex gap-3">
             <button
               type="button"

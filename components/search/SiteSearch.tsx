@@ -137,6 +137,7 @@ export default function SiteSearch() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleListKeydown}
                 placeholder={t("placeholder")}
+                aria-label={t("placeholder")}
                 className="min-w-0 flex-1 bg-transparent text-[15px] text-charcoal outline-none placeholder:text-charcoal/35"
               />
               <button
@@ -150,6 +151,13 @@ export default function SiteSearch() {
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto p-2" data-lenis-prevent>
+              <p role="status" className="sr-only">
+                {query.trim() === ""
+                  ? ""
+                  : flatResults.length === 0
+                    ? t("noResults", { query })
+                    : t("resultsCount", { count: flatResults.length })}
+              </p>
               {query.trim() === "" ? (
                 <p className="px-3 py-8 text-center text-[13px] text-charcoal/45">{t("hint")}</p>
               ) : flatResults.length === 0 ? (

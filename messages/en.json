@@ -1672,7 +1672,8 @@
     },
     "shortcutHint": "to search",
     "closeHint": "to close",
-    "navigateHint": "to navigate"
+    "navigateHint": "to navigate",
+    "resultsCount": "{count, plural, one {# result} other {# results}}"
   },
   "cartDrawer": {
     "title": "Your cart",
@@ -1818,5 +1819,8 @@
     "Brass": "Brass",
     "Stainless steel": "Stainless steel",
     "Stainless steel body": "Stainless steel body"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content"
   }
 }
