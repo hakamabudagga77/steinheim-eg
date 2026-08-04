@@ -214,7 +214,7 @@ export default function AllProductsPage() {
               )}
             </button>
 
-            <p className="ml-auto shrink-0 text-[13px] text-black/65">{t("resultCount", { count: sorted.length })}</p>
+            <p className="ms-auto shrink-0 text-[13px] text-black/65">{t("resultCount", { count: sorted.length })}</p>
           </div>
 
           {/* Grid */}
@@ -357,7 +357,7 @@ export default function AllProductsPage() {
                       onClick={() => setInStockOnly((v) => !v)}
                       className={`relative h-6 w-11 rounded-full transition ${inStockOnly ? "bg-black" : "bg-black/15"}`}
                     >
-                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${inStockOnly ? "left-[22px]" : "left-0.5"}`} />
+                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${inStockOnly ? "left-[22px] rtl:left-auto rtl:right-[22px]" : "left-0.5 rtl:left-auto rtl:right-0.5"}`} />
                     </button>
                   </label>
                 </FilterSection>

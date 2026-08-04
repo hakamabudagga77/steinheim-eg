@@ -270,7 +270,7 @@ export default function GessiInspiredHome() {
           type="button"
           onClick={toggleHeroVideo}
           aria-label={heroPaused ? t("hero.play") : t("hero.pause")}
-          className={`absolute bottom-8 right-8 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/45 text-white/80 transition duration-500 hover:bg-white hover:text-black ${
+          className={`absolute bottom-8 right-8 rtl:right-auto rtl:left-8 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/45 text-white/80 transition duration-500 hover:bg-white hover:text-black ${
             heroVideoVisible ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >

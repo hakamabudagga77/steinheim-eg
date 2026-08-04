@@ -38,11 +38,15 @@ export default function TradeRestoreClient({ id, locale }: { id: string; locale:
           return;
         }
 
-        const stored = window.localStorage.getItem(TRADE_WORKSPACE_STORAGE_KEY);
-        const existing = stored ? sanitizeTradeWorkspace(JSON.parse(stored)) : null;
-        const others = (existing?.projects ?? []).filter((entry) => entry.id !== project.id);
-        const workspace = { activeProjectId: project.id, projects: [project, ...others].slice(0, 25) };
-        window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
+        try {
+          const stored = window.localStorage.getItem(TRADE_WORKSPACE_STORAGE_KEY);
+          const existing = stored ? sanitizeTradeWorkspace(JSON.parse(stored)) : null;
+          const others = (existing?.projects ?? []).filter((entry) => entry.id !== project.id);
+          const workspace = { activeProjectId: project.id, projects: [project, ...others].slice(0, 25) };
+          window.localStorage.setItem(TRADE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
+        } catch {
+          // Storage unavailable — the restore still lands on the trade studio.
+        }
 
         setProjectName(project.details.projectName || yourProjectFallbackRef.current);
         setState("success");

@@ -38,6 +38,7 @@ const UNUSED_NAMESPACES = new Set([
   "journal",
   "contact",
   "cart",
+  "common",
   "finishTags",
 ]);
 

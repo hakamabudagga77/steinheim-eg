@@ -57,15 +57,13 @@ async function adminWrite<T>(endpoint: string, method: "POST" | "PUT", body: unk
 
 async function adminGraphQL<T>(
   query: string,
-  variables?: Record<string, unknown>,
-  revalidate = 600
+  variables?: Record<string, unknown>
 ): Promise<T> {
   const token = await getAccessToken();
   const res = await fetch(`https://${STORE_DOMAIN}/admin/api/${API_VERSION}/graphql.json`, {
     method: "POST",
     headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
-    next: { revalidate },
   });
   if (!res.ok) throw new Error(`Shopify GraphQL: ${res.status}`);
   const data = await res.json();
@@ -301,8 +299,7 @@ export async function updateShopPolicy(type: string, body: string): Promise<Shop
       }
     }
   `,
-    { policy: { type, body } },
-    0
+    { policy: { type, body } }
   );
   if (data.shopPolicyUpdate.userErrors.length > 0) {
     throw new Error(data.shopPolicyUpdate.userErrors.map((e) => e.message).join("; "));
