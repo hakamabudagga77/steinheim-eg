@@ -43,6 +43,7 @@ export async function POST(request: Request) {
   }
 
   const messages = Array.isArray(body.messages) ? body.messages : [];
+  const locale = typeof body.locale === "string" && (body.locale === "ar" || body.locale === "en") ? body.locale : undefined;
 
   const ruleResult = answerSteinheimQuestion(messages, body.projectContext ?? "");
 
@@ -88,7 +89,8 @@ export async function POST(request: Request) {
           (delta) => {
             controller.enqueue(encoder.encode(sse({ type: "delta", text: delta })));
           },
-          request.signal
+          request.signal,
+          locale
         );
       } catch (err) {
         console.error("[assistant] AI failed, falling back to rule engine:", (err as Error).message);

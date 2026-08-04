@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { AssistantAction, AssistantMessage } from "@/lib/assistant/steinheim-assistant";
 
@@ -9,19 +10,6 @@ type ChatMessage = AssistantMessage & {
   id: string;
   action?: AssistantAction;
 };
-
-const starterPrompts = [
-  "I am building a premium five-star hotel in Egypt. What should I specify?",
-  "Warm beige stone, walnut vanity, soft lighting. Which collection and finish?",
-  "What is STM-60-M500-002 and what is its catalogue price?",
-  "I need 80 bathrooms for a New Cairo compound. Where should I start?",
-];
-
-const welcomeMessage =
-  "Tell me what you are building, the room type, preferred finish, and whether this is for a home, designer presentation, hotel, compound, or commercial project. I’ll stay inside the Steinheim Egypt catalogue and call out anything that needs confirmation.";
-
-const cleanWelcomeMessage =
-  "Tell me what you are building, the room type, preferred finish, and whether this is for a home, designer presentation, hotel, compound, or commercial project. I'll stay inside the Steinheim Egypt catalogue and call out anything that needs confirmation.";
 
 function cleanAssistantText(text: string) {
   return text.replace(/\n\n\{"type":[\s\S]*$/m, "").trim();
@@ -34,7 +22,7 @@ function splitParagraphs(text: string) {
     .filter(Boolean);
 }
 
-function ConciergeRitual() {
+function ConciergeRitual({ label }: { label: string }) {
   return (
     <div className="min-w-[260px] space-y-4">
       <div className="relative mx-auto h-28 w-28">
@@ -57,7 +45,7 @@ function ConciergeRitual() {
         ))}
       </div>
       <p className="text-[11px] uppercase tracking-[0.24em] text-black/42">
-        Reading catalogue, finish, and project logic
+        {label}
       </p>
       <style jsx>{`
         @keyframes steinheimSweep {
@@ -95,13 +83,16 @@ function ConciergeRitual() {
   );
 }
 
-export default function SteinheimAssistant({ locale }: { locale: string }) {
+export default function SteinheimAssistant() {
+  const locale = useLocale();
+  const t = useTranslations("assistant");
+  const starterPrompts = t.raw("starterPrompts") as string[];
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       role: "assistant",
-      content: cleanWelcomeMessage || welcomeMessage ||
-        "Tell me what you are building, the room type, preferred finish, and whether this is for a home, designer presentation, hotel, compound, or commercial project. I’ll stay inside the Steinheim Egypt catalogue and call out anything that needs confirmation.",
+      content: t("welcomeMessage"),
     },
   ]);
   const [input, setInput] = useState("");
@@ -223,8 +214,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
           message.id === assistantId
             ? {
                 ...message,
-                content:
-                  "I could not reach the assistant service. Try again, or use the trade page to build the project schedule directly.",
+                content: t("errorMessage"),
               }
             : message
         )
@@ -244,21 +234,20 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
       <div className="mx-auto grid max-w-[1780px] gap-10 px-5 pb-20 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <p className="text-[11px] font-medium uppercase tracking-[0.36em] text-black/42">
-            Steinheim AI Concierge
+            {t("eyebrow")}
           </p>
           <h1 className="mt-6 max-w-xl font-heading text-[clamp(3.3rem,6.8vw,7.4rem)] font-light leading-[0.86] tracking-[-0.06em]">
-            A smarter way to specify.
+            {t("headline")}
           </h1>
           <p className="mt-8 max-w-md text-[16px] leading-[1.9] text-black/58">
-            Ask about products, finishes, care, warranty, hotel schedules, developer projects,
-            or which collection fits a room. The assistant is locked to the Steinheim Egypt catalogue.
+            {t("intro")}
           </p>
 
           <div className="mt-10 overflow-hidden rounded-[28px] bg-black">
             <div className="relative aspect-[16/10]">
               <Image
                 src="/images/generated/gessi/steinheim-specification-story.png"
-                alt="Steinheim specification desk with finishes and product"
+                alt={t("imageAlt")}
                 fill
                 priority
                 quality={92}
@@ -267,19 +256,19 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/48 via-transparent to-transparent" />
               <p className="absolute bottom-5 left-5 text-[11px] uppercase tracking-[0.28em] text-white/72">
-                Catalogue intelligence
+                {t("catalogueIntelligence")}
               </p>
             </div>
           </div>
 
           <div className="mt-8 rounded-[24px] border border-black/10 bg-[#ece9e2] p-6">
             <p className="text-[10px] font-medium uppercase tracking-[0.26em] text-black/42">
-              Guardrails
+              {t("guardrailsTitle")}
             </p>
             <div className="mt-5 grid gap-3 text-[13px] leading-[1.75] text-black/58">
-              <p>Only recommends active Egypt catalogue products and finishes.</p>
-              <p>Labels prices as retail-reference, never guaranteed trade pricing.</p>
-              <p>Does not invent stock, delivery dates, project quantities, or origin claims.</p>
+              <p>{t("guardrailProduct")}</p>
+              <p>{t("guardrailPrice")}</p>
+              <p>{t("guardrailStock")}</p>
             </div>
           </div>
 
@@ -288,13 +277,13 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
               href="/trade#smart-room-calculator"
               className="inline-flex h-12 items-center justify-center rounded-full bg-black px-6 text-[10px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-black/80"
             >
-              Build schedule
+              {t("buildSchedule")}
             </Link>
             <Link
               href="/collections"
               className="inline-flex h-12 items-center justify-center rounded-full border border-black/20 px-6 text-[10px] font-medium uppercase tracking-[0.16em] text-black transition hover:border-black"
             >
-              Browse catalogue
+              {t("browseCatalogue")}
             </Link>
           </div>
         </aside>
@@ -303,11 +292,11 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
           <div className="border-b border-black/10 bg-[#ece9e2] p-5 sm:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="font-heading text-[34px] font-light leading-none tracking-[-0.04em]">Concierge</p>
-                <p className="mt-2 text-[12px] text-black/45">Catalogue-backed assistant for Steinheim Egypt</p>
+                <p className="font-heading text-[34px] font-light leading-none tracking-[-0.04em]">{t("conciergeTitle")}</p>
+                <p className="mt-2 text-[12px] text-black/45">{t("conciergeSubtitle")}</p>
               </div>
               <span className="w-fit rounded-full border border-black/10 bg-white px-4 py-2 text-[9px] font-medium uppercase tracking-[0.18em] text-black/45">
-                Catalogue grounded
+                {t("catalogueGrounded")}
               </span>
             </div>
           </div>
@@ -327,7 +316,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
                     } p-4 sm:p-5 shadow-[0_12px_34px_rgba(0,0,0,0.04)]`}
                   >
                     {message.role === "assistant" && !message.content && loading ? (
-                      <ConciergeRitual />
+                      <ConciergeRitual label={t("ritualStatus")} />
                     ) : (
                       <div className="space-y-3 text-[14px] leading-[1.8]">
                         {splitParagraphs(message.content).map((paragraph) => (
@@ -368,7 +357,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Ask about a product, finish, project, hotel schedule, warranty..."
+                placeholder={t("inputPlaceholder")}
                 className="h-[54px] flex-1 rounded-full border border-black/12 bg-white px-5 text-[14px] outline-none transition focus:border-black"
               />
               <button
@@ -376,7 +365,7 @@ export default function SteinheimAssistant({ locale }: { locale: string }) {
                 disabled={loading || !input.trim()}
                 className="h-[54px] rounded-full bg-black px-8 text-[10px] font-medium uppercase tracking-[0.16em] text-white transition hover:bg-black/80 disabled:opacity-30"
               >
-                {loading ? "Reading" : "Ask"}
+                {loading ? t("reading") : t("ask")}
               </button>
             </form>
           </div>

@@ -414,6 +414,34 @@
     "viewAll": "View all",
     "currency": "LE"
   },
+  "assistant": {
+    "eyebrow": "Steinheim AI Concierge",
+    "headline": "A smarter way to specify.",
+    "intro": "Ask about products, finishes, care, warranty, hotel schedules, developer projects, or which collection fits a room. The assistant is locked to the Steinheim Egypt catalogue.",
+    "imageAlt": "Steinheim specification desk with finishes and product",
+    "catalogueIntelligence": "Catalogue intelligence",
+    "guardrailsTitle": "Guardrails",
+    "guardrailProduct": "Only recommends active Egypt catalogue products and finishes.",
+    "guardrailPrice": "Labels prices as retail-reference, never guaranteed trade pricing.",
+    "guardrailStock": "Does not invent stock, delivery dates, project quantities, or origin claims.",
+    "buildSchedule": "Build schedule",
+    "browseCatalogue": "Browse catalogue",
+    "conciergeTitle": "Concierge",
+    "conciergeSubtitle": "Catalogue-backed assistant for Steinheim Egypt",
+    "catalogueGrounded": "Catalogue grounded",
+    "ritualStatus": "Reading catalogue, finish, and project logic",
+    "inputPlaceholder": "Ask about a product, finish, project, hotel schedule, warranty...",
+    "reading": "Reading",
+    "ask": "Ask",
+    "welcomeMessage": "Tell me what you are building, the room type, preferred finish, and whether this is for a home, designer presentation, hotel, compound, or commercial project. I'll stay inside the Steinheim Egypt catalogue and call out anything that needs confirmation.",
+    "starterPrompts": [
+      "I am building a premium five-star hotel in Egypt. What should I specify?",
+      "Warm beige stone, walnut vanity, soft lighting. Which collection and finish?",
+      "What is STM-60-M500-002 and what is its catalogue price?",
+      "I need 80 bathrooms for a New Cairo compound. Where should I start?"
+    ],
+    "errorMessage": "I could not reach the assistant service. Try again, or use the trade page to build the project schedule directly."
+  },
   "landing": {
     "hero": {
       "eyebrow": "Steinheim Egypt",
