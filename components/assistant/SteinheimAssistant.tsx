@@ -346,7 +346,7 @@ export default function SteinheimAssistant() {
                   key={prompt}
                   type="button"
                   onClick={() => askAssistant(prompt)}
-                  className="rounded-[18px] border border-black/10 bg-white px-4 py-3 text-left text-[11px] leading-[1.5] text-black/58 transition hover:border-black/30"
+                  className="rounded-[18px] border border-black/10 bg-white px-4 py-3 text-start text-[11px] leading-[1.5] text-black/58 transition hover:border-black/30"
                 >
                   {prompt}
                 </button>

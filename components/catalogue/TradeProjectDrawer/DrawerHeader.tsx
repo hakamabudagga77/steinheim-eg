@@ -87,7 +87,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => { switchProject(entry.id); setShowProjectsMenu(false); }}
-                className="min-w-0 flex-1 text-left"
+                className="min-w-0 flex-1 text-start"
               >
                 <p className="truncate text-[12px] font-medium text-charcoal">{entry.details.projectName || t("projectsMenu.untitled")}</p>
                 <p className="text-[10px] text-warm-gray">{t("projectsMenu.productCount", { count: entry.items.length })}</p>
@@ -120,7 +120,7 @@ export default function DrawerHeader({
           <button
             type="button"
             onClick={() => { setStep("board"); setError(null); }}
-            className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+            className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
               step === "board"
                 ? "border-charcoal text-charcoal"
                 : "border-charcoal/15 text-warm-gray hover:text-charcoal"
@@ -132,7 +132,7 @@ export default function DrawerHeader({
             <button
               type="button"
               onClick={() => { if (hasRows) setStep("details"); }}
-              className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+              className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                 step === "details"
                   ? "border-charcoal text-charcoal"
                   : hasRows
@@ -148,7 +148,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => setStep("status")}
-                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                   step === "status"
                     ? "border-charcoal text-charcoal"
                     : "border-charcoal/15 text-warm-gray hover:text-charcoal"
@@ -159,7 +159,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => setStep("quote")}
-                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                   step === "quote"
                     ? "border-charcoal text-charcoal"
                     : "border-charcoal/15 text-warm-gray hover:text-charcoal"
@@ -170,7 +170,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => setStep("documents")}
-                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                   step === "documents"
                     ? "border-charcoal text-charcoal"
                     : "border-charcoal/15 text-warm-gray hover:text-charcoal"
@@ -181,7 +181,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => setStep("samples")}
-                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                   step === "samples"
                     ? "border-charcoal text-charcoal"
                     : "border-charcoal/15 text-warm-gray hover:text-charcoal"
@@ -192,7 +192,7 @@ export default function DrawerHeader({
               <button
                 type="button"
                 onClick={() => setStep("messages")}
-                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-left text-[9px] font-medium uppercase tracking-[0.15em] transition ${
+                className={`shrink-0 whitespace-nowrap border-t-2 pt-2 text-start text-[9px] font-medium uppercase tracking-[0.15em] transition ${
                   step === "messages"
                     ? "border-charcoal text-charcoal"
                     : "border-charcoal/15 text-warm-gray hover:text-charcoal"

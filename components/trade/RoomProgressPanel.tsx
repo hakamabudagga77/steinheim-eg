@@ -42,7 +42,7 @@ export default function RoomProgressPanel({
                   key={need.type}
                   type="button"
                   onClick={() => onSelectNeed(room.scopeId, need.type)}
-                  className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left transition hover:bg-black/[0.03]"
+                  className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-start transition hover:bg-black/[0.03]"
                 >
                   <span className="text-[12px] text-black/75">{REQUIREMENT_TYPE_LABELS[need.type]}</span>
                   <span className={`flex shrink-0 items-center gap-1.5 text-[11px] font-medium ${met ? "text-black" : "text-black/35"}`}>

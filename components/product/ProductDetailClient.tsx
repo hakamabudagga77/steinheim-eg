@@ -275,7 +275,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                 setSelectedFinish(entry.finish);
                                 setFinishOpen(false);
                               }}
-                              className={`flex w-full cursor-pointer items-center gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                              className={`flex w-full cursor-pointer items-center gap-4 px-5 py-4 text-start transition hover:bg-black/[0.035] ${
                                 i > 0 ? "border-t border-black/6" : ""
                               }`}
                             >
@@ -391,7 +391,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                                     setScopeChoice(group.scopeId);
                                     setRoomOpen(false);
                                   }}
-                                  className={`flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-black/[0.035] ${
+                                  className={`flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-start transition hover:bg-black/[0.035] ${
                                     i > 0 ? "border-t border-black/6" : ""
                                   }`}
                                 >
