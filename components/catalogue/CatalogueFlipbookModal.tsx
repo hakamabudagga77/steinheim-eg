@@ -133,6 +133,8 @@ export default function CatalogueFlipbookModal({
                         alt=""
                         className="h-full w-full object-contain"
                         draggable={false}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <div className="h-full w-full bg-[#141414]" />

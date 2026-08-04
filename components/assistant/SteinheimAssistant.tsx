@@ -358,6 +358,7 @@ export default function SteinheimAssistant() {
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder={t("inputPlaceholder")}
+                aria-label={t("inputPlaceholder")}
                 className="h-[54px] flex-1 rounded-full border border-black/12 bg-white px-5 text-[14px] outline-none transition focus:border-black"
               />
               <button

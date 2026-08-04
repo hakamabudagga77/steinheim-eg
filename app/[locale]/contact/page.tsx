@@ -149,25 +149,26 @@ export default function ContactPage() {
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.name")}</label>
-                        <input type="text" name="name" autoComplete="name" placeholder={t("fields.namePlaceholder")} className={inputBase} required />
+                        <label htmlFor="contact-name" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.name")}</label>
+                        <input id="contact-name" type="text" name="name" autoComplete="name" placeholder={t("fields.namePlaceholder")} className={inputBase} required />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.email")}</label>
-                        <input type="email" name="email" autoComplete="email" placeholder={t("fields.emailPlaceholder")} className={inputBase} required />
+                        <label htmlFor="contact-email" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.email")}</label>
+                        <input id="contact-email" type="email" name="email" autoComplete="email" placeholder={t("fields.emailPlaceholder")} className={inputBase} required />
                       </div>
                     </div>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.phone")}</label>
-                        <input type="tel" name="phone" autoComplete="tel" placeholder={t("fields.phonePlaceholder")} className={inputBase} />
+                        <label htmlFor="contact-phone" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.phone")}</label>
+                        <input id="contact-phone" type="tel" name="phone" autoComplete="tel" placeholder={t("fields.phonePlaceholder")} className={inputBase} />
                       </div>
                       <div>
-                        <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">
+                        <label htmlFor="contact-city" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">
                           {enquiryType === "homeowner" ? t("fields.city") : t("fields.company")}
                         </label>
                         <input
+                          id="contact-city"
                           type="text"
                           name={enquiryType === "homeowner" ? "city" : "company"}
                           autoComplete={enquiryType === "homeowner" ? "address-level2" : "organization"}
@@ -178,16 +179,16 @@ export default function ContactPage() {
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.subject")}</label>
-                      <input type="text" name="subject" placeholder={t("fields.subjectPlaceholder")} className={inputBase} />
+                      <label htmlFor="contact-subject" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.subject")}</label>
+                      <input id="contact-subject" type="text" name="subject" placeholder={t("fields.subjectPlaceholder")} className={inputBase} />
                     </div>
 
                     <div className="mt-4">
-                      <label className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.message")}</label>
-                      <textarea rows={4} name="message" placeholder={t("fields.messagePlaceholder")} className={`${inputBase} resize-none`} required />
+                      <label htmlFor="contact-message" className="mb-2 block text-[11px] uppercase tracking-[0.2em] text-black/65">{t("fields.message")}</label>
+                      <textarea id="contact-message" rows={4} name="message" placeholder={t("fields.messagePlaceholder")} className={`${inputBase} resize-none`} required />
                     </div>
 
-                    {submitError && <p className="mt-4 text-[13px] text-red-600">{submitError}</p>}
+                    {submitError && <p role="alert" className="mt-4 text-[13px] text-red-600">{submitError}</p>}
 
                     <button
                       type="submit"

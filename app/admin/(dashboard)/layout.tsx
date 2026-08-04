@@ -112,7 +112,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
           <X className="h-5 w-5" />
         </button>
         <div className="relative px-2">
-          <Image src="/images/brand/steinheim-logo-white.png" alt="Steinheim" width={140} height={28} className="h-6 w-auto" priority />
+          <Image src="/images/brand/steinheim-logo-white.png" alt="Steinheim" width={140} height={28} className="h-6 w-auto" />
           <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-white/30">Admin</p>
         </div>
 
