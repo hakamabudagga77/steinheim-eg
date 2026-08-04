@@ -298,7 +298,7 @@ export default function ProjectBoardShowcase() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-black/30">{t("previewLabel")}</p>
+      <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-black/45">{t("previewLabel")}</p>
       <div className="overflow-hidden rounded-[4px] border border-black/10 bg-white shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)]">
         <div className="border-b border-charcoal/8 px-6 pt-5">
           <p className="text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">{td("brand")}</p>

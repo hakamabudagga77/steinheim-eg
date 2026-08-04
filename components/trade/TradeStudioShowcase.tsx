@@ -285,7 +285,7 @@ export default function TradeStudioShowcase() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-black/30">{t("previewLabel")}</p>
+      <p className="mb-3 text-[10px] uppercase tracking-[0.3em] text-black/45">{t("previewLabel")}</p>
       <div className="border border-black/10 bg-white p-6 shadow-[0_40px_80px_-40px_rgba(0,0,0,0.25)]">
         <p className="mb-5 text-center text-[9px] font-medium uppercase tracking-[0.25em] text-warm-gray">{tc("eyebrow")}</p>
 

@@ -78,7 +78,7 @@ export default function QuickViewModal({
         </div>
 
         <div className="flex flex-col px-6 py-8 sm:px-8 sm:py-10">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-black/35" style={{ fontStyle: "italic" }}>{seriesName}</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-black/45" style={{ fontStyle: "italic" }}>{seriesName}</p>
           <h2 id="quickview-title" className="mt-1 font-heading text-[26px] leading-[1.1] tracking-[-0.02em] text-black">
             {product.name}
           </h2>

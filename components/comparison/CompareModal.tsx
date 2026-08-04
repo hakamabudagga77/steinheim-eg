@@ -111,7 +111,7 @@ export default function CompareModal() {
                       )}
                     </div>
                   </div>
-                  <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-black/35" style={{ fontStyle: "italic" }}>
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-black/45" style={{ fontStyle: "italic" }}>
                     {col.series?.name ?? col.product.series}
                   </p>
                   <p className="mt-1 text-[14px] font-medium">{col.product.name}</p>

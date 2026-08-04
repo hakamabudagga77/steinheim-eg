@@ -503,6 +503,7 @@
     },
     "collectionLabel": "{series} Collection",
     "outOfStock": "Out of stock",
+    "referencePrice": "Reference price — final price is confirmed at checkout.",
     "addToCart": "Add to Cart",
     "addedToCart": "Added to Cart",
     "noSpecificRoom": "No specific room",

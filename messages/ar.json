@@ -503,6 +503,7 @@
     },
     "collectionLabel": "مجموعة {series}",
     "outOfStock": "غير متوفر حاليًا",
+    "referencePrice": "سعر مرجعي — يُؤكَّد السعر النهائي عند الدفع.",
     "addToCart": "أضِف إلى السلة",
     "addedToCart": "أُضيف إلى السلة",
     "noSpecificRoom": "بدون غرفة محددة",

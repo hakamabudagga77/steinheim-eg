@@ -166,7 +166,7 @@ export default function SiteSearch() {
                 (["product", "collection", "page"] as const).map((kind) =>
                   grouped[kind].length === 0 ? null : (
                     <div key={kind} className="mb-1 last:mb-0">
-                      <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/35">
+                      <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-charcoal/45">
                         {t(`groups.${kind}`)}
                       </p>
                       {grouped[kind].map((result) => {
@@ -206,7 +206,7 @@ export default function SiteSearch() {
               )}
             </div>
 
-            <div className="hidden items-center gap-4 border-t border-charcoal/8 px-5 py-2.5 text-[10px] text-charcoal/35 sm:flex">
+            <div className="hidden items-center gap-4 border-t border-charcoal/8 px-5 py-2.5 text-[10px] text-charcoal/45 sm:flex">
               <span className="flex items-center gap-1.5">
                 <kbd className="rounded border border-charcoal/15 px-1.5 py-0.5 font-sans">↑↓</kbd>
                 {t("navigateHint")}
