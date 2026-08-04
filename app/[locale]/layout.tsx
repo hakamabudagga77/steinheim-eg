@@ -120,12 +120,26 @@ export default async function LocaleLayout({
     areaServed: "EG",
   };
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Steinheim Egypt",
+    url: BASE_URL,
+    inLanguage: locale === "ar" ? "ar-EG" : "en",
+    publisher: {
+      "@type": "Organization",
+      name: "Steinheim Egypt",
+      url: BASE_URL,
+      logo: `${BASE_URL}/images/brand/steinheim-logo-black.png`,
+    },
+  };
+
   return (
     <html lang={locale} dir={dir} className={`${inter.variable} ${plexArabic.variable} ${amiri.variable}`}>
       <body className="min-h-screen flex flex-col bg-white text-charcoal antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
         <GoogleAnalytics />
         <WebVitals />
