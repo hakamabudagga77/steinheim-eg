@@ -30,6 +30,17 @@
     margin: 0;
     padding: 0;
   }
+
+  /* Keyboard focus is visible everywhere (WCAG 2.4.7); the ring follows the
+     element's own text colour so it stays on-brand on both light and dark
+     surfaces. Mouse clicks keep the clean look. */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 html {

@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { MotionConfig } from "framer-motion";
+import { useTranslations } from "next-intl";
 import Navigation from "@/components/layout/Navigation";
 import ConditionalFooter from "@/components/layout/ConditionalFooter";
 import BackToTop from "@/components/ui/BackToTop";
@@ -50,27 +52,39 @@ export default function SiteShell({
   children: React.ReactNode;
   locale: string;
 }) {
+  const t = useTranslations("a11y");
+
   return (
-    <CartProvider>
-      <WishlistProvider>
-        <ComparisonProvider>
-          <TradeProjectProvider>
-            <Navigation locale={locale} />
-            <main className="flex-1">{children}</main>
-            <ConditionalFooter />
-            <TradeProjectDrawer locale={locale} />
-            <TradeSetupOverlay locale={locale} />
-            <TradeLeadPopup />
-            <CartDrawer locale={locale} />
-            <WishlistDrawer locale={locale} />
-            <FloatingRoomProgress locale={locale} />
-            <SiteSearch />
-            <BackToTop />
-            <SmoothScroll />
-            <CompareBar />
-          </TradeProjectProvider>
-        </ComparisonProvider>
-      </WishlistProvider>
-    </CartProvider>
+    <MotionConfig reducedMotion="user">
+      <CartProvider>
+        <WishlistProvider>
+          <ComparisonProvider>
+            <TradeProjectProvider>
+              <a
+                href="#main"
+                className="sr-only z-[300] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-[13px] focus:text-charcoal"
+              >
+                {t("skipToContent")}
+              </a>
+              <Navigation locale={locale} />
+              <main id="main" tabIndex={-1} className="flex-1 outline-none">
+                {children}
+              </main>
+              <ConditionalFooter />
+              <TradeProjectDrawer locale={locale} />
+              <TradeSetupOverlay locale={locale} />
+              <TradeLeadPopup />
+              <CartDrawer locale={locale} />
+              <WishlistDrawer locale={locale} />
+              <FloatingRoomProgress locale={locale} />
+              <SiteSearch />
+              <BackToTop />
+              <SmoothScroll />
+              <CompareBar />
+            </TradeProjectProvider>
+          </ComparisonProvider>
+        </WishlistProvider>
+      </CartProvider>
+    </MotionConfig>
   );
 }
