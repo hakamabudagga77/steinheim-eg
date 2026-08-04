@@ -170,6 +170,18 @@ Format response as: "Product Name in Finish — ModelNumber, Price LE"`;
 const SYSTEM_PROMPT = buildSystemPrompt();
 const LIGHT_SYSTEM_PROMPT = buildLightSystemPrompt();
 
+/**
+ * Appended to the base prompt at call time. The base prompt stays a module
+ * constant so the (expensive) catalogue index is only built once; the site
+ * language is a per-request fact, not a build-time one.
+ */
+function localeDirective(locale?: string): string {
+  if (locale === "ar") {
+    return "SITE LANGUAGE: the customer is browsing the Arabic version of the site. Reply in Modern Standard Arabic (fusha) unless they write in English or Egyptian Arabic. Keep series names, finish names, and model numbers in their Latin catalogue form; prices stay in LE.";
+  }
+  return "SITE LANGUAGE: the customer is browsing the English version of the site. Reply in English.";
+}
+
 type Provider = "anthropic" | "groq";
 
 function detectProvider(): { provider: Provider; apiKey: string; model: string } {
@@ -201,10 +213,12 @@ async function callGroqStream(
   apiKey: string,
   model: string,
   onDelta: (text: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  locale?: string
 ): Promise<string> {
   const isLightModel = model.includes("8b");
-  const systemPrompt = isLightModel ? LIGHT_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  const basePrompt = isLightModel ? LIGHT_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  const systemPrompt = `${basePrompt}\n\n${localeDirective(locale)}`;
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -275,13 +289,14 @@ async function streamGroq(
   apiKey: string,
   preferredModel: string,
   onDelta: (text: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  locale?: string
 ): Promise<string> {
   const models = [preferredModel, ...GROQ_MODELS.filter((m) => m !== preferredModel)];
 
   for (const model of models) {
     try {
-      return await callGroqStream(messages, apiKey, model, onDelta, signal);
+      return await callGroqStream(messages, apiKey, model, onDelta, signal, locale);
     } catch (err) {
       const msg = (err as Error).message;
       if (!msg.includes("429")) throw err;
@@ -291,7 +306,7 @@ async function streamGroq(
         console.log(`[assistant] ${model} rate-limited, waiting ${delay}ms and retrying...`);
         await new Promise((r) => setTimeout(r, delay));
         try {
-          return await callGroqStream(messages, apiKey, model, onDelta, signal);
+          return await callGroqStream(messages, apiKey, model, onDelta, signal, locale);
         } catch {
           // fall through to next model
         }
@@ -313,7 +328,8 @@ async function streamAnthropic(
   apiKey: string,
   model: string,
   onDelta: (text: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  locale?: string
 ): Promise<string> {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const client = new Anthropic({ apiKey });
@@ -324,7 +340,10 @@ async function streamAnthropic(
     model,
     max_tokens: 1200,
     temperature: 0.3,
-    system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+    system: [
+      { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+      { type: "text", text: localeDirective(locale) },
+    ],
     messages: messages.map((m) => ({ role: m.role, content: m.content })),
   });
 
@@ -345,7 +364,8 @@ async function streamAnthropic(
 export async function streamAssistant(
   messages: ConversationMessage[],
   onDelta: (text: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  locale?: string
 ): Promise<{ text: string; brain: string }> {
   const { provider, apiKey, model } = detectProvider();
 
@@ -360,9 +380,9 @@ export async function streamAssistant(
   let fullText: string;
 
   if (provider === "anthropic") {
-    fullText = await streamAnthropic(claudeMessages, apiKey, model, onDelta, signal);
+    fullText = await streamAnthropic(claudeMessages, apiKey, model, onDelta, signal, locale);
   } else {
-    fullText = await streamGroq(claudeMessages, apiKey, model, onDelta, signal);
+    fullText = await streamGroq(claudeMessages, apiKey, model, onDelta, signal, locale);
   }
 
   return { text: fullText, brain: `${model}+catalogue-grounded` };

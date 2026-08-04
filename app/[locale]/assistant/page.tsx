@@ -25,7 +25,7 @@ export default async function AssistantPage({
 
   return (
     <PageTransition>
-      <SteinheimAssistant locale={locale} />
+      <SteinheimAssistant />
     </PageTransition>
   );
 }
