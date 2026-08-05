@@ -132,66 +132,91 @@ suite, and the production build:
   lab section labels. Decorative glyphs (chevrons, arrows) and the admin UI
   were deliberately left at their original opacity.
 
+## 2026-08-04 - SEO depth, performance finishing & UX empty-state waves
+
+Three pull requests merged to `main`, each green on lint, typecheck, the full
+unit suite, and the production build:
+
+- **PR #94 - Instant collection grid + flipbook intrinsic dimensions.** The
+  series page no longer awaits the Redis/Shopify live-data fetch before
+  rendering: the grid (images, names, catalogue prices) paints instantly, and
+  CollectionPageClient fetches `/api/shopify/prices` client-side, swapping in
+  live prices with a price-line skeleton while it loads. The flipbook's
+  per-page tiles now carry explicit width/height from the catalogue manifest
+  (the tiles were already downscaled WebP), eliminating layout shift inside
+  the book.
+- **PR #95 - SEO depth.** FAQPage JSON-LD on the finishes page (one localized
+  question/answer set per finish: what it is, which collections carry it, and
+  how to care for it). A new server-rendered `/{locale}/search` page mirrors
+  the client modal's index with branded empty/no-results states, and the
+  WebSite schema now declares a SearchAction so Google's sitelink search box
+  is eligible. The projects index and project detail pages share the
+  project's own hero image as the OG/Twitter image.
+- **PR #96 - UX empty states.** The site-search modal's "no results" is now a
+  full empty state (icon, explanation, and a "Browse collections" link that
+  closes the modal), and the catalogue flipbook shows a book-shaped loading
+  skeleton while the manifest loads instead of a bare text line.
+
+This closes the remaining roadmap sections: #2 Performance and #4 SEO are
+fully shipped, and #6 UX depth is shipped.
+
 ---
 
-## Roadmap — the excellence track
+## Roadmap - the excellence track
 
 All work respects the brand system: cream `#ece9e2`, charcoal `#0a0a0a`,
 black/white, the italic serif headings, the logo. Nothing below changes the
-identity — it makes the experience underneath it sharper.
+identity - it makes the experience underneath it sharper.
 
-### 1. Accessibility foundation (P0) — SHIPPED (PR #88)
-- Skip-to-content link and `id="main"` targets. ✅
+### 1. Accessibility foundation (P0) - SHIPPED (PR #88)
+- Skip-to-content link and `id="main"` targets. Done.
 - `aria-live`/`role="status"` announcements for async UI (search, restock,
-  reviews, forms). ✅
-- `prefers-reduced-motion` honoured by framer-motion via `MotionConfig`. ✅
+  reviews, forms). Done.
+- `prefers-reduced-motion` honoured by framer-motion via `MotionConfig`. Done.
 - A global `:focus-visible` ring on brand (cream ring on dark, charcoal on
-  light) — WCAG 2.4.7, not a visual redesign. ✅
-- Real labels (visually hidden) for placeholder-only fields. ✅
+  light) - WCAG 2.4.7, not a visual redesign. Done.
+- Real labels (visually hidden) for placeholder-only fields. Done.
 
-### 2. Performance (P1) — most shipped (PR #89)
+### 2. Performance (P1) - SHIPPED (PRs #89, #94)
 - Hover-image double-fetch on the home cards: render the hover image only on
-  hover instead of shipping both at first paint. ✅
+  hover instead of shipping both at first paint. Done.
 - Migrate the deprecated `priority` prop to Next 16's `preload` (9 call
-  sites). ⚠️ Done as demotion instead: the five true LCP heroes keep
-  `priority`; the shell/menu/logo sites dropped it so they no longer
-  preload on every page.
+  sites). Resolved as a demotion instead: the five true LCP heroes keep
+  `priority`; the shell/menu/logo sites dropped it so they no longer preload
+  on every page.
 - Flipbook PDF-page tiles: intrinsic dimensions to kill layout shift, and
-  downscaled WebP tiles instead of full-resolution page renders. 🔲
+  downscaled WebP tiles instead of full-resolution page renders. Done
+  (PR #94 added explicit width/height; the tiles were already WebP).
 - Suspense skeleton around the Redis-backed live-data fetch on collection
-  pages so the grid paints instantly. 🔲
+  pages so the grid paints instantly. Done (PR #94: the grid now paints
+  instantly with catalogue prices and live prices arrive client-side from
+  `/api/shopify/prices` with a price-line skeleton).
 
-### 3. Error handling & resilience (P1) — SHIPPED (PR #91)
+### 3. Error handling & resilience (P1) - SHIPPED (PR #91)
 - Localized `not-found.tsx` and route-level `error.tsx` in the brand system
-  (replaces the default English 404, incl. the unstyled series fallback). ✅
-- Localize `global-error.tsx`. ✅
+  (replaces the default English 404, incl. the unstyled series fallback). Done.
+- Localize `global-error.tsx`. Done.
 - Admin dashboard: `.catch()` on the orders/products/leads fetches so a
-  network failure shows an error state + retry instead of an eternal "…". ✅
+  network failure shows an error state + retry instead of an eternal "...". Done.
 
-### 4. SEO & structured data (P1) — partially shipped (PR #90)
+### 4. SEO & structured data (P1) - SHIPPED (PRs #90, #95)
 - `CollectionPage` + `ItemList` schema on series pages; `FAQPage` on
-  finishes; `WebSite` + `SearchAction` in the layout.
-  ✅ ItemList + breadcrumbs on series pages; `WebSite` node shipped.
-  🔲 `FAQPage` on finishes and `SearchAction` remain (site search has no
-  server-side query URL yet).
+  finishes; `WebSite` + `SearchAction` in the layout. Done.
 - Per-page OG images for collections and projects instead of the generic
-  logo card (accept `ogImage` in `createLocalizedMetadata`).
-  ✅ Collections. 🔲 Projects.
+  logo card. Done.
 
-### 5. RTL completeness (P1/P2) — SHIPPED (PR #92)
-- Physical borders → inline-start in the series accordion and 3D lab. ✅
-- `text-left` → `text-start` in assistant, 3D lab, product filter pills,
-  collections landing, and the trade drawer header. ✅
+### 5. RTL completeness (P1/P2) - SHIPPED (PR #92)
+- Physical borders to inline-start in the series accordion and 3D lab. Done.
+- `text-left` to `text-start` in assistant, 3D lab, product filter pills,
+  collections landing, and the trade drawer header. Done.
 
-### 6. UX depth (P2)
-- Restock alert as a real form (Enter submits, native email validation). ✅
+### 6. UX depth (P2) - SHIPPED (PRs #88, #93, #96)
+- Restock alert as a real form (Enter submits, native email validation). Done.
 - "Reference price" note when live prices are unavailable instead of a
-  silent fallback. âœ…
-- Loading skeletons for client-driven sections; richer empty states.
+  silent fallback. Done.
+- Loading skeletons for client-driven sections; richer empty states. Done.
 
 ### 7. Contrast (P2, WCAG-driven) - SHIPPED (PR #93)
-- Raise meaningful small labels from `/25`–`/35` opacity to ≥ `/45`, keeping
-  decorative text where it is.
-
-_Last verified: 2026-08-04 — all checks green on `main` at
-`2f27ba1` (after PR #93)._
+- Raise meaningful small labels from `/25`-`/35` opacity to at least `/45`,
+  keeping decorative text where it is. Done.
+_Last verified: 2026-08-04 - all checks green on `main` at `6e3ca34` (after PRs #94-#96)._
