@@ -94,7 +94,17 @@ export default function CatalogueFlipbookModal({
         </button>
 
         {!manifest ? (
-          <p className="text-[12px] uppercase tracking-[0.2em] text-white/50">{t("loading")}</p>
+          <div className="flex flex-col items-center gap-6" aria-busy="true">
+            <div className="relative aspect-[1600/1132] w-[min(72vw,520px)] max-h-[68vh] animate-pulse overflow-hidden rounded-[4px] border border-white/15 bg-white/8">
+              <span className="absolute inset-0 flex items-center justify-center text-white/30">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+              </span>
+            </div>
+            <p className="text-[12px] uppercase tracking-[0.2em] text-white/50">{t("loading")}</p>
+          </div>
         ) : (
           <>
             <div className="flex w-full flex-1 items-center justify-center overflow-hidden">

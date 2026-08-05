@@ -1670,6 +1670,8 @@
   "siteSearch": {
     "placeholder": "Search products, collections, pages...",
     "noResults": "No results for \"{query}\"",
+    "noResultsBody": "Check the spelling, or browse the collections directly.",
+    "browseCollections": "Browse collections",
     "hint": "Search the whole site — products, collections, and pages",
     "groups": {
       "product": "Products",
