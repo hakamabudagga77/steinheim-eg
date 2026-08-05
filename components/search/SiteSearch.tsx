@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
 import { buildSearchIndex, searchIndex, type SearchResult } from "@/lib/search-index";
 
@@ -161,7 +161,24 @@ export default function SiteSearch() {
               {query.trim() === "" ? (
                 <p className="px-3 py-8 text-center text-[13px] text-charcoal/45">{t("hint")}</p>
               ) : flatResults.length === 0 ? (
-                <p className="px-3 py-8 text-center text-[13px] text-charcoal/45">{t("noResults", { query })}</p>
+                <div className="flex flex-col items-center px-4 py-10 text-center">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#ece9e2] text-charcoal/45">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M20 20l-3.5-3.5" />
+                      <path d="M8 11h6" />
+                    </svg>
+                  </span>
+                  <p className="mt-4 text-[14px] text-charcoal">{t("noResults", { query })}</p>
+                  <p className="mt-2 max-w-[36ch] text-[12px] leading-relaxed text-charcoal/50">{t("noResultsBody")}</p>
+                  <Link
+                    href="/collections"
+                    onClick={closeSearch}
+                    className="mt-5 inline-flex h-9 items-center rounded-full border border-charcoal/15 px-5 text-[10px] font-medium uppercase tracking-[0.15em] text-charcoal transition hover:border-charcoal"
+                  >
+                    {t("browseCollections")}
+                  </Link>
+                </div>
               ) : (
                 (["product", "collection", "page"] as const).map((kind) =>
                   grouped[kind].length === 0 ? null : (
