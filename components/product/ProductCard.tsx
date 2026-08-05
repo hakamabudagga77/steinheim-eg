@@ -28,6 +28,7 @@ function ProductCard({
   onAdd,
   roomOptions,
   visibleFinishes,
+  priceLoading = false,
 }: {
   product: Product;
   liveVariants?: LiveVariants;
@@ -37,6 +38,8 @@ function ProductCard({
   roomOptions?: RoomGroup[];
   /** Restricts the swatch picker + default image to just these finishes (e.g. an active catalogue filter). Omit to show all. */
   visibleFinishes?: string[];
+  /** While true (live prices are still being fetched), render a skeleton instead of the price line. */
+  priceLoading?: boolean;
 }) {
   const t = useTranslations("cards");
   const [selectedFinish, setSelectedFinish] = useState(groupFinish ?? product.variants[0].finish);
@@ -167,8 +170,12 @@ function ProductCard({
         <p className="mt-1 text-[15px] font-medium text-black">{product.name}</p>
         {!hidePrice && (
           <div className="mt-2 flex items-center gap-2">
-            <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
-            {liveVariant && (
+            {priceLoading ? (
+              <span className="inline-block h-[13px] w-16 animate-pulse rounded-sm bg-black/10" aria-hidden="true" />
+            ) : (
+              <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+            )}
+            {!priceLoading && liveVariant && (
               <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
                 <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />
                 {liveVariant.inStock ? t("inStock") : t("outOfStock")}

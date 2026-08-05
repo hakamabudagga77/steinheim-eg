@@ -131,6 +131,8 @@ export default function CatalogueFlipbookModal({
                       <img
                         src={pageSrc(index)}
                         alt=""
+                        width={manifest.width}
+                        height={manifest.height}
                         className="h-full w-full object-contain"
                         draggable={false}
                         loading="lazy"

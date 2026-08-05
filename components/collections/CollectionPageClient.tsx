@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
@@ -62,21 +62,47 @@ export default function CollectionPageClient({
   series: Series;
   products: Product[];
   finishes: Finish[];
-  liveData: LiveData;
+  liveData: LiveData | null;
 }) {
   const t = useTranslations("collectionPage");
   const locale = useLocale();
   const [globalFinish, setGlobalFinish] = useState<string | null>(finishes[0]?.id ?? null);
 
+  // When the server streamed no live data (collections/[series]/page.tsx now
+  // renders with liveData={null} so the grid paints instantly), fetch it from
+  // /api/shopify/prices and swap catalogue prices for live ones when it lands.
+  const [clientLiveData, setClientLiveData] = useState<LiveData>({});
+  const [liveDataLoading, setLiveDataLoading] = useState(liveData === null);
+
+  useEffect(() => {
+    if (liveData !== null) return;
+    let cancelled = false;
+    fetch("/api/shopify/prices")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: LiveData | null) => {
+        if (cancelled) return;
+        if (data) setClientLiveData(data);
+        setLiveDataLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLiveDataLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [liveData]);
+
+  const effectiveLiveData = liveData ?? clientLiveData;
+
   // Flattened `${slug}::${finish}` view of the live Shopify data, so the
   // starter package quotes the same prices the cards above it show.
   const livePrices = useMemo(() => {
     const map: Record<string, number> = {};
-    for (const [slug, entry] of Object.entries(liveData)) {
+    for (const [slug, entry] of Object.entries(effectiveLiveData)) {
       for (const variant of entry.variants) map[`${slug}::${variant.finish}`] = variant.price;
     }
     return map;
-  }, [liveData]);
+  }, [effectiveLiveData]);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -277,7 +303,7 @@ export default function CollectionPageClient({
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.55, delay: Math.min(index * 0.05, 0.2) }}
                 >
-                  <ProductCard product={product} liveVariants={liveData[product.slug]?.variants} finish={globalFinish} />
+                  <ProductCard product={product} liveVariants={effectiveLiveData[product.slug]?.variants} finish={globalFinish} priceLoading={liveDataLoading} />
                 </motion.div>
               ))}
             </motion.div>
