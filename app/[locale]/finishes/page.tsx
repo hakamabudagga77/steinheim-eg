@@ -38,8 +38,43 @@ export default async function FinishesPage({
   const finishes = getAllFinishes();
   const products = getAllProducts();
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: finishes.flatMap((finish) => {
+      const key = MESSAGE_KEY[finish.id];
+      if (!key) return [];
+      const name = t(`${key}.name`);
+      const seriesNames = finish.series
+        .map((id) => getSeriesById(id)?.name ?? id)
+        .filter(Boolean)
+        .join(" · ");
+      return [
+        {
+          "@type": "Question",
+          name: t("faq.whatIs", { name }),
+          acceptedAnswer: { "@type": "Answer", text: t(`${key}.description`) },
+        },
+        {
+          "@type": "Question",
+          name: t("faq.availableIn", { name }),
+          acceptedAnswer: { "@type": "Answer", text: seriesNames },
+        },
+        {
+          "@type": "Question",
+          name: t("faq.care", { name }),
+          acceptedAnswer: { "@type": "Answer", text: t(`${key}.care`) },
+        },
+      ];
+    }),
+  };
+
   return (
     <PageTransition>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="bg-white">
         <section className="px-5 pb-16 pt-28 sm:px-8 lg:px-16 lg:pb-24 lg:pt-36">
           <div className="mx-auto max-w-[1780px]">

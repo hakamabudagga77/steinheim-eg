@@ -13,7 +13,20 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return getStaticPageMetadata(locale, "/projects", "projects");
+  const metadata = getStaticPageMetadata(locale, "/projects", "projects");
+  const featured = projectReferences[0];
+  // The featured project's hero as the shared projects OG image.
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      images: [{ url: featured.heroImage, alt: featured.name }],
+    },
+    twitter: {
+      ...metadata.twitter,
+      images: [featured.heroImage],
+    },
+  };
 }
 
 export default async function ProjectsPage({
