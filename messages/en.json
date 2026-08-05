@@ -239,7 +239,12 @@
     "pvd": "PVD coated",
     "standard": "Standard finish",
     "code": "Finish code",
-    "viewProducts": "View products in this finish"
+    "viewProducts": "View products in this finish",
+    "faq": {
+      "whatIs": "What is the {name} finish?",
+      "availableIn": "Which Steinheim collections is the {name} finish available in?",
+      "care": "How should I care for the {name} finish?"
+    }
   },
   "product": {
     "addToCart": "Add to cart",
@@ -1675,6 +1680,23 @@
     "closeHint": "to close",
     "navigateHint": "to navigate",
     "resultsCount": "{count, plural, one {# result} other {# results}}"
+  },
+  "searchPage": {
+    "title": "Search",
+    "resultsFor": "Results for \"{query}\"",
+    "resultCount": "{count, plural, one {# result} other {# results}}",
+    "hint": "Search products, collections, and pages.",
+    "placeholder": "Search products, collections, pages...",
+    "search": "Search",
+    "noQuery": "Type a product, collection, or page name to search the whole site.",
+    "noResults": "No results for \"{query}\"",
+    "noResultsBody": "Check the spelling, or browse the collections directly.",
+    "browseCollections": "Browse collections",
+    "groups": {
+      "product": "Products",
+      "collection": "Collections",
+      "page": "Pages"
+    }
   },
   "cartDrawer": {
     "title": "Your cart",

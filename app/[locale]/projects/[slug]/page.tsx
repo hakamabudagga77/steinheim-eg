@@ -24,7 +24,7 @@ export async function generateMetadata({
   }
 
   const normalizedLocale = normalizeLocale(locale);
-  return createLocalizedMetadata({
+  const metadata = createLocalizedMetadata({
     locale,
     path: `/projects/${slug}`,
     title:
@@ -37,6 +37,19 @@ export async function generateMetadata({
         ? `اكتشف مشروع ${project.name} السكني الفاخر مع أنظمة حمامات شتاينهايم.`
         : `Discover the ${project.name} luxury residential project reference with Steinheim bathroom systems.`),
   });
+
+  // Per-project OG image (the project's own hero) instead of the generic logo card.
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      images: [{ url: project.heroImage, alt: project.name }],
+    },
+    twitter: {
+      ...metadata.twitter,
+      images: [project.heroImage],
+    },
+  };
 }
 
 export default async function ProjectReferencePage({

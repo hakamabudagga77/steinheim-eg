@@ -132,6 +132,14 @@ export default async function LocaleLayout({
       url: BASE_URL,
       logo: `${BASE_URL}/images/brand/steinheim-logo-black.png`,
     },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BASE_URL}/${locale}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
   };
 
   return (
