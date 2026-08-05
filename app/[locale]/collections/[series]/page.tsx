@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import CollectionPageClient from "@/components/collections/CollectionPageClient";
 import { getAllFinishes, getProductsBySeries, getSeriesById } from "@/lib/utils";
-import { getAllLiveData } from "@/lib/shopify-live-data";
 import { collectionBanners, getProductDefaultImage } from "@/data/images";
 import { createLocalizedMetadata, normalizeLocale } from "@/lib/seo";
 
@@ -61,10 +60,6 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
   const products = getProductsBySeries(seriesId);
   const finishes = getAllFinishes().filter((finish) => series.finishes.includes(finish.id));
-  const liveDataMap = await getAllLiveData();
-  const liveData = Object.fromEntries(
-    Array.from(liveDataMap.entries()).map(([slug, data]) => [slug, { variants: data.variants }])
-  );
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://steinheim-eg.com";
 
   const itemListSchema = {
@@ -103,11 +98,14 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {/* Live Shopify prices/inventory are fetched client-side (see
+          CollectionPageClient) so the grid — images, names, catalogue
+          prices — paints instantly instead of waiting on the live-data fetch. */}
       <CollectionPageClient
         series={series}
         products={products}
         finishes={finishes}
-        liveData={JSON.parse(JSON.stringify(liveData))}
+        liveData={null}
       />
     </>
   );
