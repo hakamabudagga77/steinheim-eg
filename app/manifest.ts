@@ -1,23 +1,24 @@
 import type { MetadataRoute } from "next";
 
-// Emits /manifest.webmanifest; Next injects <link rel="manifest"> automatically,
-// so no layout change is needed. Colours are the existing brand tokens from
-// app/globals.css (--color-charcoal / --color-white).
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Steinheim Egypt — German Bathroom Fixtures",
+    name: "Steinheim Egypt — German Bathroom Engineering",
     short_name: "Steinheim",
     description:
-      "Premium German-engineered bathroom mixers, showers, and accessories in Egypt.",
-    start_url: "/",
+      "German-engineered bathroom systems, coordinated collections, and premium finishes across Egypt.",
+    start_url: "/en",
+    scope: "/",
     display: "standalone",
-    background_color: "#FFFFFF",
-    theme_color: "#1A1A1A",
+    background_color: "#ece9e2",
+    theme_color: "#0a0a0a",
     icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
       {
-        src: "/favicon.ico",
-        sizes: "any",
-        type: "image/x-icon",
+        src: "/icons/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };
