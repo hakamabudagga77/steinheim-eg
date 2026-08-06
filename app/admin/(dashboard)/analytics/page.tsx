@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Users, Activity, Eye, Clock, UserPlus, MousePointer2, Download } from "lucide-react";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, ErrorState, SegmentedControl } from "@/components/admin/ui";
+import { flagEmoji } from "../analytics-summary-helpers";
+import RealtimePulse from "@/components/admin/RealtimePulse";
 
 // recharts (~120 KB gzip) loads on demand instead of in this page's initial JS.
 const VisitorsAreaChart = dynamic(() => import("./AnalyticsChart").then((m) => m.VisitorsAreaChart), {
@@ -78,14 +80,6 @@ function fmtDuration(seconds: number) {
 
 function isoDate(d: Date) {
   return d.toISOString().slice(0, 10);
-}
-
-// A flag emoji is just two "regional indicator" Unicode characters, one per
-// letter of the ISO-3166 alpha-2 code -- no image asset or library needed.
-function flagEmoji(code: string): string {
-  if (!/^[A-Za-z]{2}$/.test(code)) return "";
-  const REGIONAL_INDICATOR_OFFSET = 127397; // codepoint of "A" (65) shifted to U+1F1E6
-  return [...code.toUpperCase()].map((c) => String.fromCodePoint(c.codePointAt(0)! + REGIONAL_INDICATOR_OFFSET)).join("");
 }
 
 // Pure function of a fixed instant, not of the ambient clock -- callers pass
@@ -388,6 +382,10 @@ export default function AdminAnalyticsPage() {
   return (
     <div>
       <PageHeader eyebrow="Website Analytics · GA4" title="Digital performance" subtitle="The customer journey across the Steinheim website" />
+
+      <div className="mt-8">
+        <RealtimePulse variant="full" />
+      </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <SegmentedControl options={PRESET_OPTIONS} value={preset} onChange={setPreset} />

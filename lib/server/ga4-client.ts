@@ -286,6 +286,63 @@ function buildNewVsReturning(rows: GA4Row[]): { new: number; returning: number }
   return split;
 }
 
+export interface GA4Realtime {
+  activeUsers: number;
+  byCountry: Array<{ country: string; code: string; users: number }>;
+  byDevice: Array<{ device: string; users: number }>;
+}
+
+const REALTIME_CACHE_TTL_MS = 10_000;
+let realtimeCache: { data: GA4Realtime; fetchedAt: number } | null = null;
+
+// Realtime Data API is a distinct method on the same client/property/creds as
+// the historical reports above -- no separate auth or Google Cloud setup.
+// Deliberately uncached in Redis (this is meant to be "right now", and a
+// 10s in-memory dedupe is just to stop two open admin tabs from doubling
+// the request rate, not a real cache).
+export async function fetchGA4Realtime(): Promise<GA4Realtime> {
+  if (realtimeCache && Date.now() - realtimeCache.fetchedAt < REALTIME_CACHE_TTL_MS) {
+    return realtimeCache.data;
+  }
+
+  const client = getClient();
+  const property = propertyPath();
+
+  const [totals, byCountry, byDevice] = await Promise.all([
+    client.runRealtimeReport({ property, metrics: [{ name: "activeUsers" }] }),
+    client.runRealtimeReport({
+      property,
+      dimensions: [{ name: "country" }, { name: "countryId" }],
+      metrics: [{ name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+      limit: 8,
+    }),
+    client.runRealtimeReport({
+      property,
+      dimensions: [{ name: "deviceCategory" }],
+      metrics: [{ name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+      limit: 5,
+    }),
+  ]);
+
+  const data: GA4Realtime = {
+    activeUsers: Number(totals[0].rows?.[0]?.metricValues?.[0]?.value ?? 0),
+    byCountry: (byCountry[0].rows ?? []).map((row) => ({
+      country: row.dimensionValues?.[0]?.value || "Unknown",
+      code: row.dimensionValues?.[1]?.value || "",
+      users: Number(row.metricValues?.[0]?.value ?? 0),
+    })),
+    byDevice: (byDevice[0].rows ?? []).map((row) => ({
+      device: row.dimensionValues?.[0]?.value || "unknown",
+      users: Number(row.metricValues?.[0]?.value ?? 0),
+    })),
+  };
+
+  realtimeCache = { data, fetchedAt: Date.now() };
+  return data;
+}
+
 export async function fetchGA4Summary(startDate: string, endDate: string): Promise<GA4Summary> {
   const cacheKey = `steinheim:ga4:${startDate}:${endDate}`;
 
