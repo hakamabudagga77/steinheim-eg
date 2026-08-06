@@ -17,7 +17,7 @@ Legend: `[BLOCKED]` cannot adopt yet (upstream) · `[READY]` our code is compati
 | `eslint`     | `^9`            | `10.x` | `[BLOCKED]`         | `eslint-plugin-react` peer `eslint "^9.7"` (no v10)     |
 
 Both blockers live **inside `eslint-config-next`** (Next.js's own official lint preset,
-pinned to the Next version — currently `16.2.12`). They are **not** in our source code.
+pinned to the Next version — currently `16.3.0`). They are **not** in our source code.
 Related Dependabot PRs, closed for this reason: **#40** (TypeScript 7) and **#63** (ESLint 10).
 
 ---
@@ -91,6 +91,21 @@ check suite (below), open the PR.
 
 ---
 
+## 3. Next.js `16.2.12` → `16.3.0`  `[DONE 2026-08-06]`
+
+The deliberate hold on bumping Next past `16.2.12` is lifted. The stable
+`16.3.0` train (Next, `eslint-config-next`, `@next/bundle-analyzer`) was
+adopted on 2026-08-06 with lint / typecheck / 226 unit tests / production
+build / e2e perf+PWA all green, after the two leftover framework example
+routes (`sentry-example-page`, `sentry-example-api`) were removed.
+
+This does **not** change the two blockers above: `eslint-config-next@16.3.0`
+bundles the **identical** plugin versions (`typescript-eslint ^8.46.0`,
+`eslint-plugin-react ^7.37.0`), so TypeScript 7 and ESLint 10 remain deferred
+on upstream plugin releases — see sections 1 and 2.
+
+---
+
 ## Why we don't force it now
 
 Adopting either major today would mean either shipping a **red CI pipeline** (lint/build
@@ -99,10 +114,8 @@ regression for a live production store. "Best possible" here is the honest call:
 stable, green stack (`eslint@9` + `typescript@5`, both pass) and adopt the majors the day
 the Next.js preset supports them. Our diligence already proved the code side is ready.
 
-Upgrading Next itself does **not** help yet: the newest pre-release,
-`eslint-config-next@16.3.0-preview.10`, bundles the **identical** plugin versions
-(`typescript-eslint ^8.46.0`, `eslint-plugin-react ^7.37.0`). The fix must land in the
-upstream plugins first, then flow into a stable `eslint-config-next`.
+The fix must land in the upstream plugins first, then flow into a stable
+`eslint-config-next`.
 
 ---
 
@@ -121,7 +134,7 @@ npm view typescript-eslint@latest peerDependencies
 # 3. Has eslint-config-next bumped its bundled plugins?  (compare to ^8.46.0 / ^7.37.0)
 npm view eslint-config-next@latest dependencies
 
-# 4. Is there a newer STABLE Next?  (currently 16.2.12 is latest stable)
+# 4. Is there a newer STABLE Next?  (16.3.0 adopted 2026-08-06 — see section 3)
 npm view next dist-tags
 ```
 
@@ -139,5 +152,6 @@ so each can be verified / reverted independently.
 
 ---
 
-_Last verified: 2026-08-01 — TS 7.0.2 typecheck clean (0 errors); lint blocked by
-`typescript-eslint`; ESLint 10.8.0 blocked by `eslint-plugin-react`._
+_Last verified: 2026-08-06 — Next 16.3.0 adopted (lint/typecheck/tests/build/e2e green).
+TS 7.0.2 typecheck clean (0 errors), still blocked by `typescript-eslint`; ESLint 10.8.0
+still blocked by `eslint-plugin-react`._
