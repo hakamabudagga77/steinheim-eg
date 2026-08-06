@@ -7,6 +7,7 @@ import { getProductImage } from "@/data/images";
 import { getLiveProductData } from "@/lib/shopify-live-data";
 import { listApprovedReviewsForProduct } from "@/lib/server/review-store";
 import { createLocalizedMetadata, normalizeLocale } from "@/lib/seo";
+import { getOfferShippingDetails } from "@/lib/delivery";
 
 type ProductPageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -104,6 +105,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         availability: live?.inStock === false
           ? "https://schema.org/OutOfStock"
           : "https://schema.org/InStock",
+        shippingDetails: getOfferShippingDetails(),
       };
     }),
   };

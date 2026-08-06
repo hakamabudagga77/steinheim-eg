@@ -44,6 +44,10 @@ const CompareBar = dynamic(
   () => import("@/components/comparison/CompareBar"),
   { ssr: false }
 );
+const DesignerConcierge = dynamic(
+  () => import("@/components/ui/DesignerConcierge"),
+  { ssr: false }
+);
 
 export default function SiteShell({
   children,
@@ -81,6 +85,7 @@ export default function SiteShell({
               <BackToTop />
               <SmoothScroll />
               <CompareBar />
+              <DesignerConcierge locale={locale} />
             </TradeProjectProvider>
           </ComparisonProvider>
         </WishlistProvider>

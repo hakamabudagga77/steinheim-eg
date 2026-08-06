@@ -12,6 +12,7 @@ import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { cacheLivePricesBulk, livePriceKey } from "@/lib/live-prices";
 import { readAttribution } from "@/lib/checkout-attribution";
 import Modal from "@/components/ui/Modal";
+import DeliveryPromise from "@/components/ui/DeliveryPromise";
 
 const WHATSAPP_NUMBER = "201223998124";
 
@@ -381,6 +382,10 @@ export default function CartDrawer({ locale }: { locale: string }) {
                 <p className="pb-4 text-[10px] leading-relaxed text-warm-gray/60">
                   {t("shippingNote")}
                 </p>
+
+                <div className="pb-4">
+                  <DeliveryPromise compact />
+                </div>
 
                 {blocked.length > 0 && (
                   <div role="alert" className="mb-4 border border-charcoal/15 bg-[#faf8f4] p-4">
