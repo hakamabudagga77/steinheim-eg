@@ -53,14 +53,20 @@ export interface GA4Summary {
   dailyUsers: Array<{ date: string; users: number; sessions: number }>;
   topChannels: Array<{ channel: string; sessions: number }>;
   devices: Array<{ device: string; sessions: number }>;
-  topCountries: Array<{ country: string; users: number }>;
+  topCountries: Array<{ country: string; code: string; users: number }>;
   landingPages: Array<{ path: string; sessions: number }>;
   // Null when the requested range isn't a concrete YYYY-MM-DD pair (e.g. a
   // legacy relative string like "30daysAgo") -- there's no reliable prior
   // window to diff against in that case.
   previousPeriod: GA4PreviousPeriod | null;
+  // Day-indexed (not date-indexed) so it can overlay the current period's
+  // chart positionally -- "day 3 of this period" vs "day 3 of last period"
+  // regardless of which actual calendar dates those are. Empty when
+  // previousPeriod is null.
+  previousDailyUsers: Array<{ users: number; sessions: number }>;
   funnel: GA4FunnelStage[];
   localeSplit: { en: number; ar: number; other: number };
+  newVsReturning: { new: number; returning: number };
 }
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -97,7 +103,7 @@ async function fetchGA4SummaryUncached(startDate: string, endDate: string): Prom
   const property = propertyPath();
   const prevRange = previousPeriodRange(startDate, endDate);
 
-  const [totals, byDay, byPage, bySource, byChannel, byDevice, byCountry, byLandingPage, byEvent, byLandingLocale, prevTotals] = await Promise.all([
+  const [totals, byDay, byPage, bySource, byChannel, byDevice, byCountry, byLandingPage, byEvent, byLandingLocale, byNewVsReturning, prevTotals, prevByDay] = await Promise.all([
     client.runReport({
       property,
       dateRanges: [{ startDate, endDate }],
@@ -117,6 +123,12 @@ async function fetchGA4SummaryUncached(startDate: string, endDate: string): Prom
       dimensions: [{ name: "date" }],
       metrics: [{ name: "activeUsers" }, { name: "sessions" }],
       orderBys: [{ dimension: { dimensionName: "date" } }],
+      // GA4 omits zero-data days by default -- that's fine for a top-N list,
+      // but this series is positionally overlaid against the previous
+      // period's series (see previousDailyUsers below), so every calendar
+      // day needs a row, even a 0, or the two periods drift out of alignment
+      // the moment either one has a quiet day.
+      keepEmptyRows: true,
     }),
     client.runReport({
       property,
@@ -136,7 +148,9 @@ async function fetchGA4SummaryUncached(startDate: string, endDate: string): Prom
     }),
     client.runReport({ property, dateRanges: [{ startDate, endDate }], dimensions: [{ name: "sessionDefaultChannelGroup" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 8 }),
     client.runReport({ property, dateRanges: [{ startDate, endDate }], dimensions: [{ name: "deviceCategory" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 5 }),
-    client.runReport({ property, dateRanges: [{ startDate, endDate }], dimensions: [{ name: "country" }], metrics: [{ name: "activeUsers" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }], limit: 8 }),
+    // countryId is the ISO-3166 alpha-2 code -- fetched alongside the display
+    // name so the UI can render a flag without a separate lookup table.
+    client.runReport({ property, dateRanges: [{ startDate, endDate }], dimensions: [{ name: "country" }, { name: "countryId" }], metrics: [{ name: "activeUsers" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }], limit: 8 }),
     client.runReport({ property, dateRanges: [{ startDate, endDate }], dimensions: [{ name: "landingPagePlusQueryString" }], metrics: [{ name: "sessions" }], orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 8 }),
     client.runReport({
       property,
@@ -159,11 +173,27 @@ async function fetchGA4SummaryUncached(startDate: string, endDate: string): Prom
       orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
       limit: 100,
     }),
+    client.runReport({
+      property,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: "newVsReturning" }],
+      metrics: [{ name: "sessions" }],
+    }),
     prevRange
       ? client.runReport({
           property,
           dateRanges: [{ startDate: prevRange.start, endDate: prevRange.end }],
           metrics: [{ name: "activeUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "newUsers" }],
+        })
+      : Promise.resolve(null),
+    prevRange
+      ? client.runReport({
+          property,
+          dateRanges: [{ startDate: prevRange.start, endDate: prevRange.end }],
+          dimensions: [{ name: "date" }],
+          metrics: [{ name: "activeUsers" }, { name: "sessions" }],
+          orderBys: [{ dimension: { dimensionName: "date" } }],
+          keepEmptyRows: true,
         })
       : Promise.resolve(null),
   ]);
@@ -194,10 +224,19 @@ async function fetchGA4SummaryUncached(startDate: string, endDate: string): Prom
     })),
     topChannels: (byChannel[0].rows ?? []).map((row) => ({ channel: row.dimensionValues?.[0]?.value || "Unassigned", sessions: Number(row.metricValues?.[0]?.value ?? 0) })),
     devices: (byDevice[0].rows ?? []).map((row) => ({ device: row.dimensionValues?.[0]?.value || "unknown", sessions: Number(row.metricValues?.[0]?.value ?? 0) })),
-    topCountries: (byCountry[0].rows ?? []).map((row) => ({ country: row.dimensionValues?.[0]?.value || "Unknown", users: Number(row.metricValues?.[0]?.value ?? 0) })),
+    topCountries: (byCountry[0].rows ?? []).map((row) => ({
+      country: row.dimensionValues?.[0]?.value || "Unknown",
+      code: row.dimensionValues?.[1]?.value || "",
+      users: Number(row.metricValues?.[0]?.value ?? 0),
+    })),
     landingPages: (byLandingPage[0].rows ?? []).map((row) => ({ path: row.dimensionValues?.[0]?.value || "/", sessions: Number(row.metricValues?.[0]?.value ?? 0) })),
     funnel: buildFunnel(Number(totalsRow?.[1]?.value ?? 0), byEvent[0].rows ?? []),
     localeSplit: buildLocaleSplit(byLandingLocale[0].rows ?? []),
+    newVsReturning: buildNewVsReturning(byNewVsReturning[0].rows ?? []),
+    previousDailyUsers: (prevByDay?.[0].rows ?? []).map((row) => ({
+      users: Number(row.metricValues?.[0]?.value ?? 0),
+      sessions: Number(row.metricValues?.[1]?.value ?? 0),
+    })),
     previousPeriod: prevTotals
       ? {
           activeUsers: Number(prevTotals[0].rows?.[0]?.metricValues?.[0]?.value ?? 0),
@@ -230,6 +269,19 @@ function buildLocaleSplit(landingRows: GA4Row[]): { en: number; ar: number; othe
     if (path === "/ar" || path.startsWith("/ar/") || path.startsWith("/ar?")) split.ar += sessions;
     else if (path === "/en" || path.startsWith("/en/") || path.startsWith("/en?")) split.en += sessions;
     else split.other += sessions;
+  }
+  return split;
+}
+
+function buildNewVsReturning(rows: GA4Row[]): { new: number; returning: number } {
+  const split = { new: 0, returning: 0 };
+  for (const row of rows) {
+    const value = row.dimensionValues?.[0]?.value ?? "";
+    const sessions = Number(row.metricValues?.[0]?.value ?? 0);
+    if (value === "new") split.new += sessions;
+    else if (value === "returning") split.returning += sessions;
+    // "(not set)" sessions are excluded from both -- neither bucket is
+    // accurate for them, and they're a small minority in practice.
   }
   return split;
 }

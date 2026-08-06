@@ -56,11 +56,13 @@ interface GA4Summary {
   dailyUsers: Array<{ date: string; users: number; sessions: number }>;
   topChannels: Array<{ channel: string; sessions: number }>;
   devices: Array<{ device: string; sessions: number }>;
-  topCountries: Array<{ country: string; users: number }>;
+  topCountries: Array<{ country: string; code: string; users: number }>;
   landingPages: Array<{ path: string; sessions: number }>;
   previousPeriod: GA4PreviousPeriod | null;
+  previousDailyUsers: Array<{ users: number; sessions: number }>;
   funnel: GA4FunnelStage[];
   localeSplit: { en: number; ar: number; other: number };
+  newVsReturning: { new: number; returning: number };
 }
 
 interface DateRange {
@@ -76,6 +78,14 @@ function fmtDuration(seconds: number) {
 
 function isoDate(d: Date) {
   return d.toISOString().slice(0, 10);
+}
+
+// A flag emoji is just two "regional indicator" Unicode characters, one per
+// letter of the ISO-3166 alpha-2 code -- no image asset or library needed.
+function flagEmoji(code: string): string {
+  if (!/^[A-Za-z]{2}$/.test(code)) return "";
+  const REGIONAL_INDICATOR_OFFSET = 127397; // codepoint of "A" (65) shifted to U+1F1E6
+  return [...code.toUpperCase()].map((c) => String.fromCodePoint(c.codePointAt(0)! + REGIONAL_INDICATOR_OFFSET)).join("");
 }
 
 // Pure function of a fixed instant, not of the ambient clock -- callers pass
@@ -125,13 +135,17 @@ function downloadSummaryCsv(summary: GA4Summary, range: DateRange) {
   section("Traffic sources", "Source,Sessions", summary.topSources.map((s) => [s.source, s.sessions]));
   section("Acquisition channels", "Channel,Sessions", summary.topChannels.map((c) => [c.channel, c.sessions]));
   section("Device mix", "Device,Sessions", summary.devices.map((d) => [d.device, d.sessions]));
-  section("Top markets", "Country,Visitors", summary.topCountries.map((c) => [c.country, c.users]));
+  section("Top markets", "Country,Visitors", summary.topCountries.map((c) => [c.code ? `${c.country} (${c.code})` : c.country, c.users]));
   section("Landing pages", "Path,Sessions", summary.landingPages.map((p) => [p.path, p.sessions]));
   section("Conversion funnel", "Stage,Count", summary.funnel.map((f) => [FUNNEL_LABELS[f.stage], f.count]));
   section("Traffic by language", "Language,Sessions", [
     ["English", summary.localeSplit.en],
     ["Arabic", summary.localeSplit.ar],
     ["Other", summary.localeSplit.other],
+  ]);
+  section("New vs returning", "Type,Sessions", [
+    ["New", summary.newVsReturning.new],
+    ["Returning", summary.newVsReturning.returning],
   ]);
 
   const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
@@ -192,6 +206,21 @@ function AnalyticsData({ range }: { range: DateRange }) {
       .catch((err) => setError(err.message));
   }, [range.start, range.end]);
 
+  // Merged by day-index (not calendar date) so "day 3 of this period" lines
+  // up with "day 3 of last period" on the same X position. Computed above
+  // the error early-return -- hooks must run unconditionally every render.
+  const chartData = useMemo(
+    () =>
+      summary?.dailyUsers.map((day, i) => ({
+        date: day.date,
+        users: day.users,
+        sessions: day.sessions,
+        prevUsers: summary.previousDailyUsers[i]?.users,
+        prevSessions: summary.previousDailyUsers[i]?.sessions,
+      })) ?? [],
+    [summary]
+  );
+
   if (error) {
     return (
       <ErrorState>
@@ -233,7 +262,12 @@ function AnalyticsData({ range }: { range: DateRange }) {
 
       <Panel className="mt-4">
         <div className="flex items-center justify-between gap-4">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors and sessions</p>
+          <div className="flex items-center gap-2">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors and sessions</p>
+            {summary && summary.previousDailyUsers.length > 0 && (
+              <span className="text-[10px] text-white/25">(dashed = previous period)</span>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <p className="text-[11px] text-white/30">{summary ? `${summary.pagesPerSession.toFixed(1)} pages / session · ${Math.round(summary.bounceRate * 100)}% bounce` : ""}</p>
             {summary && (
@@ -249,7 +283,7 @@ function AnalyticsData({ range }: { range: DateRange }) {
         </div>
         <div className="mt-4 h-[200px]">
           {summary ? (
-            <VisitorsAreaChart data={summary.dailyUsers} />
+            <VisitorsAreaChart data={chartData} />
           ) : (
             <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />
           )}
@@ -289,9 +323,14 @@ function AnalyticsData({ range }: { range: DateRange }) {
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Panel><MetricList title="Acquisition channels" items={summary?.topChannels.map((item) => ({ label: item.channel, value: item.sessions }))} /></Panel>
         <Panel><MetricList title="Device mix" items={summary?.devices.map((item) => ({ label: item.device, value: item.sessions }))} /></Panel>
-        <Panel><MetricList title="Top markets" items={summary?.topCountries.map((item) => ({ label: item.country, value: item.users }))} /></Panel>
+        <Panel>
+          <MetricList
+            title="Top markets"
+            items={summary?.topCountries.map((item) => ({ label: [flagEmoji(item.code), item.country].filter(Boolean).join(" "), value: item.users }))}
+          />
+        </Panel>
       </div>
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Panel><MetricList title="Landing pages" items={summary?.landingPages.map((item) => ({ label: item.path, value: item.sessions }))} /></Panel>
         <Panel>
           <MetricList
@@ -302,6 +341,19 @@ function AnalyticsData({ range }: { range: DateRange }) {
                     { label: "English", value: summary.localeSplit.en },
                     { label: "Arabic", value: summary.localeSplit.ar },
                     { label: "Other", value: summary.localeSplit.other },
+                  ]
+                : undefined
+            }
+          />
+        </Panel>
+        <Panel>
+          <MetricList
+            title="New vs returning"
+            items={
+              summary
+                ? [
+                    { label: "New", value: summary.newVsReturning.new },
+                    { label: "Returning", value: summary.newVsReturning.returning },
                   ]
                 : undefined
             }
