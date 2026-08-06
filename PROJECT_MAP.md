@@ -1,6 +1,6 @@
 # PROJECT_MAP — Steinheim Egypt Storefront
 
-> Live document. Updated every delivery wave. Last verified: 2026-08-06, `main` @ `579a26d`.
+> Live document. Updated every delivery wave. Last verified: 2026-08-06, `main` @ `78e9793` (PRs #97-#99).
 
 ## [TECH_STACK]
 
@@ -85,11 +85,17 @@ Principles: brand-locked (cream `#ece9e2`, charcoal `#0a0a0a`, italic serif head
 
 ## [ORPHANS & PENDING]
 
+> Innovation track — Waves #97/#98/#99 shipped 2026-08-06: Designer Concierge,
+> Delivery Promise, installable PWA + offline shell, seasonal campaigns engine,
+> and the performance budget gate. The list below is what remains open.
+
 - `app/[locale]/sentry-example-page/` + `app/api/sentry-example-api/` — leftover framework examples (UI dead-ends). Candidate for removal or conversion to a real status page.
 - Next.js `16.2.12` pinned vs `16.3.0` stable — deliberate hold until 16.3.0 is exercised; check UPGRADES.md before bumping.
-- **PWA/installability absent** — no `manifest.json`, no service worker, no apple-touch-icon. Gap for a mobile-first Egyptian market.
-- **WhatsApp concierge absent at the page level** — WhatsApp is used for cart/contact, but there is no global floating "talk to a designer" entry with product/trade context deep-links.
-- **Delivery promise absent** — no governorate→ETA estimator; shipping copy is static text only (no `deliveryLeadTime` structured data).
-- **Seasonal merchandising absent** — no date-driven campaigns (Ramadan/Eid/Mother's Day) that auto-swap banners/heroes.
-- **Performance budget CI gate absent** — no automated LCP/TTI thresholds enforced per page.
 - Assistant `brain: "catalog-rules-v1"` is deterministic; no price/inventory-aware retrieval path when live data changes outside the master catalog.
+
+### Closed by the innovation track
+- ~~PWA/installability absent~~ — DONE (PR #98): `app/manifest.ts`, `public/sw.js`, brand icons via `scripts/generate-icons.mjs`, verified by `e2e/pwa.spec.ts`.
+- ~~WhatsApp concierge absent at the page level~~ — DONE (PR #97): `components/ui/DesignerConcierge.tsx` + `lib/concierge.ts` (context-aware wa.me deep links, unit tested).
+- ~~Delivery promise absent~~ — DONE (PR #97): `lib/delivery.ts` 27-governorate ETA matrix (AR/EN names) + `DeliveryPromise` UI + `OfferShippingDetails` in product schema.
+- ~~Seasonal merchandising absent~~ — DONE (PR #99): `lib/campaigns.ts` date engine + `CampaignBanner` + `campaigns` i18n.
+- ~~Performance budget CI gate absent~~ — DONE (PR #99): `e2e/perf-budget.spec.ts` LCP budgets + `npm run perf:budget`.

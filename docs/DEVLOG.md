@@ -160,6 +160,40 @@ unit suite, and the production build:
 This closes the remaining roadmap sections: #2 Performance and #4 SEO are
 fully shipped, and #6 UX depth is shipped.
 
+## 2026-08-06 - Innovation track: concierge, delivery promise, PWA, campaigns & perf gate
+
+Three pull requests merged to `main`, each green on lint, typecheck, the full
+unit suite, and the production build. All work stays inside the brand system
+(cream `#ece9e2`, charcoal `#0a0a0a`, italic serif headings) and the identity
+was not touched.
+
+- **PR #97 - Designer concierge + delivery promise.** A persistent floating
+  WhatsApp button whose deep link is pre-shaped by the page (product pages
+  name the product, series, and reference price; /trade and /contact get
+  their own intents). A 27-governorate delivery ETA matrix (accepts English
+  or Arabic names, default fallback) renders on the product page and cart,
+  and the product schema now carries `OfferShippingDetails`. Pure logic in
+  `lib/concierge.ts` / `lib/delivery.ts`, both unit tested. Also ships the
+  new `PROJECT_MAP.md` (TECH_STACK / SYSTEM_FLOW / ARCHITECTURE /
+  ORPHANS & PENDING).
+- **PR #98 - Installable PWA + offline shell.** `app/manifest.ts` emits a Web
+  App Manifest (brand icons 192/512/maskable generated from an SVG monogram
+  by `scripts/generate-icons.mjs` via sharp). `public/sw.js` is a conservative
+  offline-first worker: same-origin GETs only, API and large media skipped,
+  navigations network-first with a cached fallback. Registered in production
+  only, after load, so first paint is untouched.
+- **PR #99 - Seasonal campaigns engine + performance budget gate.** A pure
+  date-driven campaign engine (`lib/campaigns.ts`, injectable for tests)
+  drives a brand-styled `CampaignBanner` above the home hero only when a
+  window is active; copy lives in the `campaigns` i18n namespace. A Playwright
+  perf gate (`e2e/perf-budget.spec.ts`) warms and measures LCP on the key
+  routes under budgets, plus `e2e/pwa.spec.ts` verifies the PWA contract.
+  `npm run perf:budget` runs the gate alone.
+
+The innovation track closed every gap logged in `PROJECT_MAP.md`'s
+[ORPHANS & PENDING]: concierge, delivery promise, PWA, seasonal campaigns,
+and the performance gate are all shipped.
+
 ---
 
 ## Roadmap - the excellence track
@@ -219,4 +253,5 @@ identity - it makes the experience underneath it sharper.
 ### 7. Contrast (P2, WCAG-driven) - SHIPPED (PR #93)
 - Raise meaningful small labels from `/25`-`/35` opacity to at least `/45`,
   keeping decorative text where it is. Done.
-_Last verified: 2026-08-04 - all checks green on `main` at `6e3ca34` (after PRs #94-#96)._
+_Last verified: 2026-08-06 - all checks green on `main` at `78e9793` (after the innovation track PRs #97-#99)._
+
