@@ -1858,5 +1858,14 @@
     "title": "Something went wrong",
     "body": "An unexpected error occurred. Our team has been notified — please try again.",
     "reloadButton": "Try again"
+  },
+  "concierge": {
+    "label": "Talk to a designer"
+  },
+  "deliveryPromise": {
+    "title": "Delivery promise",
+    "label": "Select your governorate",
+    "placeholder": "Choose governorate",
+    "estimate": "Estimated delivery: {min}–{max} business days"
   }
 }

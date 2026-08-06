@@ -13,6 +13,7 @@ import ProductFaq from "@/components/product/ProductFaq";
 import TrustBadges from "@/components/product/TrustBadges";
 import RestockAlertForm from "@/components/product/RestockAlertForm";
 import RecentlyViewedStrip from "@/components/product/RecentlyViewedStrip";
+import DeliveryPromise from "@/components/ui/DeliveryPromise";
 import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
@@ -228,6 +229,8 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 {liveVariant && liveVariant.inStock === false && (
                   <RestockAlertForm productSlug={product.slug} finish={variant.finish} />
                 )}
+
+                <DeliveryPromise />
 
                 <div className="relative mt-7 sm:mt-20 lg:mt-28">
                   <button
