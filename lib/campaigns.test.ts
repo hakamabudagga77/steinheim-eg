@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CAMPAIGNS, getActiveCampaignAt } from "@/lib/campaigns";
+import { CAMPAIGNS, getActiveCampaignAt, type CampaignRecord } from "@/lib/campaigns";
 
 describe("getActiveCampaignAt", () => {
   it("resolves an active campaign inside its window", () => {
@@ -38,5 +38,37 @@ describe("getActiveCampaignAt", () => {
       expect(c.endsAt >= c.startsAt).toBe(true);
       expect(c.href.startsWith("/")).toBe(true);
     }
+  });
+
+  it("never resolves a disabled campaign, even inside its window", () => {
+    const disabled: CampaignRecord[] = [
+      { ...CAMPAIGNS[0], id: "paused", enabled: false, startsAt: "2026-01-01", endsAt: "2027-12-31" },
+    ];
+    expect(getActiveCampaignAt("2026-08-06T12:00:00Z", disabled)).toBeNull();
+  });
+
+  it("resolves from an injected record list instead of the defaults", () => {
+    const custom: CampaignRecord[] = [
+      {
+        id: "mothers-day",
+        enabled: true,
+        startsAt: "2027-03-21",
+        endsAt: "2027-03-21",
+        href: "/collections",
+        en: { eyebrow: "Offer", title: "Mother's Day", body: "Warm it up.", cta: "Browse" },
+        ar: { eyebrow: "عرض", title: "عيد الأم", body: "دفء في البيت.", cta: "تصفح" },
+      },
+    ];
+    const active = getActiveCampaignAt("2027-03-21T00:00:00Z", custom);
+    expect(active?.id).toBe("mothers-day");
+    expect(active?.href).toBe("/collections");
+  });
+
+  it("ignores disabled entries in an injected list", () => {
+    const custom: CampaignRecord[] = [
+      { ...CAMPAIGNS[0], id: "off", enabled: false, startsAt: "2026-01-01", endsAt: "2030-12-31" },
+      { ...CAMPAIGNS[1], id: "on", startsAt: "2026-01-01", endsAt: "2030-12-31" },
+    ];
+    expect(getActiveCampaignAt("2026-08-06T12:00:00Z", custom)?.id).toBe("on");
   });
 });
