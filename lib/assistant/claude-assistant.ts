@@ -214,11 +214,13 @@ async function callGroqStream(
   model: string,
   onDelta: (text: string) => void,
   signal?: AbortSignal,
-  locale?: string
+  locale?: string,
+  liveNote?: string
 ): Promise<string> {
   const isLightModel = model.includes("8b");
   const basePrompt = isLightModel ? LIGHT_SYSTEM_PROMPT : SYSTEM_PROMPT;
-  const systemPrompt = `${basePrompt}\n\n${localeDirective(locale)}`;
+  const liveSection = liveNote ? `\n\nLIVE STORE SNAPSHOT (use these prices/stock when they match a cited product):\n${liveNote}` : "";
+  const systemPrompt = `${basePrompt}\n\n${localeDirective(locale)}${liveSection}`;
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -290,13 +292,14 @@ async function streamGroq(
   preferredModel: string,
   onDelta: (text: string) => void,
   signal?: AbortSignal,
-  locale?: string
+  locale?: string,
+  liveNote?: string
 ): Promise<string> {
   const models = [preferredModel, ...GROQ_MODELS.filter((m) => m !== preferredModel)];
 
   for (const model of models) {
     try {
-      return await callGroqStream(messages, apiKey, model, onDelta, signal, locale);
+      return await callGroqStream(messages, apiKey, model, onDelta, signal, locale, liveNote);
     } catch (err) {
       const msg = (err as Error).message;
       if (!msg.includes("429")) throw err;
@@ -306,7 +309,7 @@ async function streamGroq(
         console.log(`[assistant] ${model} rate-limited, waiting ${delay}ms and retrying...`);
         await new Promise((r) => setTimeout(r, delay));
         try {
-          return await callGroqStream(messages, apiKey, model, onDelta, signal, locale);
+          return await callGroqStream(messages, apiKey, model, onDelta, signal, locale, liveNote);
         } catch {
           // fall through to next model
         }
@@ -329,7 +332,8 @@ async function streamAnthropic(
   model: string,
   onDelta: (text: string) => void,
   signal?: AbortSignal,
-  locale?: string
+  locale?: string,
+  liveNote?: string
 ): Promise<string> {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const client = new Anthropic({ apiKey });
@@ -343,6 +347,9 @@ async function streamAnthropic(
     system: [
       { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
       { type: "text", text: localeDirective(locale) },
+      ...(liveNote
+        ? [{ type: "text" as const, text: `LIVE STORE SNAPSHOT (use these prices/stock when they match a cited product):\n${liveNote}` }]
+        : []),
     ],
     messages: messages.map((m) => ({ role: m.role, content: m.content })),
   });
@@ -365,7 +372,8 @@ export async function streamAssistant(
   messages: ConversationMessage[],
   onDelta: (text: string) => void,
   signal?: AbortSignal,
-  locale?: string
+  locale?: string,
+  liveNote?: string
 ): Promise<{ text: string; brain: string }> {
   const { provider, apiKey, model } = detectProvider();
 
@@ -380,9 +388,9 @@ export async function streamAssistant(
   let fullText: string;
 
   if (provider === "anthropic") {
-    fullText = await streamAnthropic(claudeMessages, apiKey, model, onDelta, signal, locale);
+    fullText = await streamAnthropic(claudeMessages, apiKey, model, onDelta, signal, locale, liveNote);
   } else {
-    fullText = await streamGroq(claudeMessages, apiKey, model, onDelta, signal, locale);
+    fullText = await streamGroq(claudeMessages, apiKey, model, onDelta, signal, locale, liveNote);
   }
 
   return { text: fullText, brain: `${model}+catalogue-grounded` };

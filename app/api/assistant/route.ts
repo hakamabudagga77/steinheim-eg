@@ -1,9 +1,11 @@
 import {
   answerSteinheimQuestion,
   type AssistantMessage,
+  type LiveLookup,
 } from "@/lib/assistant/steinheim-assistant";
 import { streamAssistant } from "@/lib/assistant/claude-assistant";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { getAllLiveData } from "@/lib/shopify-live-data";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -45,9 +47,26 @@ export async function POST(request: Request) {
   const messages = Array.isArray(body.messages) ? body.messages : [];
   const locale = typeof body.locale === "string" && (body.locale === "ar" || body.locale === "en") ? body.locale : undefined;
 
-  const ruleResult = answerSteinheimQuestion(messages, body.projectContext ?? "");
+  // Resolve live Shopify prices/stock once per request (cached server-side for
+  // 5 minutes) so the rule engine quotes the number the site actually sells at
+  // instead of the catalogue reference when live data exists.
+  const liveData = await getAllLiveData();
+  const liveLookup: LiveLookup = (slug, finish) => {
+    const entry = liveData.get(slug);
+    if (!entry) return null;
+    if (finish) return entry.variants.find((variant) => variant.finish === finish) ?? null;
+    return entry.variants[0] ?? null;
+  };
+
+  const ruleResult = answerSteinheimQuestion(messages, body.projectContext ?? "", liveLookup);
 
   const hasAiKey = !!(process.env.ANTHROPIC_API_KEY || process.env.GROQ_API_KEY);
+
+  const liveNote = [...liveData.entries()]
+    .flatMap(([slug, entry]) =>
+      entry.variants.map((variant) => `${slug}|${variant.finish}|${variant.price}|${variant.inStock ? "in-stock" : "out-of-stock"}`)
+    )
+    .join("\n");
 
   if (!hasAiKey) {
     const encoder = new TextEncoder();
@@ -90,7 +109,8 @@ export async function POST(request: Request) {
             controller.enqueue(encoder.encode(sse({ type: "delta", text: delta })));
           },
           request.signal,
-          locale
+          locale,
+          liveNote
         );
       } catch (err) {
         console.error("[assistant] AI failed, falling back to rule engine:", (err as Error).message);

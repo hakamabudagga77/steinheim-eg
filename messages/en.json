@@ -1867,19 +1867,5 @@
     "label": "Select your governorate",
     "placeholder": "Choose governorate",
     "estimate": "Estimated delivery: {min}–{max} business days"
-  },
-  "campaigns": {
-    "eid-al-adha": {
-      "eyebrow": "Seasonal offer",
-      "title": "Eid at Home",
-      "body": "Coordinated bathroom sets, ready for the season.",
-      "cta": "Explore collections"
-    },
-    "ramadan-home": {
-      "eyebrow": "Seasonal offer",
-      "title": "Ramadan Home",
-      "body": "A calmer bathroom ritual for the season.",
-      "cta": "Shop the look"
-    }
   }
 }

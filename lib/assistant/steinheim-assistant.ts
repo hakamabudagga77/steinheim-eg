@@ -34,6 +34,21 @@ export type AssistantResult = {
   brain: "catalog-rules-v1";
 };
 
+/** A single live price/stock observation for one product+finish. */
+export interface AssistantLiveVariant {
+  finish: string;
+  price: number;
+  inventory: number;
+  inStock: boolean;
+}
+
+/**
+ * Resolves live Shopify price/stock for a product slug (and optionally a
+ * finish). Returns null when nothing live is known for that product — the
+ * rule engine then falls back to the catalogue retail-reference price.
+ */
+export type LiveLookup = (slug: string, finish?: string) => AssistantLiveVariant | null;
+
 const seriesAliases: Record<EgyptSeriesId, string[]> = {
   joy: ["joy"],
   up: ["up"],
@@ -147,26 +162,47 @@ function withAction(text: string, action: AssistantAction): AssistantResult {
   return { text, action, brain: "catalog-rules-v1" };
 }
 
-function productLine(product: EgyptProduct, finish?: EgyptFinishId) {
+function productLine(product: EgyptProduct, finish?: EgyptFinishId, liveLookup?: LiveLookup) {
   const variant = finish
     ? product.variants.find((entry) => entry.finish === finish)
     : product.variants[0];
 
   if (!variant) return `${seriesName(product.series)} ${product.name}`;
-  return `${seriesName(product.series)} ${product.name} in ${finishName(variant.finish)} — model ${variant.model}, retail-reference ${formatEgyptPrice(variant.price)}.`;
+  const live = liveLookup?.(product.slug, variant.finish);
+  const priceText = live
+    ? `live ${formatEgyptPrice(live.price)}`
+    : `retail-reference ${formatEgyptPrice(variant.price)}`;
+  return `${seriesName(product.series)} ${product.name} in ${finishName(variant.finish)} — model ${variant.model}, ${priceText}.`;
 }
 
-function answerModelLookup(question: string) {
+function stockNote(product: EgyptProduct, variant: { finish: string }, liveLookup?: LiveLookup) {
+  const live = liveLookup?.(product.slug, variant.finish);
+  if (!live) return "";
+  if (live.inStock) {
+    return live.inventory > 0
+      ? ` Live stock shows it in stock (${live.inventory} units).`
+      : " Live stock shows it in stock.";
+  }
+  return " Live stock currently shows it out of stock — I would check the next delivery with Steinheim Egypt.";
+}
+
+function answerModelLookup(question: string, liveLookup?: LiveLookup) {
   const found = modelLookup(question);
   if (!found) return null;
   const { product, variant } = found;
+  const live = liveLookup?.(product.slug, variant.finish);
+  const priceText = live
+    ? `The live price is ${formatEgyptPrice(live.price)}${live.inStock ? `, and it is in stock${live.inventory > 0 ? ` (${live.inventory} units)` : ""}.` : ", but it is currently showing out of stock."}`
+    : "The Egypt catalogue retail-reference price is " +
+      formatEgyptPrice(variant.price) +
+      ". Trade pricing, stock, and lead time still need Steinheim Egypt confirmation.";
   return withAction(
-    `${variant.model} is the ${seriesName(product.series)} ${product.name} in ${finishName(variant.finish)}. The Egypt catalogue retail-reference price is ${formatEgyptPrice(variant.price)}. Trade pricing, stock, and lead time still need Steinheim Egypt confirmation.`,
+    `${variant.model} is the ${seriesName(product.series)} ${product.name} in ${finishName(variant.finish)}. ${priceText}`,
     actionForProduct(product, variant.finish)
   );
 }
 
-function answerProductFacts(question: string) {
+function answerProductFacts(question: string, liveLookup?: LiveLookup) {
   const found = findProductByIntent(question);
   if (!found) return null;
   if (/(strategy|not a product schedule)/i.test(question)) return null;
@@ -183,7 +219,7 @@ function answerProductFacts(question: string) {
 
   if (wantsPrice) {
     return withAction(
-      `${productLine(product, variant.finish as EgyptFinishId)} This is a retail-reference catalogue price, not a confirmed trade price.`,
+      `${productLine(product, variant.finish as EgyptFinishId, liveLookup)}${stockNote(product, variant, liveLookup)}`,
       actionForProduct(product, variant.finish)
     );
   }
@@ -365,10 +401,21 @@ function answerCare(question: string) {
   return withAction(`${care} ${warning} For heavy water spots, send photos before using stronger chemicals.`, null);
 }
 
-function answerTradeBoundary(question: string) {
+function answerTradeBoundary(question: string, liveLookup?: LiveLookup) {
   const lower = normalize(question);
   if (/(discount|guarantee|stock|lead time|deliver|delivery|next thursday|available|bulk price|trade price)/.test(lower)) {
     if (/(stock|available)/.test(lower)) {
+      const found = findProductByIntent(question);
+      const variant = found?.variant;
+      const live = found && variant ? liveLookup?.(found.product.slug, variant.finish) : null;
+      if (live && variant) {
+        return withAction(
+          live.inStock
+            ? `${seriesName(found.product.series)} ${found.product.name} in ${finishName(variant.finish)} is showing in stock${live.inventory > 0 ? ` (${live.inventory} units)` : ""} right now. For larger quantities, reserved stock and lead time still need Steinheim Egypt confirmation.`
+            : `${seriesName(found.product.series)} ${found.product.name} in ${finishName(variant.finish)} is currently showing out of stock. I would ask Steinheim Egypt about the next delivery before promising a date.`,
+          actionForProduct(found.product, variant.finish)
+        );
+      }
       return withAction(
         "I do not have live stock data, so I won’t guess. Kareem/the Steinheim Egypt team must confirm current availability, reserved quantities, and lead time for that exact model and finish.",
         null
@@ -603,7 +650,11 @@ function fallback(question: string) {
   );
 }
 
-export function answerSteinheimQuestion(messages: AssistantMessage[] = [], projectContext = ""): AssistantResult {
+export function answerSteinheimQuestion(
+  messages: AssistantMessage[] = [],
+  projectContext = "",
+  liveLookup: LiveLookup | null = null
+): AssistantResult {
   const lastUser = [...messages].reverse().find((message) => message.role === "user")?.content ?? "";
   const question = lastUser.trim();
   const conversation = messages.map((message) => `${message.role}: ${message.content}`).join("\n");
@@ -619,9 +670,9 @@ export function answerSteinheimQuestion(messages: AssistantMessage[] = [], proje
     answerOrigin,
     answerHandoff,
     answerQuote,
-    answerModelLookup,
-    answerProductFacts,
-    answerTradeBoundary,
+    (input: string) => answerModelLookup(input, liveLookup ?? undefined),
+    (input: string) => answerProductFacts(input, liveLookup ?? undefined),
+    (input: string) => answerTradeBoundary(input, liveLookup ?? undefined),
     answerProjects,
     answerWarranty,
     answerCare,

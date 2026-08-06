@@ -100,5 +100,13 @@ export function createRedisJsonStore<T extends { id: string }>(options: RedisJso
     await writeLocal(next);
   }
 
-  return { list, get, save };
+  async function remove(id: string): Promise<void> {
+    requireConfiguredProductionStore();
+    const redisResult = await redisCommand(["HDEL", options.redisKey, id]).catch(() => undefined);
+    if (redisResult !== null && redisResult !== undefined) return;
+    const records = await readLocal();
+    await writeLocal(records.filter((entry) => entry.id !== id));
+  }
+
+  return { list, get, save, remove };
 }
