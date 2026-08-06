@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Users, Activity, Eye, Clock, UserPlus, MousePointer2 } from "lucide-react";
+import { Users, Activity, Eye, Clock, UserPlus, MousePointer2, Download } from "lucide-react";
 import { PageHeader, Panel, StatCard, StatCardSkeleton, ErrorState, SegmentedControl } from "@/components/admin/ui";
 
 // recharts (~120 KB gzip) loads on demand instead of in this page's initial JS.
@@ -11,19 +11,36 @@ const VisitorsAreaChart = dynamic(() => import("./AnalyticsChart").then((m) => m
   loading: () => <div className="h-full animate-pulse rounded-lg bg-white/[0.04]" />,
 });
 
-type Timeframe = "7d" | "30d" | "90d";
+type Preset = "7d" | "30d" | "90d" | "custom";
 
-const TIMEFRAME_OPTIONS: Array<{ value: Timeframe; label: string }> = [
+const PRESET_OPTIONS: Array<{ value: Preset; label: string }> = [
   { value: "7d", label: "7 days" },
   { value: "30d", label: "30 days" },
   { value: "90d", label: "90 days" },
+  { value: "custom", label: "Custom" },
 ];
 
-const TIMEFRAME_DAYS: Record<Timeframe, string> = {
-  "7d": "7daysAgo",
-  "30d": "30daysAgo",
-  "90d": "90daysAgo",
+const PRESET_DAYS: Record<"7d" | "30d" | "90d", number> = { "7d": 7, "30d": 30, "90d": 90 };
+
+const FUNNEL_LABELS: Record<GA4FunnelStage["stage"], string> = {
+  sessions: "Sessions",
+  view_item: "Viewed a product",
+  add_to_cart: "Added to cart",
+  begin_checkout: "Began checkout",
+  purchase: "Purchased",
 };
+
+interface GA4PreviousPeriod {
+  activeUsers: number;
+  newUsers: number;
+  sessions: number;
+  pageViews: number;
+}
+
+interface GA4FunnelStage {
+  stage: "sessions" | "view_item" | "add_to_cart" | "begin_checkout" | "purchase";
+  count: number;
+}
 
 interface GA4Summary {
   activeUsers: number;
@@ -41,6 +58,14 @@ interface GA4Summary {
   devices: Array<{ device: string; sessions: number }>;
   topCountries: Array<{ country: string; users: number }>;
   landingPages: Array<{ path: string; sessions: number }>;
+  previousPeriod: GA4PreviousPeriod | null;
+  funnel: GA4FunnelStage[];
+  localeSplit: { en: number; ar: number; other: number };
+}
+
+interface DateRange {
+  start: string;
+  end: string;
 }
 
 function fmtDuration(seconds: number) {
@@ -49,12 +74,113 @@ function fmtDuration(seconds: number) {
   return `${m}m ${s}s`;
 }
 
-function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
+function isoDate(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+
+// Pure function of a fixed instant, not of the ambient clock -- callers pass
+// `asOf` (captured once via an effect) so this stays safe to call from
+// useMemo without tripping the render-purity rule.
+function presetRangeFromAsOf(asOf: number, preset: "7d" | "30d" | "90d"): DateRange {
+  const days = PRESET_DAYS[preset];
+  const end = new Date(asOf);
+  const start = new Date(asOf);
+  start.setUTCDate(start.getUTCDate() - (days - 1));
+  return { start: isoDate(start), end: isoDate(end) };
+}
+
+function computeTrend(current: number, previous: number | undefined): { direction: "up" | "down" | "flat"; label: string } | undefined {
+  if (previous === undefined) return undefined;
+  if (previous === 0) return current === 0 ? { direction: "flat", label: "no change" } : { direction: "up", label: "new this period" };
+  const pct = ((current - previous) / previous) * 100;
+  if (Math.abs(pct) < 0.5) return { direction: "flat", label: "flat vs prior period" };
+  return { direction: pct > 0 ? "up" : "down", label: `${Math.abs(pct).toFixed(0)}% vs prior period` };
+}
+
+function csvEscape(value: string | number) {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
+function downloadSummaryCsv(summary: GA4Summary, range: DateRange) {
+  const lines: string[] = [];
+  lines.push(csvEscape(`Steinheim website analytics — ${range.start} to ${range.end}`));
+  lines.push("");
+  lines.push("Metric,Value");
+  lines.push(`Visitors,${summary.activeUsers}`);
+  lines.push(`New visitors,${summary.newUsers}`);
+  lines.push(`Sessions,${summary.sessions}`);
+  lines.push(`Page views,${summary.pageViews}`);
+  lines.push(`Engagement rate,${(summary.engagementRate * 100).toFixed(1)}%`);
+  lines.push(`Bounce rate,${(summary.bounceRate * 100).toFixed(1)}%`);
+  lines.push(`Avg. session,${Math.round(summary.avgSessionDuration)}s`);
+
+  const section = (title: string, header: string, rows: Array<[string | number, string | number]>) => {
+    lines.push("");
+    lines.push(csvEscape(title));
+    lines.push(header);
+    rows.forEach(([a, b]) => lines.push(`${csvEscape(a)},${b}`));
+  };
+
+  section("Top pages", "Path,Views", summary.topPages.map((p) => [p.path, p.views]));
+  section("Traffic sources", "Source,Sessions", summary.topSources.map((s) => [s.source, s.sessions]));
+  section("Acquisition channels", "Channel,Sessions", summary.topChannels.map((c) => [c.channel, c.sessions]));
+  section("Device mix", "Device,Sessions", summary.devices.map((d) => [d.device, d.sessions]));
+  section("Top markets", "Country,Visitors", summary.topCountries.map((c) => [c.country, c.users]));
+  section("Landing pages", "Path,Sessions", summary.landingPages.map((p) => [p.path, p.sessions]));
+  section("Conversion funnel", "Stage,Count", summary.funnel.map((f) => [FUNNEL_LABELS[f.stage], f.count]));
+  section("Traffic by language", "Language,Sessions", [
+    ["English", summary.localeSplit.en],
+    ["Arabic", summary.localeSplit.ar],
+    ["Other", summary.localeSplit.other],
+  ]);
+
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `steinheim-analytics-${range.start}-to-${range.end}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function FunnelPanel({ funnel }: { funnel: GA4FunnelStage[] }) {
+  const top = funnel[0]?.count ?? 0;
+  return (
+    <Panel className="mt-4">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Conversion funnel</p>
+      <div className="mt-4 space-y-3">
+        {top === 0 && <p className="text-[13px] text-white/30">No data yet for this period.</p>}
+        {funnel.map((stage, i) => {
+          const pctOfTop = top > 0 ? (stage.count / top) * 100 : 0;
+          const prev = funnel[i - 1];
+          const dropOff = i > 0 && prev && prev.count > 0 ? 100 - (stage.count / prev.count) * 100 : null;
+          return (
+            <div key={stage.stage}>
+              <div className="flex items-center justify-between gap-3 text-[12px]">
+                <span className="text-white/65">{FUNNEL_LABELS[stage.stage]}</span>
+                <span className="text-white/85">
+                  {stage.count.toLocaleString()}
+                  {i > 0 && <span className="ml-2 text-white/30">{pctOfTop.toFixed(1)}% of sessions</span>}
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
+                <div className="h-full rounded-full bg-[#0a84ff]" style={{ width: `${Math.max(top > 0 ? 2 : 0, pctOfTop)}%` }} />
+              </div>
+              {dropOff !== null && dropOff > 0.5 && <p className="mt-1 text-[10px] text-white/30">−{dropOff.toFixed(0)}% from the previous step</p>}
+            </div>
+          );
+        })}
+      </div>
+    </Panel>
+  );
+}
+
+function AnalyticsData({ range }: { range: DateRange }) {
   const [summary, setSummary] = useState<GA4Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/admin/analytics?start=${TIMEFRAME_DAYS[timeframe]}&end=today`)
+    fetch(`/api/admin/analytics?start=${range.start}&end=${range.end}`)
       .then(async (res) => {
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
@@ -64,7 +190,7 @@ function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
       })
       .then((data) => setSummary(data.summary))
       .catch((err) => setError(err.message));
-  }, [timeframe]);
+  }, [range.start, range.end]);
 
   if (error) {
     return (
@@ -79,15 +205,17 @@ function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
     );
   }
 
+  const prev = summary?.previousPeriod ?? undefined;
+
   return (
     <>
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {summary ? (
           <>
-            <StatCard icon={Users} label="Visitors" value={summary.activeUsers.toLocaleString()} accent />
-            <StatCard icon={UserPlus} label="New visitors" value={summary.newUsers.toLocaleString()} />
-            <StatCard icon={Activity} label="Sessions" value={summary.sessions.toLocaleString()} />
-            <StatCard icon={Eye} label="Page views" value={summary.pageViews.toLocaleString()} />
+            <StatCard icon={Users} label="Visitors" value={summary.activeUsers.toLocaleString()} accent trend={computeTrend(summary.activeUsers, prev?.activeUsers)} />
+            <StatCard icon={UserPlus} label="New visitors" value={summary.newUsers.toLocaleString()} trend={computeTrend(summary.newUsers, prev?.newUsers)} />
+            <StatCard icon={Activity} label="Sessions" value={summary.sessions.toLocaleString()} trend={computeTrend(summary.sessions, prev?.sessions)} />
+            <StatCard icon={Eye} label="Page views" value={summary.pageViews.toLocaleString()} trend={computeTrend(summary.pageViews, prev?.pageViews)} />
             <StatCard icon={MousePointer2} label="Engagement" value={`${Math.round(summary.engagementRate * 100)}%`} />
             <StatCard icon={Clock} label="Avg. session" value={fmtDuration(summary.avgSessionDuration)} />
           </>
@@ -106,7 +234,18 @@ function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
       <Panel className="mt-4">
         <div className="flex items-center justify-between gap-4">
           <p className="text-[11px] uppercase tracking-[0.2em] text-white/35">Visitors and sessions</p>
-          <p className="text-[11px] text-white/30">{summary ? `${summary.pagesPerSession.toFixed(1)} pages / session · ${Math.round(summary.bounceRate * 100)}% bounce` : ""}</p>
+          <div className="flex items-center gap-3">
+            <p className="text-[11px] text-white/30">{summary ? `${summary.pagesPerSession.toFixed(1)} pages / session · ${Math.round(summary.bounceRate * 100)}% bounce` : ""}</p>
+            {summary && (
+              <button
+                type="button"
+                onClick={() => downloadSummaryCsv(summary, range)}
+                className="flex h-7 items-center gap-1.5 rounded-full border border-white/10 px-3 text-[11px] text-white/55 transition hover:border-white/25 hover:text-white"
+              >
+                <Download className="h-3 w-3" /> Export CSV
+              </button>
+            )}
+          </div>
         </div>
         <div className="mt-4 h-[200px]">
           {summary ? (
@@ -152,23 +291,82 @@ function AnalyticsData({ timeframe }: { timeframe: Timeframe }) {
         <Panel><MetricList title="Device mix" items={summary?.devices.map((item) => ({ label: item.device, value: item.sessions }))} /></Panel>
         <Panel><MetricList title="Top markets" items={summary?.topCountries.map((item) => ({ label: item.country, value: item.users }))} /></Panel>
       </div>
-      <Panel className="mt-4"><MetricList title="Landing pages" items={summary?.landingPages.map((item) => ({ label: item.path, value: item.sessions }))} /></Panel>
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Panel><MetricList title="Landing pages" items={summary?.landingPages.map((item) => ({ label: item.path, value: item.sessions }))} /></Panel>
+        <Panel>
+          <MetricList
+            title="Traffic by language"
+            items={
+              summary
+                ? [
+                    { label: "English", value: summary.localeSplit.en },
+                    { label: "Arabic", value: summary.localeSplit.ar },
+                    { label: "Other", value: summary.localeSplit.other },
+                  ]
+                : undefined
+            }
+          />
+        </Panel>
+      </div>
+      {summary && <FunnelPanel funnel={summary.funnel} />}
     </>
   );
 }
 
 export default function AdminAnalyticsPage() {
-  const [timeframe, setTimeframe] = useState<Timeframe>("30d");
+  const [preset, setPreset] = useState<Preset>("30d");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+  const [asOf, setAsOf] = useState<number | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAsOf(Date.now());
+  }, []);
+
+  const range = useMemo<DateRange | null>(() => {
+    if (preset === "custom") {
+      if (customStart && customEnd && customStart <= customEnd) return { start: customStart, end: customEnd };
+      return null;
+    }
+    if (asOf === null) return null;
+    return presetRangeFromAsOf(asOf, preset);
+  }, [preset, customStart, customEnd, asOf]);
 
   return (
     <div>
       <PageHeader eyebrow="Website Analytics · GA4" title="Digital performance" subtitle="The customer journey across the Steinheim website" />
 
-      <div className="mt-8">
-        <SegmentedControl options={TIMEFRAME_OPTIONS} value={timeframe} onChange={setTimeframe} />
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <SegmentedControl options={PRESET_OPTIONS} value={preset} onChange={setPreset} />
+        {preset === "custom" && (
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={customStart}
+              max={customEnd || undefined}
+              onChange={(e) => setCustomStart(e.target.value)}
+              className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
+              aria-label="Start date"
+            />
+            <span className="text-[12px] text-white/30">to</span>
+            <input
+              type="date"
+              value={customEnd}
+              min={customStart || undefined}
+              onChange={(e) => setCustomEnd(e.target.value)}
+              className="h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-[13px] text-white outline-none focus:border-[#0a84ff]"
+              aria-label="End date"
+            />
+          </div>
+        )}
       </div>
 
-      <AnalyticsData key={timeframe} timeframe={timeframe} />
+      {range ? (
+        <AnalyticsData key={`${range.start}:${range.end}`} range={range} />
+      ) : (
+        <p className="mt-8 text-[13px] text-white/35">Pick a start and end date.</p>
+      )}
     </div>
   );
 }
