@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import ShowroomReel from "@/components/home/ShowroomReel";
 import CatalogueShowcase from "@/components/home/CatalogueShowcase";
+import CampaignBanner from "@/components/home/CampaignBanner";
 import TradeSetupOpenButton from "@/components/trade/TradeSetupOpenButton";
 import AutoplayVideo from "@/components/ui/AutoplayVideo";
 import { useAutoplayVideo } from "@/lib/useAutoplayVideo";
@@ -221,6 +222,7 @@ export default function GessiInspiredHome() {
 
   return (
     <div className="bg-[#ece9e2] text-[#0a0a0a] text-start">
+      <CampaignBanner />
       <section ref={heroSectionRef} className="relative h-svh min-h-[760px] overflow-hidden bg-black text-white">
         <motion.div style={{ y: heroVideoY, scale: heroVideoScale }} className="absolute inset-x-0 -top-[8%] h-[116%] origin-center">
           <Image

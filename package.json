@@ -15,6 +15,7 @@
     "test": "vitest run",
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
+    "perf:budget": "playwright test e2e/perf-budget.spec.ts e2e/pwa.spec.ts",
     "analyze": "next experimental-analyze",
     "analyze:webpack": "cross-env ANALYZE=true next build --webpack && node -e \"require('fs').rmSync('.next/dev',{recursive:true,force:true})\""
   },
