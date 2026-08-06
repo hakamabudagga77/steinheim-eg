@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { routing } from "@/i18n/routing";
 import SiteShell from "@/components/layout/SiteShell";
+import ServiceWorkerRegister from "@/components/layout/ServiceWorkerRegister";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import WebVitals from "@/components/analytics/WebVitals";
 import AttributionCapture from "@/components/analytics/AttributionCapture";
@@ -152,6 +153,7 @@ export default async function LocaleLayout({
         <GoogleAnalytics />
         <WebVitals />
         <AttributionCapture />
+        <ServiceWorkerRegister />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteShell locale={locale}>{children}</SiteShell>
         </NextIntlClientProvider>
