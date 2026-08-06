@@ -196,6 +196,42 @@ and the performance gate are all shipped.
 
 ---
 
+## 2026-08-06 - Closing wave: Next 16.3.0, framework-example cleanup, no-code campaigns & live-aware assistant
+
+Two pull requests merged to `main`, each green on lint, typecheck, the full
+unit suite, the production build, and Playwright E2E:
+
+- **PR #100 - Adopt Next 16.3.0, remove framework example routes.** Deleted
+  the leftover diagnostic pages `app/[locale]/sentry-example-page/` and
+  `app/api/sentry-example-api/` (plus their `robots.txt` disallows) — Sentry
+  capture keeps running via `instrumentation.ts`/`instrumentation-client.ts`.
+  Upgraded `next`, `eslint-config-next`, and `@next/bundle-analyzer` to
+  `16.3.0`. TS7 and ESLint 10 stay deferred: the preset still pins
+  `typescript-eslint ^8.46.0` and `eslint-plugin-react ^7.37.0`
+  (`docs/UPGRADES.md` §3). A stale `.next` type layer referenced the deleted
+  pages, so `.next` was cleared before typecheck.
+- **PR #101 - No-code campaign manager + live-aware assistant.** Campaigns
+  stopped being code. `lib/campaigns.ts` now models self-contained
+  `CampaignRecord`s (id, enabled, inclusive date window, link, EN+AR copy);
+  `lib/server/campaign-store.ts` persists them on the shared Redis-hash +
+  local-file store (with a new `remove()` in `lib/server/redis-json-store.ts`)
+  and falls back to the shipped seeds while empty. The new `/admin/campaigns`
+  page (nav item + command palette) adds/edits/pauses/deletes campaigns with
+  date inputs and bilingual copy fields — no deploy needed to run one. The
+  home banner became client-side and resolves `GET /api/campaigns/active`
+  (degrading to `campaign: null` on any error so the page can never break).
+  The now-dead `campaigns` i18n namespace was removed from both message
+  files. The assistant is now price/inventory-aware: `answerSteinheimQuestion`
+  accepts a `LiveLookup` wired to `getAllLiveData()` (5-min Redis cache), so
+  it quotes the live price/stock instead of the catalogue reference when data
+  exists and stays honest otherwise; the AI path receives a live snapshot via
+  `streamAssistant(..., liveNote)`.
+
+This wave closed the last three items under `PROJECT_MAP.md`'s
+[ORPHANS & PENDING]; the innovation track is fully closed.
+
+---
+
 ## Roadmap - the excellence track
 
 All work respects the brand system: cream `#ece9e2`, charcoal `#0a0a0a`,
@@ -253,5 +289,5 @@ identity - it makes the experience underneath it sharper.
 ### 7. Contrast (P2, WCAG-driven) - SHIPPED (PR #93)
 - Raise meaningful small labels from `/25`-`/35` opacity to at least `/45`,
   keeping decorative text where it is. Done.
-_Last verified: 2026-08-06 - all checks green on `main` at `78e9793` (after the innovation track PRs #97-#99)._
+_Last verified: 2026-08-06 - all checks green on `main` at `948ea19` (after the closing wave PRs #100-#101; innovation track fully closed)._
 

@@ -1,12 +1,12 @@
 # PROJECT_MAP — Steinheim Egypt Storefront
 
-> Live document. Updated every delivery wave. Last verified: 2026-08-06, `main` @ `78e9793` (PRs #97-#99).
+> Live document. Updated every delivery wave. Last verified: 2026-08-06, `main` @ `948ea19` (PRs #97-#101).
 
 ## [TECH_STACK]
 
 | Layer | Choice | Version (pinned) | Latest stable (2026-08-06) | Status |
 |---|---|---|---|---|
-| Framework | Next.js (App Router) | 16.2.12 | 16.3.0 | Pinned; upgrade candidate → [ORPHANS & PENDING] |
+| Framework | Next.js (App Router) | 16.3.0 | 16.3.0 | Current |
 | UI | React / react-dom | 19.2.8 | 19.2.8 | Current |
 | Styling | Tailwind CSS v4 (+ `@tailwindcss/postcss`) | ^4 | 4.3.3 | Current |
 | Motion | framer-motion | ^12.43.0 | 13.0.0 | Minor upgrade available |
@@ -22,7 +22,7 @@
 | Errors | @sentry/nextjs | ^10.69.0 | 10.69.0 | Current |
 | Cache/data | Redis (Vercel KV) + Shopify Storefront API | — | — | Current |
 | Language | TypeScript | ^5 | — | Current |
-| Tests | Vitest (218 unit), Playwright (e2e), k6 (load) | ^4.1 / ^1.62 | — | Current |
+| Tests | Vitest (249 unit), Playwright (e2e), k6 (load) | ^4.1 / ^1.62 | — | Current |
 
 Gates: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build` (all green on `main`).
 
@@ -85,13 +85,9 @@ Principles: brand-locked (cream `#ece9e2`, charcoal `#0a0a0a`, italic serif head
 
 ## [ORPHANS & PENDING]
 
-> Innovation track — Waves #97/#98/#99 shipped 2026-08-06: Designer Concierge,
-> Delivery Promise, installable PWA + offline shell, seasonal campaigns engine,
-> and the performance budget gate. The list below is what remains open.
-
-- `app/[locale]/sentry-example-page/` + `app/api/sentry-example-api/` — leftover framework examples (UI dead-ends). Candidate for removal or conversion to a real status page.
-- Next.js `16.2.12` pinned vs `16.3.0` stable — deliberate hold until 16.3.0 is exercised; check UPGRADES.md before bumping.
-- Assistant `brain: "catalog-rules-v1"` is deterministic; no price/inventory-aware retrieval path when live data changes outside the master catalog.
+> Innovation track — Waves #97/#98/#99 shipped 2026-08-06, then #100/#101 on the
+> same day closed every remaining open item below. The innovation track is now
+> fully closed: nothing under this heading remains open.
 
 ### Closed by the innovation track
 - ~~PWA/installability absent~~ — DONE (PR #98): `app/manifest.ts`, `public/sw.js`, brand icons via `scripts/generate-icons.mjs`, verified by `e2e/pwa.spec.ts`.
@@ -99,3 +95,6 @@ Principles: brand-locked (cream `#ece9e2`, charcoal `#0a0a0a`, italic serif head
 - ~~Delivery promise absent~~ — DONE (PR #97): `lib/delivery.ts` 27-governorate ETA matrix (AR/EN names) + `DeliveryPromise` UI + `OfferShippingDetails` in product schema.
 - ~~Seasonal merchandising absent~~ — DONE (PR #99): `lib/campaigns.ts` date engine + `CampaignBanner` + `campaigns` i18n.
 - ~~Performance budget CI gate absent~~ — DONE (PR #99): `e2e/perf-budget.spec.ts` LCP budgets + `npm run perf:budget`.
+- ~~`sentry-example-page` / `sentry-example-api` leftover framework examples~~ — DONE (PR #100): removed both routes + `robots.txt` disallows; Sentry capture via `instrumentation.ts`/`instrumentation-client.ts` stays.
+- ~~Next.js `16.2.12` pinned vs `16.3.0`~~ — DONE (PR #100): adopted `next`/`eslint-config-next`/`@next/bundle-analyzer` 16.3.0; TS7 + ESLint10 still blocked by the preset (UPGRADES.md §3).
+- ~~Assistant has no price/inventory-aware retrieval~~ — DONE (PR #101): `answerSteinheimQuestion` accepts a `LiveLookup` wired to `getAllLiveData()` (5-min Redis cache); live price/stock override the catalogue reference, AI path gets a live snapshot, honest fallbacks otherwise. No-code campaign manager shipped in the same PR: `lib/server/campaign-store.ts` + `/admin/campaigns` + `/api/campaigns/active`.
