@@ -290,6 +290,7 @@ export interface GA4Realtime {
   activeUsers: number;
   byCountry: Array<{ country: string; code: string; users: number }>;
   byDevice: Array<{ device: string; users: number }>;
+  nowViewing: Array<{ page: string; users: number }>;
 }
 
 const REALTIME_CACHE_TTL_MS = 10_000;
@@ -308,14 +309,17 @@ export async function fetchGA4Realtime(): Promise<GA4Realtime> {
   const client = getClient();
   const property = propertyPath();
 
-  const [totals, byCountry, byDevice] = await Promise.all([
+  const [totals, byCountry, byDevice, byPage] = await Promise.all([
     client.runRealtimeReport({ property, metrics: [{ name: "activeUsers" }] }),
     client.runRealtimeReport({
       property,
       dimensions: [{ name: "country" }, { name: "countryId" }],
       metrics: [{ name: "activeUsers" }],
       orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
-      limit: 8,
+      // Higher than the other realtime breakdowns -- this feeds dots on the
+      // globe, not just a short list, so a wider spread of markers is worth
+      // it even though most of these will be 1-2 users at our traffic level.
+      limit: 20,
     }),
     client.runRealtimeReport({
       property,
@@ -323,6 +327,16 @@ export async function fetchGA4Realtime(): Promise<GA4Realtime> {
       metrics: [{ name: "activeUsers" }],
       orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
       limit: 5,
+    }),
+    // unifiedScreenName is GA4's realtime-safe stand-in for "which page" --
+    // the historical API's pagePath dimension isn't available on realtime
+    // reports, so this reads the collected page title instead.
+    client.runRealtimeReport({
+      property,
+      dimensions: [{ name: "unifiedScreenName" }],
+      metrics: [{ name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+      limit: 6,
     }),
   ]);
 
@@ -337,6 +351,14 @@ export async function fetchGA4Realtime(): Promise<GA4Realtime> {
       device: row.dimensionValues?.[0]?.value || "unknown",
       users: Number(row.metricValues?.[0]?.value ?? 0),
     })),
+    nowViewing: (byPage[0].rows ?? [])
+      .map((row) => ({
+        page: row.dimensionValues?.[0]?.value || "Unknown page",
+        users: Number(row.metricValues?.[0]?.value ?? 0),
+      }))
+      // GA4 reports "(not set)" for screens it couldn't title -- not useful
+      // to show in a "what people are looking at" list.
+      .filter((row) => row.page !== "(not set)"),
   };
 
   realtimeCache = { data, fetchedAt: Date.now() };
