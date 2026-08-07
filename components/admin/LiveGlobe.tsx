@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { WORLD_MAP_DATA_URI } from "@/lib/world-map-texture";
 
 export interface GlobeMarker {
   /** [latitude, longitude] in degrees. */
@@ -15,13 +16,10 @@ interface Vec3 {
   z: number;
 }
 
-// Evenly distributes `count` points across a unit sphere -- this is the
-// dot-map texture, drawn ourselves in Canvas 2D instead of depending on
-// cobe/WebGL (see LiveGlobe history: the WebGL dot-map layer silently
-// failed to paint in this project's preview browser while everything else
-// about that render path worked, and a from-scratch canvas globe sidesteps
-// the mystery entirely rather than depending on a black-box shader/texture
-// pipeline actually painting).
+// Evenly distributes `count` points across a unit sphere. Generated at a
+// much higher density than we intend to actually show -- see
+// buildLandPoints() below, which keeps only the fraction that land on
+// actual landmass once the world-map image decodes.
 function fibonacciSphere(count: number): Vec3[] {
   const points: Vec3[] = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -56,17 +54,70 @@ function project(p: Vec3, phi: number, tilt: number): Vec3 {
   return { x, y: p.y * cosT - zRot * sinT, z: p.y * sinT + zRot * cosT };
 }
 
-const BASE_POINTS = fibonacciSphere(650);
+const RAW_POINTS = fibonacciSphere(2600);
 const TILT = 0.42;
+const LAND_THRESHOLD = 120; // 0-255 on the map's red channel
+
+// Loads the world-map silhouette once, samples it for every raw sphere
+// point, and resolves to only the points that land on actual landmass --
+// this is what makes the globe trace real continents instead of an evenly
+// scattered dot field. Runs entirely in Canvas 2D (image decode + pixel
+// read), no WebGL involved.
+function buildLandPoints(): Promise<Vec3[]> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const off = document.createElement("canvas");
+      off.width = img.naturalWidth;
+      off.height = img.naturalHeight;
+      const octx = off.getContext("2d");
+      if (!octx) {
+        resolve([]);
+        return;
+      }
+      octx.drawImage(img, 0, 0);
+      const { data, width, height } = octx.getImageData(0, 0, off.width, off.height);
+
+      const land: Vec3[] = [];
+      for (const p of RAW_POINTS) {
+        const lat = (Math.asin(Math.max(-1, Math.min(1, p.y))) * 180) / Math.PI;
+        const lng = (Math.atan2(p.x, p.z) * 180) / Math.PI;
+        const u = (lng + 180) / 360;
+        const v = (90 - lat) / 180;
+        const px = Math.min(width - 1, Math.max(0, Math.floor(u * width)));
+        const py = Math.min(height - 1, Math.max(0, Math.floor(v * height)));
+        const brightness = data[(py * width + px) * 4]; // red channel of a greyscale mask
+        if (brightness > LAND_THRESHOLD) land.push(p);
+      }
+      resolve(land);
+    };
+    img.onerror = () => resolve([]);
+    img.src = WORLD_MAP_DATA_URI;
+  });
+}
 
 export default function LiveGlobe({ markers }: { markers: GlobeMarker[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phiRef = useRef(4.9); // starting angle roughly centered on Europe/Africa/Middle East
   const markersRef = useRef<GlobeMarker[]>(markers);
+  // Starts as the full even scatter so the globe isn't blank for the one
+  // frame before the land mask resolves; buildLandPoints() overwrites this
+  // with the real continent-traced set once the image decodes.
+  const dotsRef = useRef<Vec3[]>(RAW_POINTS);
 
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
+
+  useEffect(() => {
+    let cancelled = false;
+    buildLandPoints().then((land) => {
+      if (!cancelled && land.length > 0) dotsRef.current = land;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,15 +162,15 @@ export default function LiveGlobe({ markers }: { markers: GlobeMarker[] }) {
       ctx.fillStyle = shade;
       ctx.fill();
 
-      for (const p of BASE_POINTS) {
+      for (const p of dotsRef.current) {
         const proj = project(p, phi, TILT);
         if (proj.z <= 0.02) continue; // back-facing half of the sphere -- hidden
         const sx = cx + proj.x * r;
         const sy = cy - proj.y * r;
         const depth = (proj.z + 1) / 2;
         ctx.beginPath();
-        ctx.arc(sx, sy, (0.65 + depth * 1) * dpr, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(205,214,228,${(0.12 + depth * 0.32).toFixed(3)})`;
+        ctx.arc(sx, sy, (0.6 + depth * 0.9) * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(205,214,228,${(0.2 + depth * 0.45).toFixed(3)})`;
         ctx.fill();
       }
 
