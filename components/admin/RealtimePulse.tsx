@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { Marker } from "cobe";
+import type { GlobeMarker } from "./LiveGlobe";
 import { Panel } from "@/components/admin/ui";
 import { flagEmoji } from "@/app/admin/(dashboard)/analytics-summary-helpers";
 import { countryCentroid } from "@/lib/country-centroids";
 
-// cobe renders to a WebGL canvas -- keep it out of the server bundle and
-// out of every admin page's initial JS, since only the Analytics page's
-// full realtime panel needs it.
+// LiveGlobe animates a canvas on every frame -- keep it out of the server
+// bundle and out of every admin page's initial JS, since only the
+// Analytics page's full realtime panel needs it.
 const LiveGlobe = dynamic(() => import("./LiveGlobe"), {
   ssr: false,
   loading: () => <div className="mx-auto aspect-square w-full max-w-[280px] animate-pulse rounded-full bg-white/[0.04]" />,
@@ -85,15 +85,15 @@ function markerSize(users: number) {
 export default function RealtimePulse({ variant }: { variant: "compact" | "full" }) {
   const { data, error } = useRealtime();
 
-  const markers = useMemo<Marker[]>(() => {
+  const markers = useMemo<GlobeMarker[]>(() => {
     if (!data) return [];
     return data.byCountry
       .map((c) => {
         const centroid = countryCentroid(c.code);
         if (!centroid) return null;
-        return { location: centroid, size: markerSize(c.users) } satisfies Marker;
+        return { location: centroid, size: markerSize(c.users) } satisfies GlobeMarker;
       })
-      .filter((m): m is Marker => m !== null);
+      .filter((m): m is GlobeMarker => m !== null);
   }, [data]);
 
   if (variant === "compact") {

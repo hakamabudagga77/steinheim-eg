@@ -1,28 +1,69 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import createGlobe, { type COBEOptions, type Marker } from "cobe";
 
-// cobe's shipped .d.ts omits `onRender`, even though the runtime requires it
-// for any rotation/marker updates (see README) -- extending the type locally
-// rather than reaching for `as any` on the whole options object.
-type GlobeOptions = COBEOptions & { onRender: (state: Record<string, unknown>) => void };
+export interface GlobeMarker {
+  /** [latitude, longitude] in degrees. */
+  location: [number, number];
+  /** Relative size, roughly 0.03-0.15 -- see markerSize() in RealtimePulse.tsx. */
+  size: number;
+}
 
-/**
- * Realtime visitor globe. Markers are pushed in via a ref and re-applied
- * every animation frame inside onRender -- this is the standard cobe
- * pattern for a globe whose data updates over time (our 30s realtime poll)
- * without tearing down and recreating the WebGL context on every refresh,
- * which would flash/reset the rotation.
- */
-export default function LiveGlobe({ markers }: { markers: Marker[] }) {
+interface Vec3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+// Evenly distributes `count` points across a unit sphere -- this is the
+// dot-map texture, drawn ourselves in Canvas 2D instead of depending on
+// cobe/WebGL (see LiveGlobe history: the WebGL dot-map layer silently
+// failed to paint in this project's preview browser while everything else
+// about that render path worked, and a from-scratch canvas globe sidesteps
+// the mystery entirely rather than depending on a black-box shader/texture
+// pipeline actually painting).
+function fibonacciSphere(count: number): Vec3[] {
+  const points: Vec3[] = [];
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < count; i++) {
+    const y = 1 - (i / (count - 1)) * 2;
+    const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = goldenAngle * i;
+    points.push({ x: Math.cos(theta) * radiusAtY, y, z: Math.sin(theta) * radiusAtY });
+  }
+  return points;
+}
+
+function latLngToVec3([lat, lng]: [number, number]): Vec3 {
+  const latRad = (lat * Math.PI) / 180;
+  const lngRad = (lng * Math.PI) / 180;
+  return {
+    x: Math.cos(latRad) * Math.sin(lngRad),
+    y: Math.sin(latRad),
+    z: Math.cos(latRad) * Math.cos(lngRad),
+  };
+}
+
+// Rotate around the vertical (Y) axis for auto-spin, then tilt around X for
+// a nicer three-quarter viewing angle -- standard orthographic globe setup.
+function project(p: Vec3, phi: number, tilt: number): Vec3 {
+  const cosPhi = Math.cos(phi);
+  const sinPhi = Math.sin(phi);
+  const x = p.x * cosPhi + p.z * sinPhi;
+  const zRot = -p.x * sinPhi + p.z * cosPhi;
+  const cosT = Math.cos(tilt);
+  const sinT = Math.sin(tilt);
+  return { x, y: p.y * cosT - zRot * sinT, z: p.y * sinT + zRot * cosT };
+}
+
+const BASE_POINTS = fibonacciSphere(650);
+const TILT = 0.42;
+
+export default function LiveGlobe({ markers }: { markers: GlobeMarker[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phiRef = useRef(4.9); // starting angle roughly centered on Europe/Africa/Middle East
-  const markersRef = useRef<Marker[]>(markers);
+  const markersRef = useRef<GlobeMarker[]>(markers);
 
-  // Keep the ref current without writing to it during render (see
-  // react-hooks/refs) -- onRender below reads markersRef every frame, so
-  // this is what makes a fresh realtime poll actually reach the globe.
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
@@ -30,72 +71,94 @@ export default function LiveGlobe({ markers }: { markers: Marker[] }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    let width = canvas.offsetWidth;
-    const onResize = () => {
-      if (canvas) width = canvas.offsetWidth;
-    };
-    window.addEventListener("resize", onResize);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let size = canvas.offsetWidth;
 
-    const options: GlobeOptions = {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
-      phi: phiRef.current,
-      theta: 0.32,
-      dark: 1,
-      diffuse: 1.2,
-      mapSamples: 14000,
-      // A dark theme still needs real contrast between the dot-map and the
-      // panel background, or the sphere itself disappears and only the
-      // markers are visible -- this brightness/base pairing keeps the globe
-      // legibly grey against the panel's near-black without going stark.
-      mapBrightness: 7,
-      // With dark:1, cobe's dot brightness comes from sampling its built-in
-      // world-map texture, which loads async and is 0 (invisible) until it
-      // resolves. mapBaseBrightness sets a brightness floor that doesn't
-      // depend on that texture, so the sphere itself is never invisible in
-      // environments where texture decode is slow or unavailable -- it
-      // still lets the map brighten further over landmasses once loaded.
-      mapBaseBrightness: 0.45,
-      baseColor: [0.42, 0.42, 0.48],
-      markerColor: [10 / 255, 132 / 255, 1],
-      glowColor: [0.25, 0.45, 0.7],
-      markers: markersRef.current,
-      onRender: (state) => {
-        // Slow, continuous auto-rotation; state.markers is re-read from the
-        // ref every frame so a fresh realtime poll updates the globe in
-        // place instead of needing globe.update() + a visible reset.
-        phiRef.current += 0.0025;
-        state.phi = phiRef.current;
-        state.width = width * 2;
-        state.height = width * 2;
-        state.markers = markersRef.current;
-      },
-    };
-    const globe = createGlobe(canvas, options);
+    function resize() {
+      if (!canvas) return;
+      size = canvas.offsetWidth;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    let raf = 0;
+    function draw() {
+      if (!canvas || !ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = w * 0.47;
+
+      phiRef.current += 0.0025;
+      const phi = phiRef.current;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Sphere shading -- a soft lit-from-upper-left gradient gives the dot
+      // field an actual sense of volume instead of reading as flat confetti.
+      const shade = ctx.createRadialGradient(cx - r * 0.32, cy - r * 0.36, r * 0.08, cx, cy, r);
+      shade.addColorStop(0, "rgba(76,96,128,0.4)");
+      shade.addColorStop(0.55, "rgba(28,30,38,0.55)");
+      shade.addColorStop(1, "rgba(8,8,11,0.8)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = shade;
+      ctx.fill();
+
+      for (const p of BASE_POINTS) {
+        const proj = project(p, phi, TILT);
+        if (proj.z <= 0.02) continue; // back-facing half of the sphere -- hidden
+        const sx = cx + proj.x * r;
+        const sy = cy - proj.y * r;
+        const depth = (proj.z + 1) / 2;
+        ctx.beginPath();
+        ctx.arc(sx, sy, (0.65 + depth * 1) * dpr, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(205,214,228,${(0.12 + depth * 0.32).toFixed(3)})`;
+        ctx.fill();
+      }
+
+      for (const m of markersRef.current) {
+        const proj = project(latLngToVec3(m.location), phi, TILT);
+        if (proj.z <= -0.04) continue; // hide once it's rotated well past the limb
+        const sx = cx + proj.x * r;
+        const sy = cy - proj.y * r;
+        const depth = Math.max(0.35, (proj.z + 1) / 2);
+        const markerSize = (3.2 + m.size * 14) * dpr * depth;
+        ctx.save();
+        ctx.shadowColor = "rgba(10,132,255,0.85)";
+        ctx.shadowBlur = 9 * dpr;
+        ctx.beginPath();
+        ctx.arc(sx, sy, markerSize, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(56,150,255,0.95)";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.lineWidth = 1.25 * dpr;
+      ctx.strokeStyle = "rgba(130,155,190,0.22)";
+      ctx.stroke();
+
+      raf = requestAnimationFrame(draw);
+    }
+    raf = requestAnimationFrame(draw);
 
     return () => {
-      globe.destroy();
-      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[280px]">
-      {/* Static CSS backdrop, always present behind the canvas -- if WebGL
-          is unsupported/disabled/slow on a visitor's browser, this alone
-          still reads as "a globe" instead of an empty box. The canvas draws
-          on top of it once (if) the real render kicks in. */}
-      <div
-        className="absolute inset-[6%] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle at 32% 28%, rgba(120,150,190,0.35), rgba(30,32,40,0.9) 55%, rgba(10,10,13,0.95) 78%)",
-          boxShadow: "inset 0 0 40px rgba(0,0,0,0.6), 0 0 40px rgba(10,132,255,0.08)",
-        }}
-      />
-      <canvas ref={canvasRef} className="relative h-full w-full" style={{ contain: "layout paint size" }} />
+    <div className="mx-auto aspect-square w-full max-w-[280px]">
+      <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );
 }
