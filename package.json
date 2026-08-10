@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
-    "@google-analytics/data": "^6.1.0",
+    "@google-analytics/data": "^7.0.0",
     "@sentry/nextjs": "^10.69.0",
     "@swc/helpers": "0.5.23",
     "@vercel/speed-insights": "^2.0.0",
