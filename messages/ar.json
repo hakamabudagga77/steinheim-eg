@@ -1294,7 +1294,8 @@
       "availability": "التوفر",
       "inStockOnly": "المتوفر فقط",
       "clearAll": "مسح الكل",
-      "showResults": "{count, plural, zero {عرض المنتجات} one {عرض منتج واحد} two {عرض منتجين} few {عرض # منتجات} many {عرض # منتجًا} other {عرض # منتج}}"
+      "showResults": "{count, plural, zero {عرض المنتجات} one {عرض منتج واحد} two {عرض منتجين} few {عرض # منتجات} many {عرض # منتجًا} other {عرض # منتج}}",
+      "category": "المكان"
     },
     "types": {
       "basin-mixer": "خلاطات مغاسل",
@@ -1313,6 +1314,10 @@
       "3000-10000": "3,000 – 10,000 جنيه",
       "10000-20000": "10,000 – 20,000 جنيه",
       "20000-plus": "أكثر من 20,000 جنيه"
+    },
+    "categories": {
+      "bathroom": "حمام",
+      "kitchen": "مطبخ"
     }
   },
   "shopByNeed": {
