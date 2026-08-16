@@ -1328,7 +1328,8 @@
       "availability": "Availability",
       "inStockOnly": "In stock only",
       "clearAll": "Clear all",
-      "showResults": "{count, plural, one {Show # product} other {Show # products}}"
+      "showResults": "{count, plural, one {Show # product} other {Show # products}}",
+      "category": "Room"
     },
     "types": {
       "basin-mixer": "Basin Mixers",
@@ -1347,6 +1348,10 @@
       "3000-10000": "EGP 3,000 – 10,000",
       "10000-20000": "EGP 10,000 – 20,000",
       "20000-plus": "EGP 20,000+"
+    },
+    "categories": {
+      "bathroom": "Bathroom",
+      "kitchen": "Kitchen"
     }
   },
   "shopByNeed": {

@@ -9,7 +9,16 @@ import { Link } from "@/i18n/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import PageTransition from "@/components/layout/PageTransition";
 import { getFinishDiscImage } from "@/data/images";
-import { getAllFinishes, getAllProducts, getAllSeries, getProductTypes, getSeriesById, type Product } from "@/lib/utils";
+import {
+  getAllFinishes,
+  getAllProducts,
+  getAllSeries,
+  getAvailableCategories,
+  getProductCategory,
+  getProductTypes,
+  getSeriesById,
+  type Product,
+} from "@/lib/utils";
 
 type LiveVariant = { finish: string; price: number; inventory: number; inStock: boolean };
 type LiveData = Record<string, { variants: LiveVariant[] }>;
@@ -84,10 +93,14 @@ export default function AllProductsPage() {
   const allSeries = useMemo(() => getAllSeries(), []);
   const allFinishes = useMemo(() => getAllFinishes(), []);
   const allTypes = useMemo(() => getProductTypes(), []);
+  // Only rendered when the catalogue actually holds more than one category, so
+  // the filter never shows up as a single dead pill.
+  const allCategories = useMemo(() => getAvailableCategories(), []);
 
   const [liveData, setLiveData] = useState<LiveData>({});
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("featured");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [selectedFinishes, setSelectedFinishes] = useState<string[]>([]);
@@ -114,6 +127,7 @@ export default function AllProductsPage() {
     selectedSeries.length + selectedTypes.length + selectedFinishes.length + (priceBracket ? 1 : 0) + (inStockOnly ? 1 : 0);
 
   function clearAllFilters() {
+    setSelectedCategories([]);
     setSelectedSeries([]);
     setSelectedTypes([]);
     setSelectedFinishes([]);
@@ -123,6 +137,7 @@ export default function AllProductsPage() {
 
   const filtered = useMemo(() => {
     let list = allProducts;
+    if (selectedCategories.length) list = list.filter((p) => selectedCategories.includes(getProductCategory(p)));
     if (selectedSeries.length) list = list.filter((p) => selectedSeries.includes(p.series));
     if (selectedTypes.length) list = list.filter((p) => selectedTypes.includes(p.type));
     if (selectedFinishes.length) list = list.filter((p) => p.variants.some((v) => selectedFinishes.includes(v.finish)));
@@ -141,7 +156,7 @@ export default function AllProductsPage() {
       );
     }
     return list;
-  }, [allProducts, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData, t]);
+  }, [allProducts, selectedCategories, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData, t]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -275,6 +290,22 @@ export default function AllProductsPage() {
               </div>
 
               <div data-lenis-prevent className="flex-1 overflow-y-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {allCategories.length > 1 && (
+                  <FilterSection title={t("drawer.category")}>
+                    <div className="flex flex-wrap gap-2">
+                      {allCategories.map((category) => (
+                        <CheckPill
+                          key={category}
+                          active={selectedCategories.includes(category)}
+                          onClick={() => toggle(selectedCategories, category, setSelectedCategories)}
+                        >
+                          {t(`categories.${category}`)}
+                        </CheckPill>
+                      ))}
+                    </div>
+                  </FilterSection>
+                )}
+
                 <FilterSection title={t("drawer.collection")}>
                   <div className="flex flex-wrap gap-2">
                     {allSeries.map((series) => (

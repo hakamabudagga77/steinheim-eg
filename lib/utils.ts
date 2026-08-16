@@ -39,6 +39,32 @@ export function formatPrice(price: number, currency = "LE"): string {
   return `${currency} ${price.toLocaleString("en-US")}`;
 }
 
+/**
+ * Which room a product belongs to. The catalogue was bathroom-only until the
+ * kitchen range, so `category` is optional in data/products.json and anything
+ * without it is a bathroom fitting — no existing product needed editing.
+ */
+export type ProductCategory = "bathroom" | "kitchen";
+
+export const PRODUCT_CATEGORIES: ProductCategory[] = ["bathroom", "kitchen"];
+
+// The Product type is inferred from the JSON, so an optional field only some
+// entries carry isn't on it. This is the one place that reads it.
+export function getProductCategory(product: Product): ProductCategory {
+  return (product as { category?: string }).category === "kitchen" ? "kitchen" : "bathroom";
+}
+
+export function getProductsByCategory(category: ProductCategory): Product[] {
+  return productsData.products.filter((p) => getProductCategory(p) === category);
+}
+
+/** Only the categories the catalogue actually contains, so the filter never
+ * offers an empty bucket. */
+export function getAvailableCategories(): ProductCategory[] {
+  const present = new Set(productsData.products.map(getProductCategory));
+  return PRODUCT_CATEGORIES.filter((category) => present.has(category));
+}
+
 export function getProductTypes(): string[] {
   const types = new Set(productsData.products.map((p) => p.type));
   return Array.from(types);
