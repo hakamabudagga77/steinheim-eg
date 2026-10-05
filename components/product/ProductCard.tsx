@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getFinishDiscImage, getProductImage, getProductImageStyle } from "@/data/images";
+import { getFinishDiscImage, getProductImage, getProductImageStyle, isShopifyProductImage } from "@/data/images";
 import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { cacheLivePrices } from "@/lib/live-prices";
 import { useCart } from "@/components/cart/CartContext";
@@ -89,6 +89,7 @@ function ProductCard({
   // Seeds the shared price cache for the quick-add path; see lib/live-prices.
   cacheLivePrices(product.slug, liveVariants);
   const imageUrl = getProductImage(product.slug, variant.finish);
+  const usesShopifyImage = isShopifyProductImage(imageUrl);
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
   const selectedRoom = roomOptions?.find((group) => group.scopeId === scopeChoice) ?? null;
@@ -110,7 +111,7 @@ function ProductCard({
         >
           <div className="relative aspect-square overflow-hidden bg-[#ece9e2]">
             <AnimatePresence mode="wait">
-              <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
+              <motion.div key={variant.finish} initial={usesShopifyImage ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: usesShopifyImage ? 1 : 0 }} transition={{ duration: usesShopifyImage ? 0 : 0.28 }} className="absolute inset-0">
                 {imageUrl ? (
                   <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${getFinishById(variant.finish)?.name ?? variant.finish}`} fill sizes="(max-width: 768px) 50vw, 33vw" style={getProductImageStyle(imageUrl)} className="object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
                 ) : (

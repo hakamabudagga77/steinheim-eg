@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getProductImage, getProductImageStyle } from "@/data/images";
+import { getProductImage, getProductImageStyle, isShopifyProductImage } from "@/data/images";
 
 describe("Shopify-generated product images", () => {
   it("uses the matching Shopify variant image for a generated product", () => {
@@ -20,5 +20,10 @@ describe("Shopify-generated product images", () => {
   it("leaves prepared local product media unchanged", () => {
     expect(getProductImageStyle("/images/products/joy/basin-mixer/chrome.png"))
       .toBeUndefined();
+  });
+
+  it("distinguishes Shopify media from prepared local assets", () => {
+    expect(isShopifyProductImage("https://cdn.shopify.com/s/files/product.png")).toBe(true);
+    expect(isShopifyProductImage("/images/products/joy/basin-mixer/chrome.png")).toBe(false);
   });
 });

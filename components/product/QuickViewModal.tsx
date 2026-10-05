@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
 import SpecTable from "@/components/product/SpecTable";
-import { getFinishDiscImage, getProductImage, getProductImageStyle } from "@/data/images";
+import { getFinishDiscImage, getProductImage, getProductImageStyle, isShopifyProductImage } from "@/data/images";
 import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
 import ProductPrice from "@/components/product/ProductPrice";
@@ -33,6 +33,7 @@ export default function QuickViewModal({
   const variant = product.variants.find((entry) => entry.finish === selectedFinish) ?? product.variants[0];
   const liveVariant = liveVariants?.find((entry) => entry.finish === variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
+  const usesShopifyImage = isShopifyProductImage(imageUrl);
   const series = getSeriesById(product.series);
   const seriesName = series?.name ?? product.series[0].toUpperCase() + product.series.slice(1);
   const finish = getFinishById(variant.finish);
@@ -68,7 +69,7 @@ export default function QuickViewModal({
 
         <div className="relative aspect-square bg-[#ece9e2] sm:aspect-auto">
           <AnimatePresence mode="wait">
-            <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
+            <motion.div key={variant.finish} initial={usesShopifyImage ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: usesShopifyImage ? 1 : 0 }} transition={{ duration: usesShopifyImage ? 0 : 0.28 }} className="absolute inset-0">
               {imageUrl ? (
                 <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`} fill sizes="(max-width: 640px) 100vw, 500px" style={getProductImageStyle(imageUrl)} className="object-contain p-[10%]" />
               ) : (
