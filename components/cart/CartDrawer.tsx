@@ -13,6 +13,7 @@ import { cacheLivePricesBulk, livePriceKey } from "@/lib/live-prices";
 import { readAttribution } from "@/lib/checkout-attribution";
 import Modal from "@/components/ui/Modal";
 import DeliveryPromise from "@/components/ui/DeliveryPromise";
+import ProductPrice from "@/components/product/ProductPrice";
 
 const WHATSAPP_NUMBER = "201223998124";
 
@@ -30,7 +31,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
   // null until the price fetch settles, so view_cart can wait for real prices
   // without a second state flag. An empty object means "fetched, nothing
   // returned" — the event still fires, on catalogue prices.
-  const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }> | null>(null);
+  const [liveData, setLiveData] = useState<Record<string, { variants: Array<{ finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean }> }> | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -81,6 +82,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
       series,
       finish: finishes.find((f) => f.id === item.finish),
       livePrice: live?.price,
+      liveCompareAtPrice: live?.compareAtPrice,
       inStock: live?.inStock,
     }];
   });
@@ -268,7 +270,7 @@ export default function CartDrawer({ locale }: { locale: string }) {
                   </div>
 
                   <div className="divide-y divide-charcoal/6">
-                    {rows.map(({ item, product, variant, series, finish, livePrice }) => {
+                    {rows.map(({ item, product, variant, series, finish, livePrice, liveCompareAtPrice }) => {
                       const img = getProductImage(product.slug, variant.finish);
                       return (
                         <motion.div
@@ -353,9 +355,13 @@ export default function CartDrawer({ locale }: { locale: string }) {
                                   </button>
                                 </div>
 
-                                <p className="text-[14px] font-medium text-charcoal">
-                                  {formatPrice((livePrice ?? variant.price) * item.quantity)}
-                                </p>
+                                <ProductPrice
+                                  price={livePrice ?? variant.price}
+                                  compareAtPrice={livePrice !== undefined ? liveCompareAtPrice : variant.compareAtPrice}
+                                  quantity={item.quantity}
+                                  className="justify-end"
+                                  priceClassName="text-[14px] font-medium text-charcoal"
+                                />
                               </div>
                             </div>
                           </div>

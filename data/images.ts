@@ -1,3 +1,5 @@
+import generatedCatalog from "@/data/shopify-catalog.generated.json";
+
 type ImageMap = Record<string, Record<string, string>>;
 
 function localProduct(series: string, product: string, finish: string) {
@@ -27,7 +29,6 @@ const productImages: ImageMap = {
   "joy-bidet-spray": buildFinishMap("joy", "bidet-spray", JOY_5),
   "joy-click-clack-waste": buildFinishMap("joy", "click-clack-waste", JOY_5),
   "joy-angle-valve": buildFinishMap("joy", "click-clack-waste", JOY_5),
-  "joy-bottle-trap": buildFinishMap("joy", "click-clack-waste", JOY_5),
 
   // UP SERIES
   "up-basin-mixer": buildFinishMap("up", "basin-mixer", UP_5),
@@ -51,6 +52,13 @@ const productImages: ImageMap = {
   "quatro-wall-mounted-basin-mixer": buildFinishMap("quatro", "wall-mounted-basin-mixer", ["chrome", "brushed-nickel", "matte-black", "brushed-gold"]),
   "quatro-concealed-shower": buildFinishMap("quatro", "concealed-shower", ["chrome", "brushed-nickel", "matte-black", "brushed-gold"]),
 };
+
+for (const [slug, images] of Object.entries(generatedCatalog.images)) {
+  productImages[slug] = {
+    ...(productImages[slug] ?? {}),
+    ...(images as Record<string, string>),
+  };
+}
 
 export const heroImage = "/images/lifestyle/wall-mounted-hero.png";
 

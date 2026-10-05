@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import productsData from "@/data/products.json";
+import { getProductBySlug, getSeriesById } from "@/lib/utils";
 import { getTradeLead } from "@/lib/server/trade-lead-store";
 import { isAdminRequest } from "@/lib/server/admin-session";
 
@@ -66,7 +66,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!lead) return Response.json({ error: "Not found." }, { status: 404 });
 
   const rows = lead.project.items.flatMap((item) => {
-    const product = productsData.products.find((p) => p.slug === item.slug);
+    const product = getProductBySlug(item.slug);
     const variant = product?.variants.find((v) => v.finish === item.finish);
     if (!product || !variant) return [];
     return [{ product, variant, quantity: item.quantity, lineTotal: variant.price * item.quantity }];
@@ -167,7 +167,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   for (const row of rows) {
     if (y < 140) break; // prototype: keep to one page
-    const series = productsData.series.find((s) => s.id === row.product.series);
+    const series = getSeriesById(row.product.series);
     const label = `${series?.name ?? row.product.series} ${row.product.name} — ${row.variant.finish} (${row.variant.model})`;
     const wrapped = wrapText(label, helvetica, 9, 310);
     page.drawText(wrapped[0], { x: MARGIN + 6, y, size: 9, font: helvetica, color: DARK_GRAY });

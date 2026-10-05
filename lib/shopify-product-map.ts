@@ -1,4 +1,5 @@
 import type { ShopifyProduct } from "./shopify-client";
+import generatedCatalog from "@/data/shopify-catalog.generated.json";
 
 const FINISH_ALIASES: Record<string, string> = {
   "chrome": "Chrome",
@@ -7,9 +8,10 @@ const FINISH_ALIASES: Record<string, string> = {
   "brushed-gold": "Brushed Gold",
   "coffee-gold": "Coffee Gold",
   "metal-gun": "Gun Metal Grey",
+  ...(generatedCatalog.finishAliases as Record<string, string>),
 };
 
-const SLUG_TO_HANDLE: Record<string, string> = {
+const CURATED_SLUG_TO_HANDLE: Record<string, string> = {
   "art-basin-mixer": "art-basin-mixer-w-o-puw",
   "art-tall-basin-mixer": "art-tall-basin-mixer-w-o-puw",
   "art-wall-mounted-basin-mixer": "art-wall-mounted-mixer-two-hole-basn",
@@ -25,7 +27,6 @@ const SLUG_TO_HANDLE: Record<string, string> = {
   "joy-bidet-spray": "joy-abidet-spray",
   "joy-click-clack-waste": "steinheim-click-clack-waste-for-basin-without-overflow",
   "joy-angle-valve": "steinheim-angle-valve-1-2-x-1-2-brass",
-  "joy-bottle-trap": "",
   "up-basin-mixer": "up-single-lever-basin-mixer",
   "up-tall-basin-mixer": "up-single-lever-tall-basin-mixer",
   "up-wall-mounted-basin-mixer": "up-single-wall-mounted-mixer",
@@ -37,6 +38,11 @@ const SLUG_TO_HANDLE: Record<string, string> = {
   "quatro-tall-basin-mixer": "quatro-single-lever-tall-basin-mixer",
   "quatro-wall-mounted-basin-mixer": "quatro-quatro-wall-mounted-basin-mixer",
   "quatro-concealed-shower": "quatro-concealed-bath-shower-set",
+};
+
+const SLUG_TO_HANDLE: Record<string, string> = {
+  ...CURATED_SLUG_TO_HANDLE,
+  ...(generatedCatalog.handles as Record<string, string>),
 };
 
 export function resolveVariantId(

@@ -1,10 +1,12 @@
 import { fetchAllProducts, type ShopifyProduct } from "./shopify-client";
 import { SLUG_TO_HANDLE, FINISH_ALIASES } from "./shopify-product-map";
 import { redisGet, redisSetEx, redisDel } from "@/lib/server/redis";
+import { validCompareAtPrice } from "@/lib/discount-pricing";
 
 export interface LiveVariantData {
   finish: string;
   price: number;
+  compareAtPrice: number | null;
   inventory: number;
   inStock: boolean;
 }
@@ -52,6 +54,23 @@ const FINISH_REVERSE: Record<string, string> = Object.fromEntries(
   Object.entries(FINISH_ALIASES).map(([local, shopify]) => [shopify.toLowerCase(), local])
 );
 
+function toLiveVariant(variant: ShopifyProduct["variants"][number]): LiveVariantData {
+  const shopifyFinish = (variant.option1 ?? "").toLowerCase();
+  const finish = FINISH_REVERSE[shopifyFinish] ?? shopifyFinish.replace(/\s+/g, "-");
+  const price = Number.parseFloat(variant.price);
+  const rawCompareAtPrice = variant.compare_at_price
+    ? Number.parseFloat(variant.compare_at_price)
+    : null;
+
+  return {
+    finish,
+    price,
+    compareAtPrice: validCompareAtPrice(price, rawCompareAtPrice),
+    inventory: variant.inventory_quantity,
+    inStock: variant.inventory_quantity > 0,
+  };
+}
+
 export async function getLiveProductData(slug: string): Promise<LiveProductData | null> {
   const handle = SLUG_TO_HANDLE[slug];
   if (!handle) return null;
@@ -61,16 +80,7 @@ export async function getLiveProductData(slug: string): Promise<LiveProductData 
     const shopifyProduct = products.find((p) => p.handle === handle);
     if (!shopifyProduct) return null;
 
-    const variants: LiveVariantData[] = shopifyProduct.variants.map((v) => {
-      const shopifyFinish = (v.option1 ?? "").toLowerCase();
-      const localFinish = FINISH_REVERSE[shopifyFinish] ?? shopifyFinish.replace(/\s+/g, "-");
-      return {
-        finish: localFinish,
-        price: parseFloat(v.price),
-        inventory: v.inventory_quantity,
-        inStock: v.inventory_quantity > 0,
-      };
-    });
+    const variants = shopifyProduct.variants.map(toLiveVariant);
 
     return { slug, variants };
   } catch (error) {
@@ -90,16 +100,7 @@ export async function getAllLiveData(): Promise<Map<string, LiveProductData>> {
       const shopifyProduct = products.find((p) => p.handle === handle);
       if (!shopifyProduct) continue;
 
-      const variants: LiveVariantData[] = shopifyProduct.variants.map((v) => {
-        const shopifyFinish = (v.option1 ?? "").toLowerCase();
-        const localFinish = FINISH_REVERSE[shopifyFinish] ?? shopifyFinish.replace(/\s+/g, "-");
-        return {
-          finish: localFinish,
-          price: parseFloat(v.price),
-          inventory: v.inventory_quantity,
-          inStock: v.inventory_quantity > 0,
-        };
-      });
+      const variants = shopifyProduct.variants.map(toLiveVariant);
 
       map.set(slug, { slug, variants });
     }

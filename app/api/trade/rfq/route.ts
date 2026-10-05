@@ -1,8 +1,8 @@
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import productsData from "@/data/products.json";
-import finishesData from "@/data/finishes.json";
+import { getProductImage } from "@/data/images";
+import { getFinishById, getProductBySlug, getSeriesById, type Finish, type Product, type Variant } from "@/lib/utils";
 import { sanitizeTradeProject, type TradeProject } from "@/lib/trade-project";
 import { checkRateLimit } from "@/lib/server/rate-limit";
 
@@ -22,9 +22,9 @@ const MARGIN = 48;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 
 interface ResolvedItem {
-  product: (typeof productsData.products)[number];
-  variant: (typeof productsData.products)[number]["variants"][number];
-  finish: (typeof finishesData)[number] | undefined;
+  product: Product;
+  variant: Variant;
+  finish: Finish | undefined;
   quantity: number;
   lineTotal: number;
   scopeId: string;
@@ -91,12 +91,21 @@ async function loadLogo(): Promise<Buffer | null> {
   }
 }
 
-async function loadProductImage(slug: string, finish: string): Promise<Buffer | null> {
+async function loadProductImage(
+  slug: string,
+  finish: string,
+  assetOrigin: string
+): Promise<{ bytes: Buffer; format: "jpg" | "png" } | null> {
   try {
-    const series = slug.split("-")[0];
-    const productName = slug.replace(`${series}-`, "");
-    const imgPath = join(process.cwd(), "public", "images", "products", series, productName, `${finish}.png`);
-    return await readFile(imgPath) as unknown as Buffer;
+    const image = getProductImage(slug, finish);
+    if (!image) return null;
+    const imageUrl = image.startsWith("https://") ? image : new URL(image, assetOrigin).toString();
+    const response = await fetch(imageUrl);
+    if (!response.ok) return null;
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+    const isJpeg = contentType.includes("jpeg") || (bytes[0] === 0xff && bytes[1] === 0xd8);
+    return { bytes, format: isJpeg ? "jpg" : "png" };
   } catch {
     return null;
   }
@@ -117,10 +126,10 @@ const SPEC_FIELDS: Array<[key: string, label: string]> = [
 
 function resolveItems(project: TradeProject): ResolvedItem[] {
   return project.items.flatMap((item) => {
-    const product = productsData.products.find((p) => p.slug === item.slug);
+    const product = getProductBySlug(item.slug);
     const variant = product?.variants.find((v) => v.finish === item.finish);
     if (!product || !variant) return [];
-    const finish = finishesData.find((f) => f.id === item.finish);
+    const finish = getFinishById(item.finish);
     return [{
       product,
       variant,
@@ -134,7 +143,12 @@ function resolveItems(project: TradeProject): ResolvedItem[] {
   });
 }
 
-async function buildPremiumPdf(project: TradeProject, includePrices: boolean, includeSpecs: boolean) {
+async function buildPremiumPdf(
+  project: TradeProject,
+  includePrices: boolean,
+  includeSpecs: boolean,
+  assetOrigin: string
+) {
   const now = new Date();
   const reference = `STM-RFQ-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getTime()).slice(-6)}`;
   const rows = resolveItems(project);
@@ -396,14 +410,16 @@ async function buildPremiumPdf(project: TradeProject, includePrices: boolean, in
         x: MARGIN, y: y - ROW_HEIGHT + 16, width: CONTENT_W, height: 0.5, color: rgb(0.9, 0.9, 0.88),
       });
 
-      const series = productsData.series.find((s) => s.id === row.product.series);
+      const series = getSeriesById(row.product.series);
       const seriesName = series?.name ?? row.product.series;
 
       // Product image
       try {
-        const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
-        if (imgBytes) {
-          const img = await doc.embedPng(imgBytes);
+        const productImage = await loadProductImage(row.product.slug, row.variant.finish, assetOrigin);
+        if (productImage) {
+          const img = productImage.format === "jpg"
+            ? await doc.embedJpg(productImage.bytes)
+            : await doc.embedPng(productImage.bytes);
           const imgSize = 48;
           const imgDims = img.scaleToFit(imgSize, imgSize);
           currentPage.drawRectangle({
@@ -562,7 +578,7 @@ async function buildPremiumPdf(project: TradeProject, includePrices: boolean, in
         y -= 30;
       }
 
-      const series = productsData.series.find((s) => s.id === product.series);
+      const series = getSeriesById(product.series);
       const seriesName = series?.name ?? product.series;
 
       specPage.drawRectangle({ x: MARGIN, y: y - 4, width: CONTENT_W, height: 22, color: WARM_BG });
@@ -683,7 +699,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const { pdf, reference } = await buildPremiumPdf(project, includePrices, includeSpecs);
+  const { pdf, reference } = await buildPremiumPdf(
+    project,
+    includePrices,
+    includeSpecs,
+    new URL(request.url).origin
+  );
   const safeName = project.details.projectName
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-|-$/g, "")

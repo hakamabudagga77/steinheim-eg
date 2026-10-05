@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAllLiveData } from "@/lib/shopify-live-data";
+import { getAllLiveData, type LiveVariantData } from "@/lib/shopify-live-data";
 
 export async function GET() {
   try {
     const liveMap = await getAllLiveData();
-    const data: Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }> = {};
+    const data: Record<string, { variants: LiveVariantData[] }> = {};
     for (const [slug, entry] of liveMap) {
       data[slug] = { variants: entry.variants };
     }

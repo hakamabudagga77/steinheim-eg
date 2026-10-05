@@ -7,7 +7,7 @@ import { Link } from "@/i18n/navigation";
 import type { Product } from "@/lib/utils";
 
 const SHOWER_TYPES = ["concealed-shower", "shower-column"];
-const ACCESSORY_TYPES = ["accessories", "bidet-spray", "click-clack", "angle-valve"];
+const ACCESSORY_TYPES = ["accessories", "bidet-spray", "click-clack", "angle-valve", "shower-arm", "bottle-trap"];
 
 function installationCategory(type: string): "shower" | "accessory" | "mixer" {
   if (SHOWER_TYPES.includes(type)) return "shower";

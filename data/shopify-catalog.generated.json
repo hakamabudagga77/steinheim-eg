@@ -1,0 +1,386 @@
+{
+  "products": [
+    {
+      "slug": "joy-series-ceiling-shower-arm",
+      "series": "joy",
+      "name": "Ceiling Shower Arm",
+      "type": "shower-arm",
+      "variants": [
+        {
+          "finish": "chrome",
+          "model": "STM-60-ARC201-001",
+          "price": 1800,
+          "compareAtPrice": 2100
+        },
+        {
+          "finish": "brushed-nickel",
+          "model": "STM-60-ARC201-002",
+          "price": 2000,
+          "compareAtPrice": 2350
+        },
+        {
+          "finish": "matte-black",
+          "model": "STM-60-ARC201-003",
+          "price": 2000,
+          "compareAtPrice": 2350
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-60-ARC201-004",
+          "price": 2200,
+          "compareAtPrice": 2600
+        },
+        {
+          "finish": "coffee-gold",
+          "model": "STM-60-ARC201-009",
+          "price": 2200,
+          "compareAtPrice": 2600
+        }
+      ]
+    },
+    {
+      "slug": "joy-series-kitchen-sink-mixer-with-pull-out-shower",
+      "series": "joy",
+      "name": "Kitchen Sink Mixer With Pull-Out Shower",
+      "type": "kitchen-mixer",
+      "variants": [
+        {
+          "finish": "brushed-nickel",
+          "model": "STM-60-K500-002",
+          "price": 13650,
+          "compareAtPrice": 16050
+        }
+      ]
+    },
+    {
+      "slug": "joy-series-minimal-bottle-trap",
+      "series": "joy",
+      "name": "Minimal Bottle Trap",
+      "type": "bottle-trap",
+      "variants": [
+        {
+          "finish": "chrome",
+          "model": "STM-60-BTM114-001",
+          "price": 1750,
+          "compareAtPrice": 2050
+        },
+        {
+          "finish": "brushed-nickel",
+          "model": "STM-60-BTM114-002",
+          "price": 2250,
+          "compareAtPrice": 2650
+        },
+        {
+          "finish": "matte-black",
+          "model": "STM-60-BTM114-003",
+          "price": 2250,
+          "compareAtPrice": 2650
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-60-BTM114-004",
+          "price": 2500,
+          "compareAtPrice": 2950
+        },
+        {
+          "finish": "coffee-gold",
+          "model": "STM-60-BTM114-009",
+          "price": 2750,
+          "compareAtPrice": 3250
+        },
+        {
+          "finish": "metal-gun",
+          "model": "STM-60-BTM114-005",
+          "price": 2750,
+          "compareAtPrice": 3250
+        }
+      ]
+    },
+    {
+      "slug": "up-series-ceiling-shower-arm",
+      "series": "up",
+      "name": "Ceiling Shower Arm",
+      "type": "shower-arm",
+      "variants": [
+        {
+          "finish": "chrome",
+          "model": "STM-50-ARS201-001",
+          "price": 1800,
+          "compareAtPrice": 2100
+        },
+        {
+          "finish": "brushed-nickel",
+          "model": "STM-50-ARS201-002",
+          "price": 2000,
+          "compareAtPrice": 2350
+        },
+        {
+          "finish": "matte-black",
+          "model": "STM-50-ARS201-003",
+          "price": 2000,
+          "compareAtPrice": 2350
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-50-ARS201-004",
+          "price": 2200,
+          "compareAtPrice": 2600
+        },
+        {
+          "finish": "metal-gun",
+          "model": "STM-50-ARS201-005",
+          "price": 2200,
+          "compareAtPrice": 2600
+        }
+      ]
+    }
+  ],
+  "variantAdditions": {
+    "joy-bidet-spray": [
+      {
+        "finish": "metal-gun",
+        "model": "STM-50-F800-005",
+        "price": 4100,
+        "compareAtPrice": 4800
+      }
+    ],
+    "quatro-basin-mixer": [
+      {
+        "finish": "coffee-gold",
+        "model": "STM-40-M500-009",
+        "price": 7050,
+        "compareAtPrice": 8300
+      }
+    ],
+    "quatro-concealed-shower": [
+      {
+        "finish": "coffee-gold",
+        "model": "STM-40-M605-009",
+        "price": 18000,
+        "compareAtPrice": 21200
+      }
+    ],
+    "quatro-tall-basin-mixer": [
+      {
+        "finish": "coffee-gold",
+        "model": "STM-40-M501-009",
+        "price": 9900,
+        "compareAtPrice": 11650
+      }
+    ],
+    "quatro-wall-mounted-basin-mixer": [
+      {
+        "finish": "coffee-gold",
+        "model": "STM-40-M503-009",
+        "price": 10500,
+        "compareAtPrice": 12350
+      }
+    ]
+  },
+  "handles": {
+    "joy-series-ceiling-shower-arm": "joy-series-ceiling-shower-arm",
+    "joy-series-kitchen-sink-mixer-with-pull-out-shower": "joy-series-kitchen-sink-mixer-with-pull-out-shower",
+    "joy-series-minimal-bottle-trap": "joy-series-minimal-bottle-trap",
+    "up-series-ceiling-shower-arm": "up-series-ceiling-shower-arm"
+  },
+  "images": {
+    "art-basin-mixer": {
+      "brushed-nickel": "/images/products/art/basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/art/basin-mixer/chrome.png",
+      "matte-black": "/images/products/art/basin-mixer/matte-black.png"
+    },
+    "art-concealed-shower": {
+      "brushed-nickel": "/images/products/art/concealed-shower/brushed-nickel.png",
+      "chrome": "/images/products/art/concealed-shower/chrome.png",
+      "matte-black": "/images/products/art/concealed-shower/matte-black.png"
+    },
+    "art-free-standing-bath-mixer": {
+      "brushed-nickel": "/images/products/art/free-standing-bath-mixer/brushed-nickel.png",
+      "chrome": "/images/products/art/free-standing-bath-mixer/chrome.png",
+      "matte-black": "/images/products/art/free-standing-bath-mixer/matte-black.png"
+    },
+    "art-tall-basin-mixer": {
+      "brushed-nickel": "/images/products/art/tall-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/art/tall-basin-mixer/chrome.png",
+      "matte-black": "/images/products/art/tall-basin-mixer/matte-black.png"
+    },
+    "art-wall-mounted-basin-mixer": {
+      "brushed-nickel": "/images/products/art/wall-mounted-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/art/wall-mounted-basin-mixer/chrome.png",
+      "matte-black": "/images/products/art/wall-mounted-basin-mixer/matte-black.png"
+    },
+    "joy-accessories-set": {
+      "brushed-gold": "/images/products/joy/accessories-set/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/accessories-set/brushed-nickel.png",
+      "chrome": "/images/products/joy/accessories-set/chrome.png",
+      "coffee-gold": "/images/products/joy/accessories-set/coffee-gold.png",
+      "matte-black": "/images/products/joy/accessories-set/matte-black.png"
+    },
+    "joy-angle-valve": {
+      "brushed-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97682_dce7d44f-ecfa-4c82-8deb-be682c950ad0.png?v=1791233012",
+      "brushed-nickel": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97681_0dbde461-4bd7-4622-86a4-dc770b6c86d7.png?v=1791232956",
+      "chrome": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97680_c2b0a4a3-7ab9-4e15-82b4-a9d21154b6fe.png?v=1791232939",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97679_3d5888d8-0aeb-44bf-9f1e-4292b09eeaba.png?v=1791233064",
+      "matte-black": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97678_bdb186aa-f077-4d29-95fd-c7b0d7d08220.png?v=1791232990",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97677_7ee8ae9a-8e5b-4cf1-bd67-90cf96d00c0f.png?v=1791233044"
+    },
+    "joy-basin-mixer": {
+      "brushed-gold": "/images/products/joy/basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/joy/basin-mixer/chrome.png",
+      "coffee-gold": "/images/products/joy/basin-mixer/coffee-gold.png",
+      "matte-black": "/images/products/joy/basin-mixer/matte-black.png"
+    },
+    "joy-bidet-spray": {
+      "brushed-gold": "/images/products/joy/bidet-spray/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/bidet-spray/brushed-nickel.png",
+      "chrome": "/images/products/joy/bidet-spray/chrome.png",
+      "coffee-gold": "/images/products/joy/bidet-spray/coffee-gold.png",
+      "matte-black": "/images/products/joy/bidet-spray/matte-black.png",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regenerate-img1-but-make-it-same-color-as-img2__65478.png?v=1774278515"
+    },
+    "joy-click-clack-waste": {
+      "brushed-gold": "/images/products/joy/click-clack-waste/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/click-clack-waste/brushed-nickel.png",
+      "chrome": "/images/products/joy/click-clack-waste/chrome.png",
+      "coffee-gold": "/images/products/joy/click-clack-waste/coffee-gold.png",
+      "matte-black": "/images/products/joy/click-clack-waste/matte-black.png",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik__regernate-this-excat-photo-but-with-beige-backgrou__97685.png?v=1774360905"
+    },
+    "joy-concealed-shower": {
+      "brushed-gold": "/images/products/joy/concealed-shower/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/concealed-shower/brushed-nickel.png",
+      "chrome": "/images/products/joy/concealed-shower/chrome.png",
+      "coffee-gold": "/images/products/joy/concealed-shower/coffee-gold.png",
+      "matte-black": "/images/products/joy/concealed-shower/matte-black.png"
+    },
+    "joy-free-standing-bath-mixer": {
+      "brushed-gold": "/images/products/joy/free-standing-bath-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/free-standing-bath-mixer/brushed-nickel.png",
+      "chrome": "/images/products/joy/free-standing-bath-mixer/chrome.png",
+      "coffee-gold": "/images/products/joy/free-standing-bath-mixer/coffee-gold.png",
+      "matte-black": "/images/products/joy/free-standing-bath-mixer/matte-black.png"
+    },
+    "joy-series-ceiling-shower-arm": {
+      "brushed-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/7217ab97-95c0-421b-bfd7-3c24119d22ff_744e4a40-eeec-4ec4-96b1-2bdf51a33518.png?v=1791232161",
+      "brushed-nickel": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/bcb1dbf2-def8-4d14-85ef-340cedff438e_0d1ae796-9eb9-4bbb-86bd-f9c4414a3888.png?v=1791232044",
+      "chrome": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/12c4e86b-01e7-438a-b13c-c66e91e0763e_2de0e8ee-b7ec-4a17-9464-1b28dee1aae2.png?v=1791232010",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/1d3c937e-21a0-48ae-bc9c-df5fb040d0cc_6c6228e8-8ed5-41a9-a210-ae190a666ef5.png?v=1791232199",
+      "matte-black": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/e0ec6be9-74fc-4023-b7a3-88b7eff60be4_c3c5ae69-1b03-4083-95dc-82348d7f3efd.png?v=1791232129"
+    },
+    "joy-series-kitchen-sink-mixer-with-pull-out-shower": {
+      "brushed-nickel": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/c656ae57-f1d0-49e8-b5ac-afbac2f61104.png?v=1791232351"
+    },
+    "joy-series-minimal-bottle-trap": {
+      "brushed-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/93e1c32a-1ff3-4b86-86bf-0d76aa658590.png?v=1791232644",
+      "brushed-nickel": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/6345508f-d757-4007-b11a-797ead3d1176.png?v=1791232605",
+      "chrome": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/ffe8f649-cf1d-496e-b45d-249e0058b33d.png?v=1791232587",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/ec48e54b-f398-4501-a35f-19da2adec2ed.png?v=1791232691",
+      "matte-black": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/e2e6b146-7e66-432a-b100-f846e1c9febf.png?v=1791232623",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/468c67ed-c1c2-48b8-87a2-d06f1534d497.png?v=1791232666"
+    },
+    "joy-shower-column": {
+      "brushed-gold": "/images/products/joy/shower-column/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/shower-column/brushed-nickel.png",
+      "chrome": "/images/products/joy/shower-column/chrome.png",
+      "coffee-gold": "/images/products/joy/shower-column/coffee-gold.png",
+      "matte-black": "/images/products/joy/shower-column/matte-black.png"
+    },
+    "joy-tall-basin-mixer": {
+      "brushed-gold": "/images/products/joy/tall-basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/tall-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/joy/tall-basin-mixer/chrome.png",
+      "coffee-gold": "/images/products/joy/tall-basin-mixer/coffee-gold.png",
+      "matte-black": "/images/products/joy/tall-basin-mixer/matte-black.png"
+    },
+    "joy-wall-mounted-basin-mixer": {
+      "brushed-gold": "/images/products/joy/wall-mounted-basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/joy/wall-mounted-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/joy/wall-mounted-basin-mixer/chrome.png",
+      "coffee-gold": "/images/products/joy/wall-mounted-basin-mixer/coffee-gold.png",
+      "matte-black": "/images/products/joy/wall-mounted-basin-mixer/matte-black.png"
+    },
+    "quatro-basin-mixer": {
+      "brushed-gold": "/images/products/quatro/basin-mixer/brushed-gold.png",
+      "chrome": "/images/products/quatro/basin-mixer/chrome.png",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/03d1fcb5-3076-44a3-91f0-11be08234cb2.jpg?v=1791196398",
+      "matte-black": "/images/products/quatro/basin-mixer/matte-black.png"
+    },
+    "quatro-concealed-shower": {
+      "brushed-gold": "/images/products/quatro/concealed-shower/brushed-gold.png",
+      "chrome": "/images/products/quatro/concealed-shower/chrome.png",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/b8c00fec-527d-4d68-a92b-16241f92d354.jpg?v=1791196399",
+      "matte-black": "/images/products/quatro/concealed-shower/matte-black.png"
+    },
+    "quatro-tall-basin-mixer": {
+      "brushed-gold": "/images/products/quatro/tall-basin-mixer/brushed-gold.png",
+      "chrome": "/images/products/quatro/tall-basin-mixer/chrome.png",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/d71a2787-0484-427d-b797-6ec72dbf7c4e.jpg?v=1791196398",
+      "matte-black": "/images/products/quatro/tall-basin-mixer/matte-black.png"
+    },
+    "quatro-wall-mounted-basin-mixer": {
+      "brushed-gold": "/images/products/quatro/wall-mounted-basin-mixer/brushed-gold.png",
+      "chrome": "/images/products/quatro/wall-mounted-basin-mixer/chrome.png",
+      "coffee-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/942f194b-cb31-406d-a7da-87e3ba6234ab.jpg?v=1791196400",
+      "matte-black": "/images/products/quatro/wall-mounted-basin-mixer/matte-black.png"
+    },
+    "up-accessories-set": {
+      "brushed-gold": "/images/products/up/accessories-set/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/accessories-set/brushed-nickel.png",
+      "chrome": "/images/products/up/accessories-set/chrome.png",
+      "matte-black": "/images/products/up/accessories-set/matte-black.png",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/freepik_generate-this-again-but-change-the-products-to-gun-metal-grey-color-like-img2_0001.png?v=1774636492"
+    },
+    "up-basin-mixer": {
+      "brushed-gold": "/images/products/up/basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/up/basin-mixer/chrome.png",
+      "matte-black": "/images/products/up/basin-mixer/matte-black.png",
+      "metal-gun": "/images/products/up/basin-mixer/metal-gun.png"
+    },
+    "up-concealed-shower": {
+      "brushed-gold": "/images/products/up/concealed-shower/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/concealed-shower/brushed-nickel.png",
+      "chrome": "/images/products/up/concealed-shower/chrome.png",
+      "matte-black": "/images/products/up/concealed-shower/matte-black.png",
+      "metal-gun": "/images/products/up/concealed-shower/metal-gun.png"
+    },
+    "up-free-standing-bath-mixer": {
+      "brushed-gold": "/images/products/up/free-standing-bath-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/free-standing-bath-mixer/brushed-nickel.png",
+      "chrome": "/images/products/up/free-standing-bath-mixer/chrome.png",
+      "matte-black": "/images/products/up/free-standing-bath-mixer/matte-black.png",
+      "metal-gun": "/images/products/up/free-standing-bath-mixer/metal-gun.png"
+    },
+    "up-series-ceiling-shower-arm": {
+      "brushed-gold": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/cfe269f1-940d-43c6-b8fb-b903276e3467_0a83d67a-a59e-4136-b6b0-1dabfe0f2912.png?v=1791232472",
+      "brushed-nickel": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/3a46e0cb-b0a6-4933-bfcd-64ed89ceae84_2faa1d98-ca01-46f7-b0a4-84454d675ec3.png?v=1791232421",
+      "chrome": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/fe78ccb2-1ccf-4f8d-930d-3782aaea8e59_3072fb33-13da-4618-871e-df0f77fdf0e1.png?v=1791232391",
+      "matte-black": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/c593fc51-bce2-40a6-8079-4b799c532a70_4787843a-e265-478f-8da3-b7eb7259afd3.png?v=1791232441",
+      "metal-gun": "https://cdn.shopify.com/s/files/1/0779/6919/5065/files/b0a46049-cb49-4946-aaa5-cc6da67636ac_e750b622-423c-46ab-9622-41cde13b2bc7.png?v=1791232497"
+    },
+    "up-shower-column": {
+      "brushed-gold": "/images/products/up/shower-column/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/shower-column/brushed-nickel.png",
+      "chrome": "/images/products/up/shower-column/chrome.png",
+      "matte-black": "/images/products/up/shower-column/matte-black.png",
+      "metal-gun": "/images/products/up/shower-column/metal-gun.png"
+    },
+    "up-tall-basin-mixer": {
+      "brushed-gold": "/images/products/up/tall-basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/tall-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/up/tall-basin-mixer/chrome.png",
+      "matte-black": "/images/products/up/tall-basin-mixer/matte-black.png",
+      "metal-gun": "/images/products/up/tall-basin-mixer/metal-gun.png"
+    },
+    "up-wall-mounted-basin-mixer": {
+      "brushed-gold": "/images/products/up/wall-mounted-basin-mixer/brushed-gold.png",
+      "brushed-nickel": "/images/products/up/wall-mounted-basin-mixer/brushed-nickel.png",
+      "chrome": "/images/products/up/wall-mounted-basin-mixer/chrome.png",
+      "matte-black": "/images/products/up/wall-mounted-basin-mixer/matte-black.png",
+      "metal-gun": "/images/products/up/wall-mounted-basin-mixer/metal-gun.png"
+    }
+  },
+  "finishAdditions": [],
+  "finishAliases": {}
+}

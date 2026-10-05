@@ -1340,7 +1340,10 @@
       "accessories": "إكسسوارات",
       "bidet-spray": "دشاشات بيديه",
       "click-clack": "بالطات كليك-كلاك",
-      "angle-valve": "محابس زاوية"
+      "angle-valve": "محابس زاوية",
+      "kitchen-mixer": "خلاطات مطبخ",
+      "shower-arm": "أذرع دش",
+      "bottle-trap": "سيفونات أحواض"
     },
     "priceBrackets": {
       "under-3000": "أقل من 3,000 جنيه",

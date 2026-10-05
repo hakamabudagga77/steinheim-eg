@@ -1,6 +1,6 @@
 import "server-only";
 
-import productsData from "@/data/products.json";
+import { getProductBySlug } from "@/lib/utils";
 import { getProjectCompletion, type TradeProject } from "@/lib/trade-project";
 import type { TradeLeadPriority, TradeLeadScope } from "@/lib/trade-leads";
 
@@ -28,7 +28,7 @@ function buildScopeBreakdown(
 
 export function analyzeProject(project: TradeProject) {
   const rows = project.items.flatMap((item) => {
-    const product = productsData.products.find((entry) => entry.slug === item.slug);
+    const product = getProductBySlug(item.slug);
     const variant = product?.variants.find((entry) => entry.finish === item.finish);
     return product && variant ? [{ item, variant }] : [];
   });

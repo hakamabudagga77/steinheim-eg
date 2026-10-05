@@ -8,10 +8,11 @@ import { Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
 import SpecTable from "@/components/product/SpecTable";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
-import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
+import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
+import ProductPrice from "@/components/product/ProductPrice";
 
-type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
+type LiveVariants = Array<{ finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean }>;
 
 export default function QuickViewModal({
   product,
@@ -84,7 +85,11 @@ export default function QuickViewModal({
           </h2>
 
           <div className="mt-3 flex items-center gap-2">
-            <p className="text-[18px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+            <ProductPrice
+              price={liveVariant?.price ?? variant.price}
+              compareAtPrice={liveVariant ? liveVariant.compareAtPrice : variant.compareAtPrice}
+              priceClassName="text-[18px] font-medium"
+            />
             {liveVariant && (
               <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>
                 <span className={`h-1 w-1 rounded-full ${liveVariant.inStock ? "bg-emerald-500" : "bg-red-400"}`} />

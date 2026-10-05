@@ -51,7 +51,7 @@ const collectionCardImages: Record<string, string[]> = {
 
 const cardOrder = ["intro", "concept", "design"] as const;
 
-type LiveData = Record<string, { variants: Array<{ finish: string; price: number; inventory: number; inStock: boolean }> }>;
+type LiveData = Record<string, { variants: Array<{ finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean }> }>;
 
 export default function CollectionPageClient({
   series,

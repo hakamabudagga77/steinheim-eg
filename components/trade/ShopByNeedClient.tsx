@@ -15,7 +15,7 @@ import {
 } from "@/lib/trade-project";
 import { getProductsByType } from "@/lib/utils";
 
-type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
+type LiveVariants = Array<{ finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean }>;
 
 export default function ShopByNeedClient() {
   const t = useTranslations("shopByNeed");

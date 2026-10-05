@@ -1340,7 +1340,10 @@
       "accessories": "Accessories",
       "bidet-spray": "Bidet Sprays",
       "click-clack": "Click-Clack Wastes",
-      "angle-valve": "Angle Valves"
+      "angle-valve": "Angle Valves",
+      "kitchen-mixer": "Kitchen Mixers",
+      "shower-arm": "Shower Arms",
+      "bottle-trap": "Bottle Traps"
     },
     "priceBrackets": {
       "under-3000": "Under EGP 3,000",

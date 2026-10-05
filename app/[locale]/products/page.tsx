@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -11,7 +11,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import { getFinishDiscImage } from "@/data/images";
 import { getAllFinishes, getAllProducts, getAllSeries, getProductTypes, getSeriesById, type Product } from "@/lib/utils";
 
-type LiveVariant = { finish: string; price: number; inventory: number; inStock: boolean };
+type LiveVariant = { finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean };
 type LiveData = Record<string, { variants: LiveVariant[] }>;
 type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc";
 
@@ -95,6 +95,13 @@ export default function AllProductsPage() {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const productTypeLabel = useCallback((type: string) => {
+    const key = `types.${type}`;
+    return t.has(key)
+      ? t(key)
+      : type.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }, [t]);
+
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/shopify/prices", { signal: controller.signal })
@@ -137,11 +144,11 @@ export default function AllProductsPage() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           (getSeriesById(p.series)?.name ?? "").toLowerCase().includes(q) ||
-          t(`types.${p.type}`).toLowerCase().includes(q)
+          productTypeLabel(p.type).toLowerCase().includes(q)
       );
     }
     return list;
-  }, [allProducts, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData, t]);
+  }, [allProducts, selectedSeries, selectedTypes, selectedFinishes, priceBracket, inStockOnly, search, liveData, productTypeLabel]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -289,7 +296,7 @@ export default function AllProductsPage() {
                   <div className="flex flex-wrap gap-2">
                     {allTypes.map((type) => (
                       <CheckPill key={type} active={selectedTypes.includes(type)} onClick={() => toggle(selectedTypes, type, setSelectedTypes)}>
-                        {t(`types.${type}`)}
+                        {productTypeLabel(type)}
                       </CheckPill>
                     ))}
                   </div>

@@ -18,12 +18,13 @@ import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
-import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { trackViewItem } from "@/lib/analytics";
 import { cacheLivePrices } from "@/lib/live-prices";
+import ProductPrice from "@/components/product/ProductPrice";
 
-type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
+type LiveVariantData = { finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
 const productInfoTabs = ["description", "detail", "downloads"] as const;
 
@@ -59,6 +60,14 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   }, [product.slug, variant.finish, liveVariant?.price]);
   const finish = getFinishById(variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
+  const usesShopifyImage = imageUrl?.includes("cdn.shopify.com") ?? false;
+  const mobileImageClass = !usesShopifyImage
+    ? "scale-[1.45] px-0"
+    : product.type === "bottle-trap"
+      ? "scale-100 px-[8%]"
+      : product.type === "kitchen-mixer"
+        ? "scale-[1.45] px-[4%]"
+        : "scale-[1.15] px-[4%]";
   const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
   const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
@@ -173,10 +182,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
         </div>
 
         <section className="bg-[#ece9e2]">
-          <div className="grid min-h-[calc(100svh-84px)] grid-rows-[minmax(80svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
+          <div className="grid min-w-0 min-h-[calc(100svh-84px)] grid-rows-[minmax(80svh,1fr)_auto] lg:min-h-[calc(100svh-172px)] lg:grid-cols-[56vw_44vw] lg:grid-rows-none">
             <div
               ref={imageWrapRef}
-              className="relative flex min-h-[80svh] items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
+              className="relative flex min-h-[80svh] min-w-0 items-start justify-center overflow-hidden bg-[#ece9e2] sm:min-h-[58svh] lg:sticky lg:top-0 lg:min-h-[100svh]"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -195,7 +204,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      className="origin-top scale-[1.45] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
+                      className={`origin-top object-contain object-[center_top] pb-[6%] pt-[2%] transition duration-[900ms] ${mobileImageClass} sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]`}
                     />
                   ) : (
                     <div className="font-heading text-3xl text-black/15">{product.name}</div>
@@ -204,20 +213,24 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
               </AnimatePresence>
             </div>
 
-            <div className="flex items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:px-8 sm:pt-4 sm:pb-12 lg:px-16 lg:pt-8 lg:pb-20 xl:px-20">
+            <div className="flex min-w-0 items-start px-5 pb-[calc(28px+env(safe-area-inset-bottom))] pt-0 sm:px-8 sm:pt-4 sm:pb-12 lg:px-16 lg:pt-8 lg:pb-20 xl:px-20">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.15 }}
-                className="w-full max-w-[620px]"
+                className="min-w-0 w-full max-w-[620px]"
               >
                 <p className="text-[16px] text-black/72 sm:text-[17px]">{t("collectionLabel", { series: seriesName })}</p>
-                <h1 className="mt-2 whitespace-nowrap text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:font-heading sm:text-[1.8rem] lg:text-[clamp(1.3rem,2.1vw,2.6rem)] sm:font-light sm:leading-[0.95]">
+                <h1 className="mt-2 break-words text-[28px] font-normal leading-[1.05] tracking-[-0.045em] sm:mt-6 sm:whitespace-nowrap sm:font-heading sm:text-[1.8rem] lg:text-[clamp(1.3rem,2.1vw,2.6rem)] sm:font-light sm:leading-[0.95]">
                   {product.name}
                 </h1>
 
                 <div className="mt-4 flex items-center gap-3 sm:mt-6">
-                  <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+                  <ProductPrice
+                    price={liveVariant?.price ?? variant.price}
+                    compareAtPrice={liveVariant ? liveVariant.compareAtPrice : variant.compareAtPrice}
+                    priceClassName="text-[20px] font-medium sm:text-[24px]"
+                  />
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />

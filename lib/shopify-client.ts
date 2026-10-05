@@ -77,6 +77,7 @@ export interface ShopifyVariant {
   inventory_item_id: number;
   title: string;
   price: string;
+  compare_at_price?: string | null;
   sku: string;
   inventory_quantity: number;
   option1: string | null;
