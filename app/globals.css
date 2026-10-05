@@ -43,6 +43,15 @@
   }
 }
 
+/* Shopify's newly synced catalogue images can arrive with an opaque white
+   canvas instead of transparency. Darken blending keeps the product itself
+   intact while allowing Steinheim's warm product surface to replace that
+   white canvas everywhere the image is reused. The optimized Next.js URL
+   retains the Shopify hostname, so future synced products inherit this too. */
+img[src*="cdn.shopify.com"] {
+  mix-blend-mode: darken;
+}
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
