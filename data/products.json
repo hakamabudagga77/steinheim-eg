@@ -50,7 +50,7 @@
       "operatingTemperature": "45°C",
       "mountingAperture": "DIA 35mm",
       "variants": [
-        { "finish": "chrome", "model": "STM-60-M500-001", "price": 4350, "compareAtPrice": 5100 },
+        { "finish": "chrome", "model": "STM-60-M500-001", "price": 4950 },
         { "finish": "brushed-nickel", "model": "STM-60-M500-002", "price": 5350 },
         { "finish": "matte-black", "model": "STM-60-M500-003", "price": 5350 },
         { "finish": "brushed-gold", "model": "STM-60-M500-004", "price": 6000 },
