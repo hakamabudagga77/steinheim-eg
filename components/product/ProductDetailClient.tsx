@@ -17,7 +17,7 @@ import DeliveryPromise from "@/components/ui/DeliveryPromise";
 import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
-import { getCollectionContextImage, getFinishDiscImage, getProductImage, getProductImageStyle, isShopifyProductImage } from "@/data/images";
+import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
 import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { trackViewItem } from "@/lib/analytics";
@@ -60,7 +60,6 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
   }, [product.slug, variant.finish, liveVariant?.price]);
   const finish = getFinishById(variant.finish);
   const imageUrl = getProductImage(product.slug, variant.finish);
-  const usesShopifyImage = isShopifyProductImage(imageUrl);
   const isBasinRelated = product.type.includes("basin") || product.name.toLowerCase().includes("basin");
   const contextImage = isBasinRelated ? "/images/generated/gessi/product-context-basin.png" : getCollectionContextImage(product.series);
   const related = getProductsBySeries(product.series).filter((entry) => entry.slug !== product.slug).slice(0, 4);
@@ -183,10 +182,10 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
               <AnimatePresence mode="wait">
                 <motion.div
                   key={variant.finish}
-                  initial={usesShopifyImage ? false : { opacity: 0 }}
+                  initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: usesShopifyImage ? 1 : 0 }}
-                  transition={{ duration: usesShopifyImage ? 0 : 0.5 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
                   className="absolute inset-x-0 bottom-0 top-[100px] flex items-center justify-center sm:top-4 lg:top-10"
                 >
                   {imageUrl ? (
@@ -197,7 +196,6 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
-                      style={getProductImageStyle(imageUrl)}
                       className="origin-top scale-[1.45] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (

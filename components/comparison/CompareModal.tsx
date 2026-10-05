@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
 import { useComparison } from "@/components/comparison/ComparisonContext";
-import { getProductImage, getProductImageStyle } from "@/data/images";
+import { getProductImage } from "@/data/images";
 import { formatPrice, getFinishById, getProductBySlug, getSeriesById, type Product } from "@/lib/utils";
 
 const SPEC_FIELDS: Array<{ key: keyof Product; labelKey: string }> = [
@@ -105,7 +105,7 @@ export default function CompareModal() {
                     </button>
                     <div className="relative aspect-square overflow-hidden rounded-lg bg-white">
                       {col.imageUrl ? (
-                        <Image src={col.imageUrl} alt={col.product.name} fill sizes="(max-width: 768px) 33vw, 240px" style={getProductImageStyle(col.imageUrl)} className="object-contain p-[10%]" />
+                        <Image src={col.imageUrl} alt={col.product.name} fill sizes="(max-width: 768px) 33vw, 240px" className="object-contain p-[10%]" />
                       ) : (
                         <div className="flex h-full items-center justify-center px-3 text-center font-heading text-sm text-black/20">{col.product.name}</div>
                       )}

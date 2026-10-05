@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
-import { getProductImage, getProductImageStyle } from "@/data/images";
+import { getProductImage } from "@/data/images";
 import { encodeWishlistItems } from "@/lib/wishlist";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useCart } from "@/components/cart/CartContext";
@@ -152,7 +152,7 @@ export default function WishlistDrawer({ locale }: { locale: string }) {
                               className="relative h-[80px] w-[80px] shrink-0 bg-[#ece9e2]"
                             >
                               {img && (
-                                <Image src={img} alt={product.name} fill sizes="80px" style={getProductImageStyle(img)} className="object-contain p-2" />
+                                <Image src={img} alt={product.name} fill sizes="80px" className="object-contain p-2" />
                               )}
                             </Link>
 

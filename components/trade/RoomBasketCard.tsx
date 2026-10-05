@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { formatPrice, type Finish, type Product, type Variant } from "@/lib/utils";
-import { getProductImage, getProductImageStyle } from "@/data/images";
+import { getProductImage } from "@/data/images";
 import type { TradeProjectItem } from "@/lib/trade-project";
 
 export function ProjectItemRow({
@@ -36,7 +36,7 @@ export function ProjectItemRow({
     >
       <div className="flex gap-4 p-4">
         <div className="relative h-[72px] w-[72px] shrink-0 bg-[#ece9e2]">
-          {img && <Image src={img} alt={product.name} fill sizes="72px" style={getProductImageStyle(img)} className="object-contain p-1" />}
+          {img && <Image src={img} alt={product.name} fill sizes="72px" className="object-contain p-1" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between">

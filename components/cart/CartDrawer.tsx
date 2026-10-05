@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPrice, getAllFinishes, getProductBySlug, getSeriesById } from "@/lib/utils";
-import { getProductImage, getProductImageStyle } from "@/data/images";
+import { getProductImage } from "@/data/images";
 import { useCart } from "@/components/cart/CartContext";
 import { trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { cacheLivePricesBulk, livePriceKey } from "@/lib/live-prices";
@@ -293,7 +293,6 @@ export default function CartDrawer({ locale }: { locale: string }) {
                                   alt={product.name}
                                   fill
                                   sizes="80px"
-                                  style={getProductImageStyle(img)}
                                   className="object-contain p-2"
                                 />
                               )}

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import Image from "next/image";
-import { getProductDefaultImage, getProductImageStyle } from "@/data/images";
+import { getProductDefaultImage } from "@/data/images";
 import Logo from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartContext";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
@@ -474,7 +474,6 @@ export default function Navigation({ locale }: { locale: string }) {
                                 alt={product.name}
                                 fill
                                 sizes="45vw"
-                                style={getProductImageStyle(image)}
                                 className="object-cover transition duration-700 group-active:scale-[1.03]"
                               />
                             ) : null}
@@ -655,7 +654,6 @@ export default function Navigation({ locale }: { locale: string }) {
                                       alt={product.name}
                                       fill
                                       sizes="32vw"
-                                      style={getProductImageStyle(image)}
                                       className="object-cover transition duration-[1200ms] group-hover:scale-[1.08]"
                                     />
                                   ) : null}
