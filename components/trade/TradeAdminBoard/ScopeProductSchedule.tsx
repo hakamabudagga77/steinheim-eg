@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { formatPrice, getFinishById, getProductBySlug, getSeriesById } from "@/lib/utils";
-import { getProductDefaultImage, getProductImage } from "@/data/images";
+import { getProductDefaultImage, getProductImage, getProductImageStyle } from "@/data/images";
 import type { TradeLead } from "@/lib/trade-leads";
 import { routing } from "@/i18n/routing";
 
@@ -67,7 +67,7 @@ export function ScopeProductSchedule({ lead }: { lead: TradeLead }) {
                         aria-label={`Open ${row.productName}`}
                       >
                         {row.image ? (
-                          <Image src={row.image} alt="" width={52} height={52} className="h-full w-full object-contain p-1.5" />
+                          <Image src={row.image} alt="" width={52} height={52} style={getProductImageStyle(row.image)} className="h-full w-full object-contain p-1.5" />
                         ) : (
                           <span className="text-[9px] uppercase tracking-[0.12em] text-black/35">No image</span>
                         )}

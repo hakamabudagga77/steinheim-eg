@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getProductImage } from "@/data/images";
+import { getProductImage, getProductImageStyle } from "@/data/images";
 
 describe("Shopify-generated product images", () => {
   it("uses the matching Shopify variant image for a generated product", () => {
@@ -10,5 +10,15 @@ describe("Shopify-generated product images", () => {
   it("adds an image for the new Quatro Coffee Gold variant", () => {
     expect(getProductImage("quatro-basin-mixer", "coffee-gold"))
       .toMatch(/^https:\/\/cdn\.shopify\.com\/s\/files\//);
+  });
+
+  it("applies the warm-surface treatment to Shopify product media", () => {
+    expect(getProductImageStyle("https://cdn.shopify.com/s/files/product.png"))
+      .toEqual({ mixBlendMode: "darken" });
+  });
+
+  it("leaves prepared local product media unchanged", () => {
+    expect(getProductImageStyle("/images/products/joy/basin-mixer/chrome.png"))
+      .toBeUndefined();
   });
 });

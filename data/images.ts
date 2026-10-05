@@ -1,6 +1,11 @@
 import generatedCatalog from "@/data/shopify-catalog.generated.json";
+import type { CSSProperties } from "react";
 
 type ImageMap = Record<string, Record<string, string>>;
+
+const shopifyProductImageStyle = {
+  mixBlendMode: "darken",
+} satisfies CSSProperties;
 
 function localProduct(series: string, product: string, finish: string) {
   return `/images/products/${series}/${product}/${finish}.png`;
@@ -113,6 +118,15 @@ export const collectionContextImages: Record<string, string> = {
 
 export function getProductImage(slug: string, finish: string): string | null {
   return productImages[slug]?.[finish] ?? null;
+}
+
+/**
+ * Shopify product media can use an opaque white studio canvas. Applying the
+ * blend inline means the browser receives the treatment in the initial HTML,
+ * before a stylesheet or hydration can briefly reveal that white canvas.
+ */
+export function getProductImageStyle(src: string | null | undefined): CSSProperties | undefined {
+  return src?.includes("cdn.shopify.com") ? shopifyProductImageStyle : undefined;
 }
 
 export function getProductDefaultImage(slug: string): string | null {

@@ -17,7 +17,7 @@ import DeliveryPromise from "@/components/ui/DeliveryPromise";
 import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
-import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
+import { getCollectionContextImage, getFinishDiscImage, getProductImage, getProductImageStyle } from "@/data/images";
 import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { trackViewItem } from "@/lib/analytics";
@@ -196,6 +196,7 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                       priority
                       quality={92}
                       sizes="(max-width: 1024px) 100vw, 56vw"
+                      style={getProductImageStyle(imageUrl)}
                       className="origin-top scale-[1.45] object-contain object-[center_top] px-0 pb-[6%] pt-[2%] transition duration-[900ms] sm:scale-100 sm:px-[8%] sm:pb-[10%] sm:pt-[3%] lg:scale-[1.06] lg:px-[8%] lg:pb-[9%] lg:pt-[4%]"
                     />
                   ) : (

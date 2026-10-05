@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Modal from "@/components/ui/Modal";
 import SpecTable from "@/components/product/SpecTable";
-import { getFinishDiscImage, getProductImage } from "@/data/images";
+import { getFinishDiscImage, getProductImage, getProductImageStyle } from "@/data/images";
 import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartContext";
 import ProductPrice from "@/components/product/ProductPrice";
@@ -70,7 +70,7 @@ export default function QuickViewModal({
           <AnimatePresence mode="wait">
             <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
               {imageUrl ? (
-                <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`} fill sizes="(max-width: 640px) 100vw, 500px" className="object-contain p-[10%]" />
+                <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${finish?.name ?? variant.finish}`} fill sizes="(max-width: 640px) 100vw, 500px" style={getProductImageStyle(imageUrl)} className="object-contain p-[10%]" />
               ) : (
                 <div className="flex h-full items-center justify-center px-5 text-center font-heading text-xl text-black/20">{product.name}</div>
               )}

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { getFinishDiscImage, getProductImage } from "@/data/images";
+import { getFinishDiscImage, getProductImage, getProductImageStyle } from "@/data/images";
 import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { cacheLivePrices } from "@/lib/live-prices";
 import { useCart } from "@/components/cart/CartContext";
@@ -112,7 +112,7 @@ function ProductCard({
             <AnimatePresence mode="wait">
               <motion.div key={variant.finish} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }} className="absolute inset-0">
                 {imageUrl ? (
-                  <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${getFinishById(variant.finish)?.name ?? variant.finish}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
+                  <Image src={imageUrl} alt={`${seriesName} ${product.name} in ${getFinishById(variant.finish)?.name ?? variant.finish}`} fill sizes="(max-width: 768px) 50vw, 33vw" style={getProductImageStyle(imageUrl)} className="object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
                 ) : (
                   <div className="flex h-full items-center justify-center px-5 text-center font-heading text-xl text-black/20">{product.name}</div>
                 )}
