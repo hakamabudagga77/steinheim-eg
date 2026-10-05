@@ -9,11 +9,9 @@
 //
 //     npm run verify:shopify-map
 //
-// It reads SHOPIFY_STORE_DOMAIN / SHOPIFY_CLIENT_ID / SHOPIFY_CLIENT_SECRET
-// from the environment (or from .env.local, if present). It is strictly
-// READ-ONLY: it calls the Shopify Admin products endpoint and nothing else.
-// Exit code is 1 if any hard problem is found (missing creds, a mapped handle
-// that does not exist in the store), 0 otherwise.
+// It is strictly READ-ONLY. With Admin credentials it uses the Admin products
+// endpoint; otherwise it verifies against Shopify's public published-products
+// feed, which is also what the automated catalog PR uses.
 
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -77,30 +75,36 @@ async function fetchProducts(domain, token) {
   return (await res.json()).products ?? [];
 }
 
+async function fetchPublishedProducts(domain) {
+  const products = [];
+  for (let page = 1; ; page += 1) {
+    const res = await fetch(`https://${domain}/products.json?limit=250&page=${page}`);
+    if (!res.ok) throw new Error(`Shopify public products fetch failed: ${res.status}`);
+    const batch = (await res.json()).products ?? [];
+    products.push(...batch);
+    if (batch.length < 250) return products;
+  }
+}
+
 async function main() {
   loadEnvLocal();
 
-  const domain = process.env.SHOPIFY_STORE_DOMAIN;
+  const domain = process.env.SHOPIFY_STORE_DOMAIN || "steinheim.myshopify.com";
   const id = process.env.SHOPIFY_CLIENT_ID;
   const secret = process.env.SHOPIFY_CLIENT_SECRET;
 
-  if (!domain || !id || !secret) {
-    console.error(bad("\n✗ Shopify credentials are not set.\n"));
-    console.error("  Set these in your environment or .env.local, then re-run:");
-    console.error("    SHOPIFY_STORE_DOMAIN   (e.g. steinheim.myshopify.com)");
-    console.error("    SHOPIFY_CLIENT_ID");
-    console.error("    SHOPIFY_CLIENT_SECRET\n");
-    process.exit(1);
-  }
-
   const src = readFileSync(join(ROOT, "lib", "shopify-product-map.ts"), "utf8");
-  const slugToHandle = parseRecord(src, "SLUG_TO_HANDLE");
-  const finishAliases = parseRecord(src, "FINISH_ALIASES");
+  const generated = JSON.parse(readFileSync(join(ROOT, "data", "shopify-catalog.generated.json"), "utf8"));
+  const slugToHandle = { ...parseRecord(src, "CURATED_SLUG_TO_HANDLE"), ...generated.handles };
+  const finishAliases = { ...parseRecord(src, "FINISH_ALIASES"), ...generated.finishAliases };
   const finishNames = new Set(Object.values(finishAliases).map((v) => v.toLowerCase()));
 
-  console.log(dim(`\nStore: ${domain} · API ${API_VERSION}\n`));
+  const hasAdminCredentials = Boolean(id && secret);
+  console.log(dim(`\nStore: ${domain} · ${hasAdminCredentials ? `Admin API ${API_VERSION}` : "public published-products feed"}\n`));
 
-  const products = await fetchProducts(domain, token(await getAccessToken(domain, id, secret)));
+  const products = hasAdminCredentials
+    ? await fetchProducts(domain, token(await getAccessToken(domain, id, secret)))
+    : await fetchPublishedProducts(domain);
   if (products.length === 250) {
     console.log(warn("⚠ Exactly 250 products returned — the store may have more (this check, like the app, fetches the first 250).\n"));
   }
@@ -145,7 +149,7 @@ async function main() {
       ` · ${Object.keys(slugToHandle).length} mapped slugs checked\n`
   );
 
-  process.exit(hardErrors ? 1 : 0);
+  process.exitCode = hardErrors ? 1 : 0;
 }
 
 // Small helper kept separate so the token value never lands in a log line.

@@ -54,6 +54,16 @@ describe("getAllProducts", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(products.length).toBeGreaterThan(0);
   });
+
+  it("includes products and finish additions generated from Shopify", () => {
+    const products = getAllProducts();
+    expect(products.find((product) => product.slug === "joy-series-kitchen-sink-mixer-with-pull-out-shower"))
+      .toMatchObject({ series: "joy", type: "kitchen-mixer" });
+    expect(getProductBySlug("quatro-basin-mixer")?.variants.some((variant) => variant.finish === "coffee-gold"))
+      .toBe(true);
+    expect(getSeriesById("quatro")?.finishes).toContain("coffee-gold");
+    expect(getFinishById("coffee-gold")?.series).toContain("quatro");
+  });
 });
 
 describe("getAllFinishes / getFinishById", () => {

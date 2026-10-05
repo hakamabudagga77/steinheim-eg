@@ -35,16 +35,14 @@ const catalogue: ShopifyProduct[] = [
     variant({ id: 101, option1: "Chrome", price: "4500.00", inventory_quantity: 7 }),
     variant({ id: 102, option1: "Matte Black", price: "5200.50", inventory_quantity: 0 }),
   ]),
+  product("joy-series-kitchen-sink-mixer-with-pull-out-shower", [
+    variant({ id: 201, option1: "Brushed Nickel", price: "13650.00", inventory_quantity: 0 }),
+  ]),
 ];
 
 describe("resolveVariantId", () => {
   it("returns null for a slug not in the map", () => {
     expect(resolveVariantId("does-not-exist", "chrome", catalogue)).toBeNull();
-  });
-
-  it("returns null for a slug mapped to an empty handle", () => {
-    // joy-bottle-trap is intentionally mapped to "" (no Shopify handle yet).
-    expect(resolveVariantId("joy-bottle-trap", "chrome", catalogue)).toBeNull();
   });
 
   it("returns null when the mapped product is absent from the catalogue", () => {
@@ -57,6 +55,16 @@ describe("resolveVariantId", () => {
 
   it("matches an unaliased finish case-insensitively", () => {
     expect(resolveVariantId("joy-basin-mixer", "Chrome", catalogue)).toBe(101);
+  });
+
+  it("resolves products added by the generated Shopify catalog", () => {
+    expect(
+      resolveVariantId(
+        "joy-series-kitchen-sink-mixer-with-pull-out-shower",
+        "brushed-nickel",
+        catalogue
+      )
+    ).toBe(201);
   });
 
   it("returns null when the finish has no matching variant", () => {

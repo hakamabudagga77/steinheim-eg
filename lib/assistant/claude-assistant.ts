@@ -1,26 +1,27 @@
-import productsData from "@/data/products.json";
-import finishesData from "@/data/finishes.json";
 import { egyptCollectionPositioning } from "@/data/egypt-master-catalog";
+import { getAllFinishes, getAllProducts, getAllSeries } from "@/lib/utils";
 
 export type MessageRole = "user" | "assistant";
 export type ConversationMessage = { role: MessageRole; content: string };
 
 function buildProductIndex(): string {
   const lines: string[] = [];
+  const products = getAllProducts();
+  const finishes = getAllFinishes();
 
-  for (const series of productsData.series) {
+  for (const series of getAllSeries()) {
     const pos = egyptCollectionPositioning[series.id as keyof typeof egyptCollectionPositioning];
     lines.push(`## ${series.name} (Code ${series.code}, ${series.shape})`);
     lines.push(`${pos?.role ?? ""} Best for: ${pos?.bestFor.join(", ") ?? ""}`);
     if (pos?.caution) lines.push(`Note: ${pos.caution}`);
     lines.push(`Finishes: ${series.finishes.join(", ")}`);
 
-    const seriesProducts = productsData.products.filter((p) => p.series === series.id);
+    const seriesProducts = products.filter((p) => p.series === series.id);
     for (const p of seriesProducts) {
       const mat = p.material ? ` [${p.material}]` : "";
       const variants = p.variants
         .map((v) => {
-          const fn = finishesData.find((f) => f.id === v.finish)?.name ?? v.finish;
+          const fn = finishes.find((f) => f.id === v.finish)?.name ?? v.finish;
           return `${fn}=${v.model}@${v.price}`;
         })
         .join(" | ");
@@ -33,22 +34,26 @@ function buildProductIndex(): string {
 }
 
 function buildFinishGuide(): string {
-  return finishesData
+  const series = getAllSeries();
+  return getAllFinishes()
     .map((f) => {
-      const sn = f.series.map((sid) => productsData.series.find((s) => s.id === sid)?.name ?? sid).join(", ");
+      const sn = f.series.map((sid) => series.find((s) => s.id === sid)?.name ?? sid).join(", ");
       return `${f.name} (${f.type}) — in ${sn}. Care: ${f.careInstructions}`;
     })
     .join("\n");
 }
 
 function computePriceExtremes(): string {
+  const products = getAllProducts();
+  const series = getAllSeries();
+  const finishes = getAllFinishes();
   let cheapest = { name: "", price: Infinity, model: "", finish: "", series: "" };
   let mostExpensive = { name: "", price: 0, model: "", finish: "", series: "" };
 
-  for (const p of productsData.products) {
-    const seriesName = productsData.series.find((s) => s.id === p.series)?.name ?? p.series;
+  for (const p of products) {
+    const seriesName = series.find((s) => s.id === p.series)?.name ?? p.series;
     for (const v of p.variants) {
-      const fn = finishesData.find((f) => f.id === v.finish)?.name ?? v.finish;
+      const fn = finishes.find((f) => f.id === v.finish)?.name ?? v.finish;
       if (v.price < cheapest.price) {
         cheapest = { name: `${seriesName} ${p.name}`, price: v.price, model: v.model, finish: fn, series: seriesName };
       }
@@ -59,8 +64,8 @@ function computePriceExtremes(): string {
   }
 
   const seriesCheapest: string[] = [];
-  for (const s of productsData.series) {
-    const prods = productsData.products.filter((p) => p.series === s.id);
+  for (const s of series) {
+    const prods = products.filter((p) => p.series === s.id);
     let min = Infinity;
     let minName = "";
     for (const p of prods) {
@@ -75,9 +80,9 @@ function computePriceExtremes(): string {
 Cheapest: ${cheapest.name} in ${cheapest.finish} — ${cheapest.model}, ${cheapest.price.toLocaleString()} LE
 Most expensive: ${mostExpensive.name} in ${mostExpensive.finish} — ${mostExpensive.model}, ${mostExpensive.price.toLocaleString()} LE
 ${seriesCheapest.join(". ")}.
-Total active product families: ${productsData.products.length}. Total variants (including finishes): ${productsData.products.reduce((sum, p) => sum + p.variants.length, 0)}.
+Total active product families: ${products.length}. Total variants (including finishes): ${products.reduce((sum, p) => sum + p.variants.length, 0)}.
 4 collections: Joy (round, warm), Up (streamline, trade workhorse), Art (stainless steel, architectural), Quatro (geometric, bold).
-6 finishes: Chrome, Brushed Nickel, Matte Black, Brushed Gold, Coffee Gold (Joy only), Metal Gun (Up only).`;
+6 finishes: Chrome, Brushed Nickel, Matte Black, Brushed Gold, Coffee Gold (Joy and Quatro), Metal Gun (Up and selected Joy accessories). Always follow the product index for exact availability.`;
 }
 
 function buildSystemPrompt(): string {
@@ -97,10 +102,10 @@ CRITICAL RULES:
 - If asked about a product NOT in the index, say "That product is not currently in the active Egypt catalogue" — never make up details.
 
 COLLECTIONS:
-Joy = warm, round lines, broadest range (5 finishes incl. Coffee Gold). Best for villas, hotel suites, luxury residential.
+Joy = warm, round lines, broadest product range. Best for villas, hotel suites, luxury residential.
 Up = streamlined, complete range, trade workhorse (5 finishes incl. Metal Gun). Best for hotels, compounds, developers.
 Art = stainless steel bodies, architectural statement (3 finishes). Best for architect-led projects, boutique hospitality.
-Quatro = geometric, linear, bold (3 finishes). Best for modern apartments, commercial washrooms, powder rooms.
+Quatro = geometric, linear, bold (4 finishes incl. Coffee Gold). Best for modern apartments, commercial washrooms, powder rooms.
 
 FINISH MATCHING:
 brass/gold/warm accents → Brushed Gold or Coffee Gold. chrome/silver/steel → Chrome or Brushed Nickel. dark/moody spaces → Matte Black. industrial/gunmetal → Metal Gun.
@@ -109,6 +114,7 @@ PRODUCT TYPE GUIDE:
 Basin Mixer = standard deck-mounted single-lever. Tall Basin Mixer = elevated for countertop/vessel basins. Wall-Mounted Basin Mixer = concealed in-wall, cleaner look for floating vanities.
 Concealed Shower = in-wall thermostatic with rain head + hand shower. Shower Column = exposed with bath mixer, rain head + hand shower. Free-Standing Bath Mixer = floor-mounted tub filler.
 Accessories Set = 4pc stainless steel (towel ring, robe hook, paper holder, towel bar). Bidet Spray = handheld shataff. Click-Clack Waste = pop-up basin drain. Angle Valve = 1/2" x 1/2" shut-off valve.
+Kitchen Mixer = deck-mounted kitchen tap. Shower Arm = ceiling-mounted support for an overhead shower. Bottle Trap = exposed basin waste trap.
 
 HOTEL/HOSPITALITY:
 Standard rooms → Up collection (complete, repeatable, cost-effective). Suites → Joy (warmer, more premium). Recommend "Smart Room Calculator on our trade page" for room-based scheduling.

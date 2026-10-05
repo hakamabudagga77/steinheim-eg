@@ -67,6 +67,11 @@ const nextConfig: NextConfig = {
         hostname: "steinheim-eg.com",
         pathname: "/cdn/shop/files/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.shopify.com",
+        pathname: "/s/files/**",
+      },
     ],
   },
   async headers() {
