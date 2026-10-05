@@ -91,17 +91,21 @@ async function loadLogo(): Promise<Buffer | null> {
   }
 }
 
-async function loadProductImage(slug: string, finish: string): Promise<Buffer | null> {
+async function loadProductImage(
+  slug: string,
+  finish: string,
+  assetOrigin: string
+): Promise<{ bytes: Buffer; format: "jpg" | "png" } | null> {
   try {
     const image = getProductImage(slug, finish);
     if (!image) return null;
-    if (image.startsWith("https://")) {
-      const response = await fetch(image);
-      if (!response.ok) return null;
-      return Buffer.from(await response.arrayBuffer());
-    }
-    const imgPath = join(process.cwd(), "public", image.replace(/^\//, ""));
-    return await readFile(imgPath) as unknown as Buffer;
+    const imageUrl = image.startsWith("https://") ? image : new URL(image, assetOrigin).toString();
+    const response = await fetch(imageUrl);
+    if (!response.ok) return null;
+    const bytes = Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+    const isJpeg = contentType.includes("jpeg") || (bytes[0] === 0xff && bytes[1] === 0xd8);
+    return { bytes, format: isJpeg ? "jpg" : "png" };
   } catch {
     return null;
   }
@@ -139,7 +143,12 @@ function resolveItems(project: TradeProject): ResolvedItem[] {
   });
 }
 
-async function buildPremiumPdf(project: TradeProject, includePrices: boolean, includeSpecs: boolean) {
+async function buildPremiumPdf(
+  project: TradeProject,
+  includePrices: boolean,
+  includeSpecs: boolean,
+  assetOrigin: string
+) {
   const now = new Date();
   const reference = `STM-RFQ-${now.toISOString().slice(0, 10).replace(/-/g, "")}-${String(now.getTime()).slice(-6)}`;
   const rows = resolveItems(project);
@@ -406,9 +415,11 @@ async function buildPremiumPdf(project: TradeProject, includePrices: boolean, in
 
       // Product image
       try {
-        const imgBytes = await loadProductImage(row.product.slug, row.variant.finish);
-        if (imgBytes) {
-          const img = await doc.embedPng(imgBytes);
+        const productImage = await loadProductImage(row.product.slug, row.variant.finish, assetOrigin);
+        if (productImage) {
+          const img = productImage.format === "jpg"
+            ? await doc.embedJpg(productImage.bytes)
+            : await doc.embedPng(productImage.bytes);
           const imgSize = 48;
           const imgDims = img.scaleToFit(imgSize, imgSize);
           currentPage.drawRectangle({
@@ -688,7 +699,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const { pdf, reference } = await buildPremiumPdf(project, includePrices, includeSpecs);
+  const { pdf, reference } = await buildPremiumPdf(
+    project,
+    includePrices,
+    includeSpecs,
+    new URL(request.url).origin
+  );
   const safeName = project.details.projectName
     .replace(/[^a-z0-9]+/gi, "-")
     .replace(/^-|-$/g, "")
