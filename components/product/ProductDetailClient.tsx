@@ -18,12 +18,13 @@ import { useRecordProductView } from "@/components/product/useRecentlyViewed";
 import { useTradeProject } from "@/components/catalogue/TradeProjectContext";
 import { useCart } from "@/components/cart/CartContext";
 import { getCollectionContextImage, getFinishDiscImage, getProductImage } from "@/data/images";
-import { formatPrice, getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
+import { getFinishById, getProductBySlug, getProductsBySeries, getSeriesById } from "@/lib/utils";
 import { hasActiveRoomNeeds } from "@/lib/trade-project";
 import { trackViewItem } from "@/lib/analytics";
 import { cacheLivePrices } from "@/lib/live-prices";
+import ProductPrice from "@/components/product/ProductPrice";
 
-type LiveVariantData = { finish: string; price: number; inventory: number; inStock: boolean };
+type LiveVariantData = { finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean };
 type LiveProductData = { slug: string; variants: LiveVariantData[] } | null;
 const productInfoTabs = ["description", "detail", "downloads"] as const;
 
@@ -217,7 +218,11 @@ export default function ProductDetailClient({ slug, liveData = null }: { slug: s
                 </h1>
 
                 <div className="mt-4 flex items-center gap-3 sm:mt-6">
-                  <p className="text-[20px] font-medium sm:text-[24px]">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+                  <ProductPrice
+                    price={liveVariant?.price ?? variant.price}
+                    compareAtPrice={liveVariant ? liveVariant.compareAtPrice : variant.compareAtPrice}
+                    priceClassName="text-[20px] font-medium sm:text-[24px]"
+                  />
                   {liveVariant && liveVariant.inStock === false && (
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-red-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />

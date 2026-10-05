@@ -11,7 +11,7 @@ import PageTransition from "@/components/layout/PageTransition";
 import { getFinishDiscImage } from "@/data/images";
 import { getAllFinishes, getAllProducts, getAllSeries, getProductTypes, getSeriesById, type Product } from "@/lib/utils";
 
-type LiveVariant = { finish: string; price: number; inventory: number; inStock: boolean };
+type LiveVariant = { finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean };
 type LiveData = Record<string, { variants: LiveVariant[] }>;
 type SortOption = "featured" | "price-asc" | "price-desc" | "name-asc";
 

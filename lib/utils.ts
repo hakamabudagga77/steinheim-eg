@@ -7,6 +7,7 @@ export interface Variant {
   finish: string;
   model: string;
   price: number;
+  compareAtPrice?: number;
 }
 
 export interface Product {

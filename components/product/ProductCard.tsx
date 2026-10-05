@@ -6,15 +6,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getFinishDiscImage, getProductImage } from "@/data/images";
-import { formatPrice, getFinishById, getSeriesById, type Product } from "@/lib/utils";
+import { getFinishById, getSeriesById, type Product } from "@/lib/utils";
 import { cacheLivePrices } from "@/lib/live-prices";
 import { useCart } from "@/components/cart/CartContext";
 import { useWishlist } from "@/components/wishlist/WishlistContext";
 import { useComparison } from "@/components/comparison/ComparisonContext";
 import QuickViewModal from "@/components/product/QuickViewModal";
+import ProductPrice from "@/components/product/ProductPrice";
 import type { RoomGroup } from "@/lib/trade-project";
 
-type LiveVariants = Array<{ finish: string; price: number; inventory: number; inStock: boolean }>;
+type LiveVariants = Array<{ finish: string; price: number; compareAtPrice: number | null; inventory: number; inStock: boolean }>;
 
 // Memoized: rendered in grids of 20+ cards, so unrelated page-state changes
 // (modals, finish selectors) must not re-render every card.
@@ -173,7 +174,11 @@ function ProductCard({
             {priceLoading ? (
               <span className="inline-block h-[13px] w-16 animate-pulse rounded-sm bg-black/10" aria-hidden="true" />
             ) : (
-              <p className="text-[14px] font-medium">{formatPrice(liveVariant?.price ?? variant.price)}</p>
+              <ProductPrice
+                price={liveVariant?.price ?? variant.price}
+                compareAtPrice={liveVariant ? liveVariant.compareAtPrice : variant.compareAtPrice}
+                priceClassName="text-[14px] font-medium"
+              />
             )}
             {!priceLoading && liveVariant && (
               <span className={`inline-flex items-center gap-1 text-[9px] font-medium uppercase tracking-[0.08em] ${liveVariant.inStock ? "text-emerald-600" : "text-red-400"}`}>

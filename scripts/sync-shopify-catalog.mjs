@@ -189,10 +189,13 @@ export function buildGeneratedCatalog(shopifyProducts, productsData, finishesDat
           images[slug] ??= {};
           images[slug][finish] = image;
         }
+        const price = Number.parseFloat(variant.price) || 0;
+        const compareAtPrice = Number.parseFloat(variant.compare_at_price);
         return {
           finish,
           model: String(variant.sku || `shopify-${variant.id}`),
-          price: Number.parseFloat(variant.price) || 0,
+          price,
+          ...(Number.isFinite(compareAtPrice) && compareAtPrice > price ? { compareAtPrice } : {}),
         };
       })
       .filter(Boolean);
