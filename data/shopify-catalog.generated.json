@@ -7,10 +7,10 @@
       "type": "shower-arm",
       "variants": [
         {
-          "finish": "brushed-gold",
-          "model": "STM-60-ARC201-004",
-          "price": 2200,
-          "compareAtPrice": 2600
+          "finish": "chrome",
+          "model": "STM-60-ARC201-001",
+          "price": 1800,
+          "compareAtPrice": 2100
         },
         {
           "finish": "brushed-nickel",
@@ -19,22 +19,22 @@
           "compareAtPrice": 2350
         },
         {
-          "finish": "chrome",
-          "model": "STM-60-ARC201-001",
-          "price": 1800,
-          "compareAtPrice": 2100
+          "finish": "matte-black",
+          "model": "STM-60-ARC201-003",
+          "price": 2000,
+          "compareAtPrice": 2350
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-60-ARC201-004",
+          "price": 2200,
+          "compareAtPrice": 2600
         },
         {
           "finish": "coffee-gold",
           "model": "STM-60-ARC201-009",
           "price": 2200,
           "compareAtPrice": 2600
-        },
-        {
-          "finish": "matte-black",
-          "model": "STM-60-ARC201-003",
-          "price": 2000,
-          "compareAtPrice": 2350
         }
       ]
     },
@@ -59,10 +59,10 @@
       "type": "bottle-trap",
       "variants": [
         {
-          "finish": "brushed-gold",
-          "model": "STM-60-BTM114-004",
-          "price": 2500,
-          "compareAtPrice": 2950
+          "finish": "chrome",
+          "model": "STM-60-BTM114-001",
+          "price": 1750,
+          "compareAtPrice": 2050
         },
         {
           "finish": "brushed-nickel",
@@ -71,22 +71,22 @@
           "compareAtPrice": 2650
         },
         {
-          "finish": "chrome",
-          "model": "STM-60-BTM114-001",
-          "price": 1750,
-          "compareAtPrice": 2050
+          "finish": "matte-black",
+          "model": "STM-60-BTM114-003",
+          "price": 2250,
+          "compareAtPrice": 2650
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-60-BTM114-004",
+          "price": 2500,
+          "compareAtPrice": 2950
         },
         {
           "finish": "coffee-gold",
           "model": "STM-60-BTM114-009",
           "price": 2750,
           "compareAtPrice": 3250
-        },
-        {
-          "finish": "matte-black",
-          "model": "STM-60-BTM114-003",
-          "price": 2250,
-          "compareAtPrice": 2650
         },
         {
           "finish": "metal-gun",
@@ -103,10 +103,10 @@
       "type": "shower-arm",
       "variants": [
         {
-          "finish": "brushed-gold",
-          "model": "STM-50-ARS201-004",
-          "price": 2200,
-          "compareAtPrice": 2600
+          "finish": "chrome",
+          "model": "STM-50-ARS201-001",
+          "price": 1800,
+          "compareAtPrice": 2100
         },
         {
           "finish": "brushed-nickel",
@@ -115,16 +115,16 @@
           "compareAtPrice": 2350
         },
         {
-          "finish": "chrome",
-          "model": "STM-50-ARS201-001",
-          "price": 1800,
-          "compareAtPrice": 2100
-        },
-        {
           "finish": "matte-black",
           "model": "STM-50-ARS201-003",
           "price": 2000,
           "compareAtPrice": 2350
+        },
+        {
+          "finish": "brushed-gold",
+          "model": "STM-50-ARS201-004",
+          "price": 2200,
+          "compareAtPrice": 2600
         },
         {
           "finish": "metal-gun",

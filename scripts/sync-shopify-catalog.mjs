@@ -17,6 +17,7 @@ const FINISH_ALIASES = {
   "coffee-gold": "Coffee Gold",
   "metal-gun": "Gun Metal Grey",
 };
+const FINISH_PRIORITY = new Map(Object.keys(FINISH_ALIASES).map((finish, index) => [finish, index]));
 
 const TYPE_ALIASES = new Map([
   ["kitchen mixer", "kitchen-mixer"],
@@ -68,6 +69,12 @@ function normalizeFinish(name) {
     return "metal-gun";
   }
   return slugify(normalized);
+}
+
+function compareFinishes(a, b) {
+  const aPriority = FINISH_PRIORITY.get(a) ?? Number.MAX_SAFE_INTEGER;
+  const bPriority = FINISH_PRIORITY.get(b) ?? Number.MAX_SAFE_INTEGER;
+  return aPriority - bPriority || a.localeCompare(b);
 }
 
 function inferFinish(variant, finishesByCode) {
@@ -208,7 +215,7 @@ export function buildGeneratedCatalog(shopifyProducts, productsData, finishesDat
     if (curated) {
       const existingFinishes = new Set(curated.variants.map((variant) => variant.finish));
       const additions = normalizedVariants.filter((variant) => !existingFinishes.has(variant.finish));
-      if (additions.length > 0) variantAdditions[slug] = additions.sort((a, b) => a.finish.localeCompare(b.finish));
+      if (additions.length > 0) variantAdditions[slug] = additions.sort((a, b) => compareFinishes(a.finish, b.finish));
       if (curatedHandles[slug] !== shopifyProduct.handle) handles[slug] = shopifyProduct.handle;
       continue;
     }
@@ -218,7 +225,7 @@ export function buildGeneratedCatalog(shopifyProducts, productsData, finishesDat
       series,
       name: cleanProductName(shopifyProduct.title, series),
       type: inferType(shopifyProduct),
-      variants: normalizedVariants.sort((a, b) => a.finish.localeCompare(b.finish)),
+      variants: normalizedVariants.sort((a, b) => compareFinishes(a.finish, b.finish)),
     });
     handles[slug] = shopifyProduct.handle;
   }

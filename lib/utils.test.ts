@@ -64,6 +64,17 @@ describe("getAllProducts", () => {
     expect(getSeriesById("quatro")?.finishes).toContain("coffee-gold");
     expect(getFinishById("coffee-gold")?.series).toContain("quatro");
   });
+
+  it("starts generated products with Chrome when available", () => {
+    expect(getProductBySlug("joy-series-ceiling-shower-arm")?.variants[0].finish).toBe("chrome");
+    expect(getProductBySlug("up-series-ceiling-shower-arm")?.variants[0].finish).toBe("chrome");
+    expect(getProductBySlug("joy-series-minimal-bottle-trap")?.variants[0].finish).toBe("chrome");
+  });
+
+  it("uses the only available finish when Chrome is unavailable", () => {
+    expect(getProductBySlug("joy-series-kitchen-sink-mixer-with-pull-out-shower")?.variants[0].finish)
+      .toBe("brushed-nickel");
+  });
 });
 
 describe("getAllFinishes / getFinishById", () => {
