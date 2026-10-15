@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowUpRight, BriefcaseBusiness, PackageX, Truck } from "lucide-react";
 import DigestTestButton from "@/components/admin/DigestTestButton";
+import RealtimePulse from "@/components/admin/RealtimePulse";
 import type { ContactLead } from "@/lib/contact-leads";
 import type { ShopifyOrder, ShopifyProduct } from "@/lib/shopify-client";
 import type { TradeLead } from "@/lib/trade-leads";
@@ -283,7 +284,10 @@ export default function AdminDashboardPage() {
           <p className="text-[11px] uppercase tracking-[0.35em] text-white/30">Steinheim Egypt</p>
           <h1 className="mt-2 font-heading text-[34px] tracking-[-0.02em] text-white">Good to see you.</h1>
         </div>
-        <DigestTestButton />
+        <div className="flex flex-wrap items-center gap-3">
+          <RealtimePulse variant="compact" />
+          <DigestTestButton />
+        </div>
       </div>
 
       {/* Load failure banner — a dead endpoint shouldn't show a silent blank */}

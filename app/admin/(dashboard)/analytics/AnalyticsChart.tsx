@@ -1,6 +1,6 @@
 "use client";
 
-import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
+import { AreaChart, Area, Line, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 // Split out so recharts (~120 KB gzip) loads on demand via next/dynamic
 // instead of in the analytics page's initial bundle. JSX is verbatim from the
@@ -11,7 +11,17 @@ function fmtDate(yyyymmdd: string) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-export function VisitorsAreaChart({ data }: { data: { date: string; users: number; sessions: number }[] }) {
+interface ChartPoint {
+  date: string;
+  users: number;
+  sessions: number;
+  prevUsers?: number;
+  prevSessions?: number;
+}
+
+export function VisitorsAreaChart({ data }: { data: ChartPoint[] }) {
+  const hasPrevious = data.some((d) => d.prevUsers !== undefined);
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
@@ -42,6 +52,14 @@ export function VisitorsAreaChart({ data }: { data: { date: string; users: numbe
         />
         <Area type="monotone" dataKey="users" stroke="#60a5fa" strokeWidth={2} fill="url(#visitorsFill)" />
         <Area type="monotone" dataKey="sessions" stroke="#a78bfa" strokeWidth={1.5} fill="transparent" />
+        {hasPrevious && (
+          <>
+            {/* Same day-index position as the current period, not the same
+                calendar date -- see previousDailyUsers in ga4-client.ts. */}
+            <Line type="monotone" dataKey="prevUsers" stroke="rgba(96,165,250,0.4)" strokeWidth={1.5} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
+            <Line type="monotone" dataKey="prevSessions" stroke="rgba(167,139,250,0.4)" strokeWidth={1.5} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
+          </>
+        )}
       </AreaChart>
     </ResponsiveContainer>
   );
